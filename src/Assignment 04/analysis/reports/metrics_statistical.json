@@ -1,0 +1,350 @@
+{
+  "multi_seed": {
+    "customer_comments": {
+      "numpy": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "values": [
+          0.8831321754489255,
+          0.8813659110980276,
+          0.8793052693553135,
+          0.8798940241389461,
+          0.8822490432734766
+        ],
+        "mean": 0.881189284662938,
+        "std": 0.0015934493497467709
+      },
+      "pytorch": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "values": [
+          0.8798940241389461,
+          0.8766558728289667,
+          0.8863703267589049,
+          0.8822490432734766,
+          0.8804827789225788
+        ],
+        "mean": 0.8811304091845746,
+        "std": 0.0035594110097596403
+      },
+      "tensorflow": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "values": [
+          0.8781277597880482,
+          0.8860759493670886,
+          0.880777156314395,
+          0.8801884015307624,
+          0.877833382396232
+        ],
+        "mean": 0.8806005298793054,
+        "std": 0.003314851518459622
+      }
+    },
+    "diabetes": {
+      "numpy": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "values": [
+          0.9700416088765603,
+          0.9686546463245492,
+          0.9688626907073509,
+          0.9664355062413315,
+          0.9687933425797504
+        ],
+        "mean": 0.9685575589459084,
+        "std": 0.0013099272070033474
+      },
+      "pytorch": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "values": [
+          0.9701803051317615,
+          0.9703190013869626,
+          0.9701109570041608,
+          0.9701803051317615,
+          0.9706657420249654
+        ],
+        "mean": 0.9702912621359223,
+        "std": 0.0002225631974463648
+      },
+      "tensorflow": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "values": [
+          0.9676144244105409,
+          0.969625520110957,
+          0.9700416088765603,
+          0.9706657420249654,
+          0.9692094313453536
+        ],
+        "mean": 0.9694313453536754,
+        "std": 0.0011493811472387217
+      }
+    },
+    "house_price": {
+      "numpy": {
+        "metric": "r2",
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "values": [
+          0.3992260335708506,
+          0.4033165628034553,
+          0.40040694110001407
+        ],
+        "mean": 0.40098317915810666,
+        "std": 0.0021052660343514958
+      },
+      "pytorch": {
+        "metric": "r2",
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "values": [
+          0.4033473079245209,
+          0.40037539729534377,
+          0.4018440412898452
+        ],
+        "mean": 0.40185558216990325,
+        "std": 0.0014859889269063801
+      },
+      "tensorflow": {
+        "metric": "r2",
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "values": [
+          0.38785804857772455,
+          0.3977913552336927,
+          0.3976781557150145
+        ],
+        "mean": 0.3944425198421439,
+        "std": 0.005702600275903143
+      }
+    },
+    "mnist": {
+      "pytorch": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "values": [
+          0.9906,
+          0.9917,
+          0.9912
+        ],
+        "mean": 0.9911666666666666,
+        "std": 0.0005507570547286033
+      },
+      "tensorflow": {
+        "metric": "accuracy",
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "values": [
+          0.9902,
+          0.9896,
+          0.9872
+        ],
+        "mean": 0.989,
+        "std": 0.0015874507866387685
+      }
+    }
+  },
+  "mcnemar": {
+    "customer_comments": [
+      {
+        "pair": [
+          "numpy",
+          "pytorch"
+        ],
+        "b": 77,
+        "c": 88,
+        "statistic": 77.0,
+        "p_value": 0.4363682280537135,
+        "significant": false,
+        "method": "exact"
+      },
+      {
+        "pair": [
+          "numpy",
+          "tensorflow"
+        ],
+        "b": 74,
+        "c": 91,
+        "statistic": 74.0,
+        "p_value": 0.2127857970115208,
+        "significant": false,
+        "method": "exact"
+      },
+      {
+        "pair": [
+          "pytorch",
+          "tensorflow"
+        ],
+        "b": 89,
+        "c": 95,
+        "statistic": 89.0,
+        "p_value": 0.7125307737127085,
+        "significant": false,
+        "method": "exact"
+      }
+    ],
+    "diabetes": [
+      {
+        "pair": [
+          "numpy",
+          "pytorch"
+        ],
+        "b": 19,
+        "c": 17,
+        "statistic": 17.0,
+        "p_value": 0.8679394004284404,
+        "significant": false,
+        "method": "exact"
+      },
+      {
+        "pair": [
+          "numpy",
+          "tensorflow"
+        ],
+        "b": 22,
+        "c": 57,
+        "statistic": 22.0,
+        "p_value": 0.00010259635179423318,
+        "significant": true,
+        "method": "exact"
+      },
+      {
+        "pair": [
+          "pytorch",
+          "tensorflow"
+        ],
+        "b": 27,
+        "c": 64,
+        "statistic": 27.0,
+        "p_value": 0.00013216326274489117,
+        "significant": true,
+        "method": "exact"
+      }
+    ],
+    "mnist": [
+      {
+        "pair": [
+          "pytorch",
+          "tensorflow"
+        ],
+        "b": 39,
+        "c": 43,
+        "statistic": 39.0,
+        "p_value": 0.740652841345783,
+        "significant": false,
+        "method": "exact"
+      }
+    ]
+  },
+  "wilson": {
+    "customer_comments": {
+      "numpy": {
+        "accuracy": 0.8831321754489255,
+        "n": 3397,
+        "lo": 0.8718934330382663,
+        "hi": 0.8935053753209564
+      },
+      "pytorch": {
+        "accuracy": 0.8798940241389461,
+        "n": 3397,
+        "lo": 0.8685307085611732,
+        "hi": 0.8903991125587477
+      },
+      "tensorflow": {
+        "accuracy": 0.8781277597880482,
+        "n": 3397,
+        "lo": 0.8666975782288184,
+        "hi": 0.8887037043969377
+      }
+    },
+    "diabetes": {
+      "numpy": {
+        "accuracy": 0.9700416088765603,
+        "n": 14420,
+        "lo": 0.9671315774904106,
+        "hi": 0.9727012706937339
+      },
+      "pytorch": {
+        "accuracy": 0.9701803051317615,
+        "n": 14420,
+        "lo": 0.96727647775127,
+        "hi": 0.9728336890661541
+      },
+      "tensorflow": {
+        "accuracy": 0.9676144244105409,
+        "n": 14420,
+        "lo": 0.9645982890347216,
+        "hi": 0.9703814830670321
+      }
+    },
+    "mnist": {
+      "pytorch": {
+        "accuracy": 0.9906,
+        "n": 10000,
+        "lo": 0.9885113090469386,
+        "hi": 0.9923119117517536
+      },
+      "tensorflow": {
+        "accuracy": 0.9902,
+        "n": 10000,
+        "lo": 0.9880722440525997,
+        "hi": 0.9919512839447888
+      }
+    }
+  },
+  "notes": "Da hat giong theo tung mien: customer_comments 5 hat giong [42, 43, 44, 45, 46], diabetes 5 hat giong [42, 43, 44, 45, 46], house_price 3 hat giong [42, 43, 44], mnist 3 hat giong [42, 43, 44]. Hai mien customer_comments va diabetes giu du nam hat giong vi bien do chenh lech giua cac khung o do sit sao nhat; house_price va mnist dung ba hat giong vi may dang chay song song nhieu notebook nang va mot lan chay truoc do da that bai voi MemoryError o cap he thong. Do lech chuan uoc luong tu ba quan sat kem chac hon tu nam, va bao cao noi ro dieu do thay vi lam ngo. Kien truc, sieu tham so va phep chia train/val/test giu nguyen theo CONTRACT.md, chi hat giong khoi tao va thu tu xao tron lo thay doi. Phep chia du lieu co dinh o random_state=42 vi kiem dinh McNemar bat buoc hai mo hinh chay tren cung cac mau. Ti so (khoang cach khung lon nhat)/(do lech chuan lon nhat) theo mien: customer_comments 0.17, diabetes 1.32, house_price 1.30, mnist 1.36. McNemar: ban CHINH XAC qua scipy.stats.binomtest vi moi truong .venv khong co statsmodels, dung phuong an du phong ma CONTRACT.md Muc 8.1 quy dinh; statistic = min(b, c); 2/7 cap khac biet co y nghia o alpha=0.05; 2/7 cap cho ket luan nhat quan tren ca nam hat giong. McNemar va Wilson deu tinh tren du doan cua hat giong 42, dung cau hinh ma cac bang doi chuan o cac chuong truoc da cong bo. house_price la bai toan hoi quy nen khong co McNemar va khong co Wilson; chi so la R2 tren thang log. Mien mnist chi lap lai hai mo hinh framework; hai mo hinh 2D thuan NumPy bi bo qua co chu y vi mot lan chay da ton 120s va 148s. SAI LECH CO GHI NHAN: notebook mnist/02 chay PyTorch tren CPU, notebook nay chay tren GPU theo CONTRACT.md Muc 1, nen con so cua seed 42 o mien mnist khong trung khit voi 0.9898 da cong bo; kien truc, phep chia, sieu tham so va thu tu lo deu giu nguyen. Rieng TxtConv1D duoc them co optimize=True cho ba loi goi einsum (do duoc 3x den 7.5x nhanh hon, sai lech tuong doi khoang 1e-14, thuan tuy tai ket hop dau phay dong); hai ngan xep NumPy con lai von da dung co nay. Cac lop NumPy duoc sao chep tu notebook goc va them tien to Txt/Tab/Reg de bon ngan xep cung ton tai trong mot notebook; phan toan hoc giu nguyen. Lop MnistCNN duoc nap truc tiep tu mnist/models/mnist_cnn_def.py. Thoi gian chay khong the so sanh giua cac khung vi PyTorch chay GPU con TensorFlow va NumPy chay CPU."
+}
