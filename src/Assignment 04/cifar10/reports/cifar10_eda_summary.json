@@ -1,0 +1,97 @@
+{
+  "domain": "cifar10",
+  "n_train_total": 50000,
+  "n_test_total": 10000,
+  "n_classes": 10,
+  "class_names_en": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ],
+  "class_names_vi": [
+    "máy bay",
+    "ô tô",
+    "chim",
+    "mèo",
+    "hươu",
+    "chó",
+    "ếch",
+    "ngựa",
+    "tàu thủy",
+    "xe tải"
+  ],
+  "class_counts_train": [
+    5000,
+    5000,
+    5000,
+    5000,
+    5000,
+    5000,
+    5000,
+    5000,
+    5000,
+    5000
+  ],
+  "class_counts_test": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ],
+  "balanced_train": true,
+  "balanced_test": true,
+  "split": {
+    "n_train": 40000,
+    "n_val": 10000,
+    "test_size": 0.2,
+    "stratify": true,
+    "random_state": 42
+  },
+  "preprocess": {
+    "mean_per_channel": [
+      0.4910935266352635,
+      0.48214713340609683,
+      0.44657537683823534
+    ],
+    "std_per_channel": [
+      0.2470076650819681,
+      0.2435435304637328,
+      0.2616426137008899
+    ],
+    "mean_scalar": 0.4732720122931985,
+    "std_scalar": 0.25158973192948225,
+    "scale": 255.0
+  },
+  "difficulty": {
+    "within_class_rms": [
+      0.2464796832993667,
+      0.2624759053540301,
+      0.229618741212896,
+      0.2551591316871504,
+      0.21088100503117313,
+      0.245838776451554,
+      0.22177373178866372,
+      0.24302783281426518,
+      0.23194530947865274,
+      0.25078411435243786
+    ],
+    "within_class_rms_mean": 0.239798423147019,
+    "between_class_rms": 0.06517166500335964,
+    "fisher_like_ratio": 0.2717768705401506,
+    "near_constant_pixels": 0,
+    "n_pixel_positions": 3072
+  }
+}
