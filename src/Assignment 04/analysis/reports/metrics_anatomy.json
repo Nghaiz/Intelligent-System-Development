@@ -1,0 +1,288 @@
+{
+  "calibration": {
+    "mnist": {
+      "ece_before": 0.00223162434399124,
+      "ece_after": 0.0017585297226905452,
+      "temperature": 1.2317585945129395,
+      "n_bins": 15,
+      "bin_acc": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.2,
+        0.5,
+        0.42105263157894735,
+        0.5862068965517241,
+        0.5,
+        0.7142857142857143,
+        0.7837837837837838,
+        0.8135593220338984,
+        0.8674698795180723,
+        0.9977342945417096
+      ],
+      "bin_conf": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.3727819204330444,
+        0.4195282310247421,
+        0.5126418753674156,
+        0.56712897892656,
+        0.6343981822331747,
+        0.704307530607496,
+        0.7645205049901396,
+        0.8310972694623269,
+        0.9050495782530451,
+        0.9987955208296142
+      ],
+      "bin_count": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        5,
+        6,
+        19,
+        29,
+        24,
+        28,
+        37,
+        59,
+        83,
+        9710
+      ],
+      "bin_acc_after": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.375,
+        0.25,
+        0.5517241379310345,
+        0.5862068965517241,
+        0.6666666666666666,
+        0.75,
+        0.8125,
+        0.873015873015873,
+        0.8974358974358975,
+        0.9985446985446985
+      ],
+      "bin_conf_after": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.31419622898101807,
+        0.3606826402246952,
+        0.4439675249159336,
+        0.5074121910950233,
+        0.5688555035097845,
+        0.6365206422227802,
+        0.7008469809185375,
+        0.7707473586002985,
+        0.8344588327029395,
+        0.9016636997206599,
+        0.9979489438437127
+      ],
+      "bin_count_after": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        8,
+        8,
+        29,
+        29,
+        33,
+        44,
+        48,
+        63,
+        117,
+        9620
+      ],
+      "test_accuracy": 0.9898,
+      "mean_confidence_before": 0.9916259802073241,
+      "mean_confidence_after": 0.9885135881364345,
+      "nll_test_before": 0.030117981135845184,
+      "nll_test_after": 0.030098095536231995,
+      "nll_val_before": 0.03925544396042824,
+      "nll_val_after": 0.037711549550294876,
+      "fit_split": "validation",
+      "n_val": 12000,
+      "n_test": 10000,
+      "checkpoint_sha1": "c22e2ee6d3ac",
+      "high_confidence_tail": {
+        "n_wrong_total": 102,
+        "max_confidence_among_wrong": 0.9999234676361084,
+        "by_threshold": [
+          {
+            "threshold": 0.9,
+            "n": 9763,
+            "n_wrong": 27,
+            "accuracy": 0.99723445662194
+          },
+          {
+            "threshold": 0.9333333333333333,
+            "n": 9710,
+            "n_wrong": 22,
+            "accuracy": 0.9977342945417096
+          },
+          {
+            "threshold": 0.99,
+            "n": 9397,
+            "n_wrong": 6,
+            "accuracy": 0.9993614983505374
+          },
+          {
+            "threshold": 0.999,
+            "n": 8725,
+            "n_wrong": 2,
+            "accuracy": 0.9997707736389685
+          },
+          {
+            "threshold": 0.9999,
+            "n": 7508,
+            "n_wrong": 1,
+            "accuracy": 0.9998668087373468
+          }
+        ],
+        "ece_if_high_conf_errors_fixed": 0.0016316243439913015,
+        "ece_if_last_bin_errors_fixed": 0.002370722892880468
+      }
+    }
+  },
+  "filters": {
+    "mnist": {
+      "n_filters": 32,
+      "shape": [
+        1,
+        3,
+        3
+      ],
+      "abs_mean": 0.16999393701553345,
+      "std": 0.19887511432170868,
+      "w_min": -0.42659568786621094,
+      "w_max": 0.4057791531085968,
+      "kernel_sum_abs_mean": 0.31879931688308716,
+      "n_near_zero_sum": 11
+    }
+  },
+  "occlusion": {
+    "mnist": [
+      {
+        "index": 10,
+        "true": 0,
+        "pred": 0,
+        "prob_drop_max": 0.00010800361633300781,
+        "selection": "Dung, tin cay cao nhat",
+        "confidence": 1.0,
+        "prob_true_original": 1.0,
+        "prob_true_min": 0.999891996383667,
+        "prob_true_max": 1.0,
+        "argmin_row_col": [
+          12,
+          12
+        ],
+        "argmax_row_col": [
+          0,
+          20
+        ],
+        "grid_shape": [
+          6,
+          6
+        ]
+      },
+      {
+        "index": 3558,
+        "true": 5,
+        "pred": 5,
+        "prob_drop_max": 0.3500044010579586,
+        "selection": "Dung, tin cay thap nhat",
+        "confidence": 0.3917364478111267,
+        "prob_true_original": 0.3917364478111267,
+        "prob_true_min": 0.041732046753168106,
+        "prob_true_max": 0.7346017360687256,
+        "argmin_row_col": [
+          8,
+          8
+        ],
+        "argmax_row_col": [
+          20,
+          12
+        ],
+        "grid_shape": [
+          6,
+          6
+        ]
+      },
+      {
+        "index": 2654,
+        "true": 6,
+        "pred": 1,
+        "prob_drop_max": 4.0865591472538654e-05,
+        "selection": "SAI, tin cay cao nhat",
+        "confidence": 0.9999234676361084,
+        "prob_true_original": 4.521550363278948e-05,
+        "prob_true_min": 4.349912160250824e-06,
+        "prob_true_max": 0.039025068283081055,
+        "argmin_row_col": [
+          4,
+          20
+        ],
+        "argmax_row_col": [
+          12,
+          16
+        ],
+        "grid_shape": [
+          6,
+          6
+        ]
+      },
+      {
+        "index": 3005,
+        "true": 9,
+        "pred": 8,
+        "prob_drop_max": 0.25436567433644086,
+        "selection": "SAI, tin cay thap nhat",
+        "confidence": 0.34009885787963867,
+        "prob_true_original": 0.25571632385253906,
+        "prob_true_min": 0.0013506495160982013,
+        "prob_true_max": 0.549513578414917,
+        "argmin_row_col": [
+          8,
+          20
+        ],
+        "argmax_row_col": [
+          20,
+          4
+        ],
+        "grid_shape": [
+          6,
+          6
+        ]
+      }
+    ]
+  },
+  "config": {
+    "n_bins": 15,
+    "occlusion_patch": 8,
+    "occlusion_stride": 4,
+    "occlusion_grey_value": 0.5,
+    "random_seed": 42,
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "torch_version": "2.13.0+cu126",
+    "temperature_fit_split": "validation",
+    "temperature_optimizer": "L-BFGS tren log T",
+    "datasets_included": [
+      "mnist"
+    ]
+  },
+  "notes": "Notebook 05_model_anatomy.ipynb mo xe mo hinh CNN da huan luyen, KHONG huan luyen lai: trong so nap tu mnist/models/mnist_cnn_pytorch.pt. Suy luan tren GPU (RTX 4060 Laptop) voi model.eval() nen Dropout tat va BatchNorm dong bang. HIEU CHINH XAC SUAT: ECE dung 15 khoang deu tren [0,1], khoang nua mo [lo, hi); khoang rong dong gop 0. Nhiet do T duoc khop BANG L-BFGS TREN TAP VALIDATION VA CHI TREN TAP VALIDATION (12 000 anh MNIST tach ra bang train_test_split(test_size=0.2, stratify=y, random_state=42), dung phep chia da dung luc huan luyen); tap test 10 000 anh chi dung de BAO CAO ECE truoc va sau. Khop T tren tap test se la ro ri du lieu va lam vo hieu toan bo muc nay. T duoc tham so hoa qua log T de rang buoc T > 0 tu dong. Vi T > 0 khong doi thu tu logit nen accuracy khong doi sau hieu chinh, va dieu nay da duoc kiem tra trong output. CANH BAO KHI DOC ECE: ECE la mot trung binh co trong so tren toan bo tap test, nen mot nhom nho du doan sai voi do tin cay cao gan nhu khong lam no thay doi. Voi MNIST, 97,1% so anh nam trong khoang cuoi cung nen khoang do chi phoi ECE. Do do ECE thap KHONG cho phep tin vao tung du doan rieng le; phan high_confidence_tail trong tep nay ghi lai so anh sai theo tung nguong do tin cay de doc gia danh gia duoc rui ro o duoi. Dac biet, gia dinh sua het cac anh sai trong khoang cuoi thanh dung se lam ECE TANG chu khong giam, vi khoang do chuyen tu hoi qua tu tin sang hoi thieu tu tin: mot mo hinh chinh xac hon van co the co ECE te hon. BO LOC TANG MOT: moi kernel duoc chuan hoa DOC LAP khi hien thi (MNIST dung thang phan ky RdBu_r voi gioi han doi xung +-max|w| cua rieng kernel do; anh RGB chuan hoa chung ba kenh trong pham vi tung kernel de giu quan he mau). s_f la tong trong so, do dap ung voi vung dong nhat. Bang doi chieu voi nam mau 3x3 kinh dien chi la cach sap xep tho: |cos| lon nhat trung binh chi 0,5346 va 25/32 kernel duoi 0,6, nen KHONG duoc doc bang do nhu tuyen bo rang mang hoc ra dung bo loc Sobel. BAN DO DAC TRUNG: chon anh test dau tien duoc phan loai DUNG (tat dinh). Moi khoi ve 8 kenh co kich hoat trung binh lon nhat tren chinh anh do, khong phai 8 kenh dau, vi sau ReLU nhieu kenh tat han tren mot anh cu the. DO NHAY CHE KHUAT: o vuong xam gia tri 0,5 tren thang [0,1], kich thuoc 8x8, buoc nhay 4, ap TRUOC khi chuan hoa. Chi lay cac vi tri ma o che nam tron trong anh, nen luoi la 6x6 = 36 vi tri voi anh 28x28. Bon anh moi mien duoc chon bang quy tac 2x2 TAT DINH tren hai truc dung/sai va tu tin/do du: (1) dung voi do tin cay cao nhat, (2) dung voi do tin cay thap nhat, (3) sai voi do tin cay cao nhat, (4) sai voi do tin cay thap nhat; dong hang bang chi so nho nhat. Chon nhu vay de bao phu du cac che do hanh xu, va truong hop (3) chinh la hien tuong 'sai voi do tin cay cao' ma Chuong 6 va 7 mo ta. prob_drop_max = prob_true_original - prob_true_min, co the rat nho voi anh ma mo hinh vo cung tu tin, va co the am y nghia khi che lam TANG xac suat lop dung (truong hop do doc o prob_true_max). HAN CHE CAN GHI NHAN: (a) o che xam 0,5 la kich thich nam ngoai phan phoi huan luyen cua MNIST (nen 0, net gan 1), nen mot phan phan ung co the la phan ung voi su bat thuong chu khong phai voi viec mat thong tin; (b) luoi 6x6 buoc 4 rat tho tren anh 28x28 nen chi dinh vi duoc o muc vung, khong o muc net; (c) voi anh ma mo hinh da cuc ky tu tin thi do nhay che khuat gan nhu khong do duoc gi, phuong phap chi co suc phan giai o nhung anh mo hinh con do du; (d) chin khoang ECE o giua chi chua tong cong 290 anh nen acc theo khoang o do rat nhieu va khong nen doc nhu bang chung."
+}
