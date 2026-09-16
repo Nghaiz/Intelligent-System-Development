@@ -18,23 +18,43 @@ vì trình dựng báo cáo (`Report/Assignment 04/build_report.py`) đọc chú
 
 ## 1. Môi trường
 
-| Thư viện | Phiên bản đã cài |
-|---|---|
-| Python | 3.13.7 |
-| NumPy | 2.4.0 |
-| pandas | 2.3.3 |
-| scikit-learn | 1.9.0 |
-| PyTorch | 2.9.1 (**CPU only** — không có CUDA/MPS) |
-| TensorFlow / Keras | 2.21.0 / 3.15.1 |
-| matplotlib | 3.10.8 |
-| seaborn | 0.13.2 |
+Toàn bộ chạy trong **một venv duy nhất**: `D:/Python/Intelligent-System-Development/.venv`.
+Gọi bằng `python` hoặc `python -m pip` từ thư mục gốc dự án. **Không dùng lệnh `pip` trần**, vì nó
+trỏ sang một venv khác ở thư mục cha và đã gây ra một giờ chẩn đoán nhầm.
 
-**Chạy trên CPU.** Ngân sách thời gian mỗi notebook ≤ 15 phút. Nếu một cấu hình vượt ngưỡng,
-giảm số epoch hoặc lấy mẫu con **có phân tầng** rồi **ghi rõ điều đó trong notebook và trong
-metrics JSON** (khóa `notes`). Tuyệt đối không bịa số.
+| Thư viện | Phiên bản | Thiết bị |
+|---|---|---|
+| Python | 3.13 | |
+| NumPy | 2.5.1 | CPU (theo định nghĩa) |
+| pandas | 3.0.5 | |
+| scikit-learn | 1.9.0 | |
+| SciPy | 1.18.0 | |
+| **PyTorch** | **2.13.0+cu126** | **GPU: RTX 4060 Laptop, 8,6 GB, CUDA 12.6** |
+| TensorFlow / Keras | 2.21.0 / 3.15.1 | **CPU**, vì TF từ 2.11 bỏ hỗ trợ GPU native trên Windows |
 
-`RANDOM_SEED = 42` ở mọi nơi (`np.random.seed`, `torch.manual_seed`, `tf.random.set_seed`,
-`random_state=42` trong mọi lần `train_test_split`).
+### Quy tắc thiết bị, bắt buộc tuân thủ
+
+```python
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+assert torch.cuda.is_available(), "Phai chay tren GPU; kiem tra lai venv"
+```
+
+Mọi notebook PyTorch **phải** dùng GPU và **phải in ra tên thiết bị** trong output. Đo thời gian
+thì bọc `torch.cuda.synchronize()` trước và sau, nếu không sẽ đo nhầm thời gian xếp hàng lệnh
+chứ không phải thời gian tính toán.
+
+**Ba mô hình chạy trên ba thiết bị khác nhau, và đây là điều phải nói thẳng trong báo cáo:**
+PyTorch trên GPU, TensorFlow trên CPU, NumPy trên CPU. Hệ quả là **cột thời gian không còn là
+phép so sánh khung thư viện mà là phép so sánh phần cứng**. Mọi bảng có cột thời gian phải ghi
+rõ thiết bị bên cạnh, và phần diễn giải không được kết luận khung nào nhanh hơn khung nào. Các
+chỉ số chất lượng (accuracy, F1, R²) vẫn so sánh được bình thường vì không phụ thuộc thiết bị.
+
+Ngân sách thời gian mỗi notebook: 20 phút. Với GPU, một epoch CNN trên 40.000 ảnh CIFAR-10 mất
+khoảng 2,3 giây, nên **không còn lý do gì để lấy mẫu con cho PyTorch**. Chỉ hai mô hình NumPy
+thuần vẫn phải dùng tập con, vì NumPy chạy CPU là bản chất của bài tập chứ không phải hạn chế
+phần cứng.
+
+`RANDOM_SEED = 42` ở mọi nơi, trừ các thực nghiệm đa hạt giống ở Mục 8.
 
 ## 2. Cây thư mục
 
@@ -254,3 +274,83 @@ Y hệt danh sách MNIST, đổi tiền tố `fig_mnist_` → `fig_cifar10_`. **
   `git commit -m "..." -- "src/Assignment 04/<domain>/..."`.
 - Không đổi tên figure hay khóa JSON vì "thấy hợp lý hơn". Báo cáo đọc theo tên ở đây.
 - Không dùng `plt.show()` mà quên `plt.savefig()` — hình phải nằm trên đĩa.
+
+---
+
+## 8. Ba thực nghiệm gốc (miền `analysis/`)
+
+Phần này là **đóng góp riêng của báo cáo**, không có trong bất kỳ bài tham khảo nào. Mục tiêu là
+lấp đúng những lỗ hổng mà các bài khác hoặc bỏ qua, hoặc chỉ nêu ở phần hướng phát triển.
+
+Ba notebook, đặt ở `analysis/notebooks/`, mỗi notebook ghi một tệp JSON riêng.
+
+### 8.1 `04_statistical_rigor.ipynb` → `reports/metrics_statistical.json`
+
+Trả lời câu hỏi mà mọi bảng đối chuẩn trong báo cáo đang né: **chênh lệch 0,26 điểm phần trăm
+giữa hai khung có thật sự là khác biệt, hay chỉ là nhiễu khởi tạo?**
+
+- **Đa hạt giống**: huấn luyện lại mỗi cấu hình với `seed ∈ {42, 43, 44, 45, 46}`, báo cáo
+  `mean ± std` thay cho một con số trần. Làm cho Comments, Diabetes, House Price và MNIST.
+- **Kiểm định McNemar** cho từng cặp khung trên cùng tập kiểm thử. Đây là phép kiểm đúng cho
+  hai bộ phân loại chạy trên **cùng** các mẫu, vì nó chỉ nhìn vào số mẫu mà hai bên **bất đồng**
+  (`b` và `c` trong bảng 2×2), chứ không coi hai dãy dự đoán là độc lập. Báo cáo `statistic`,
+  `p_value`, và kết luận ở mức ý nghĩa 0,05. Dùng `statsmodels` nếu có, nếu không thì tự cài
+  bằng `scipy.stats.binomtest(b, b+c, 0.5)` (phiên bản chính xác, đúng khi `b+c` nhỏ).
+- **Khoảng tin cậy Wilson 95%** cho từng accuracy. Ưu điểm so với khoảng Wald là không tràn ra
+  ngoài đoạn [0,1] và vẫn đúng khi tỉ lệ gần 0 hoặc gần 1.
+- Kết luận phải nói thẳng: những cặp nào **không** khác biệt có ý nghĩa thống kê. Nếu hoá ra
+  phần lớn các cặp đều không khác biệt, đó là một kết quả mạnh chứ không phải thất bại, vì nó
+  chứng minh đúng luận điểm trung tâm rằng nền toán học quyết định kết quả.
+
+Hình: `fig_seed_variance.png` (thanh lỗi mean ± std theo miền),
+`fig_mcnemar_matrix.png` (ma trận p-value từng cặp), `fig_wilson_ci.png` (khoảng tin cậy).
+
+### 8.2 `05_model_anatomy.ipynb` → `reports/metrics_anatomy.json`
+
+Mổ xẻ mô hình đã huấn luyện, thay vì chỉ báo cáo điểm số.
+
+- **Hiệu chỉnh xác suất**: tính **ECE** (Expected Calibration Error, 15 bin) và vẽ **biểu đồ độ
+  tin cậy**. Một trong hai bài tham khảo chỉ ghi "có thể bổ sung calibration" vào hướng phát
+  triển; báo cáo này làm thật và đo được. Kèm **nhiệt độ scaling**: tối ưu một tham số `T` duy
+  nhất trên tập validation rồi báo cáo ECE trước và sau. Nếu ECE giảm rõ thì đó là bằng chứng
+  mô hình *quá tự tin*, đúng như hiện tượng "sai với độ tin cậy cao" mà Chương 6 và 7 mô tả.
+- **Trực quan bộ lọc tầng một**: vẽ toàn bộ 32 kernel của tầng Conv đầu tiên trên CIFAR-10
+  (3×3×3 nên hiển thị được thành ảnh RGB), và trên MNIST (3×3×1, thang xám). Nhận xét xem có
+  bộ lọc nào học được cạnh, gradient màu, hay đốm.
+- **Bản đồ đặc trưng**: chọn một ảnh test, cho đi qua từng khối và vẽ các feature map, để thấy
+  biểu diễn trừu tượng dần theo độ sâu.
+- **Độ nhạy che khuất**: trượt một ô vuông xám 8×8 trên ảnh, ghi lại xác suất lớp đúng tại mỗi
+  vị trí, rồi vẽ bản đồ nhiệt. Bản đồ này cho biết **vùng ảnh nào thực sự chi phối quyết định**,
+  và là cách kiểm tra mô hình có nhìn vào vật thể hay đang bám vào nền.
+
+Hình: `fig_reliability_diagram.png`, `fig_temperature_scaling.png`, `fig_conv1_filters.png`,
+`fig_feature_maps.png`, `fig_occlusion_sensitivity.png`.
+
+### 8.3 `06_ablation_scaling.ipynb` → `reports/metrics_ablation.json`
+
+Gỡ hai chỗ mà phần còn lại của báo cáo đang phải thừa nhận là bị trộn lẫn.
+
+- **Bóc tách yếu tố cải tiến**: hiện tại "Improved" gộp ba thay đổi (đệm viền, He Normal, lịch
+  giảm tốc độ học) nên không biết cái nào đóng góp bao nhiêu. Chạy đủ **8 tổ hợp 2³** trên tập
+  con MNIST, báo cáo accuracy từng tổ hợp, rồi tính **hiệu ứng chính** của từng yếu tố bằng
+  trung bình chênh lệch khi bật so với khi tắt. Đây là thiết kế giai thừa đầy đủ, không phải
+  thử từng cái một.
+- **Đường cong theo cỡ dữ liệu**: huấn luyện cùng một kiến trúc trên
+  `n ∈ {500, 1000, 2000, 5000, 10000, 20000, 40000}` ảnh, vẽ accuracy theo `n` ở thang log.
+  Mục đích rất cụ thể: Chương 6 và 7 thừa nhận khoảng cách giữa NumPy và framework **trộn lẫn**
+  ba nguyên nhân (ít dữ liệu hơn, kiến trúc nông hơn, tầng hiện thực khác). Đường cong này tách
+  được phần do **dữ liệu**: đọc giá trị của mô hình framework tại đúng `n` mà NumPy đã dùng, rồi
+  so với giá trị tại `n` đầy đủ. Phần chênh còn lại mới là do kiến trúc.
+  Báo cáo phải nêu con số tách bạch đó, ví dụ "trong 20,3 điểm chênh lệch thì 12,1 điểm là do
+  dữ liệu và 8,2 điểm là do kiến trúc".
+
+Hình: `fig_ablation_factorial.png` (8 tổ hợp + hiệu ứng chính),
+`fig_learning_curve.png` (accuracy theo cỡ dữ liệu, có đánh dấu điểm NumPy dùng),
+`fig_gap_decomposition.png` (thanh xếp chồng tách phần dữ liệu và phần kiến trúc).
+
+### Quy tắc chung cho cả ba notebook
+
+Không được chạy lại toàn bộ pipeline nặng nếu có thể nạp lại mô hình đã lưu. Mọi con số vào JSON
+phải từ một lần chạy thật. Nếu một phép kiểm cho kết quả **trái** với kỳ vọng nêu trong phần mở
+đầu notebook, giữ nguyên kết quả và sửa phần diễn giải, tuyệt đối không sửa thực nghiệm cho khớp
+câu chuyện.
