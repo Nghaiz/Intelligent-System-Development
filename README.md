@@ -83,18 +83,6 @@ pip install -r requirements.txt
 
 ---
 
-## Tham khảo
-
-Kho bài của một nhóm khác cùng học phần, dùng để đối chiếu bố cục và tài liệu:
-
-```bash
-git clone https://github.com/phamtu2x5/INTELLIGENT-SYSTEM-DEVELOPMENT.git
-```
-
-Kho đó không được sao chép vào đây; tải về khi cần đối chiếu.
-
----
-
 ## Ghi chú
 
 Toàn bộ hệ thống chạy trên máy cá nhân, không có bản triển khai công khai trên Internet. Hướng dẫn dựng lại nằm trong README của từng bài.
