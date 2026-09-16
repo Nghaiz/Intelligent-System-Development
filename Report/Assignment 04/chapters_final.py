@@ -347,32 +347,66 @@ def _mlp_table(r: R.Report, d: dict) -> None:
 
 
 def _gap_commentary(r: R.Report, d: dict) -> None:
+    """Binh luan khoang cach MLP voi CNN, ton trong DAU cua chenh lech.
+
+    Gia thuyet o muc 8.1 la CNN thang tren ca hai tap, va thang dam tren CIFAR-10.
+    Neu so lieu noi nguoc lai thi phai noi nguoc lai, khong duoc lay tri tuyet doi
+    roi viet nhu the gia thuyet da duoc xac nhan.
+    """
     mn, cf = d.get("mnist"), d.get("cifar10")
     if not mn or not cf:
         return
-    g_mn = cf_g = None
+
     g_mn = mn["cnn"]["accuracy"] - mn["mlp"]["accuracy"]
-    cf_g = cf["cnn"]["accuracy"] - cf["mlp"]["accuracy"]
+    g_cf = cf["cnn"]["accuracy"] - cf["mlp"]["accuracy"]
+
+    def phrase(g: float, ds: str, blk: dict) -> str:
+        if g > 0:
+            return (f"Tren {ds}, m\u1ea1ng t\u00edch ch\u1eadp \u0111\u1ee9ng tr\u00ean v\u1edbi "
+                    f"{pct(blk['cnn']['accuracy'])} so v\u1edbi {pct(blk['mlp']['accuracy'])} "
+                    f"c\u1ee7a m\u1ea1ng truy\u1ec1n th\u1eb3ng, ch\u00eanh {pct(g)}")
+        return (f"Tren {ds}, <strong>m\u1ea1ng truy\u1ec1n th\u1eb3ng l\u1ea1i v\u01b0\u1ee3t "
+                f"m\u1ea1ng t\u00edch ch\u1eadp</strong>, {pct(blk['mlp']['accuracy'])} so v\u1edbi "
+                f"{pct(blk['cnn']['accuracy'])}, ch\u00eanh {pct(-g)} theo h\u01b0\u1edbng "
+                f"ng\u01b0\u1ee3c v\u1edbi gi\u1ea3 thuy\u1ebft")
+
+    r.p(phrase(g_mn, "MNIST", mn).replace("Tren", "Tr\u00ean", 1) + ". "
+        + phrase(g_cf, "CIFAR-10", cf).replace("Tren", "Tr\u00ean", 1) + ".")
+
+    if g_mn > 0 and g_cf > g_mn:
+        ratio = g_cf / max(g_mn, 1e-9)
+        r.p(
+            f"K\u1ebft qu\u1ea3 x\u00e1c nh\u1eadn c\u1ea3 hai gi\u1ea3 thuy\u1ebft. T\u1ec9 l\u1ec7 gi\u1eefa hai kho\u1ea3ng c\u00e1ch l\u00e0 "
+            f"kho\u1ea3ng {ratio:.0f} l\u1ea7n, v\u00e0 \u0111\u00f3 l\u00e0 n\u1ed9i dung ch\u00ednh c\u1ee7a ch\u01b0\u01a1ng: gi\u00e1 tr\u1ecb c\u1ee7a "
+            f"t\u00edch ch\u1eadp <strong>kh\u00f4ng ph\u1ea3i m\u1ed9t h\u1eb1ng s\u1ed1</strong> m\u00e0 ph\u1ee5 thu\u1ed9c v\u00e0o vi\u1ec7c d\u1eef "
+            f"li\u1ec7u c\u00f3 c\u1ea5u tr\u00fac kh\u00f4ng gian \u0111\u1ec3 khai th\u00e1c hay kh\u00f4ng. Tr\u00ean m\u1ed9t b\u1ed9 d\u1eef li\u1ec7u "
+            f"\u0111\u00e3 \u0111\u01b0\u1ee3c c\u0103n ch\u1ec9nh s\u1eb5n, t\u00edch ch\u1eadp g\u1ea7n nh\u01b0 kh\u00f4ng mang l\u1ea1i g\u00ec; tr\u00ean "
+            f"\u1ea3nh t\u1ef1 nhi\u00ean ch\u01b0a qua c\u0103n ch\u1ec9nh, n\u00f3 l\u00e0 kh\u00e1c bi\u1ec7t gi\u1eefa d\u00f9ng \u0111\u01b0\u1ee3c v\u00e0 "
+            f"kh\u00f4ng d\u00f9ng \u0111\u01b0\u1ee3c.")
+    else:
+        r.p(R.note(
+            "K\u1ebft qu\u1ea3 kh\u00f4ng kh\u1edbp gi\u1ea3 thuy\u1ebft, v\u00e0 b\u00e1o c\u00e1o gi\u1eef nguy\u00ean n\u00f3.",
+            "Gi\u1ea3 thuy\u1ebft \u1edf m\u1ee5c 8.1 d\u1ef1 \u0111o\u00e1n m\u1ea1ng t\u00edch ch\u1eadp th\u1eafng tr\u00ean c\u1ea3 hai t\u1eadp v\u00e0 "
+            "th\u1eafng \u0111\u1eadm tr\u00ean CIFAR-10. S\u1ed1 li\u1ec7u \u0111o \u0111\u01b0\u1ee3c kh\u00f4ng \u1ee7ng h\u1ed9 \u0111i\u1ec1u \u0111\u00f3. "
+            "Nguy\u00ean nh\u00e2n kh\u1ea3 d\u0129 nh\u1ea5t <em>kh\u00f4ng</em> ph\u1ea3i l\u00e0 t\u00edch ch\u1eadp v\u00f4 d\u1ee5ng, m\u00e0 l\u00e0 hai "
+            "m\u00f4 h\u00ecnh ch\u01b0a \u0111\u01b0\u1ee3c hu\u1ea5n luy\u1ec7n \u1edf c\u00f9ng m\u1ed9t m\u1ee9c \u0111\u1ed9 h\u1ed9i t\u1ee5: m\u1ed9t ph\u00e9p so "
+            "s\u00e1nh ki\u1ebfn tr\u00fac ch\u1ec9 c\u00f3 ngh\u0129a khi c\u1ea3 hai b\u00ean \u0111\u1ec1u ch\u1ea1y \u0111\u1ee7 s\u1ed1 epoch tr\u00ean \u0111\u1ee7 "
+            "d\u1eef li\u1ec7u. Tr\u01b0\u1edbc khi r\u00fat b\u1ea5t k\u1ef3 k\u1ebft lu\u1eadn n\u00e0o v\u1ec1 ki\u1ebfn tr\u00fac, c\u1ea7n hu\u1ea5n luy\u1ec7n "
+            "l\u1ea1i hai b\u00ean trong c\u00f9ng \u0111i\u1ec1u ki\u1ec7n. B\u00e1o c\u00e1o ghi nh\u1eadn \u0111i\u1ec1u n\u00e0y thay v\u00ec di\u1ec5n gi\u1ea3i "
+            "cho kh\u1edbp c\u00e2u chuy\u1ec7n \u0111\u00e3 \u0111\u1ecbnh s\u1eb5n.", "warn"))
+
     r.p(
-        f"Kết quả xác nhận cả hai giả thuyết. Trên MNIST, khoảng cách giữa hai kiến trúc "
-        f"chỉ là {pct(abs(g_mn))}; mạng truyền thẳng đạt {pct(mn['mlp']['accuracy'])} so "
-        f"với {pct(mn['cnn']['accuracy'])} của mạng tích chập. Trên CIFAR-10, khoảng cách "
-        f"giãn ra thành {pct(abs(cf_g))}: {pct(cf['mlp']['accuracy'])} so với "
-        f"{pct(cf['cnn']['accuracy'])}.")
-    ratio = abs(cf_g) / max(abs(g_mn), 1e-9)
-    r.p(
-        f"Tỉ lệ giữa hai khoảng cách là khoảng {ratio:.0f} lần. Con số này là nội dung "
-        f"chính của chương: giá trị của tích chập <strong>không phải một hằng số</strong> "
-        f"mà phụ thuộc vào việc dữ liệu có cấu trúc không gian để khai thác hay không. Trên "
-        f"một bộ dữ liệu đã được căn chỉnh sẵn, tích chập gần như không mang lại gì; trên "
-        f"ảnh tự nhiên chưa qua căn chỉnh, nó là khác biệt giữa dùng được và không dùng "
-        f"được.")
-    r.p(
-        f"Đáng chú ý là mạng truyền thẳng trên CIFAR-10 có {cf['mlp']['params']:,} tham số, "
-        f"so với {cf['cnn']['params']:,} của mạng tích chập. Bên thua cuộc có nhiều tham số "
-        f"hơn, nên thất bại này không thể quy cho thiếu dung lượng mô hình. Nó là thất bại "
-        f"của một <em>giả định kiến trúc</em>: giả định rằng mọi điểm ảnh đều độc lập và "
-        f"hoán vị được.")
+        f"\u0110\u00e1ng ch\u00fa \u00fd l\u00e0 m\u1ea1ng truy\u1ec1n th\u1eb3ng tr\u00ean CIFAR-10 c\u00f3 "
+        f"{cf['mlp']['params']:,} tham s\u1ed1, so v\u1edbi {cf['cnn']['params']:,} c\u1ee7a m\u1ea1ng t\u00edch "
+        f"ch\u1eadp. "
+        + ("B\u00ean thua cu\u1ed9c c\u00f3 nhi\u1ec1u tham s\u1ed1 h\u01a1n, n\u00ean th\u1ea5t b\u1ea1i n\u00e0y kh\u00f4ng th\u1ec3 quy cho "
+           "thi\u1ebfu dung l\u01b0\u1ee3ng m\u00f4 h\u00ecnh. N\u00f3 l\u00e0 th\u1ea5t b\u1ea1i c\u1ee7a m\u1ed9t <em>gi\u1ea3 \u0111\u1ecbnh ki\u1ebfn "
+           "tr\u00fac</em>: gi\u1ea3 \u0111\u1ecbnh r\u1eb1ng m\u1ecdi \u0111i\u1ec3m \u1ea3nh \u0111\u1ec1u \u0111\u1ed9c l\u1eadp v\u00e0 ho\u00e1n v\u1ecb "
+           "\u0111\u01b0\u1ee3c."
+           if g_cf > 0 else
+           "S\u1ed1 tham s\u1ed1 g\u1ea5p g\u1ea7n ch\u00edn l\u1ea7n n\u00e0y c\u0169ng l\u00e0 m\u1ed9t l\u00fd do khi\u1ebfn ph\u00e9p so s\u00e1nh "
+           "hi\u1ec7n t\u1ea1i ch\u01b0a c\u00f4ng b\u1eb1ng theo chi\u1ec1u ng\u01b0\u1ee3c l\u1ea1i, v\u00e0 c\u1ea7n \u0111\u01b0\u1ee3c c\u00e2n nh\u1eafc "
+           "khi \u0111\u1ecdc con s\u1ed1 \u1edf tr\u00ean."))
 
 
 def _pca_commentary(r: R.Report, d: dict) -> None:
