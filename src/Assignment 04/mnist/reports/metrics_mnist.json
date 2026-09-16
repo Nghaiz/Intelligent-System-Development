@@ -278,7 +278,8 @@
           "pred": 6,
           "confidence": 0.996810257434845
         }
-      ]
+      ],
+      "device": "cpu"
     },
     "numpy_improved": {
       "framework": "NumPy From Scratch (Improved)",
@@ -532,113 +533,115 @@
           "pred": 0,
           "confidence": 0.9990528225898743
         }
-      ]
+      ],
+      "device": "cpu"
     },
     "pytorch": {
-      "framework": "PyTorch 2.9.1 (CPU)",
+      "framework": "PyTorch 2.13.0+cu126 (GPU)",
       "params": 421738,
-      "train_time_s": 1220.824286699295,
+      "train_time_s": 136.86719250679016,
+      "device": "cuda",
       "epochs": 10,
       "best_epoch": 9,
-      "accuracy": 0.9898,
-      "macro_precision": 0.9898666208385827,
-      "macro_recall": 0.9897330209636236,
-      "macro_f1": 0.9897769817636194,
-      "loss": 0.030118413537740706,
+      "accuracy": 0.9906,
+      "macro_precision": 0.9905823899050652,
+      "macro_recall": 0.9905581427898559,
+      "macro_f1": 0.990563110763901,
+      "loss": 0.027565119707584382,
       "history": {
         "train_loss": [
-          0.34615194953481354,
-          0.14171783529718718,
-          0.11102161879837513,
-          0.09870760806898277,
-          0.08918783774971963,
-          0.08004122789452474,
-          0.07542056864500046,
-          0.0717008879793187,
-          0.06556472926090161,
-          0.061477854025860625
+          0.33933401117722195,
+          0.14130794555942217,
+          0.11136031882961592,
+          0.10116388743619124,
+          0.08695682601630687,
+          0.08230062382668257,
+          0.07541560364266237,
+          0.0693854110762477,
+          0.06746318083504836,
+          0.061436916187405585
         ],
         "val_loss": [
-          0.07854199536641439,
-          0.05488550960024198,
-          0.04634884050488472,
-          0.0392639237344265,
-          0.04180449123183886,
-          0.04104830150306225,
-          0.038184635569651924,
-          0.03949238021671772,
-          0.03925517453749974,
-          0.03697570294638475
+          0.07371428794662158,
+          0.05364436945319176,
+          0.048204976732532184,
+          0.03735165985922018,
+          0.04551989606022835,
+          0.03874047708511352,
+          0.038045871376991273,
+          0.03693441221614679,
+          0.0343227964391311,
+          0.03566932854056358
         ],
         "train_acc": [
-          0.8913541666666667,
-          0.958125,
-          0.9670416666666667,
-          0.970125,
-          0.9737916666666667,
-          0.9760625,
-          0.9768541666666667,
-          0.9780833333333333,
-          0.9789166666666667,
-          0.9815208333333333
+          0.895375,
+          0.95825,
+          0.9671041666666667,
+          0.969875,
+          0.9729583333333334,
+          0.9760833333333333,
+          0.9772083333333333,
+          0.9789375,
+          0.9788333333333333,
+          0.9815
         ],
         "val_acc": [
-          0.97675,
-          0.9836666666666667,
-          0.9868333333333333,
-          0.98875,
-          0.98825,
-          0.9868333333333333,
+          0.9791666666666666,
+          0.9833333333333333,
+          0.9846666666666667,
+          0.9889166666666667,
+          0.9863333333333333,
           0.9888333333333333,
-          0.9885,
           0.9895,
-          0.9893333333333333
+          0.98975,
+          0.9901666666666666,
+          0.9885833333333334
         ]
       },
       "confusion_matrix": [
         [
-          978,
+          975,
           0,
           0,
           0,
           0,
           0,
+          3,
           1,
-          1,
-          0,
-          0
-        ],
-        [
-          0,
-          1132,
-          1,
-          1,
-          0,
-          1,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          2,
-          4,
-          1016,
-          0,
-          1,
-          0,
-          0,
-          8,
           1,
           0
         ],
         [
           0,
+          1133,
           0,
           1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          3,
+          1022,
+          1,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
           1004,
           0,
-          2,
+          3,
           0,
           2,
           1,
@@ -649,141 +652,142 @@
           0,
           0,
           0,
-          973,
+          967,
+          0,
+          3,
           0,
           1,
-          0,
-          1,
-          7
+          11
         ],
         [
           1,
           0,
           0,
+          2,
+          0,
+          888,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          3,
+          0,
+          0,
+          1,
           4,
-          0,
-          885,
-          1,
+          949,
           0,
           0,
-          1
+          0
         ],
         [
+          0,
+          2,
           6,
-          3,
+          1,
           0,
+          0,
+          0,
+          1015,
+          1,
+          3
+        ],
+        [
+          2,
+          1,
+          2,
+          2,
+          0,
+          0,
+          0,
+          1,
+          963,
+          3
+        ],
+        [
+          1,
+          1,
           0,
           1,
           4,
-          944,
-          0,
-          0,
-          0
-        ],
-        [
-          0,
-          2,
-          2,
-          1,
-          0,
-          0,
-          0,
-          1020,
-          1,
-          2
-        ],
-        [
           5,
-          2,
           0,
-          1,
-          1,
-          0,
-          0,
-          3,
-          961,
-          1
-        ],
-        [
-          3,
-          3,
-          0,
-          0,
-          5,
           4,
-          0,
-          5,
-          4,
-          985
+          3,
+          990
         ]
       ],
       "per_class_accuracy": [
-        0.9979591836734694,
-        0.9973568281938326,
-        0.9844961240310077,
+        0.9948979591836735,
+        0.9982378854625551,
+        0.9903100775193798,
         0.994059405940594,
-        0.9908350305498982,
-        0.992152466367713,
-        0.9853862212943633,
-        0.9922178988326849,
-        0.9866529774127311,
-        0.9762140733399405
+        0.984725050916497,
+        0.9955156950672646,
+        0.9906054279749478,
+        0.9873540856031129,
+        0.9887063655030801,
+        0.981169474727453
       ],
       "high_conf_errors": [
         {
-          "index": 2654,
+          "index": 9729,
+          "true": 5,
+          "pred": 6,
+          "confidence": 0.9982845187187195
+        },
+        {
+          "index": 1014,
           "true": 6,
-          "pred": 1,
-          "confidence": 0.9999234676361084
+          "pred": 5,
+          "confidence": 0.9968692660331726
+        },
+        {
+          "index": 1878,
+          "true": 8,
+          "pred": 3,
+          "confidence": 0.9965283274650574
         },
         {
           "index": 2462,
           "true": 2,
           "pred": 0,
-          "confidence": 0.9994007349014282
+          "confidence": 0.9964708089828491
         },
         {
-          "index": 9729,
-          "true": 5,
-          "pred": 6,
-          "confidence": 0.9981536269187927
+          "index": 2654,
+          "true": 6,
+          "pred": 1,
+          "confidence": 0.9918150305747986
+        },
+        {
+          "index": 2130,
+          "true": 4,
+          "pred": 9,
+          "confidence": 0.9884210824966431
         },
         {
           "index": 2135,
           "true": 6,
           "pred": 1,
-          "confidence": 0.9975998997688293
+          "confidence": 0.9820241332054138
         },
         {
-          "index": 2896,
-          "true": 8,
-          "pred": 0,
-          "confidence": 0.9961104989051819
-        },
-        {
-          "index": 2597,
-          "true": 5,
-          "pred": 3,
-          "confidence": 0.9928566217422485
-        },
-        {
-          "index": 6597,
-          "true": 0,
-          "pred": 7,
-          "confidence": 0.9844449758529663
-        },
-        {
-          "index": 3808,
-          "true": 7,
-          "pred": 8,
-          "confidence": 0.983873188495636
+          "index": 3726,
+          "true": 4,
+          "pred": 9,
+          "confidence": 0.9770147800445557
         }
       ]
     },
     "tensorflow": {
       "framework": "TensorFlow 2.21.0 / Keras 3.15.1 (CPU)",
       "params": 421738,
-      "train_time_s": 126.47758078575134,
+      "train_time_s": 744.7434096336365,
+      "device": "cpu",
       "epochs": 10,
       "best_epoch": 9,
       "accuracy": 0.9902,
@@ -1027,7 +1031,7 @@
       ]
     }
   },
-  "best_model": "tensorflow",
+  "best_model": "pytorch",
   "gradient_check": {
     "eps": 1e-05,
     "dtype": "float64",
@@ -1212,5 +1216,5 @@
       }
     ]
   },
-  "notes": "Hai mô hình NumPy thuần (numpy_baseline, numpy_improved) được huấn luyện trên TẬP CON PHÂN TẦNG 12000 ảnh train và 3000 ảnh validation (12 epoch, batch 64) thay vì toàn bộ 48000/12000, do mạng tích chập cài bằng NumPy thuần chạy trên CPU vượt ngân sách 15 phút mỗi notebook mà hợp đồng quy định. Hai mô hình framework (pytorch, tensorflow) dùng ĐẦY ĐỦ 48000 ảnh train và 12000 ảnh validation, 10 epoch, batch 128. CẢ BỐN mô hình đều được đánh giá trên trọn vẹn 10000 ảnh của tập kiểm thử gốc nên phép so sánh công bằng ở phía đánh giá; chênh lệch giữa nhóm NumPy và nhóm framework là tổng hợp của hai yếu tố kiến trúc và lượng dữ liệu huấn luyện. Khóa roc_auc của schema nhị phân không áp dụng cho bài toán 10 lớp nên được lược bỏ, thay bằng macro_precision / macro_recall / macro_f1 / per_class_accuracy / high_conf_errors đúng theo biến thể đa lớp của mục 5.3. Kiểm tra gradient bằng sai phân hữu hạn trung tâm (eps=1e-5, float64) trên 16 vị trí tham số cho sai số tương đối lớn nhất 1.861e-10, xác nhận phép lan truyền ngược viết tay là đúng. Notebook 01 còn ghi tệp trung gian reports/metrics_mnist_scratch_partial.json chứa nhật ký chi tiết của kiểm tra gradient; tệp đó bổ sung chứ không thay thế tệp bắt buộc này."
+  "notes": "Hai mô hình NumPy thuần (numpy_baseline, numpy_improved) được huấn luyện trên TẬP CON PHÂN TẦNG 12000 ảnh train và 3000 ảnh validation (12 epoch, batch 64) thay vì toàn bộ 48000/12000, do mạng tích chập cài bằng NumPy thuần chạy trên CPU vượt ngân sách 15 phút mỗi notebook mà hợp đồng quy định. Hai mô hình framework (pytorch, tensorflow) dùng ĐẦY ĐỦ 48000 ảnh train và 12000 ảnh validation, 10 epoch, batch 128. CẢ BỐN mô hình đều được đánh giá trên trọn vẹn 10000 ảnh của tập kiểm thử gốc nên phép so sánh công bằng ở phía đánh giá; chênh lệch giữa nhóm NumPy và nhóm framework là tổng hợp của hai yếu tố kiến trúc và lượng dữ liệu huấn luyện. Khóa roc_auc của schema nhị phân không áp dụng cho bài toán 10 lớp nên được lược bỏ, thay bằng macro_precision / macro_recall / macro_f1 / per_class_accuracy / high_conf_errors đúng theo biến thể đa lớp của mục 5.3. Kiểm tra gradient bằng sai phân hữu hạn trung tâm (eps=1e-5, float64) trên 16 vị trí tham số cho sai số tương đối lớn nhất 1.861e-10, xác nhận phép lan truyền ngược viết tay là đúng. THIẾT BỊ: mô hình pytorch huấn luyện trên GPU (NVIDIA GeForce RTX 4060 Laptop GPU, CUDA 12.6), còn tensorflow, numpy_baseline và numpy_improved chạy trên CPU vì TensorFlow từ 2.11 bỏ hỗ trợ GPU native trên Windows và NumPy thuần vốn là cài đặt CPU. Khóa device của từng khối mô hình ghi rõ thiết bị tương ứng. Hệ quả: cột train_time_s là phép so sánh PHẦN CỨNG chứ không phải phép so sánh khung thư viện, và báo cáo không rút ra kết luận nào về tốc độ tương đối giữa hai khung. Các chỉ số chất lượng không phụ thuộc thiết bị nên vẫn so sánh được bình thường. Notebook 01 còn ghi tệp trung gian reports/metrics_mnist_scratch_partial.json chứa nhật ký chi tiết của kiểm tra gradient; tệp đó bổ sung chứ không thay thế tệp bắt buộc này."
 }

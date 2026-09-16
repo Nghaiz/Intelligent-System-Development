@@ -1,7 +1,7 @@
 {
   "framework": "TensorFlow/Keras",
   "params": 509665,
-  "train_time_s": 21.278382301330566,
+  "train_time_s": 75.51875042915344,
   "epochs": 12,
   "best_epoch": 4,
   "accuracy": 0.8781277597880482,
@@ -78,6 +78,7 @@
       2632
     ]
   ],
+  "device": "cpu",
   "dataset": {
     "file": "womens_ecommerce_reviews.csv",
     "n_raw": 23486,

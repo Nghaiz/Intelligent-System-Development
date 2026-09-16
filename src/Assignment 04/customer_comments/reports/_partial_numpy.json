@@ -1,7 +1,7 @@
 {
   "framework": "NumPy From Scratch",
   "params": 509665,
-  "train_time_s": 397.77053475379944,
+  "train_time_s": 444.225252866745,
   "epochs": 12,
   "best_epoch": 3,
   "accuracy": 0.8831321754489255,
@@ -79,6 +79,7 @@
     ]
   ],
   "gradient_check_max_rel_error": 2.0553789499838522e-08,
+  "device": "cpu",
   "dataset": {
     "file": "womens_ecommerce_reviews.csv",
     "n_raw": 23486,

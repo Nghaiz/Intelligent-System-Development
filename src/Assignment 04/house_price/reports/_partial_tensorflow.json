@@ -1,7 +1,7 @@
 {
   "framework": "TensorFlow/Keras",
   "params": 1377,
-  "train_time_s": 36.35146689414978,
+  "train_time_s": 311.25176978111267,
   "epochs": 40,
   "best_epoch": 40,
   "rmse_usd": 563725.1849552076,
@@ -502,6 +502,7 @@
       12.966154098510742
     ]
   },
+  "device": "cpu",
   "dataset": {
     "file": "usa_real_estate_150k.csv",
     "n_raw": 150000,

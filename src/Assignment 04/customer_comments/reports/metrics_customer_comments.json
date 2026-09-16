@@ -14,7 +14,7 @@
     "numpy": {
       "framework": "NumPy From Scratch",
       "params": 509665,
-      "train_time_s": 397.77053475379944,
+      "train_time_s": 444.225252866745,
       "epochs": 12,
       "best_epoch": 3,
       "accuracy": 0.8831321754489255,
@@ -90,93 +90,95 @@
           142,
           2640
         ]
-      ]
+      ],
+      "device": "cpu"
     },
     "pytorch": {
       "framework": "PyTorch",
       "params": 509665,
-      "train_time_s": 23.931579113006592,
+      "train_time_s": 117.01063203811646,
       "epochs": 12,
       "best_epoch": 3,
-      "accuracy": 0.8804827789225788,
-      "precision": 0.8991935483870968,
-      "recall": 0.9618979151689432,
-      "f1": 0.9294894060437652,
-      "roc_auc": 0.9021426943241395,
-      "loss": 0.2847144260995961,
+      "accuracy": 0.8834265528407418,
+      "precision": 0.900604432505037,
+      "recall": 0.9640546369518332,
+      "f1": 0.93125,
+      "roc_auc": 0.9019521546761119,
+      "loss": 0.2851831038072069,
       "history": {
         "train_loss": [
-          0.4303985035766628,
-          0.28479950469627346,
-          0.22856383162273883,
-          0.18577990269122338,
-          0.14879430592861237,
-          0.11747684907641834,
-          0.08958874262867948,
-          0.06806298363828062,
-          0.04982163863752707,
-          0.036467453336865394,
-          0.025899109862039103,
-          0.018317831404343312
+          0.43017210305158354,
+          0.2847117156941274,
+          0.228783939255896,
+          0.1859927777876318,
+          0.14936830114728156,
+          0.11793505008613761,
+          0.09012102821504851,
+          0.06818613868939949,
+          0.049804711025489154,
+          0.03705524593827239,
+          0.026513568396534484,
+          0.01857949259069804
         ],
         "val_loss": [
-          0.3184569724954715,
-          0.26785612344952375,
-          0.2544129601393793,
-          0.2544966350943684,
-          0.2637552807646567,
-          0.2726523584395884,
-          0.29272117057125957,
-          0.30875808696273777,
-          0.3356569450604133,
-          0.3549175491605326,
-          0.3806072730929633,
-          0.4090900999028647
+          0.3177834816818768,
+          0.26728522817475114,
+          0.2534373475061573,
+          0.2545279499877015,
+          0.26471685648210125,
+          0.2760238207488471,
+          0.29618943489436583,
+          0.3177908132154871,
+          0.3439672833458269,
+          0.3636821797131299,
+          0.3876723264696881,
+          0.4131651352021776
         ],
         "train_acc": [
-          0.8091121347889191,
-          0.8755600429103301,
-          0.904082791695589,
-          0.92616899097621,
-          0.9444689846658674,
-          0.9591089796175932,
-          0.9704044929639679,
-          0.9793020761027323,
-          0.9877579352558844,
-          0.9923644853915567,
-          0.9950148293052312,
-          0.9975389663658737
+          0.8095538587745315,
+          0.8753707326307818,
+          0.9042721019751373,
+          0.9254748532845334,
+          0.9435855366946425,
+          0.9584779453524327,
+          0.9703413895374519,
+          0.9794913863822805,
+          0.9865589701520793,
+          0.9919227614059444,
+          0.9952672430112955,
+          0.997854483498454
         ],
         "val_acc": [
-          0.8569325875772741,
-          0.884604062408007,
-          0.885487194583456,
-          0.8896084780688843,
-          0.8907859876361496,
-          0.8904916102443332,
-          0.8904916102443332,
-          0.8881365911098028,
-          0.8887253458934354,
+          0.8560494554018251,
+          0.8834265528407418,
           0.8875478363261702,
-          0.884604062408007,
-          0.8831321754489255
+          0.8928466293788637,
+          0.8904916102443332,
+          0.8910803650279658,
+          0.8860759493670886,
+          0.8851928171916397,
+          0.8869590815425376,
+          0.8851928171916397,
+          0.8837209302325582,
+          0.8837209302325582
         ]
       },
       "confusion_matrix": [
         [
-          315,
-          300
+          319,
+          296
         ],
         [
-          106,
-          2676
+          100,
+          2682
         ]
-      ]
+      ],
+      "device": "cuda"
     },
     "tensorflow": {
       "framework": "TensorFlow/Keras",
       "params": 509665,
-      "train_time_s": 21.278382301330566,
+      "train_time_s": 75.51875042915344,
       "epochs": 12,
       "best_epoch": 4,
       "accuracy": 0.8781277597880482,
@@ -252,8 +254,9 @@
           150,
           2632
         ]
-      ]
+      ],
+      "device": "cpu"
     }
   },
-  "notes": "Chia dữ liệu 70/15/15 có phân tầng theo nhãn, random_state=42; hợp đồng không quy định tỉ lệ chia riêng cho miền customer_comments nên báo cáo chọn tỉ lệ này và áp dụng thống nhất cho cả ba cách hiện thực. Từ điển 5000 từ chỉ được xây trên tập huấn luyện để tránh rò rỉ dữ liệu. Không lấy mẫu con: toàn bộ 22.641 bình luận hợp lệ đều được dùng. Cả ba mô hình đều huấn luyện 12 epoch, kích thước lô 64, Adam lr=1e-3, chọn epoch theo mất mát kiểm định thấp nhất. Các hình gồm ba bảng con và tệp metrics tổng hợp được dựng ở cuối notebook 01 (notebook chạy sau cùng) thay vì notebook 03, nhằm bảo đảm mọi con số trong tệp tổng hợp đến từ đúng lần chạy cuối cùng của từng notebook. Kiểm tra gradient bằng sai phân trung tâm cho sai số tương đối lớn nhất 2.06e-08."
+  "notes": "Chia dữ liệu 70/15/15 có phân tầng theo nhãn, random_state=42; hợp đồng không quy định tỉ lệ chia riêng cho miền customer_comments nên báo cáo chọn tỉ lệ này và áp dụng thống nhất cho cả ba cách hiện thực. Từ điển 5000 từ chỉ được xây trên tập huấn luyện để tránh rò rỉ dữ liệu. Không lấy mẫu con: toàn bộ 22.641 bình luận hợp lệ đều được dùng. Cả ba mô hình đều huấn luyện 12 epoch, kích thước lô 64, Adam lr=1e-3, chọn epoch theo mất mát kiểm định thấp nhất. Các hình gồm ba bảng con và tệp metrics tổng hợp được dựng ở cuối notebook 01 (notebook chạy sau cùng) thay vì notebook 03, nhằm bảo đảm mọi con số trong tệp tổng hợp đến từ đúng lần chạy cuối cùng của từng notebook. THIẾT BỊ: mô hình pytorch huấn luyện trên GPU (RTX 4060 Laptop, CUDA 12.6), còn numpy và tensorflow chạy trên CPU vì TensorFlow từ 2.11 bỏ hỗ trợ GPU native trên Windows và NumPy thuần vốn là cài đặt CPU. Khóa device của từng khối mô hình ghi rõ thiết bị tương ứng. Hệ quả: cột train_time_s là phép so sánh PHẦN CỨNG chứ không phải phép so sánh khung thư viện, và báo cáo không rút ra bất kỳ kết luận nào về tốc độ tương đối giữa ba khung. Các chỉ số chất lượng không phụ thuộc thiết bị nên vẫn so sánh được. Kiểm tra gradient bằng sai phân trung tâm cho sai số tương đối lớn nhất 2.06e-08."
 }
