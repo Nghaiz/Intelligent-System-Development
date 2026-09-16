@@ -63,3 +63,6 @@ temp/
 # Dung lai bang: python "src/Assignment 04/download_cifar10.py"
 src/Assignment 04/cifar10/data/cifar10.npz
 src/Assignment 04/cifar10/data/cifar-10-python.tar.gz
+
+# Thu muc hinh cua bao cao la ban sao sinh tu cac mien, build_report.py tu gom lai
+Report/Assignment 04/figures/
