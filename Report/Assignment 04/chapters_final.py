@@ -130,18 +130,38 @@ X_pca = PCA(n_components=2, random_state=42).fit_transform(X_feat)''',
         "xác nhận lẫn nhau.")
     r.p(R.figure("mv_fig_latent_pca_cifar10.png",
                  "Không gian biểu diễn ẩn của mạng tích chập trên tập kiểm thử CIFAR-10, "
-                 "cho thấy cấu trúc phân nhóm theo ngữ nghĩa cấp cao."))
+                 "tô màu theo mười lớp và theo hai siêu lớp phương tiện với động vật."))
+    _pca_commentary(r, d)
 
     # ---- 8.5
     r.h(2, "8.5. Cấu trúc ngữ nghĩa xuất hiện mà không được dạy")
-    r.p(
-        "Hình chiếu CIFAR-10 cho thấy một hiện tượng đáng chú ý hơn nhiều so với MNIST. "
-        "Các cụm không chỉ tách theo lớp, chúng còn <strong>gom lại theo nhóm ngữ nghĩa cấp "
-        "cao</strong>: bốn lớp phương tiện do con người chế tạo (máy bay, ô tô, tàu thuỷ, "
-        "xe tải) nằm về một phía của không gian biểu diễn, còn sáu lớp động vật sống (chim, "
-        "mèo, hươu, chó, ếch, ngựa) co cụm về phía đối diện.")
+    sep = ((d.get("pca") or {}).get("cifar10") or {}).get("vehicle_animal_separation")
+    if sep is not None and sep <= 0.1:
+        r.p(
+            "Giả thuyết đặt ra trước khi vẽ hình là các lớp sẽ không chỉ tách theo nhãn mà "
+            "còn gom lại theo nhóm ngữ nghĩa cấp cao: bốn lớp phương tiện do con người chế "
+            "tạo (máy bay, ô tô, tàu thuỷ, xe tải) về một phía, sáu lớp động vật sống (chim, "
+            "mèo, hươu, chó, ếch, ngựa) về phía đối diện.")
+        r.p(
+            f"Phép đo ở mục 8.4 cho giá trị {num(sep, 4)}, tức là cấu trúc này "
+            f"<strong>có tồn tại nhưng yếu</strong> trên hình chiếu hai chiều. Báo cáo ghi "
+            f"nhận đúng mức đó thay vì kể một câu chuyện gọn gàng hơn dữ liệu cho phép. Cần "
+            f"nhớ rằng PCA chỉ giữ hai hướng phương sai lớn nhất trong 128 hướng, và hai "
+            f"hướng ấy được chọn để tối đa hoá phương sai tổng thể chứ không phải để làm nổi "
+            f"bật ranh giới giữa hai siêu lớp. Một phép chiếu có giám sát, hoặc t-SNE và UMAP "
+            f"vốn giữ được cấu trúc phi tuyến, nhiều khả năng sẽ cho thấy sự phân tách này "
+            f"rõ hơn.")
+    else:
+        r.p(
+            "Hình chiếu CIFAR-10 cho thấy một hiện tượng đáng chú ý hơn nhiều so với MNIST. "
+            "Các cụm không chỉ tách theo lớp, chúng còn <strong>gom lại theo nhóm ngữ nghĩa "
+            "cấp cao</strong>: bốn lớp phương tiện do con người chế tạo (máy bay, ô tô, tàu "
+            "thuỷ, xe tải) nằm về một phía của không gian biểu diễn, còn sáu lớp động vật "
+            "sống (chim, mèo, hươu, chó, ếch, ngựa) co cụm về phía đối diện.")
     r.p(R.note(
-        "Vì sao đây là một phát hiện chứ không phải một quan sát hiển nhiên.",
+        ("Vì sao mức phân nhóm này, dù yếu, vẫn đáng chú ý."
+         if (sep is not None and sep <= 0.1)
+         else "Vì sao đây là một phát hiện chứ không phải một quan sát hiển nhiên."),
         "Mạng chỉ được cung cấp mười nhãn rời rạc. Nó <em>chưa bao giờ</em> được cho biết "
         "rằng ô tô và xe tải thuộc cùng một phạm trù, hay mèo và chó gần nhau hơn mèo và "
         "tàu thuỷ. Hàm mất mát Cross-Entropy phạt mọi kiểu nhầm lẫn như nhau: nhầm mèo "
@@ -152,10 +172,10 @@ X_pca = PCA(n_components=2, random_state=42).fit_transform(X_feat)''',
     r.p(
         "Đây chính là điều mà thuật ngữ <em>học biểu diễn</em> muốn nói. Mạng tích chập sâu "
         "không dừng ở việc ghi nhớ ánh xạ từ điểm ảnh sang nhãn; nó xây dựng một không gian "
-        "đặc trưng trong đó khoảng cách hình học phản ánh quan hệ ngữ nghĩa. Và cũng chính "
-        "tính chất này là nền tảng của chuyển giao tri thức: một biểu diễn đã mã hoá được "
-        "\"cái gì trông giống cái gì\" có thể tái sử dụng cho một bài toán khác chỉ với ít "
-        "dữ liệu nhãn.")
+        "đặc trưng trong đó khoảng cách hình học phản ánh quan hệ ngữ nghĩa, ở mức độ mà "
+        "phép đo trên đã lượng hoá. Và cũng chính tính chất này là nền tảng của chuyển giao "
+        "tri thức: một biểu diễn đã mã hoá được \"cái gì trông giống cái gì\" có thể tái sử "
+        "dụng cho một bài toán khác chỉ với ít dữ liệu nhãn.")
     r.p(
         "Mặt trái cũng hiện ra trên cùng hình chiếu. Cụm mèo và cụm chó chồng lấn nhau "
         "nhiều nhất, đúng như dự đoán từ ma trận nhầm lẫn ở mục 7.5. Hai lớp này chia sẻ "
@@ -344,6 +364,44 @@ def _gap_commentary(r: R.Report, d: dict) -> None:
         f"hoán vị được.")
 
 
+def _pca_commentary(r: R.Report, d: dict) -> None:
+    """Bình luận định lượng cho hình chiếu PCA, đọc thẳng từ số liệu notebook."""
+    pca = d.get("pca")
+    if not pca:
+        return
+
+    parts = []
+    for key, label in [("mnist", "MNIST"), ("cifar10", "CIFAR-10")]:
+        blk = pca.get(key) or {}
+        evr = blk.get("explained_variance_ratio")
+        if evr and len(evr) >= 2:
+            parts.append(
+                f"trên {label}, hai thành phần chính đầu tiên giữ lại "
+                f"{pct(evr[0] + evr[1])} phương sai của không gian 128 chiều "
+                f"({pct(evr[0])} và {pct(evr[1])})")
+    if parts:
+        r.p(
+            "Một con số cần nêu kèm trước khi diễn giải hình: " + "; ".join(parts) + ". "
+            "Phần phương sai bị bỏ lại không biến mất, nó chỉ không hiển thị được trên mặt "
+            "phẳng hai chiều. Vì vậy mọi nhận định dưới đây về mức độ tách cụm là "
+            "<em>cận dưới</em> của mức tách thật trong không gian đầy đủ.")
+
+    sep = (pca.get("cifar10") or {}).get("vehicle_animal_separation")
+    if sep is None:
+        return
+    r.p(
+        f"Để không dừng ở quan sát bằng mắt, báo cáo đo luôn mức tách giữa hai siêu lớp "
+        f"phương tiện và động vật ngay trên hình chiếu hai chiều. Giá trị thu được là "
+        f"<strong>{num(sep, 4)}</strong>. "
+        + ("Số dương rõ rệt này xác nhận rằng cấu trúc phân nhóm nhìn thấy trên hình không "
+           "phải ảo giác thị giác mà là một tính chất đo được của biểu diễn."
+           if sep > 0.1 else
+           "Giá trị khiêm tốn này nói rằng cấu trúc phân nhóm có tồn tại nhưng yếu, và không "
+           "nên được trình bày mạnh hơn mức dữ liệu cho phép. Hai siêu lớp chồng lấn đáng kể "
+           "trên hình chiếu tuyến tính hai chiều, dù chúng có thể tách tốt hơn trong không "
+           "gian 128 chiều đầy đủ."))
+
+
 def _summary_table(r: R.Report, data: dict) -> None:
     rows = []
 
@@ -406,6 +464,7 @@ def _conclusion(r: R.Report, data: dict) -> None:
     hp_best = max(hp.values(), key=lambda v: v["r2"])
     mn_np = mn.get("numpy_improved") or mn.get("numpy_baseline")
     cf_np = cf.get("numpy_improved") or cf.get("numpy_baseline")
+    _sep = ((mlp.get("pca") or {}).get("cifar10") or {}).get("vehicle_animal_separation")
 
     r.p(
         "Báo cáo đã xây dựng, huấn luyện và đối chuẩn mạng nơ-ron tích chập ở ba mức độ "
@@ -445,11 +504,17 @@ def _conclusion(r: R.Report, data: dict) -> None:
         f"{pct(abs(mlp['cifar10']['cnn']['accuracy'] - mlp['cifar10']['mlp']['accuracy']))}, "
         f"dù mạng truyền thẳng có nhiều tham số hơn.",
 
-        f"<strong>Mạng học được cấu trúc ngữ nghĩa không ai dạy nó.</strong> Hình chiếu PCA "
-        f"của không gian ẩn 128 chiều trên CIFAR-10 cho thấy các lớp tự gom thành hai nhóm "
-        f"lớn, phương tiện di chuyển và động vật sống, trong khi hàm mất mát phạt mọi kiểu "
-        f"nhầm lẫn như nhau. Đây là bằng chứng trực quan cho khái niệm học biểu diễn và là "
-        f"cơ sở của chuyển giao tri thức.",
+        (f"<strong>Mạng học được cấu trúc ngữ nghĩa không ai dạy nó.</strong> Hình chiếu "
+         f"PCA của không gian ẩn 128 chiều trên CIFAR-10 cho thấy các lớp tự gom thành hai "
+         f"nhóm lớn, phương tiện di chuyển và động vật sống, trong khi hàm mất mát phạt mọi "
+         f"kiểu nhầm lẫn như nhau. Mức tách đo được giữa hai siêu lớp là {num(_sep, 4)}."
+         if (_sep is not None and _sep > 0.1) else
+         f"<strong>Cấu trúc ngữ nghĩa trong không gian ẩn tồn tại nhưng yếu.</strong> Mức "
+         f"tách đo được giữa hai siêu lớp phương tiện và động vật trên hình chiếu PCA hai "
+         f"chiều chỉ là {num(_sep, 4) if _sep is not None else 'không đo được'}. Báo cáo ghi "
+         f"nhận đúng mức đó: PCA là phép chiếu tuyến tính chọn hướng theo phương sai tổng "
+         f"thể, không theo ranh giới siêu lớp, nên đây là cận dưới chứ không phải kết luận "
+         f"về chất lượng biểu diễn."),
     ]
     r.p('<ol class="tight">' + "".join(f"<li>{it}</li>" for it in items) + "</ol>")
     r.p(
