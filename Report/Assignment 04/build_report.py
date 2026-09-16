@@ -36,6 +36,7 @@ FIG_SOURCES = [
     ("mn", ROOT / "mnist" / "reports" / "figures"),
     ("cf", ROOT / "cifar10" / "reports" / "figures"),
     ("mv", ROOT / "mlp_vs_cnn" / "reports" / "figures"),
+    ("an", ROOT / "analysis" / "reports" / "figures"),
 ]
 
 
@@ -62,6 +63,14 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_optional(path: Path):
+    """Doc tep neu co, tra None neu chua co. Dung cho ba thuc nghiem bo sung."""
+    if not path.exists():
+        print(f"  ! chua co {path.name}, chuong tuong ung se in o canh bao")
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def load_all() -> dict:
     return {
         "comments": load_json(ROOT / "customer_comments" / "reports" / "metrics_customer_comments.json"),
@@ -70,6 +79,11 @@ def load_all() -> dict:
         "mnist": load_json(ROOT / "mnist" / "reports" / "metrics_mnist.json"),
         "cifar": load_json(ROOT / "cifar10" / "reports" / "metrics_cifar10.json"),
         "mlp": load_json(ROOT / "mlp_vs_cnn" / "reports" / "metrics_mlp_vs_cnn.json"),
+        # Ba thuc nghiem goc o Muc 8 hop dong. Chua co thi bao cao van dung duoc,
+        # chuong tuong ung se in mot o canh bao thay vi lam hong ca ban build.
+        "statistical": load_optional(ROOT / "analysis" / "reports" / "metrics_statistical.json"),
+        "anatomy": load_optional(ROOT / "analysis" / "reports" / "metrics_anatomy.json"),
+        "ablation": load_optional(ROOT / "analysis" / "reports" / "metrics_ablation.json"),
     }
 
 
@@ -105,6 +119,7 @@ def main() -> int:
     import chapters_theory
     import chapters_1d
     import chapters_2d
+    import chapters_analysis
     import chapters_final
     import paginate
 
@@ -118,6 +133,7 @@ def main() -> int:
     chapters_theory.write(rep, data)
     chapters_1d.write(rep, data)
     chapters_2d.write(rep, data)
+    chapters_analysis.write(rep, data)
     chapters_final.write(rep, data)
 
     html_path = REPORT / "Assignment_04.html"

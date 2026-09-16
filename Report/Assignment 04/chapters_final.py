@@ -1,4 +1,4 @@
-"""Chương 8 (đối kháng MLP với CNN, không gian ẩn PCA) và Chương 9 (tổng hợp, kết luận)."""
+"""Chương 8 (đối kháng MLP với CNN, không gian ẩn PCA) và Chương 12 (tổng hợp, kết luận)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from chapters_2d import M_LABEL, _best
 
 def write(r: R.Report, data: dict) -> None:
     _chapter8(r, data)
-    _chapter9(r, data)
+    _chapter12(r, data)
 
 
 # ===========================================================================
@@ -186,15 +186,15 @@ X_pca = PCA(n_components=2, random_state=42).fit_transform(X_feat)''',
 # ===========================================================================
 # CHƯƠNG 9 — TỔNG HỢP VÀ KẾT LUẬN
 # ===========================================================================
-def _chapter9(r: R.Report, data: dict) -> None:
-    r.h(1, "Chương 9. Tổng hợp đối chuẩn, giới hạn và kết luận")
+def _chapter12(r: R.Report, data: dict) -> None:
+    r.h(1, "Chương 12. Tổng hợp đối chuẩn, giới hạn và kết luận")
 
     # ---- 9.1
-    r.h(2, "9.1. Bảng tổng hợp toàn bộ thực nghiệm")
+    r.h(2, "12.1. Bảng tổng hợp toàn bộ thực nghiệm")
     _summary_table(r, data)
 
     # ---- 9.2
-    r.h(2, "9.2. So sánh ba cách cài đặt")
+    r.h(2, "12.2. So sánh ba cách cài đặt")
     r.p(R.table(
         ["Cách cài đặt", "Ưu điểm", "Hạn chế", "Vai trò trong bài tập này"],
         [["NumPy thuần từ đầu",
@@ -220,7 +220,7 @@ def _chapter9(r: R.Report, data: dict) -> None:
         "bài giảng nêu ra: cùng một mô hình toán học không có nghĩa là cùng một hiện thực.")
 
     # ---- 9.3
-    r.h(2, "9.3. Tính công bằng và giới hạn của phép đối chuẩn")
+    r.h(2, "12.3. Tính công bằng và giới hạn của phép đối chuẩn")
     r.p(
         "Phép đối chuẩn trong báo cáo giữ cố định tập kiểm thử và bộ chỉ số, nhưng không "
         "phải mọi điều kiện đều giống hệt nhau. Liệt kê đầy đủ những sai lệch, kể cả những "
@@ -246,7 +246,7 @@ def _chapter9(r: R.Report, data: dict) -> None:
         "luôn chính xác hơn.")
 
     # ---- 9.4
-    r.h(2, "9.4. Kiểm toán khả năng tái lập")
+    r.h(2, "12.4. Kiểm toán khả năng tái lập")
     r.p(R.table(
         ["Hạng mục", "Cách thực hiện", "Ý nghĩa"],
         [["Hạt giống ngẫu nhiên",
@@ -282,11 +282,11 @@ def _chapter9(r: R.Report, data: dict) -> None:
         "trên cùng phần cứng.")
 
     # ---- 9.5
-    r.h(2, "9.5. Kết luận")
+    r.h(2, "12.5. Kết luận")
     _conclusion(r, data)
 
     # ---- 9.6
-    r.h(2, "9.6. Hướng phát triển tiếp theo")
+    r.h(2, "12.6. Hướng phát triển tiếp theo")
     r.p(
         '<ol class="tight">'
         '<li><strong>Tăng cường dữ liệu.</strong> Cắt ngẫu nhiên, lật ngang và nhiễu màu '

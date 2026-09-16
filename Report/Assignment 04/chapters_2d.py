@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import report_lib as R
-from chapters_1d import num, pct, thousands
+from chapters_1d import dev, device_note, num, pct, thousands
 
 M_LABEL = {
     "numpy_baseline": "NumPy cơ sở",
@@ -26,7 +26,7 @@ def _rows(models: dict) -> list[list[str]]:
         mk = models[k]
         out.append([M_LABEL.get(k, k), pct(mk["accuracy"]), pct(mk["macro_precision"]),
                     pct(mk["macro_recall"]), pct(mk["macro_f1"]),
-                    f'{mk["params"]:,}', num(mk["train_time_s"], 1)])
+                    f'{mk["params"]:,}', dev(mk), num(mk["train_time_s"], 1)])
     return out
 
 
@@ -186,9 +186,11 @@ def _chapter6(r: R.Report, data: dict) -> None:
     r.p(R.figure("mn_fig_mnist_framework_confusion.png",
                  "Ma trận nhầm lẫn của hai mô hình framework trên tập kiểm thử MNIST."))
     r.p(R.table(
-        ["Mô hình", "Accuracy", "Macro-P", "Macro-R", "Macro-F1", "Tham số", "Thời gian (s)"],
+        ["Mô hình", "Accuracy", "Macro-P", "Macro-R", "Macro-F1", "Tham số",
+         "Thiết bị", "Thời gian (s)"],
         _rows(m),
         "Đối chuẩn bốn cách cài đặt 2D CNN trên MNIST, sắp theo Macro-F1."))
+    r.p(device_note(m))
     _threeway_commentary(r, m, "MNIST")
     r.p(R.figure("mn_fig_mnist_3way_benchmark.png",
                  "So sánh Accuracy, Macro-Precision, Macro-Recall và Macro-F1 giữa các cách "
@@ -310,9 +312,11 @@ def _chapter7(r: R.Report, data: dict) -> None:
     r.p(R.figure("cf_fig_cifar10_framework_confusion.png",
                  "Ma trận nhầm lẫn của hai mô hình framework trên tập kiểm thử CIFAR-10."))
     r.p(R.table(
-        ["Mô hình", "Accuracy", "Macro-P", "Macro-R", "Macro-F1", "Tham số", "Thời gian (s)"],
+        ["Mô hình", "Accuracy", "Macro-P", "Macro-R", "Macro-F1", "Tham số",
+         "Thiết bị", "Thời gian (s)"],
         _rows(m),
         "Đối chuẩn bốn cách cài đặt 2D CNN trên CIFAR-10, sắp theo Macro-F1."))
+    r.p(device_note(m))
     _threeway_commentary(r, m, "CIFAR-10")
     r.p(R.figure("cf_fig_cifar10_3way_benchmark.png",
                  "So sánh đa chỉ số giữa các cách cài đặt trên CIFAR-10."))
@@ -465,10 +469,10 @@ def _threeway_commentary(r: R.Report, m: dict, dataset: str) -> None:
         t_pt, t_tf = fw[a]["train_time_s"], fw[b]["train_time_s"]
         ratio = max(t_pt, t_tf) / max(min(t_pt, t_tf), 1e-9)
         r.p(
-            f"Về thời gian huấn luyện, PyTorch mất {num(t_pt, 1)} giây và Keras mất "
-            f"{num(t_tf, 1)} giây, tỉ lệ {ratio:.2f} lần. Con số này phụ thuộc mạnh vào "
-            f"backend, quá trình biên dịch đồ thị, giai đoạn khởi động và tải hệ thống tại "
-            f"thời điểm chạy, nên không nên khái quát thành ưu thế tuyệt đối của khung nào.")
+            f"Về thời gian chạy, PyTorch mất {num(t_pt, 1)} giây và Keras mất "
+            f"{num(t_tf, 1)} giây. Tỉ lệ {ratio:.2f} lần giữa hai con số này <strong>không "
+            f"nói lên điều gì về hai khung</strong>, vì PyTorch chạy trên GPU còn Keras chạy "
+            f"trên CPU. Đây là chênh lệch phần cứng chứ không phải chênh lệch phần mềm.")
 
     if np_best:
         gap = best_m["macro_f1"] - np_best["macro_f1"]

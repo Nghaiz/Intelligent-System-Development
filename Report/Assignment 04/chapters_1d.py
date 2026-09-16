@@ -11,6 +11,31 @@ FW_LABEL = {
 }
 FW_ORDER = ["numpy", "pytorch", "tensorflow"]
 
+DEVICE_LABEL = {"cuda": "GPU", "cpu": "CPU"}
+
+
+def dev(m: dict) -> str:
+    """Nhan thiet bi cho cot thoi gian. Chua ghi thi tra dau gach."""
+    return DEVICE_LABEL.get(m.get("device"), "—")
+
+
+def device_note(models: dict) -> str:
+    """O canh bao khi cac mo hinh trong bang khong chay cung thiet bi."""
+    devs = {m.get("device") for m in models.values() if isinstance(m, dict)}
+    devs.discard(None)
+    if len(devs) < 2:
+        return ""
+    return R.note(
+        "Cột thời gian không so sánh được giữa các khung.",
+        "Các mô hình trong bảng chạy trên <strong>thiết bị khác nhau</strong>: PyTorch trên "
+        "GPU (RTX 4060), TensorFlow và NumPy trên CPU. TensorFlow từ bản 2.11 không còn hỗ trợ "
+        "GPU native trên Windows, còn NumPy chạy CPU là bản chất của bài tập chứ không phải hạn "
+        "chế phần cứng. Vì vậy cột thời gian ở đây là phép so sánh <em>phần cứng</em>, không "
+        "phải phép so sánh khung thư viện, và báo cáo không rút ra kết luận nào về tốc độ tương "
+        "đối giữa ba khung. Các chỉ số chất lượng không phụ thuộc thiết bị nên vẫn so sánh được "
+        "bình thường.", "warn")
+
+
 
 # ---------------------------------------------------------------------------
 # Tiện ích định dạng — mọi con số đều đi qua đây, không gõ tay vào văn bản
@@ -320,11 +345,13 @@ def backward(self, dZ):
     # ---- 3.5
     r.h(2, "3.5. Kết quả đối chuẩn ba khung")
     r.p(R.table(
-        ["Khung hiện thực", "Accuracy", "Precision", "Recall", "F1", "Tham số", "Thời gian (s)"],
+        ["Khung hiện thực", "Accuracy", "Precision", "Recall", "F1", "Tham số",
+         "Thiết bị", "Thời gian (s)"],
         [[FW_LABEL[k], pct(m[k]["accuracy"]), pct(m[k]["precision"]),
           pct(m[k]["recall"]), pct(m[k]["f1"]),
-          f'{m[k]["params"]:,}', num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
+          f'{m[k]["params"]:,}', dev(m[k]), num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
         "Đối chuẩn 1D CNN trên tập đánh giá khách hàng, đo trên cùng một tập kiểm thử."))
+    r.p(device_note(m))
     _benchmark_commentary(r, m, "f1", "F1")
     r.p(R.figure("cm_fig_comments_benchmark.png",
                  "So sánh Accuracy, Precision, Recall và F1 giữa ba cách cài đặt trên tập "
@@ -395,11 +422,13 @@ def _chapter4(r: R.Report, data: dict) -> None:
     # ---- 4.4
     r.h(2, "4.4. Kết quả đối chuẩn ba khung")
     r.p(R.table(
-        ["Khung hiện thực", "Accuracy", "Precision", "Recall", "F1", "ROC-AUC", "Thời gian (s)"],
+        ["Khung hiện thực", "Accuracy", "Precision", "Recall", "F1", "ROC-AUC",
+         "Thiết bị", "Thời gian (s)"],
         [[FW_LABEL[k], pct(m[k]["accuracy"]), pct(m[k]["precision"]),
           pct(m[k]["recall"]), pct(m[k]["f1"]), num(m[k].get("roc_auc", 0)),
-          num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
+          dev(m[k]), num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
         "Hiệu năng 1D CNN trên bài toán chẩn đoán tiểu đường, chỉ số tính trên lớp dương."))
+    r.p(device_note(m))
     _benchmark_commentary(r, m, "f1", "F1")
     r.p(R.figure("db_fig_diabetes_benchmark.png",
                  "So sánh bốn chỉ số phân loại giữa ba cách cài đặt trên bài toán tiểu đường."))
@@ -506,12 +535,13 @@ def _chapter5(r: R.Report, data: dict) -> None:
     r.h(2, "5.4. Kết quả đối chuẩn ba khung")
     r.p(R.table(
         ["Khung hiện thực", "RMSE (USD)", "MAE (USD)", "RMSE (log)", "MAE (log)", "R²",
-         "Thời gian (s)"],
+         "Thiết bị", "Thời gian (s)"],
         [[FW_LABEL[k], usd(m[k]["rmse_usd"]), usd(m[k]["mae_usd"]),
           num(m[k]["rmse_log"]), num(m[k]["mae_log"]), num(m[k]["r2"]),
-          num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
+          dev(m[k]), num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
         "Các chỉ số hồi quy của mô hình 1D CNN trên bài toán định giá bất động sản."))
 
+    r.p(device_note(m))
     best_k, best_m = best_of(m, "r2")
     worst_k, worst_m = worst_of(m, "r2")
     r.p(
@@ -610,11 +640,12 @@ def _benchmark_commentary(r: R.Report, m: dict, key: str, label: str) -> None:
 
     t_fast, t_slow = worst_of(m, "train_time_s"), best_of(m, "train_time_s")
     r.p(
-        f"Về chi phí tính toán, {FW_LABEL[t_fast[0]]} nhanh nhất với "
-        f"{num(t_fast[1]['train_time_s'], 1)} giây, {FW_LABEL[t_slow[0]]} chậm nhất với "
-        f"{num(t_slow[1]['train_time_s'], 1)} giây. Cần nhắc lại rằng toàn bộ thực nghiệm "
-        f"chạy trên CPU; trên phần cứng có GPU thứ tự này gần như chắc chắn thay đổi, vì "
-        f"phần lợi thế lớn nhất của hai khung thư viện nằm ở chỗ báo cáo này không đo được.")
+        f"Về thời gian chạy, {FW_LABEL[t_fast[0]]} mất "
+        f"{num(t_fast[1]['train_time_s'], 1)} giây và {FW_LABEL[t_slow[0]]} mất "
+        f"{num(t_slow[1]['train_time_s'], 1)} giây. Hai con số này <strong>không</strong> so "
+        f"sánh được với nhau, vì chúng đo trên hai loại thiết bị khác nhau như ô cảnh báo bên "
+        f"trên đã nêu. Điều duy nhất rút ra được là chi phí tuyệt đối của từng cấu hình trong "
+        f"đúng thiết lập này, đủ để biết một lần chạy lại tốn bao lâu.")
 
 
 def _binary_cm_commentary(r: R.Report, m: dict, pos_label: str, neg_label: str) -> None:
