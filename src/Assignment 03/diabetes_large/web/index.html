@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sàng lọc nguy cơ tiểu đường — Hệ thống 1</title>
+<style>
+  :root{
+    --primary:#0d6efd; --primary-dark:#0b5ed7; --accent:#dc3545;
+    --bg:#f4f6fb; --card:#ffffff; --text:#1c2430; --muted:#6b7480;
+    --border:#e2e6ee; --ok:#198754; --warn:#997404;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5;
+  }
+  .wrap{max-width:1200px; margin:0 auto; padding:24px 20px 60px;}
+  header{margin-bottom:20px;}
+  h1{margin:0 0 4px; font-size:26px; color:var(--primary-dark);}
+  .subtitle{color:var(--muted); font-size:15px;}
+  .badge-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; background:var(--card);
+    border:1px solid var(--border); border-radius:999px; padding:6px 14px;
+    font-size:13px; color:var(--text); box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .badge .dot{width:8px; height:8px; border-radius:50%; background:var(--muted);}
+  .badge.on .dot{background:var(--ok);}
+  .badge.off .dot{background:#adb5bd;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:22px; box-shadow:0 2px 10px rgba(20,30,60,.05);
+  }
+  .card h2{margin:0 0 16px; font-size:17px; color:var(--primary-dark);}
+  .field{margin-bottom:14px;}
+  label{display:block; font-size:13px; font-weight:600; color:var(--text); margin-bottom:5px;}
+  input[type=number], select, textarea{
+    width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px;
+    font-size:14px; font-family:inherit; background:#fff; color:var(--text);
+  }
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--primary); outline-offset:1px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .actions{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;}
+  button{
+    cursor:pointer; border:none; border-radius:8px; padding:11px 20px;
+    font-size:14px; font-weight:600; font-family:inherit; transition:opacity .15s;
+  }
+  button:hover{opacity:.9;}
+  button:disabled{opacity:.6; cursor:not-allowed;}
+  .btn-primary{background:var(--primary); color:#fff;}
+  .btn-secondary{background:#eef1f7; color:var(--text);}
+  .error-box{
+    background:#fdecea; border:1px solid #f5c2c7; color:#842029; border-radius:8px;
+    padding:12px 14px; margin-top:14px; font-size:14px; display:none;
+  }
+  .loading{color:var(--muted); font-size:14px; margin-top:12px; display:none;}
+  .result-empty{color:var(--muted); font-size:14px; text-align:center; padding:40px 10px;}
+  .result-body{display:none;}
+  .prob-block{margin-bottom:18px;}
+  .prob-value{font-size:34px; font-weight:800; color:var(--primary-dark);}
+  .bar-track{
+    position:relative; height:18px; border-radius:999px; margin-top:12px;
+    background:linear-gradient(90deg, #198754, #ffc107, #dc3545);
+  }
+  .bar-marker{
+    position:absolute; top:-6px; width:3px; height:30px; background:#212529;
+    border-radius:2px;
+  }
+  .bar-marker .tag{
+    position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+    font-size:10px; color:var(--muted); white-space:nowrap;
+  }
+  .bar-cursor{
+    position:absolute; top:-4px; width:14px; height:26px; margin-left:-7px;
+    background:#212529; border-radius:4px; box-shadow:0 0 0 2px #fff;
+  }
+  .tier-badge{
+    display:inline-block; margin-top:14px; padding:6px 14px; border-radius:999px;
+    font-size:13px; font-weight:700;
+  }
+  .tier-badge.dia_high{background:#f8d7da; color:#842029;}
+  .tier-badge.dia_moderate{background:#fff3cd; color:#664d03;}
+  .tier-badge.dia_low{background:#d1e7dd; color:#0f5132;}
+  .label-line{font-size:16px; font-weight:700; margin-top:6px;}
+  .k-note{color:var(--muted); font-size:12.5px; margin-top:16px; font-style:italic;}
+  .k-group{margin-top:16px;}
+  .k-group h3{font-size:14px; margin:0 0 8px; color:var(--primary-dark);}
+  .k-item{padding:10px 12px; background:#f6f8fc; border-radius:8px; margin-bottom:8px;}
+  .k-item .t{font-weight:700; font-size:13.5px;}
+  .k-item .c{font-size:13px; color:var(--text); margin-top:2px;}
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Sàng lọc nguy cơ tiểu đường</h1>
+    <div class="subtitle">Hệ thống 1 · 100,000 hồ sơ bệnh nhân</div>
+    <div class="badge-row" id="badgeRow">
+      <span class="badge off" id="badgeModel"><span class="dot"></span>Đang tải mô hình…</span>
+      <span class="badge off" id="badgeGraph"><span class="dot"></span>Đồ thị tri thức: đang kiểm tra…</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Nhập thông tin bệnh nhân</h2>
+      <form id="predictForm">
+        <div class="row2">
+          <div class="field">
+            <label for="gender">Giới tính</label>
+            <select id="gender" name="gender">
+              <option value="Female">Nữ</option>
+              <option value="Male">Nam</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="age">Tuổi (1–120)</label>
+            <input type="number" id="age" name="age" min="1" max="120" step="1" value="54" required>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="hypertension">Tăng huyết áp</label>
+            <select id="hypertension" name="hypertension">
+              <option value="0">Không</option>
+              <option value="1">Có</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="heart_disease">Bệnh tim</label>
+            <select id="heart_disease" name="heart_disease">
+              <option value="0">Không</option>
+              <option value="1">Có</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="smoking_history">Tiền sử hút thuốc</label>
+          <select id="smoking_history" name="smoking_history">
+            <option value="No Info">Không có thông tin</option>
+            <option value="current">Đang hút</option>
+            <option value="ever">Đã từng hút</option>
+            <option value="former">Đã bỏ thuốc</option>
+            <option value="never" selected>Chưa từng hút</option>
+            <option value="not current">Hiện không hút</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="bmi">Chỉ số BMI (10–80)</label>
+            <input type="number" id="bmi" name="bmi" min="10" max="80" step="0.1" value="27.3" required>
+          </div>
+          <div class="field">
+            <label for="HbA1c_level">HbA1c % (3–20)</label>
+            <input type="number" id="HbA1c_level" name="HbA1c_level" min="3" max="20" step="0.1" value="6.2" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="blood_glucose_level">Đường huyết mg/dL (50–500)</label>
+          <input type="number" id="blood_glucose_level" name="blood_glucose_level" min="50" max="500" step="1" value="155" required>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn-primary" id="btnPredict">Dự đoán</button>
+          <button type="button" class="btn-secondary" id="btnSample">Điền dữ liệu mẫu</button>
+        </div>
+        <div class="loading" id="loading">Đang tính toán…</div>
+        <div class="error-box" id="errorBox"></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Kết quả dự đoán</h2>
+      <div class="result-empty" id="resultEmpty">Nhập thông tin và bấm "Dự đoán" để xem kết quả.</div>
+      <div class="result-body" id="resultBody">
+        <div class="prob-block">
+          <div class="prob-value" id="probValue">0%</div>
+          <div class="label-line" id="labelText"></div>
+          <div class="bar-track" id="barTrack">
+            <div class="bar-marker" id="barMarker"><span class="tag" id="barMarkerTag"></span></div>
+            <div class="bar-cursor" id="barCursor"></div>
+          </div>
+          <span class="tier-badge" id="tierBadge"></span>
+        </div>
+        <div id="knowledgeArea"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer>Hệ thống 1 — Sàng lọc nguy cơ tiểu đường · Suy luận thuần NumPy · Bản mô phỏng giao diện Web</footer>
+</div>
+
+<script>
+(function(){
+  var PREFIX = '/diabetes/v1';
+  var els = {
+    badgeModel: document.getElementById('badgeModel'),
+    badgeGraph: document.getElementById('badgeGraph'),
+    form: document.getElementById('predictForm'),
+    btnPredict: document.getElementById('btnPredict'),
+    btnSample: document.getElementById('btnSample'),
+    loading: document.getElementById('loading'),
+    errorBox: document.getElementById('errorBox'),
+    resultEmpty: document.getElementById('resultEmpty'),
+    resultBody: document.getElementById('resultBody'),
+    probValue: document.getElementById('probValue'),
+    labelText: document.getElementById('labelText'),
+    barMarker: document.getElementById('barMarker'),
+    barMarkerTag: document.getElementById('barMarkerTag'),
+    barCursor: document.getElementById('barCursor'),
+    tierBadge: document.getElementById('tierBadge'),
+    knowledgeArea: document.getElementById('knowledgeArea')
+  };
+
+  var TIER_LABEL = {dia_high:'Nguy cơ cao', dia_moderate:'Nguy cơ trung bình', dia_low:'Nguy cơ thấp'};
+
+  function loadHealth(){
+    fetch(PREFIX + '/health').then(function(r){ return r.json(); }).then(function(d){
+      els.badgeModel.className = 'badge on';
+      els.badgeModel.innerHTML = '<span class="dot"></span>' + d.architecture + ' · ' +
+        Number(d.n_params).toLocaleString('vi-VN') + ' tham số · Suy luận thuần NumPy — không dùng framework học sâu';
+      if(d.knowledge_graph === 'connected'){
+        els.badgeGraph.className = 'badge on';
+        els.badgeGraph.innerHTML = '<span class="dot"></span>Đồ thị tri thức: đã kết nối';
+      } else {
+        els.badgeGraph.className = 'badge off';
+        els.badgeGraph.innerHTML = '<span class="dot"></span>Đồ thị tri thức: không khả dụng';
+      }
+    }).catch(function(){
+      els.badgeModel.className = 'badge off';
+      els.badgeModel.innerHTML = '<span class="dot"></span>Không kết nối được máy chủ mô hình';
+    });
+  }
+
+  function showError(msg){
+    els.errorBox.textContent = msg;
+    els.errorBox.style.display = 'block';
+  }
+  function hideError(){ els.errorBox.style.display = 'none'; }
+
+  function renderKnowledge(groups, err){
+    var html = '';
+    if(groups && groups.length){
+      groups.forEach(function(g){
+        html += '<div class="k-group"><h3>' + escapeHtml(g.title) + '</h3>';
+        (g.items || []).forEach(function(it){
+          html += '<div class="k-item"><div class="t">' + escapeHtml(it.title) + '</div>' +
+                  (it.content ? '<div class="c">' + escapeHtml(it.content) + '</div>' : '') + '</div>';
+        });
+        html += '</div>';
+      });
+    }
+    if(err){
+      html += '<div class="k-note">Ghi chú: ' + escapeHtml(err) + '</div>';
+    }
+    els.knowledgeArea.innerHTML = html;
+  }
+
+  function escapeHtml(s){
+    if(s === null || s === undefined) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderResult(data){
+    els.resultEmpty.style.display = 'none';
+    els.resultBody.style.display = 'block';
+    var pct = data.probability * 100;
+    els.probValue.textContent = pct.toFixed(1) + '%';
+    els.labelText.textContent = data.label_text;
+    els.labelText.style.color = data.label === 1 ? '#dc3545' : '#198754';
+
+    var thPct = data.threshold * 100;
+    els.barMarker.style.left = thPct + '%';
+    els.barMarkerTag.textContent = 'Ngưỡng ' + thPct.toFixed(0) + '%';
+    els.barCursor.style.left = Math.max(0, Math.min(100, pct)) + '%';
+
+    if(data.risk_tier){
+      els.tierBadge.style.display = 'inline-block';
+      els.tierBadge.className = 'tier-badge ' + data.risk_tier;
+      els.tierBadge.textContent = TIER_LABEL[data.risk_tier] || data.risk_tier;
+    } else {
+      els.tierBadge.style.display = 'none';
+    }
+
+    renderKnowledge(data.knowledge, data.knowledge_error);
+  }
+
+  function submitForm(e){
+    e.preventDefault();
+    hideError();
+    var payload = {
+      gender: els.form.gender.value,
+      age: Number(els.form.age.value),
+      hypertension: Number(els.form.hypertension.value),
+      heart_disease: Number(els.form.heart_disease.value),
+      smoking_history: els.form.smoking_history.value,
+      bmi: Number(els.form.bmi.value),
+      HbA1c_level: Number(els.form.HbA1c_level.value),
+      blood_glucose_level: Number(els.form.blood_glucose_level.value)
+    };
+    els.btnPredict.disabled = true;
+    els.loading.style.display = 'block';
+    fetch(PREFIX + '/predict', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      return r.json().then(function(d){ return {ok:r.ok, data:d}; });
+    }).then(function(res){
+      els.btnPredict.disabled = false;
+      els.loading.style.display = 'none';
+      if(!res.ok){
+        showError(res.data.error || 'Đã có lỗi xảy ra.');
+        return;
+      }
+      renderResult(res.data);
+    }).catch(function(){
+      els.btnPredict.disabled = false;
+      els.loading.style.display = 'none';
+      showError('Không thể kết nối tới máy chủ. Vui lòng kiểm tra API có đang chạy trên cổng 5001 hay không.');
+    });
+  }
+
+  els.form.addEventListener('submit', submitForm);
+  els.btnSample.addEventListener('click', function(){
+    els.form.gender.value = 'Female';
+    els.form.age.value = 54;
+    els.form.hypertension.value = '0';
+    els.form.heart_disease.value = '0';
+    els.form.smoking_history.value = 'never';
+    els.form.bmi.value = 27.3;
+    els.form.HbA1c_level.value = 6.2;
+    els.form.blood_glucose_level.value = 155;
+  });
+
+  loadHealth();
+})();
+</script>
+</body>
+</html>

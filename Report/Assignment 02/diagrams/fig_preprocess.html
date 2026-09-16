@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  *{box-sizing:border-box;font-family:"Segoe UI","Be Vietnam Pro","Noto Sans",Arial,sans-serif;}
+  .canvas{width:780px;height:980px;position:relative;background:#fff;overflow:hidden;}
+  .title{position:absolute;top:14px;left:0;width:780px;text-align:center;font-size:17px;font-weight:700;color:#1e293b;}
+  .col{position:absolute;top:60px;left:30px;width:720px;}
+  .row{display:flex;align-items:center;margin-bottom:23px;position:relative;}
+  .rowline{position:absolute;left:26px;top:44px;width:2px;height:20px;background:#cbd5e1;}
+  .num{width:52px;height:52px;border-radius:50%;color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 2px 4px rgba(0,0,0,.15);}
+  .connector{width:26px;text-align:center;color:#94a3b8;font-size:18px;font-weight:700;flex:none;}
+  .box{flex:1;min-height:64px;border-radius:10px;border:1.5px solid #cbd5e1;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.05);padding:14px 16px;display:flex;flex-direction:column;justify-content:center;}
+  .lbl{font-size:13px;font-weight:700;color:#1e293b;letter-spacing:.01em;}
+  .desc{font-size:11.5px;color:#64748b;margin-top:4px;line-height:1.5;}
+  .n1{background:#2563eb;} .b1{background:#eff6ff;}
+  .n2{background:#3b82f6;} .b2{background:#eff6ff;}
+  .n3{background:#dc2626;} .b3{background:#fef2f2;}
+  .n4{background:#d97706;} .b4{background:#fffbeb;}
+  .n5{background:#0d9488;} .b5{background:#f0fdfa;}
+  .n6{background:#7c3aed;} .b6{background:#f5f3ff;}
+  .n7{background:#2563eb;} .b7{background:#eff6ff;}
+  .n8{background:#059669;} .b8{background:#ecfdf5;border-color:#059669;}
+  .check{margin-left:8px;color:#059669;font-weight:700;font-size:16px;}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Quy trình tiền xử lý dữ liệu</div>
+  <div class="col">
+
+    <div class="row">
+      <div class="num n1">1</div><div class="connector">→</div>
+      <div class="box b1"><div class="lbl">DỮ LIỆU BAN ĐẦU</div><div class="desc">Dữ liệu thô từ nguồn (CSV, bảng dữ liệu, v.v.)</div></div>
+    </div>
+    <div class="row">
+      <div class="num n2">2</div><div class="connector">→</div>
+      <div class="box b2"><div class="lbl">KIỂM TRA CHẤT LƯỢNG DỮ LIỆU</div><div class="desc">Kiểm tra kiểu dữ liệu, giá trị thiếu, dữ liệu trùng lặp, giá trị không hợp lệ, ngoại lệ và phân bố dữ liệu.</div></div>
+    </div>
+    <div class="row">
+      <div class="num n3">3</div><div class="connector">→</div>
+      <div class="box b3"><div class="lbl">XỬ LÝ GIÁ TRỊ THIẾU</div><div class="desc">Loại bỏ hoặc điền giá trị thiếu bằng giá trị phù hợp (trung bình, trung vị, mode, v.v.)</div></div>
+    </div>
+    <div class="row">
+      <div class="num n4">4</div><div class="connector">→</div>
+      <div class="box b4"><div class="lbl">XỬ LÝ DỮ LIỆU TRÙNG LẶP</div><div class="desc">Phát hiện và loại bỏ các bản ghi trùng lặp không cần thiết.</div></div>
+    </div>
+    <div class="row">
+      <div class="num n5">5</div><div class="connector">→</div>
+      <div class="box b5"><div class="lbl">XỬ LÝ GIÁ TRỊ KHÔNG HỢP LỆ</div><div class="desc">Kiểm tra và xử lý các giá trị sai, không hợp lệ (âm, ngoài phạm vi, v.v.)</div></div>
+    </div>
+    <div class="row">
+      <div class="num n6">6</div><div class="connector">→</div>
+      <div class="box b6"><div class="lbl">MÃ HOÁ BIẾN PHÂN LOẠI</div><div class="desc">Chuyển đổi các biến phân loại thành dạng số (Label Encoding, One-Hot Encoding, v.v.)</div></div>
+    </div>
+    <div class="row">
+      <div class="num n7">7</div><div class="connector">→</div>
+      <div class="box b7"><div class="lbl">CHUẨN HOÁ DỮ LIỆU</div><div class="desc">Chuẩn hoá hoặc chuẩn hoá lại các biến số để đưa về cùng một thang đo (Standardization, Normalization, v.v.)</div></div>
+    </div>
+    <div class="row">
+      <div class="num n8">8</div><div class="connector">→</div>
+      <div class="box b8"><div class="lbl">DỮ LIỆU SẴN SÀNG CHO MÔ HÌNH <span class="check">✓</span></div><div class="desc">Dữ liệu đã được tiền xử lý, sẵn sàng đưa vào biểu diễn và huấn luyện mô hình.</div></div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

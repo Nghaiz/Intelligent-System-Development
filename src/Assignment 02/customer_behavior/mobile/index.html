@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile — Dự đoán khuyến nghị khách hàng</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; font-family: "Segoe UI", Roboto, Arial, sans-serif; }
+  body {
+    min-height: 100vh; background: radial-gradient(circle at top, #4c1d95 0%, #0f172a 60%, #020617 100%);
+    display: flex; flex-direction: column; align-items: center; padding: 30px 12px 50px;
+  }
+  .caption { color: #cbd5e1; font-size: 13.5px; text-align: center; margin-bottom: 18px; max-width: 420px; line-height: 1.5; }
+  .phone { position: relative; width: 390px; height: 844px; background: #0b0b0f; border-radius: 46px; padding: 12px; box-shadow: 0 30px 70px rgba(0,0,0,.55), 0 0 0 2px #26262e inset; }
+  .screen { position: relative; width: 100%; height: 100%; background: #faf7fe; border-radius: 34px; overflow: hidden; display: flex; flex-direction: column; }
+  .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 120px; height: 28px; background: #0b0b0f; border-radius: 20px; z-index: 30; }
+  .status-bar { height: 46px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; font-size: 13.5px; font-weight: 700; color: #0f172a; background: #faf7fe; position: relative; z-index: 20; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; font-size: 12px; }
+  .app-header { flex: none; padding: 6px 18px 14px; background: linear-gradient(135deg, #9333ea, #7e22ce); color: #fff; }
+  .app-header h1 { margin: 0; font-size: 18px; font-weight: 800; }
+  .app-header p { margin: 4px 0 0; font-size: 12px; opacity: .9; }
+  .app-content { flex: 1; overflow-y: auto; padding: 16px 16px 100px; -webkit-overflow-scrolling: touch; }
+  .config { background: #fff; border: 1px solid #e6dcf5; border-radius: 14px; padding: 10px 14px; margin-bottom: 16px; font-size: 12.5px; }
+  .config summary { cursor: pointer; font-weight: 700; color: #7e22ce; list-style: none; }
+  .config summary::-webkit-details-marker { display: none; }
+  .config input { width: 100%; margin-top: 8px; padding: 9px 10px; border-radius: 9px; border: 1px solid #cbd5e1; font-size: 12.5px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e6dcf5; font-size: 15px; background: #fff; font-family: inherit; }
+  .field textarea { min-height: 110px; resize: vertical; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: #9333ea; }
+  .card { background: #fff; border-radius: 16px; padding: 16px; margin-top: 6px; box-shadow: 0 6px 18px rgba(76,29,149,.08); border: 1px solid #f1e9fb; }
+  .card h2 { margin: 0 0 10px; font-size: 14px; color: #4c1d95; }
+  .placeholder { font-size: 12.8px; color: #94a3b8; line-height: 1.5; }
+  .badge { display: inline-block; padding: 6px 12px; border-radius: 999px; font-weight: 800; font-size: 12.5px; margin-bottom: 10px; }
+  .badge.pos { background: #f0fdf4; color: #16a34a; }
+  .badge.neg { background: #fef2f2; color: #dc2626; }
+  .badge.err { background: #fef2f2; color: #dc2626; }
+  .conf-bar { height: 9px; border-radius: 999px; background: #e9d8fd; overflow: hidden; margin: 6px 0 12px; }
+  .conf-fill { height: 100%; background: linear-gradient(90deg,#c084fc,#9333ea); border-radius: 999px; }
+  .conf-fill.neg { background: linear-gradient(90deg,#f87171,#dc2626); }
+  .interpretation { font-size: 12.6px; line-height: 1.55; color: #334155; }
+  .repr-chip { display: inline-block; margin-top: 10px; padding: 4px 9px; border-radius: 999px; background: #f3e8fd; color: #6b21a8; font-size: 11px; font-weight: 700; }
+  .bottom-actions { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 26px; background: linear-gradient(180deg, rgba(250,247,254,0) 0%, #faf7fe 30%); z-index: 25; }
+  button.primary { width: 100%; border: 0; border-radius: 16px; padding: 16px; font-size: 16px; font-weight: 800; color: #fff; background: linear-gradient(135deg,#9333ea,#7e22ce); box-shadow: 0 10px 24px rgba(147,51,234,.4); cursor: pointer; }
+  button.primary:disabled { opacity: .6; }
+  .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 130px; height: 5px; border-radius: 3px; background: #0f172a; opacity: .35; z-index: 40; }
+  .samples { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .samples button { font: inherit; font-size: 11px; font-weight: 700; padding: 7px 11px; border-radius: 999px; border: 1.5px solid #e6dcf5; background: #fff; color: #334155; }
+  .samples button.clear { color: #94a3b8; }
+  .importance { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f1e9fb; }
+  .importance h4 { margin: 0 0 6px; font-size: 12px; color: #4c1d95; }
+  .importance .note { font-size: 10.2px; color: #94a3b8; font-style: italic; margin: 0 0 8px; }
+  .term-list { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .term-chip { font-size: 10.4px; padding: 3px 8px; border-radius: 999px; background: #f8fafc; color: #64748b; border: 1px solid #e6dcf5; }
+  .term-chip.pos { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+  .term-chip.neg { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .term-chip.matched { font-weight: 800; box-shadow: 0 0 0 2px currentColor inset; }
+  .term-group-label { font-size: 10.6px; font-weight: 700; color: #334155; margin: 5px 0 4px; }
+  .compare { margin-top: 0; }
+  .compare summary { cursor: pointer; font-weight: 700; color: #7e22ce; font-size: 12.5px; list-style: none; }
+  .compare summary::-webkit-details-marker { display: none; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 10.6px; margin-top: 8px; }
+  table.cmp th, table.cmp td { padding: 6px 4px; text-align: right; border-bottom: 1px solid #f1e9fb; }
+  table.cmp th:first-child, table.cmp td:first-child { text-align: left; }
+  table.cmp th { color: #94a3b8; font-weight: 700; font-size: 9.5px; text-transform: uppercase; }
+  table.cmp tr.selected { background: #faf5ff; }
+  table.cmp tr.selected td:first-child { font-weight: 800; color: #7e22ce; }
+</style>
+</head>
+<body>
+  <div class="caption">Ứng dụng Mobile — Dự đoán khuyến nghị khách hàng (mô phỏng thiết bị 390×844)</div>
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="status-bar">
+        <span>9:41</span>
+        <span class="icons"><span>&#128246;</span><span>&#128225;</span><span>&#128267;</span></span>
+      </div>
+      <div class="app-header">
+        <h1>🛍️ Dự đoán khuyến nghị</h1>
+        <p>Nhập đánh giá sản phẩm để dự đoán</p>
+      </div>
+      <div class="app-content">
+        <details class="config">
+          <summary>⚙️ Cấu hình API</summary>
+          <input id="api-base" type="text" value="">
+        </details>
+
+        <div class="samples" id="samples"></div>
+        <div class="field"><label for="Title">Tiêu đề (tùy chọn)</label><input id="Title" type="text" placeholder="Ví dụ: Great fit!"></div>
+        <div class="field"><label for="ReviewText">Nội dung đánh giá</label><textarea id="ReviewText" placeholder="Ví dụ: Absolutely love this dress..."></textarea></div>
+        <div class="field"><label for="Age">Tuổi khách hàng</label><input id="Age" type="number" min="1" max="120" step="1" placeholder="Ví dụ: 34"></div>
+        <div class="field"><label for="PositiveFeedbackCount">Số lượt phản hồi tích cực</label><input id="PositiveFeedbackCount" type="number" min="0" step="1" placeholder="Ví dụ: 3"></div>
+        <div class="field"><label for="DivisionName">Phân khúc</label><select id="DivisionName"></select></div>
+        <div class="field"><label for="DepartmentName">Danh mục</label><select id="DepartmentName"></select></div>
+        <div class="field"><label for="ClassName">Loại sản phẩm</label><select id="ClassName"></select></div>
+        <div class="field"><label for="model">Mô hình dự đoán</label><select id="model"></select></div>
+
+        <div class="card">
+          <h2>Kết quả dự đoán</h2>
+          <div id="result-body">
+            <p class="placeholder">Chưa có dữ liệu. Nhập đánh giá rồi bấm nút "Dự đoán" bên dưới.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <details class="compare">
+            <summary>📊 So sánh các mô hình</summary>
+            <div id="compare-table"><p class="placeholder">Đang tải...</p></div>
+          </details>
+        </div>
+      </div>
+      <div class="bottom-actions">
+        <button class="primary" id="submit-btn">Dự đoán</button>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+
+<script>
+  const apiBaseInput = document.querySelector("#api-base");
+  apiBaseInput.value = window.location.origin;
+
+  const escapeHtml = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+
+  const submitBtn = document.querySelector("#submit-btn");
+  const resultBody = document.querySelector("#result-body");
+  const modelSelect = document.querySelector("#model");
+
+  function fillSelect(id, options, current) {
+    const el = document.getElementById(id);
+    el.innerHTML = options.map((opt) => `<option value="${escapeHtml(opt)}"${opt === current ? " selected" : ""}>${escapeHtml(opt)}</option>`).join("");
+  }
+
+  let METADATA = null;
+
+  const SAMPLES = [
+    { label: "😍 Tích cực", values: {
+      Title: "Great fit!",
+      ReviewText: "Absolutely love this dress, fits perfectly and the fabric feels amazing. Comfortable and beautiful, highly recommend!",
+      Age: 34, PositiveFeedbackCount: 5, DivisionName: "General", DepartmentName: "Dresses", ClassName: "Dresses",
+    } },
+    { label: "😞 Tiêu cực", values: {
+      Title: "Disappointed",
+      ReviewText: "The fabric felt cheap and the fit was awful, very disappointing purchase, I am returning it.",
+      Age: 45, PositiveFeedbackCount: 0, DivisionName: "General Petite", DepartmentName: "Tops", ClassName: "Blouses",
+    } },
+  ];
+
+  function fillSample(values) {
+    for (const [id, val] of Object.entries(values)) {
+      const el = document.querySelector(`#${id}`);
+      if (el) el.value = val;
+    }
+  }
+
+  function renderSamples() {
+    const el = document.querySelector("#samples");
+    el.innerHTML = SAMPLES.map((s, i) => `<button type="button" data-sample="${i}">${escapeHtml(s.label)}</button>`).join("")
+      + `<button type="button" class="clear" data-clear="1">↺ Xoá</button>`;
+    el.querySelectorAll("[data-sample]").forEach((btn) => btn.addEventListener("click", () => fillSample(SAMPLES[Number(btn.dataset.sample)].values)));
+    el.querySelector("[data-clear]").addEventListener("click", () => {
+      document.querySelector("#Title").value = "";
+      document.querySelector("#ReviewText").value = "";
+      document.querySelector("#Age").value = "";
+      document.querySelector("#PositiveFeedbackCount").value = "";
+    });
+  }
+
+  function metricFmt(v) { return (v === undefined || v === null) ? "—" : Number(v).toFixed(3); }
+
+  function renderCompareTable() {
+    const compareEl = document.querySelector("#compare-table");
+    const testMetrics = METADATA?.test_metrics || {};
+    const labels = METADATA?.model_labels || {};
+    const models = Object.keys(testMetrics);
+    if (!models.length) { compareEl.innerHTML = '<p class="placeholder">Không có dữ liệu.</p>'; return; }
+    const cols = ["Accuracy", "Precision", "Recall", "F1", "ROC-AUC"];
+    const selected = modelSelect.value;
+    const rows = models.map((key) => {
+      const m = testMetrics[key];
+      return `<tr class="${key === selected ? "selected" : ""}">
+        <td>${escapeHtml(labels[key] || key)}${key === METADATA.best_model ? " ★" : ""}</td>
+        ${cols.map((c) => `<td>${metricFmt(m[c])}</td>`).join("")}
+      </tr>`;
+    }).join("");
+    compareEl.innerHTML = `<table class="cmp"><thead><tr><th>Mô hình</th>${cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function importanceHtml(reviewText) {
+    const pos = METADATA?.top_positive_terms;
+    const neg = METADATA?.top_negative_terms;
+    if (!pos && !neg) return "";
+    const lowerText = (reviewText || "").toLowerCase();
+    const chip = (term, cls) => {
+      const matched = lowerText.includes(term.toLowerCase());
+      return `<span class="term-chip ${cls}${matched ? " matched" : ""}">${escapeHtml(term)}</span>`;
+    };
+    const posChips = pos ? Object.keys(pos).slice(0, 8).map((t) => chip(t, "pos")).join("") : "";
+    const negChips = neg ? Object.keys(neg).slice(0, 8).map((t) => chip(t, "neg")).join("") : "";
+    return `<div class="importance">
+      <h4>📊 Từ khoá quan trọng</h4>
+      <p class="note">Từ tô viền đậm là từ có xuất hiện trong đánh giá bạn vừa nhập.</p>
+      <div class="term-group-label">Tích cực</div>
+      <div class="term-list">${posChips || '<span class="hint">Không có dữ liệu.</span>'}</div>
+      <div class="term-group-label">Tiêu cực</div>
+      <div class="term-list">${negChips || '<span class="hint">Không có dữ liệu.</span>'}</div>
+    </div>`;
+  }
+
+  async function loadMetadata() {
+    try {
+      const base = apiBaseInput.value.replace(/\/$/, "");
+      const res = await fetch(`${base}/metadata`);
+      METADATA = await res.json();
+      const opts = METADATA.categorical_options || {};
+      fillSelect("DivisionName", opts["Division Name"] || [], "General");
+      fillSelect("DepartmentName", opts["Department Name"] || [], "Dresses");
+      fillSelect("ClassName", opts["Class Name"] || [], "Dresses");
+      const labels = METADATA.model_labels || {};
+      const models = Object.keys(METADATA.test_metrics || {});
+      modelSelect.innerHTML = models.map((key) => {
+        const isBest = key === METADATA.best_model;
+        return `<option value="${escapeHtml(key)}"${isBest ? " selected" : ""}>${escapeHtml(labels[key] || key)}${isBest ? " ★" : ""}</option>`;
+      }).join("");
+      renderCompareTable();
+      modelSelect.addEventListener("change", renderCompareTable);
+    } catch (err) {
+      modelSelect.innerHTML = '<option value="">Không tải được danh sách mô hình</option>';
+    }
+  }
+
+  function renderResult(body, reviewText) {
+    const isPositive = body.prediction_class === 1;
+    const confidence = body.confidence;
+    resultBody.innerHTML = `
+      <span class="badge ${isPositive ? "pos" : "neg"}">${isPositive ? "👍 Khuyến nghị" : "👎 Không khuyến nghị"}</span>
+      <div style="font-weight:800;font-size:14px;margin-bottom:8px;">${escapeHtml(body.prediction)}</div>
+      ${confidence !== null && confidence !== undefined ? `
+        <div class="conf-bar"><div class="conf-fill ${isPositive ? "" : "neg"}" style="width:${confidence}%"></div></div>
+        <div class="hint" style="margin-bottom:8px;">Độ tin cậy: ${confidence}%</div>
+      ` : ""}
+      <div class="interpretation">${escapeHtml(body.interpretation)}</div>
+      ${importanceHtml(reviewText)}
+      <span class="repr-chip">Biểu diễn: ${escapeHtml(body.representation)}</span>
+    `;
+  }
+
+  function renderError(msg) {
+    resultBody.innerHTML = `<span class="badge err">❌ Lỗi</span><div class="interpretation">${escapeHtml(msg)}</div>`;
+  }
+
+  submitBtn.addEventListener("click", async () => {
+    const reviewText = document.querySelector("#ReviewText").value.trim();
+    if (!reviewText) {
+      renderError("Nội dung đánh giá không được để trống.");
+      return;
+    }
+    const ageRaw = document.querySelector("#Age").value;
+    const ageNum = Number(ageRaw);
+    if (ageRaw === "" || Number.isNaN(ageNum)) {
+      renderError("Tuổi khách hàng phải là một số hợp lệ.");
+      return;
+    }
+    const feedbackRaw = document.querySelector("#PositiveFeedbackCount").value;
+    const feedbackNum = feedbackRaw === "" ? 0 : Number(feedbackRaw);
+    if (Number.isNaN(feedbackNum)) {
+      renderError("Số lượt phản hồi tích cực phải là một số hợp lệ.");
+      return;
+    }
+
+    const payload = {
+      Title: document.querySelector("#Title").value,
+      "Review Text": reviewText,
+      Age: ageNum,
+      "Positive Feedback Count": feedbackNum,
+      "Division Name": document.querySelector("#DivisionName").value,
+      "Department Name": document.querySelector("#DepartmentName").value,
+      "Class Name": document.querySelector("#ClassName").value,
+      model: modelSelect.value,
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Đang dự đoán...";
+    try {
+      const base = apiBaseInput.value.replace(/\/$/, "");
+      const res = await fetch(`${base}/customer-behavior/v1/predict`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Không thể dự đoán.");
+      renderResult(body, reviewText);
+      renderCompareTable();
+    } catch (err) {
+      renderError(err.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Dự đoán";
+    }
+  });
+
+  renderSamples();
+  loadMetadata();
+</script>
+</body>
+</html>

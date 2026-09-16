@@ -1,0 +1,321 @@
+{
+  "application": "house_price",
+  "task": "regression",
+  "random_seed": 42,
+  "numeric_features": [
+    "Area",
+    "Frontage",
+    "Access Road",
+    "Floors",
+    "Bedrooms",
+    "Bathrooms",
+    "Total_Area",
+    "Room_Density",
+    "Frontage_Ratio",
+    "Area_per_Bedroom",
+    "Log_Area"
+  ],
+  "categorical_features": [
+    "House direction",
+    "Balcony direction",
+    "Legal status",
+    "Furniture state",
+    "Province",
+    "District"
+  ],
+  "feature_columns": [
+    "Area",
+    "Frontage",
+    "Access Road",
+    "Floors",
+    "Bedrooms",
+    "Bathrooms",
+    "Total_Area",
+    "Room_Density",
+    "Frontage_Ratio",
+    "Area_per_Bedroom",
+    "Log_Area",
+    "House direction",
+    "Balcony direction",
+    "Legal status",
+    "Furniture state",
+    "Province",
+    "District"
+  ],
+  "categorical_options": {
+    "House direction": [
+      "Bắc",
+      "Không rõ",
+      "Nam",
+      "Tây",
+      "Tây - Bắc",
+      "Tây - Nam",
+      "Đông",
+      "Đông - Bắc",
+      "Đông - Nam"
+    ],
+    "Balcony direction": [
+      "Bắc",
+      "Không rõ",
+      "Nam",
+      "Tây",
+      "Tây - Bắc",
+      "Tây - Nam",
+      "Đông",
+      "Đông - Bắc",
+      "Đông - Nam"
+    ],
+    "Legal status": [
+      "Have certificate",
+      "Không rõ",
+      "Sale contract"
+    ],
+    "Furniture state": [
+      "Basic",
+      "Full",
+      "Không rõ"
+    ],
+    "Province": [
+      "Bà Rịa Vũng Tàu",
+      "Bình Dương",
+      "Bắc Ninh",
+      "Hà Nội",
+      "Hưng Yên",
+      "Hải Phòng",
+      "Hồ Chí Minh",
+      "Khác",
+      "Khánh Hòa",
+      "Long An",
+      "Đà Nẵng",
+      "Đồng Nai"
+    ],
+    "District": [
+      "An Dương",
+      "Ba Đình",
+      "Biên Hòa",
+      "Bình Chánh",
+      "Bình Thạnh",
+      "Bình Tân",
+      "Bắc Từ Liêm",
+      "Bến Cát",
+      "Bến Lức",
+      "Chương Mỹ",
+      "Cầu Giấy",
+      "Cẩm Lệ",
+      "Dĩ An",
+      "Gia Lâm",
+      "Gò Vấp",
+      "Hai Bà Trưng",
+      "Hoài Đức",
+      "Hoàng Mai",
+      "Hà Đông",
+      "Hóc Môn",
+      "Hải An",
+      "Hải Châu",
+      "Hồng Bàng",
+      "Khác",
+      "Liên Chiểu",
+      "Long Biên",
+      "Lê Chân",
+      "Nam Từ Liêm",
+      "Ngô Quyền",
+      "Ngũ Hành Sơn",
+      "Nha Trang",
+      "Nhà Bè",
+      "Nhơn Trạch",
+      "Phan Thiết",
+      "Phú Nhuận",
+      "Quận 1",
+      "Quận 10",
+      "Quận 11",
+      "Quận 12",
+      "Quận 2",
+      "Quận 3",
+      "Quận 4",
+      "Quận 6",
+      "Quận 7",
+      "Quận 8",
+      "Quận 9",
+      "Sơn Trà",
+      "Thanh Khê",
+      "Thanh Trì",
+      "Thanh Xuân",
+      "Thuận An",
+      "Thủ Dầu Một",
+      "Thủ Đức",
+      "Thủy Nguyên",
+      "Tân Bình",
+      "Tân Phú",
+      "Tân Uyên",
+      "Tây Hồ",
+      "Từ Sơn",
+      "Văn Giang",
+      "Vũng Tàu",
+      "Đông Anh",
+      "Đống Đa",
+      "Đức Hòa"
+    ]
+  },
+  "target": "Price",
+  "target_unit": "tỷ VNĐ",
+  "n_samples_raw": 30229,
+  "n_samples_clean": 27513,
+  "feature_matrix_shape": [
+    27513,
+    111
+  ],
+  "n_features_before_encoding": 17,
+  "n_features_after_encoding": 111,
+  "split": {
+    "train": 19258,
+    "validation": 4128,
+    "test": 4127
+  },
+  "baseline": {
+    "MAE": 1.867,
+    "RMSE": 2.2361,
+    "R2": 0.0
+  },
+  "best_model": "gradient_boosting_regressor",
+  "best_model_label": "Gradient Boosting Regressor",
+  "test_metrics": {
+    "gradient_boosting_regressor": {
+      "MAE": 1.0039,
+      "MSE": 1.8082,
+      "RMSE": 1.3447,
+      "R2": 0.6384
+    },
+    "random_forest_regressor": {
+      "MAE": 1.0849,
+      "MSE": 2.0302,
+      "RMSE": 1.4249,
+      "R2": 0.5939
+    },
+    "ridge_regression": {
+      "MAE": 1.1581,
+      "MSE": 2.2259,
+      "RMSE": 1.4919,
+      "R2": 0.5548
+    },
+    "linear_regression": {
+      "MAE": 1.1581,
+      "MSE": 2.228,
+      "RMSE": 1.4927,
+      "R2": 0.5544
+    },
+    "decision_tree_regressor": {
+      "MAE": 1.2518,
+      "MSE": 2.6647,
+      "RMSE": 1.6324,
+      "R2": 0.4671
+    }
+  },
+  "validation_metrics": {
+    "linear_regression": {
+      "MAE": 1.1463,
+      "MSE": 2.1898,
+      "RMSE": 1.4798,
+      "R2": 0.5461
+    },
+    "ridge_regression": {
+      "MAE": 1.1468,
+      "MSE": 2.1905,
+      "RMSE": 1.48,
+      "R2": 0.5459
+    },
+    "decision_tree_regressor": {
+      "MAE": 1.2396,
+      "MSE": 2.6619,
+      "RMSE": 1.6315,
+      "R2": 0.4482
+    },
+    "random_forest_regressor": {
+      "MAE": 1.0858,
+      "MSE": 2.0121,
+      "RMSE": 1.4185,
+      "R2": 0.5829
+    },
+    "gradient_boosting_regressor": {
+      "MAE": 1.0202,
+      "MSE": 1.8546,
+      "RMSE": 1.3618,
+      "R2": 0.6155
+    }
+  },
+  "feature_importance": {
+    "num__Total_Area": 0.25044,
+    "num__Bathrooms": 0.06176,
+    "num__Access Road": 0.06017,
+    "num__Area_per_Bedroom": 0.05308,
+    "num__Log_Area": 0.05107,
+    "num__Area": 0.0458,
+    "cat__Province_Hồ Chí Minh": 0.03975,
+    "num__Room_Density": 0.03322,
+    "cat__District_Khác": 0.03307,
+    "num__Frontage_Ratio": 0.03216,
+    "cat__Province_Hà Nội": 0.0298,
+    "cat__Province_Bình Dương": 0.02252,
+    "num__Floors": 0.0196,
+    "num__Frontage": 0.01828,
+    "num__Bedrooms": 0.01255,
+    "cat__Province_Hải Phòng": 0.01058,
+    "cat__District_Quận 12": 0.01009,
+    "cat__Province_Long An": 0.01004,
+    "cat__District_Hoài Đức": 0.00944,
+    "cat__District_Chương Mỹ": 0.00767
+  },
+  "residual_std": 1.3447,
+  "mae_by_price_band": {
+    "<3 tỷ": 1.056,
+    "3-5 tỷ": 0.896,
+    "5-7 tỷ": 0.83,
+    "7-9 tỷ": 0.984,
+    ">9 tỷ": 1.944
+  },
+  "value_ranges": {
+    "Area": [
+      10.35,
+      595.0
+    ],
+    "Frontage": [
+      1.0,
+      77.0
+    ],
+    "Access Road": [
+      1.0,
+      85.0
+    ],
+    "Floors": [
+      1.0,
+      10.0
+    ],
+    "Bedrooms": [
+      1.0,
+      9.0
+    ],
+    "Bathrooms": [
+      1.0,
+      9.0
+    ],
+    "Total_Area": [
+      10.35,
+      1760.0
+    ],
+    "Room_Density": [
+      0.0,
+      0.5833333333333334
+    ],
+    "Frontage_Ratio": [
+      0.0056179775280898875,
+      2.026315789473684
+    ],
+    "Area_per_Bedroom": [
+      3.75,
+      577.6
+    ],
+    "Log_Area": [
+      2.4292177439274116,
+      6.39024066706535
+    ]
+  }
+}

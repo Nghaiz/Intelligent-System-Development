@@ -1,0 +1,933 @@
+% =====================================================================
+%  Chương 3 — Hệ thống Định giá Bất động sản Việt Nam
+% =====================================================================
+\chapter{Hệ thống Định giá Bất động sản Việt Nam}
+\label{ch:batdongsan}
+
+\section{Phát biểu bài toán}
+\label{sec:phatbieu-hou}
+
+\subsection{Hiện tượng thực tế và người dùng}
+
+Thị trường nhà đất Việt Nam thiếu một mức giá tham chiếu công khai. Người mua
+dựa vào giá rao của người bán, người bán dựa vào giá rao của hàng xóm, và cả hai
+bên đều không có cách kiểm chứng độc lập. Hệ quả là khoảng chênh lệch thương
+lượng rất rộng, và bên nào ít thông tin hơn thì chịu thiệt.
+
+Một hệ thống định giá tự động không thay thế được thẩm định giá chính thức ---
+việc ấy đòi hỏi khảo sát hiện trạng --- nhưng nó cung cấp được \textbf{mốc tham
+chiếu độc lập} dựng từ 30.229 giao dịch thật, cùng với điều mà một con số giá
+đơn lẻ không nói được: vay được bao nhiêu, trả góp thế nào, và quanh đó có gì.
+
+\subsection{Phát biểu hình thức}
+
+Cho một hồ sơ bất động sản $\mathbf{x}$ gồm thuộc tính vật lý, vị trí hành chính
+và tình trạng pháp lý, hãy học hàm
+
+\begin{equation}
+f_{\bm\theta}:\ \mathcal{X}\longrightarrow\mathbb{R}_{+},
+\qquad
+\hat y = f_{\bm\theta}(\mathbf{x}) \approx \texttt{Price}\ \text{(tỷ VNĐ)},
+\label{eq:baitoan-hou}
+\end{equation}
+
+\noindent sao cho cực tiểu hoá sai số bình phương trung bình~\eqref{eq:mse} trên
+tập huấn luyện. Khác bài toán ở Chương~\ref{ch:tieuduong}, đầu ra ở đây là số
+thực liên tục nên không có ngưỡng quyết định nào cần chọn --- nhưng bù lại xuất
+hiện một vấn đề mà bài phân lớp không có: \textbf{độ chệch có hệ thống theo vùng
+giá trị} (Mục~\ref{sec:chech-hou}).
+
+\begin{table}[H]
+\centering
+\caption{Đặc tả bài toán định giá bất động sản}
+\label{tab:dacta-hou}
+\small
+\begin{tabularx}{\textwidth}{@{}L{4.2cm}X@{}}
+\toprule
+\textbf{Hạng mục} & \textbf{Nội dung} \\
+\midrule
+Hiện tượng thực tế   & Biến động giá bất động sản theo cấu trúc vật lý và vị trí \\
+Một quan sát         & Một tin đăng rao bán nhà đất \\
+Loại bài toán        & Hồi quy (Regression) \\
+Biến mục tiêu        & \texttt{Price}, số thực liên tục, đơn vị tỷ VNĐ \\
+Số quan sát          & 30.229 tin đăng \\
+Đặc trưng đầu vào    & 14 cột --- 9 định lượng và 5 định danh \\
+Số chiều sau mã hoá  & 84 chiều \\
+Người dùng cuối      & Người mua, người bán, nhà đầu tư, chuyên viên tín dụng \\
+Độ đo quyết định     & MAE (đọc thẳng ra tiền) và $R^2$ (so với đoán trung bình) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Tập dữ liệu và quy trình làm sạch}
+\label{sec:dulieu-hou}
+
+\subsection{Nguồn dữ liệu}
+
+Tập \textbf{Vietnam Housing Dataset}~\cite{vnhousing} thu thập từ các trang rao bán bất động sản
+Việt Nam, công bố công khai trên Kaggle:
+
+\begin{center}
+\small\url{https://www.kaggle.com/datasets/huutri148/vietnam-housing-dataset}
+\end{center}
+
+\begin{phathien}{Tệp nguồn có BOM ở đầu}
+Tệp CSV bắt đầu bằng dấu Byte Order Mark. Đọc bằng \texttt{encoding="utf-8"}
+thông thường khiến tên cột đầu tiên mang thêm ký tự vô hình \texttt{\textbackslash ufeff},
+và mọi phép truy cập cột theo tên sau đó đều thất bại --- nhưng thất bại theo
+kiểu ``không tìm thấy cột'' chứ không phải ``tệp hỏng'', nên rất dễ đi tìm sai
+chỗ. Phải đọc bằng \texttt{encoding="utf-8-sig"}.
+\end{phathien}
+
+\subsection{Tỷ lệ dữ liệu khuyết}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{hou_missing_ratio.png}
+\caption[Tỷ lệ dữ liệu khuyết theo từng thuộc tính]%
+{Tỷ lệ dữ liệu khuyết theo từng thuộc tính của tập bất động sản}
+\label{fig:hou-missing}
+\end{figure}
+
+\bieudo{Biểu đồ cột ngang, sắp giảm dần theo tỷ lệ khuyết.}
+
+\phanphoi{Trải rất rộng và liên tục --- từ $82{,}6\%$ xuống $11{,}9\%$, không có
+khoảng đứt gãy rõ rệt giữa nhóm ``khuyết nhiều'' và nhóm ``khuyết ít''.}
+
+\chitiet{\texttt{Balcony direction} đứng đầu với $82{,}6\%$ --- vượt ngưỡng loại
+bỏ $80\%$ nên cột này bị loại khỏi mô hình. \texttt{House direction} khuyết
+$70{,}3\%$ nhưng vẫn dưới ngưỡng nên được giữ. Tiếp theo là
+\texttt{Furniture state} $46{,}7\%$, \texttt{Access Road} $44{,}0\%$,
+\texttt{Frontage} $38{,}3\%$, \texttt{Bathrooms} $23{,}4\%$,
+\texttt{Bedrooms} $17{,}1\%$, \texttt{Legal status} $14{,}9\%$ và
+\texttt{Floors} $11{,}9\%$. Ba cột \texttt{Address}, \texttt{Area} và
+\texttt{Price} đầy đủ hoàn toàn.}
+
+\nhanxet{Việc giữ lại \texttt{House direction} dù khuyết $70{,}3\%$ là một quyết
+định có căn cứ: hướng nhà mang ý nghĩa phong thuỷ đáng kể trong định giá tại
+Việt Nam, và với biến định danh thì bản thân trạng thái ``không rõ'' cũng là một
+hạng mục có ý nghĩa --- tin đăng không khai hướng nhà có thể chính là tin đăng
+mà hướng nhà không phải điểm mạnh.}
+
+\subsection{Tách địa chỉ thành hai cấp hành chính}
+
+Cột \texttt{Address} là chuỗi tự do. Bước làm sạch tách nó thành
+\texttt{Province} và \texttt{District}. Dữ liệu thật để lại nhiều dạng viết khác
+nhau của cùng một địa danh --- ``Hà Nội'', ``HN'', ``Quận Nam Từ Liêm'' xuất hiện
+ở cấp tỉnh; ``Hồ Chí Minh giá 2tỷ380'' cho thấy người đăng tin gõ lẫn giá vào ô
+địa chỉ. Hệ thống giữ nguyên các biến thể này thay vì hợp nhất thủ công, và xử
+lý bằng cơ chế gộp hạng mục hiếm ở bước mã hoá (Mục~\ref{sec:bieudien-hou}).
+
+\section{Phân tích khám phá dữ liệu}
+\label{sec:eda-hou}
+
+\subsection{Ba biến người mua thật sự cân nhắc}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{hou_price_area_bedrooms.png}
+\caption[Khám phá liên hợp Giá -- Diện tích -- Số phòng ngủ]%
+{Khám phá liên hợp Giá -- Diện tích -- Số phòng ngủ: ba phân phối biên ở hàng
+trên, ba quan hệ chéo ở hàng dưới}
+\label{fig:hou-joint}
+\end{figure}
+
+\bieudo{Lưới sáu bảng. Hàng trên là ba phân phối biên --- hai biểu đồ tần suất
+kèm đường mật độ và một biểu đồ cột cho biến đếm. Hàng dưới là ba quan hệ ---
+biểu đồ phân tán, biểu đồ hộp theo nhóm, và phân phối của một biến dẫn xuất.}
+
+\phanphoi{Ba biến ở ba chế độ phân phối hoàn toàn khác nhau. \texttt{Price} gần
+đối xứng, \texttt{Area} lệch phải rất mạnh, \texttt{Bedrooms} là biến đếm có một
+đỉnh trội hẳn.}
+
+\chitiet{\texttt{Price} có độ lệch $-0{,}029$ --- gần như đối xứng hoàn hảo ---
+với trung vị $5{,}90$ tỷ. \texttt{Area} có độ lệch $3{,}889$, khối lượng dữ liệu
+dồn trong khoảng $30$--$100$ m$^2$ với trung vị $56$ m$^2$, đuôi phải kéo tới
+$595$ m$^2$. \texttt{Bedrooms} có đỉnh áp đảo tại 3 phòng ($13.703$ tin,
+$45{,}3\%$), kế đến 4 phòng ($7.740$) và 2 phòng ($4.290$).
+
+Hàng dưới cho ba con số quan trọng: Giá theo Diện tích có $r=0{,}098$; Giá theo
+Số phòng ngủ có $r=0{,}333$ với các hộp chồng lấn rất nhiều; và đơn giá mỗi mét
+vuông có độ lệch $2{,}135$ với trung vị $102{,}3$ triệu đồng/m$^2$.}
+
+\begin{phathien}{Ba điều đi ngược trực giác, đọc được từ một hình}
+\textbf{(1) Không được biến đổi log cho \texttt{Price} ở tập này.} Phép biến đổi
+log là thao tác mặc định khi làm việc với giá nhà, vì giá nhà thị trường lệch
+phải mạnh. Nhưng \texttt{Price} ở đây gần đối xứng ($-0{,}029$), nên lấy log sẽ
+\emph{tạo ra} độ lệch trái thay vì sửa chữa gì. Giả định phải được đo trước khi
+viện dẫn --- xem thêm Mục~\ref{sec:price-cat-bien}.
+
+\textbf{(2) Diện tích gần như không định giá được căn nhà.} Hệ số $0{,}098$ có
+nghĩa Diện tích một mình giải thích chưa tới $1\%$ phương sai của giá. Điều này
+nghe vô lý cho tới khi nhớ rằng dữ liệu trải khắp cả nước: $56$ m$^2$ ở Cầu Giấy
+và $56$ m$^2$ ở Phổ Yên là hai mức giá hoàn toàn khác nhau. Diện tích chỉ có ý
+nghĩa \emph{sau khi đã cố định vị trí}.
+
+\textbf{(3) Đơn giá mỗi m$^2$ mới là biến giữ đúng hình dáng mà trực giác mong
+đợi} --- lệch phải mạnh với độ lệch $2{,}135$. Đây chính là biến bị \emph{ẩn} đi
+khi chỉ nhìn Giá và Diện tích một cách tách rời, và là lời giải thích trực quan
+cho việc vì sao \texttt{District} chi phối mô hình tới vậy
+(Mục~\ref{sec:importance-hou}).
+\end{phathien}
+
+\subsection{Phân phối biến mục tiêu}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{hou_hist_price.png}
+\caption[Phân phối tần suất của biến mục tiêu \texttt{Price}]%
+{Phân phối tần suất của biến mục tiêu \texttt{Price}}
+\label{fig:hou-hist-price}
+\end{figure}
+
+\bieudo{Biểu đồ tần suất, 30 khoảng.}
+
+\phanphoi{Gần đối xứng, một đỉnh rộng và bằng phẳng ở giữa, hai đuôi cắt cụt đột
+ngột ở cả hai đầu.}
+
+\chitiet{Dữ liệu nằm gọn trong dải $1{,}0$ -- $11{,}5$ tỷ VNĐ, không có một quan
+sát nào ngoài dải ấy. Đỉnh trải rộng trong khoảng $4$--$6$ tỷ với chiều cao
+$1.700$--$1.870$ tin mỗi khoảng. Hai đầu dừng đột ngột chứ không thoải dần ---
+dấu hiệu đặc trưng của dữ liệu đã bị cắt biên.}
+
+\begin{phathien}{\texttt{Price} đã bị cắt biên từ nguồn --- và hệ quả không nhỏ}
+\label{sec:price-cat-bien}
+Thống kê đầy đủ: nhỏ nhất $1{,}00$, lớn nhất $11{,}50$, trung bình $5{,}8721$,
+trung vị $5{,}90$, độ lệch chuẩn $2{,}2119$, độ lệch (skewness) $-0{,}029$, độ
+nhọn (kurtosis) $-0{,}8464$. Trung bình xấp xỉ trung vị và độ lệch xấp xỉ $0$ ---
+một phân phối gần đối xứng, gần như đều ở phần giữa.
+
+Đây \textbf{không} phải hình dáng của giá bất động sản thật, vốn lệch phải rất
+mạnh với một đuôi dài các bất động sản siêu cao cấp. Kết luận: người thu thập dữ
+liệu đã lọc bỏ hai đầu trước khi công bố.
+
+Hai hệ quả phải nói rõ:
+
+\begin{enumerate}
+  \item \textbf{$R^2$ ở đây khắt khe hơn bình thường.} Mẫu số
+        của~\eqref{eq:r2} là phương sai của \texttt{Price}, và phương sai ấy đã
+        bị thu hẹp do cắt biên. Cùng một sai số tuyệt đối sẽ cho $R^2$ thấp hơn
+        so với trên một tập trải rộng.
+  \item \textbf{Hệ thống chỉ áp dụng được trong đúng dải $1$--$11{,}5$ tỷ.} Mô
+        hình cây \emph{không ngoại suy} --- đưa vào một biệt thự $50$ tỷ, nó vẫn
+        trả về một con số nằm trong dải đã thấy lúc huấn luyện, và con số ấy sai
+        hoàn toàn mà không có cảnh báo nào.
+\end{enumerate}
+
+Giả định ``giá nhà lệch phải mạnh'' nghe hiển nhiên tới mức suýt trôi qua mà
+không ai đo. Nó đúng với thị trường thật và \emph{sai} với tập dữ liệu này.
+\end{phathien}
+
+\subsection{Quan hệ giữa diện tích và giá}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{hou_scatter_area_price.png}
+\caption[Quan hệ giữa Diện tích và Giá]%
+{Biểu đồ phân tán giữa Diện tích và Giá}
+\label{fig:hou-scatter}
+\end{figure}
+
+\bieudo{Biểu đồ phân tán (scatter plot) với độ trong suốt cao để thấy mật độ
+điểm ở vùng chồng chất.}
+
+\phanphoi{Đám mây điểm dày đặc ở góc trái, thưa dần rất nhanh về phía phải; theo
+trục dọc thì trải gần như đều khắp dải giá.}
+
+\chitiet{Với diện tích dưới $130$ m$^2$, giá trải gần như kín toàn bộ dải
+$1$--$11{,}5$ tỷ --- cùng một mức diện tích ứng với mọi mức giá. Từ $150$ m$^2$
+trở lên điểm thưa hẳn nhưng vẫn không hình thành xu hướng đi lên rõ rệt: có căn
+$400$ m$^2$ giá $3{,}8$ tỷ nằm cạnh căn $80$ m$^2$ giá $10$ tỷ. Đường giới hạn
+trên ở mức $10$--$11{,}5$ tỷ hiện ra thành một vệt ngang --- chính là biên cắt
+đã nêu.}
+
+\subsection{Vị trí hành chính và tình trạng pháp lý}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.52\textwidth}
+  \includegraphics[width=\textwidth]{hou_bar_province.png}
+  \caption{Giá trung bình theo Tỉnh/Thành}
+  \label{fig:hou-bar-province}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.45\textwidth}
+  \includegraphics[width=\textwidth]{hou_bar_legal.png}
+  \caption{Giá trung bình theo Tình trạng pháp lý}
+  \label{fig:hou-bar-legal}
+\end{subfigure}
+\caption[Giá trung bình theo hai biến định danh]%
+{Giá trung bình theo Tỉnh/Thành (12 tỉnh dẫn đầu) và theo Tình trạng pháp lý}
+\label{fig:hou-bars}
+\end{figure}
+
+\bieudo{Hai biểu đồ cột đứng, mỗi cột là giá trung bình của một hạng mục.}
+
+\phanphoi{Hai hình cho hai câu chuyện trái ngược. Bảng bên trái có độ dốc rõ; bảng
+bên phải gần như phẳng hoàn toàn.}
+
+\chitiet{Theo tỉnh, dẫn đầu là Hưng Yên $7{,}895$ tỷ (404 tin), rồi Quảng Ninh
+$6{,}984$ (110 tin), Bắc Ninh $6{,}402$ (167 tin), Hồ Chí Minh $6{,}214$
+(11.778 tin) và Hà Nội $6{,}154$ (10.457 tin). Chênh lệch giữa đầu và cuối bảng
+là khoảng $2{,}3$ tỷ.
+
+Theo pháp lý, ba hạng mục gần như bằng nhau: ``Không rõ'' $5{,}9263$,
+``Sale contract'' $5{,}8933$, ``Have certificate'' $5{,}8614$ --- chênh lệch chỉ
+$0{,}065$ tỷ, tức $1{,}1\%$.}
+
+\begin{phathien}{Trung bình biên che mất cấu trúc có điều kiện}
+Hai hình trên gợi ý rằng pháp lý không ảnh hưởng tới giá, và rằng Hưng Yên là
+tỉnh đắt nhất Việt Nam. Cả hai kết luận đều sai, và sai vì cùng một lý do:
+\emph{trung bình biên trộn lẫn mọi điều kiện khác}.
+
+Hưng Yên đứng đầu không phải vì đất Hưng Yên đắt hơn đất Quận 1, mà vì 404 tin
+đăng ở đó tình cờ là các dự án lớn; trong khi trung bình của Hồ Chí Minh bị kéo
+xuống bởi hàng nghìn căn nhỏ ở vùng ven. Tương tự, giấy tờ đầy đủ có giá trị
+thật, nhưng những căn thiếu giấy tờ trong tập này lại tập trung ở phân khúc cao
+hơn, và hai hiệu ứng triệt tiêu nhau khi lấy trung bình.
+
+Mô hình cây \emph{không} bị đánh lừa như vậy vì nó học quan hệ \emph{có điều
+kiện}: sau khi đã chia theo quận, nó mới xét tới pháp lý. Bằng chứng là
+\texttt{Legal status} vẫn nhận mức quan trọng $0{,}0133$ ở
+Mục~\ref{sec:importance-hou} --- nhỏ, nhưng khác $0$ rõ rệt.
+\end{phathien}
+
+\subsection{Ma trận tương quan}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.94\textwidth]{hou_corr_heatmap.png}
+\caption[Ma trận tương quan Pearson của các đặc trưng bất động sản]%
+{Ma trận tương quan Pearson của các đặc trưng bất động sản}
+\label{fig:hou-corr}
+\end{figure}
+
+\bieudo{Bản đồ nhiệt đối xứng, thang màu hai chiều từ xanh (âm) qua trắng (không
+tương quan) tới đỏ (dương).}
+
+\phanphoi{Khác hẳn ma trận ở Hình~\ref{fig:dia-corr}: ở đây có cả tương quan âm
+rõ rệt, và cột \texttt{Price} thì nhạt màu gần như toàn bộ.}
+
+\chitiet{Cặp mạnh nhất là \texttt{Area}--\texttt{Total\_Area} $=0{,}78$ (đúng
+theo định nghĩa) và \texttt{Bedrooms}--\texttt{Bathrooms} $=0{,}74$. Có ba tương
+quan âm đáng kể: \texttt{Area}--\texttt{Room\_Density} $=-0{,}59$,
+\texttt{Area}--\texttt{Floors} $=-0{,}32$ và \texttt{Area}--\texttt{Frontage\_Ratio}
+$=-0{,}26$. Với \texttt{Price}, hệ số cao nhất chỉ là $0{,}364$
+(\texttt{Bathrooms}), rồi $0{,}333$ (\texttt{Bedrooms}), $0{,}309$
+(\texttt{Floors}), $0{,}290$ (\texttt{Total\_Area}) và $0{,}098$
+(\texttt{Area}).}
+
+\begin{phathien}{Trần của mô hình tuyến tính đọc được ngay từ ma trận tương quan}
+Không đặc trưng định lượng nào tương quan tuyến tính với giá quá $0{,}364$.
+Với một mô hình tuyến tính, $R^2$ tối đa đạt được bị chặn bởi chính các hệ số
+này --- và Linear Regression thực tế đạt $R^2 = 0{,}3557$
+(Bảng~\ref{tab:ketqua-hou}), gần khít với dự đoán.
+
+Đây là một kiểm chứng đẹp: ma trận tương quan tính được \emph{trước khi} huấn
+luyện bất kỳ mô hình nào đã báo trước đúng trần hiệu năng của cả một họ thuật
+toán. Nó cũng nói luôn rằng muốn vượt trần ấy thì phải đưa vào thông tin mà các
+cột định lượng không chứa --- tức là các biến định danh về vị trí, đúng như Thực
+nghiệm~3 sẽ đo được ở Mục~\ref{sec:tn3-hou}.
+
+Quan hệ âm \texttt{Area}--\texttt{Floors} $=-0{,}32$ cũng nói một điều thật về
+đô thị Việt Nam: nhà mặt đất diện tích nhỏ thì xây cao lên, còn nhà diện tích
+lớn thường là nhà vườn hoặc biệt thự thấp tầng.
+\end{phathien}
+
+\section{Thiết kế đặc trưng và biểu diễn}
+\label{sec:bieudien-hou}
+
+\begin{table}[H]
+\centering
+\caption{Ba đặc trưng thiết kế cho bài toán bất động sản}
+\label{tab:engineered-hou}
+\small
+\begin{tabularx}{\textwidth}{@{}L{2.9cm}L{4.4cm}X@{}}
+\toprule
+\textbf{Đặc trưng} & \textbf{Công thức} & \textbf{Căn cứ} \\
+\midrule
+\texttt{Total\_Area}     & $\texttt{Area}\times\max(\texttt{Floors},1)$ & Tổng diện tích sàn sử dụng, thứ người mua thật sự trả tiền \\
+\addlinespace
+\texttt{Room\_Density}   & $\dfrac{\texttt{Bedrooms}+\texttt{Bathrooms}}{\max(\texttt{Area},1)}$ & Mật độ phòng --- phân biệt nhà ở gia đình với nhà chia phòng cho thuê \\
+\addlinespace
+\texttt{Frontage\_Ratio} & $\dfrac{\texttt{Frontage}}{\max(\texttt{Area},1)}$ & Tỷ lệ mặt tiền --- đại lượng quyết định khả năng kinh doanh \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Năm biến định danh được mã hoá one-hot với giới hạn 30 hạng mục phổ biến nhất
+mỗi biến; các hạng mục hiếm gộp chung vào một nhóm. Không có giới hạn này,
+riêng \texttt{District} với hàng trăm giá trị sẽ tạo ma trận thưa khổng lồ và
+khiến mô hình học thuộc từng quận hiếm thay vì học quy luật giá. Kết quả:
+biểu diễn cuối cùng có \textbf{84 chiều} từ 14 cột ban đầu.
+
+\begin{table}[H]
+\centering
+\caption{Kích thước ba tập dữ liệu và kết quả mô hình cơ sở}
+\label{tab:split-hou}
+\small
+\begin{tabular}{@{}lrr@{\hspace{1.4cm}}lr@{}}
+\toprule
+\textbf{Tập} & \textbf{Số tin} & \textbf{Tỷ lệ} & \textbf{Mô hình cơ sở} & \textbf{Giá trị} \\
+\midrule
+Huấn luyện & 21.764 & 72{,}0\% & MAE  & 1{,}8587 \\
+Kiểm tra   &  5.442 & 18{,}0\% & RMSE & 2{,}2265 \\
+Ngoại kiểm &  3.023 & 10{,}0\% & $R^2$ & \textbf{$-0{,}0008$} \\
+\textbf{Tổng} & \textbf{30.229} & \textbf{100\%} & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\nhanxet{MAE $=1{,}8587$ của mô hình cơ sở đọc thẳng ra tiền: không dùng mô hình
+nào thì sai số trung bình khi định giá một căn nhà là gần \textbf{1,86 tỷ VNĐ}.
+$R^2 = -0{,}0008$ xấp xỉ $0$ đúng như lý thuyết --- đoán trung vị không giải
+thích được chút phương sai nào.}
+
+\section{Thực nghiệm 1 --- Đối đầu năm mô hình}
+\label{sec:tn1-hou}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả năm mô hình hồi quy trên tập kiểm tra, sắp theo $R^2$}
+\label{tab:ketqua-hou}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Mô hình} & \textbf{MAE} & \textbf{MSE} & \textbf{RMSE} & \textbf{$R^2$} \\
+\midrule
+Mô hình cơ sở (trung vị)  & 1{,}8587 & 4{,}9573 & 2{,}2265 & $-0{,}0008$ \\
+\midrule
+XGBoost                   & \textbf{1{,}0493} & \textbf{1{,}9115} & \textbf{1{,}3826} & \textbf{0{,}6141} \\
+Random Forest             & 1{,}0818 & 2{,}0184 & 1{,}4207 & 0{,}5925 \\
+Support Vector Regression & 1{,}0743 & 2{,}0883 & 1{,}4451 & 0{,}5784 \\
+Decision Tree             & 1{,}2412 & 2{,}7519 & 1{,}6589 & 0{,}4444 \\
+Linear Regression         & 1{,}2677 & 3{,}1914 & 1{,}7865 & 0{,}3557 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{hou_model_comparison.png}
+\caption[So sánh năm mô hình hồi quy trên ba độ đo]%
+{So sánh năm mô hình hồi quy trên cùng tập kiểm tra}
+\label{fig:hou-comparison}
+\end{figure}
+
+\nhanxet{Thứ hạng ở đây \textbf{ngược hẳn} với bài toán tiểu đường. Hai mô hình
+tổ hợp phức tạp nhất --- XGBoost và Random Forest --- đứng đầu, còn mô hình
+tuyến tính đơn giản nhất đứng cuối. Lời giải thích nằm ở quy mô dữ liệu và cấu
+trúc quan hệ:
+
+\begin{itemize}
+  \item \textbf{21.764 mẫu huấn luyện} so với 552 ở bài toán tiểu đường --- gấp
+        gần 40 lần. Mô hình phương sai cao giờ có đủ dữ liệu để phát huy.
+  \item \textbf{Quan hệ giá là phi tuyến và có tương tác mạnh}: hiệu ứng của
+        diện tích phụ thuộc hoàn toàn vào quận. Cây quyết định biểu diễn được
+        tương tác này một cách tự nhiên; mô hình tuyến tính thì không, và trần
+        của nó đã được ma trận tương quan báo trước.
+\end{itemize}
+
+Bài học phương pháp: \emph{không có thuật toán nào tốt nhất một cách tuyệt
+đối}. Cùng một bộ năm thuật toán, chạy trên hai bài toán, cho hai thứ hạng gần
+như đảo ngược. Đây là lý do phải chạy đối đầu thay vì chọn theo danh tiếng.}
+
+\subsection{Giá dự đoán so với giá thật}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{hou_pred_vs_true.png}
+\caption[Giá dự đoán so với giá thật của mô hình XGBoost]%
+{Giá dự đoán so với giá thật của mô hình XGBoost trên tập kiểm tra}
+\label{fig:hou-pred-true}
+\end{figure}
+
+\bieudo{Biểu đồ phân tán dự báo -- thực tế, kèm đường chéo tham chiếu ứng với dự
+báo hoàn hảo.}
+
+\phanphoi{Đám mây điểm bám quanh đường chéo nhưng \textbf{thoải hơn} đường chéo:
+ở vùng giá thấp nó nằm phía trên, ở vùng giá cao nó nằm phía dưới.}
+
+\chitiet{Trong khoảng $4$--$7$ tỷ, đám mây bám sát đường chéo và tương đối hẹp.
+Từ $8$ tỷ trở lên, gần như toàn bộ điểm rơi xuống dưới đường chéo --- mô hình
+định giá hụt. Ở phía dưới $3$ tỷ thì ngược lại, điểm nằm trên đường chéo. Hình
+dáng ``chữ S nằm'' này là dấu hiệu kinh điển của hồi quy về trung bình.}
+
+\subsection{Phân tích phần dư}
+\label{sec:chech-hou}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{hou_residual_analysis.png}
+\caption[Phân tích phần dư của mô hình XGBoost]%
+{Phân tích phần dư của mô hình XGBoost --- bốn góc nhìn về cách mô hình sai}
+\label{fig:hou-residual}
+\end{figure}
+
+\bieudo{Lưới bốn bảng: biểu đồ phân tán phần dư, biểu đồ tần suất phần dư, đồ
+thị Q--Q so với phân phối chuẩn, và biểu đồ cột độ chệch theo ngũ phân vị.}
+
+\phanphoi{Ba bảng đầu trông tương đối lành mạnh --- phần dư tập trung quanh $0$,
+gần đối xứng. Bảng thứ tư phá vỡ ấn tượng ấy: các cột không dao động ngẫu nhiên
+quanh $0$ mà \textbf{giảm đơn điệu} từ dương sang âm.}
+
+\chitiet{Bảng 1: đám mây phần dư nghiêng rõ rệt, dày ở vùng dự báo $4$--$7$ tỷ.
+Bảng 2: phân phối phần dư gần đối xứng quanh $0$ với hai đuôi tương đương. Bảng
+3: Q--Q bám đường chuẩn ở phần giữa nhưng lệch ở hai đuôi --- phần dư có đuôi
+dày hơn phân phối chuẩn. Bảng 4 là bảng quyết định, chi tiết ở
+Bảng~\ref{tab:chech-hou}.}
+
+\begin{table}[H]
+\centering
+\caption{Độ chệch và MAE theo ngũ phân vị giá thật, mô hình XGBoost}
+\label{tab:chech-hou}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Ngũ phân vị} & \textbf{Số tin} & \textbf{Giá thật TB} & \textbf{Giá dự báo TB} & \textbf{Độ chệch} & \textbf{MAE} \\
+\midrule
+Q1 --- rẻ nhất & 1.089 & 2{,}6849 & 3{,}7338 & \textbf{$+1{,}0488$} & 1{,}1575 \\
+Q2             & 1.114 & 4{,}5032 & 5{,}1497 & $+0{,}6465$ & 0{,}9366 \\
+Q3 --- giữa    & 1.133 & 5{,}9186 & 6{,}1605 & $+0{,}2419$ & \textbf{0{,}7889} \\
+Q4             & 1.030 & 7{,}2372 & 6{,}8511 & $-0{,}3860$ & 0{,}8375 \\
+Q5 --- đắt nhất& 1.076 & 8{,}9774 & 7{,}4930 & \textbf{$-1{,}4844$} & \textbf{1{,}5335} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{phathien}{Độ chệch đơn điệu theo phân khúc --- phát hiện phải nói với người dùng}
+Độ chệch không dao động ngẫu nhiên mà giảm đều từ $+1{,}0488$ xuống $-1{,}4844$
+qua năm ngũ phân vị. Hai nguyên nhân cộng dồn:
+
+\begin{enumerate}
+  \item \textbf{Hồi quy về trung bình~\cite{hastie2009}.} Cực tiểu hoá MSE ở~\eqref{eq:mse} kéo
+        mọi dự báo về phía trung tâm phân phối, vì sai lớn bị phạt bình phương.
+  \item \textbf{Mô hình cây không ngoại suy.} Giá trị dự báo của một cây là
+        trung bình các mẫu huấn luyện trong lá, nên nó không bao giờ vượt quá
+        khoảng giá trị đã thấy.
+\end{enumerate}
+
+MAE cũng không đều: $0{,}7889$ ở nhóm giữa nhưng $1{,}5335$ ở nhóm đắt nhất ---
+gần gấp đôi. Con số MAE gộp $1{,}0493$ là trung bình của hai chế độ sai rất khác
+nhau, và nó \emph{che mất} điều đó.
+
+\textbf{Hệ quả bắt buộc phải hiển thị cho người dùng:} với bất động sản cao cấp,
+con số hệ thống đưa ra là \textbf{cận dưới}, không phải ước lượng không chệch.
+Một hệ thống định giá im lặng về điều này sẽ khiến người bán nhà cao cấp bị
+thiệt một cách có hệ thống.
+\end{phathien}
+
+\section{Thực nghiệm 2 --- Khảo sát độ sâu của rừng ngẫu nhiên}
+\label{sec:tn2-hou}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{hou_depth_sweep.png}
+\caption[Ảnh hưởng của độ sâu tối đa tới $R^2$ của Random Forest]%
+{Ảnh hưởng của độ sâu tối đa tới $R^2$ của Random Forest}
+\label{fig:hou-depth}
+\end{figure}
+
+\bieudo{Biểu đồ đường. Trục ngang là \texttt{max\_depth}, trục dọc là $R^2$.}
+
+\phanphoi{Dạng bão hoà cổ điển: tăng nhanh ở đầu dải, chậm dần, rồi đi ngang
+hoàn toàn --- không có đoạn đi xuống, tức không thấy dấu hiệu học thuộc.}
+
+\chitiet{$R^2$ tăng từ $0{,}3712$ ở độ sâu $4$ lên $0{,}5654$ ở độ sâu $12$ ---
+phần lớn mức cải thiện nằm ở đoạn này. Từ $16$ tới $20$ chỉ còn tăng nhẹ
+($0{,}5862 \to 0{,}5937$), rồi đạt đỉnh $0{,}5954$ tại độ sâu $24$. Từ $28$ trở
+đi đường cong bằng phẳng tuyệt đối: $0{,}5954$, $0{,}5953$, $0{,}5953$.}
+
+\begin{table}[H]
+\centering
+\caption{Khảo sát độ sâu tối đa --- kết quả đầy đủ}
+\label{tab:depth-hou}
+\small
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+\textbf{max\_depth} & \textbf{MAE} & \textbf{RMSE} & \textbf{$R^2$} \\
+\midrule
+4  & 1{,}4240 & 1{,}7648 & 0{,}3712 \\
+8  & 1{,}2275 & 1{,}5506 & 0{,}5146 \\
+12 & 1{,}1376 & 1{,}4671 & 0{,}5654 \\
+16 & 1{,}0947 & 1{,}4317 & 0{,}5862 \\
+20 & 1{,}0774 & 1{,}4186 & 0{,}5937 \\
+\textbf{24} & 1{,}0716 & 1{,}4156 & \textbf{0{,}5954} \\
+28 & 1{,}0704 & 1{,}4157 & 0{,}5954 \\
+40 & 1{,}0703 & 1{,}4159 & 0{,}5953 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\nhanxet{Bẫy ``cực trị chạm biên'' xuất hiện lần thứ hai trong dự án này. Dải
+khảo sát ban đầu dừng ở $24$ và $R^2$ đạt đỉnh đúng tại đầu mút. Chỉ sau khi nới
+dải tới $40$ mới xác nhận được rằng đó là đỉnh thật chứ không phải điểm cắt cụt.
+
+Việc đường cong \emph{không} đi xuống ở độ sâu lớn là nhờ
+\texttt{min\_samples\_leaf=5}: tham số này chặn cây mọc tới lá chỉ chứa một quan
+sát. Nó còn có tác dụng phụ quan trọng về kỹ thuật --- để mặc định, rừng 200 cây
+trên 21.764 dòng chiếm $156$ MB trên đĩa và vượt giới hạn $100$ MB mỗi tệp của
+GitHub. Đặt bằng $5$ thì còn $44$ MB mà $R^2$ chỉ giảm từ $0{,}5976$ xuống
+$0{,}5925$.}
+
+\section{Thực nghiệm 3 --- Ảnh hưởng của cách biểu diễn dữ liệu}
+\label{sec:tn3-hou}
+
+\textbf{Thiết kế.} Ba phương án biểu diễn, cùng chạy trên Random Forest độ sâu
+$16$, cùng phép chia dữ liệu.
+
+\begin{table}[H]
+\centering
+\caption{Ba phương án biểu diễn và kết quả trên Random Forest}
+\label{tab:rep-hou}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Phương án biểu diễn} & \textbf{MAE} & \textbf{MSE} & \textbf{RMSE} & \textbf{$R^2$} \\
+\midrule
+Định lượng $+$ định danh, chưa thiết kế & \textbf{1{,}0932} & \textbf{2{,}0294} & \textbf{1{,}4246} & \textbf{0{,}5903} \\
+Đầy đủ $+$ đặc trưng thiết kế           & 1{,}0947 & 2{,}0497 & 1{,}4317 & 0{,}5862 \\
+Chỉ đặc trưng định lượng                & 1{,}4388 & 3{,}2988 & 1{,}8163 & 0{,}3340 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{hou_representation.png}
+\caption[Ảnh hưởng của cách biểu diễn dữ liệu tới $R^2$]%
+{Ảnh hưởng của cách biểu diễn dữ liệu tới $R^2$ của Random Forest}
+\label{fig:hou-representation}
+\end{figure}
+
+\bieudo{Biểu đồ cột ngang, sắp giảm dần theo $R^2$.}
+
+\phanphoi{Hai cột đầu gần bằng nhau, cột thứ ba \emph{ngắn hơn hẳn} --- một
+khoảng đứt gãy rõ rệt, khác hẳn hình dáng gần đều ở Hình~\ref{fig:dia-representation}.}
+
+\chitiet{Hai phương án có biến định danh cho $R^2$ $0{,}5903$ và $0{,}5862$ ---
+chênh nhau $0{,}0041$, tức trong nhiễu. Bỏ hết biến định danh làm $R^2$ tụt
+xuống $0{,}3340$ --- mất $0{,}2563$, tức hơn $43\%$ năng lực giải thích. MAE
+đồng thời xấu đi từ $1{,}0932$ lên $1{,}4388$ tỷ VNĐ.}
+
+\begin{table}[H]
+\centering
+\caption{Biên độ do đổi biểu diễn so với biên độ do đổi thuật toán, bài toán bất động sản}
+\label{tab:biendo-hou}
+\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Nguồn biến thiên} & \textbf{Biên độ $R^2$} & \textbf{Ghi chú} \\
+\midrule
+Đổi cách biểu diễn (3 phương án) & 0{,}2563 & $0{,}3340 \to 0{,}5903$ \\
+Đổi thuật toán (5 mô hình)       & 0{,}2584 & $0{,}3557 \to 0{,}6141$ \\
+\midrule
+\textbf{Tỷ số} & \multicolumn{2}{l}{\textbf{Ngang bằng --- nhưng đổi biểu diễn ít công hơn nhiều}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\nhanxet{Hai kết luận, một trong đó đi ngược kỳ vọng ban đầu.
+
+\textbf{(1) Vị trí hành chính là nhóm thông tin quyết định.} Đây là kết luận
+mạnh nhất của cả chương, và nó nhất quán với ba bằng chứng độc lập: tương quan
+tuyến tính yếu của mọi biến định lượng (Hình~\ref{fig:hou-corr}), mức quan trọng
+đặc trưng (Mục~\ref{sec:importance-hou}), và thực nghiệm này.
+
+\textbf{(2) Ba đặc trưng thiết kế \emph{không} giúp gì.} $R^2$ giảm nhẹ từ
+$0{,}5903$ xuống $0{,}5862$ khi thêm chúng vào. Lý do giống hệt trường hợp
+\texttt{Glucose\_Level} ở Mục~\ref{sec:importance-dia}: cây quyết định
+\emph{tự} tìm được các tổ hợp cần thiết, nên cung cấp sẵn
+$\texttt{Area}\times\texttt{Floors}$ chỉ thêm một cột tương quan $0{,}78$ với cột
+đã có mà không thêm thông tin nào.}
+
+\section{Thực nghiệm 4 --- Kiểm chuẩn ngoài phân phối}
+\label{sec:tn4-hou}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{hou_ood_comparison.png}
+\caption[So sánh $R^2$ giữa tập kiểm tra và tập ngoại kiểm]%
+{So sánh $R^2$ của năm mô hình giữa tập kiểm tra và tập ngoại kiểm}
+\label{fig:hou-ood}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả trên tập ngoại kiểm (3.023 tin chưa từng dùng trong phát triển)}
+\label{tab:ood-hou}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Mô hình} & \textbf{MAE} & \textbf{RMSE} & \textbf{$R^2$} & \textbf{$\Delta R^2$ so với kiểm tra} \\
+\midrule
+XGBoost                   & \textbf{1{,}1070} & \textbf{1{,}4651} & \textbf{0{,}5629} & $-0{,}0512$ \\
+Random Forest             & 1{,}1310 & 1{,}4932 & 0{,}5460 & $-0{,}0465$ \\
+Support Vector Regression & 1{,}1302 & 1{,}5279 & 0{,}5246 & $-0{,}0538$ \\
+Linear Regression         & 1{,}2935 & 1{,}6571 & 0{,}4408 & $+0{,}0851$ \\
+Decision Tree             & 1{,}2736 & 1{,}7038 & 0{,}4088 & $-0{,}0356$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\nhanxet{Khác hẳn bài toán tiểu đường, ở đây kết quả ngoại kiểm \textbf{ổn định
+và có thể tin được}: thứ hạng bốn mô hình đầu giữ nguyên hoàn toàn, và mức sụt
+$R^2$ đều đặn quanh $0{,}05$ cho ba mô hình dẫn đầu. Sự khác biệt đến từ kích
+thước tập: $3.023$ tin so với $77$ ca --- gấp gần 40 lần, nên dao động lấy mẫu
+nhỏ hơn nhiều.
+
+Mức sụt $0{,}05$ là biên độ lành mạnh: nó xác nhận điểm số trên tập kiểm tra có
+lạc quan chút ít (do đã dùng tập ấy để chọn mô hình) nhưng không phải học thuộc.
+Riêng Linear Regression \emph{tăng} $R^2$ --- mô hình có độ chệch cao thì ít
+nhạy với việc đổi tập, đúng như lý thuyết dự đoán.}
+
+\section{Mức độ quan trọng của đặc trưng}
+\label{sec:importance-hou}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{hou_feature_importance.png}
+\caption[Mức độ quan trọng của đặc trưng theo XGBoost]%
+{Mức độ quan trọng của 15 đặc trưng dẫn đầu theo mô hình XGBoost}
+\label{fig:hou-importance}
+\end{figure}
+
+\bieudo{Biểu đồ cột ngang, 15 cột one-hot dẫn đầu.}
+
+\phanphoi{Phân bố phân mảnh --- không cột đơn lẻ nào vượt $0{,}07$, nhưng các cột
+dẫn đầu gần như đều thuộc cùng hai nhóm gốc.}
+
+\chitiet{Dẫn đầu là \texttt{Province\_Bình Dương} $0{,}069$, rồi
+\texttt{Province\_Hồ Chí Minh} $0{,}056$, \texttt{District\_Hoài Đức} $0{,}050$,
+\texttt{Province\_Hà Nội} $0{,}046$. Đặc trưng định lượng đầu tiên xuất hiện là
+\texttt{Bathrooms} và \texttt{Total\_Area}, cả hai quanh $0{,}028$.}
+
+\begin{table}[H]
+\centering
+\caption{Mức quan trọng cộng dồn theo nhóm đặc trưng gốc}
+\label{tab:importance-grouped}
+\small
+\begin{tabular}{@{}lrlr@{}}
+\toprule
+\textbf{Nhóm đặc trưng} & \textbf{Tổng} & \textbf{Nhóm đặc trưng} & \textbf{Tổng} \\
+\midrule
+\texttt{District}       & \textbf{0{,}4301} & \texttt{Floors}         & 0{,}0122 \\
+\texttt{Province}       & \textbf{0{,}4235} & \texttt{Access Road}    & 0{,}0075 \\
+\texttt{Bathrooms}      & 0{,}0287 & \texttt{Area}           & 0{,}0072 \\
+\texttt{Total\_Area}    & 0{,}0270 & \texttt{Bedrooms}       & 0{,}0047 \\
+\texttt{House direction}& 0{,}0217 & \texttt{Frontage\_Ratio}& 0{,}0041 \\
+\texttt{Legal status}   & 0{,}0133 & \texttt{Room\_Density}  & 0{,}0038 \\
+\texttt{Furniture state}& 0{,}0131 & \texttt{Frontage}       & 0{,}0031 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{phathien}{Hai biến vị trí chiếm 85\% toàn bộ năng lực quyết định}
+Cộng dồn theo nhóm gốc cho một con số dứt khoát: \texttt{District} $+$
+\texttt{Province} $= 0{,}8536$, tức \textbf{85,4\%} tổng mức quan trọng. Mười
+hai nhóm đặc trưng còn lại --- gồm toàn bộ thuộc tính vật lý và pháp lý --- chia
+nhau $14{,}6\%$ còn lại.
+
+Con số này giải thích trọn vẹn kết quả Thực nghiệm~3: bỏ biến định danh đi thì
+mất đúng phần lớn nhất của cấu trúc, và $R^2$ tụt từ $0{,}5903$ xuống $0{,}3340$.
+
+Nó cũng khép lại nghịch lý ở Hình~\ref{fig:hou-bar-legal}: \texttt{Legal status}
+có trung bình biên gần như phẳng nhưng vẫn nhận mức quan trọng $0{,}0133$ --- gấp
+gần bốn lần \texttt{Frontage}. Mô hình cây khai thác được quan hệ \emph{có điều
+kiện} mà trung bình biên không nhìn thấy.
+
+Câu ngạn ngữ ``vị trí, vị trí, vị trí'' của giới bất động sản, ở tập dữ liệu
+này, có một con số cụ thể: $85{,}4\%$.
+\end{phathien}
+
+\section{Tích hợp Đồ thị Tri thức Đô thị -- Tài chính}
+\label{sec:kg-hou}
+
+\subsection{Phân khúc thị trường}
+
+\begin{table}[H]
+\centering
+\caption{Ba phân khúc thị trường và gói tín dụng tương ứng}
+\label{tab:phankhuc-hou}
+\small
+\begin{tabularx}{\textwidth}{@{}L{3.2cm}L{1.5cm}L{3.4cm}rrX@{}}
+\toprule
+\textbf{Phân khúc} & \textbf{Ngưỡng} & \textbf{Gói vay} & \textbf{LTV} & \textbf{Lãi suất} & \textbf{Kỳ hạn} \\
+\midrule
+Cao cấp    & $\ge 8{,}0$ tỷ & Bất động sản Cao cấp & 70\% & 8{,}5\% & 25 năm \\
+Trung cấp  & $\ge 4{,}5$ tỷ & Mua nhà Linh hoạt    & 75\% & 7{,}9\% & 20 năm \\
+Bình dân   & $\ge 0{,}0$ tỷ & Nhà ở Xã hội         & 80\% & 4{,}8\% & 25 năm \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Đồ thị của một ca cụ thể}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{kg_property.png}
+\caption[Đồ thị Tri thức Đô thị -- Tài chính của tin đăng \#23933]%
+{Đồ thị Tri thức Đô thị -- Tài chính của tin đăng \#23933 --- Phân khúc Cao cấp,
+20 thực thể và 20 cạnh}
+\label{fig:kg-property}
+\end{figure}
+
+\bieudo{Đồ thị có hướng vẽ theo bố cục phân tầng, màu nút mã hoá loại thực thể.}
+
+\phanphoi{Cấu trúc hình thoi: mở rộng ở tầng thuộc tính, thắt lại tại nút định
+giá và nút phân khúc, rồi mở rộng lần nữa ở tầng tài chính và hạ tầng.}
+
+\chitiet{Bên trái là bốn thuộc tính vật lý cùng nút pháp lý. Ở giữa là chuỗi
+Bất động sản $\to$ Quận Nhà Bè $\to$ Tỉnh Hồ Chí Minh và song song là Mô hình
+XGBoost $\to$ Giá $8{,}42$ tỷ $\to$ Phân khúc Cao cấp. Bên phải chia hai nhánh:
+nhánh tài chính đi qua Gói vay $\to$ Trả góp $47{,}5$ triệu/tháng $\to$ Thu nhập
+tối thiểu $118{,}7$ triệu/tháng, và nhánh hạ tầng đi qua Cụm Hạ tầng Đô thị Cao
+cấp tới bốn tiện ích.}
+
+\subsection{Gói tài chính mua nhà}
+\label{sec:goi-tai-chinh}
+
+Áp dụng công thức niên kim~\eqref{eq:nienkim} và ngưỡng DTI~\eqref{eq:dti} cho
+tin đăng \#23933:
+
+\begin{table}[H]
+\centering
+\caption{Hồ sơ tài chính đầy đủ cho tin đăng \#23933 (giá dự báo 8,42 tỷ VNĐ)}
+\label{tab:taichinh-hou}
+\small
+\begin{tabularx}{\textwidth}{@{}L{5.2cm}R{3.4cm}X@{}}
+\toprule
+\textbf{Khoản mục} & \textbf{Giá trị} & \textbf{Cách tính} \\
+\midrule
+Giá định giá            & 8{,}42 tỷ đ    & Mô hình XGBoost \\
+Tỷ lệ cho vay (LTV)     & 70\%           & Theo phân khúc Cao cấp \\
+Hạn mức vay $P$         & \textbf{5{,}89 tỷ đ} & $8{,}42\times0{,}70$ \\
+Vốn tự có tối thiểu     & 2{,}53 tỷ đ    & $8{,}42-5{,}89$ \\
+Lãi suất danh nghĩa     & 8{,}5\%/năm    & Mặt bằng công bố \\
+Kỳ hạn                  & 25 năm (300 kỳ) & \\
+\textbf{Trả góp hằng tháng $M$} & \textbf{47{,}5 triệu đ} & Công thức~\eqref{eq:nienkim} \\
+Tổng tiền lãi           & 8{,}34 tỷ đ    & $Mn - P$ \\
+\textbf{Thu nhập tối thiểu} & \textbf{118{,}7 triệu đ/tháng} & $M/0{,}40$, công thức~\eqref{eq:dti} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{phathien}{Tổng tiền lãi vượt cả dư nợ gốc}
+Với kỳ hạn 25 năm ở lãi suất $8{,}5\%$/năm, tổng tiền lãi là $8{,}34$ tỷ trên
+khoản vay gốc $5{,}89$ tỷ --- tức \textbf{142\% dư nợ gốc}. Người vay trả về cho
+ngân hàng tổng cộng $14{,}23$ tỷ để mua một căn nhà định giá $8{,}42$ tỷ.
+
+Đây là con số mà bảng quảng cáo gói vay hiếm khi đặt cạnh con số trả góp hằng
+tháng, và hệ thống hiển thị nó tường minh. Lịch trả nợ còn cho thấy một điều
+nữa: năm đầu tiên trả $498$ triệu tiền lãi nhưng chỉ giảm được $71$ triệu dư
+nợ --- phần lãi dồn hết về đầu kỳ, nên trả trước hạn trong vài năm đầu là lúc
+tiết kiệm được nhiều nhất.
+
+Con số \textbf{thu nhập tối thiểu $118{,}7$ triệu đồng mỗi tháng} là câu trả lời
+thẳng thắn nhất mà hệ thống đưa ra: nó nói cho người dùng biết căn nhà này có
+nằm trong tầm với của họ hay không, điều mà con số ``$8{,}42$ tỷ'' đơn thuần
+không nói được.
+\end{phathien}
+
+\subsection{Tiện ích hạ tầng đô thị}
+
+\begin{table}[H]
+\centering
+\caption{Cụm hạ tầng tiện ích theo phân khúc, phân loại theo bốn nhóm chức năng}
+\label{tab:tienich-hou}
+\small
+\begin{tabularx}{\textwidth}{@{}L{3.4cm}rXX@{}}
+\toprule
+\textbf{Cụm} & \textbf{Bán kính} & \textbf{Tiện ích} & \textbf{Nhóm chức năng} \\
+\midrule
+\multirow{4}{*}{Cao cấp}   & \multirow{4}{*}{2{,}0 km} & Trung tâm thương mại & Thương mại \\
+ & & Trường quốc tế        & Giáo dục \\
+ & & Bệnh viện đa khoa     & Y tế \\
+ & & Tuyến đường vành đai  & Giao thông \\
+\midrule
+\multirow{4}{*}{Trung cấp} & \multirow{4}{*}{1{,}5 km} & Siêu thị & Thương mại \\
+ & & Trường công lập       & Giáo dục \\
+ & & Trạm y tế phường      & Y tế \\
+ & & Tuyến xe buýt nội đô  & Giao thông \\
+\midrule
+\multirow{4}{*}{Cơ bản}    & \multirow{4}{*}{3{,}0 km} & Chợ dân sinh & Thương mại \\
+ & & Trường tiểu học       & Giáo dục \\
+ & & Phòng khám đa khoa    & Y tế \\
+ & & Tuyến xe buýt liên huyện & Giao thông \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\nhanxet{Bốn nhóm chức năng được giữ cố định qua cả ba phân khúc, chỉ đổi mức
+độ. Cách tổ chức này cho phép so sánh trực tiếp: cùng nhu cầu y tế, phân khúc
+cao cấp có bệnh viện đa khoa trong bán kính $2$ km còn phân khúc cơ bản có phòng
+khám khu vực trong bán kính $3$ km.
+
+Xin nhắc lại ranh giới ở Mục~\ref{sec:ranh-gioi-so-lieu}: đây là mô hình hoá
+theo phân khúc, \textbf{không phải} khảo sát thực địa từng quận --- tập dữ liệu
+gốc chỉ có địa chỉ hành chính, không có toạ độ, nên không thể suy ra khoảng cách
+thật tới một siêu thị cụ thể.}
+
+\section{Ứng dụng web}
+\label{sec:app-hou}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{app-desktop-3-dinh-gia.png}
+\caption[Giao diện trang Định giá Bất động sản trên máy tính]%
+{Giao diện trang Định giá Bất động sản trên máy tính --- biểu mẫu khai thuộc
+tính, giá dự báo, hạn mức vay và đồ thị tri thức}
+\label{fig:app-hou-desktop}
+\end{figure}
+
+\bieudo{Ảnh chụp màn hình bản đã triển khai công khai, khổ máy tính $1440$ px.}
+
+\chitiet{Cột trái là biểu mẫu chia ba khối --- quy mô và kết cấu, vị trí hành
+chính, pháp lý và bàn giao --- trong đó danh sách Quận/Huyện được lọc động theo
+Tỉnh/Thành đã chọn. Cột phải hiển thị giá dự báo cỡ lớn, thanh phân khúc, đơn
+giá mỗi m$^2$ và hạn mức vay. Bốn tab phía dưới: Gói vay, Hạ tầng \& Tài chính,
+So sánh, Vì sao.}
+
+\nhanxet{Tab ``Hạ tầng \& Tài chính'' là nơi hệ thống trả lời trọn vẹn câu hỏi
+của người mua: bốn thẻ số ở đầu tab cho trả góp hằng tháng, thu nhập tối thiểu,
+vốn tự có và tổng tiền lãi; bảng bên trái liệt kê điều khoản vay; bảng bên phải
+là lịch trả nợ theo từng năm với cột trả gốc, trả lãi và dư nợ còn lại.
+
+Ứng dụng cũng hiển thị cảnh báo khi tin đăng thiếu giấy tờ: ``chưa có sổ đỏ hoặc
+sổ hồng --- phần lớn ngân hàng sẽ không nhận thế chấp tài sản này'', lấy trực
+tiếp từ quan hệ \texttt{QUALIFIES\_FOR} trong đồ thị tri thức.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{app-desktop-5-ha-tang-tai-chinh.png}
+\caption[Tab Hạ tầng \& Tài chính --- trả góp, lịch trả nợ và cụm tiện ích]%
+{Tab \emph{Hạ tầng \& Tài chính} --- bốn chỉ số tài chính, bảng điều khoản vay,
+lịch trả nợ theo năm và cụm tiện ích hạ tầng}
+\label{fig:app-hou-tai-chinh}
+\end{figure}
+
+\bieudo{Ảnh chụp màn hình tab thứ hai của trang Định giá.}
+
+\chitiet{Bốn thẻ số ở đầu tab: trả góp $47{,}4$ triệu đồng mỗi tháng, thu nhập
+tối thiểu $118{,}6$ triệu đồng, vốn tự có $2{,}52$ tỷ và tổng tiền lãi
+$8{,}34$ tỷ --- bằng $142\%$ dư nợ gốc. Bảng bên trái liệt kê bảy dòng điều
+khoản vay; bảng bên phải là lịch trả nợ theo năm với ba cột trả gốc, trả lãi và
+dư nợ cuối năm. Cuối tab là bốn thẻ tiện ích, mỗi thẻ ghi nhóm chức năng và bán
+kính tiếp cận.}
+
+\nhanxet{Con số trên giao diện chênh nhẹ so với Bảng~\ref{tab:taichinh-hou}
+($47{,}4$ so với $47{,}5$ triệu đồng) vì ứng dụng tính trên giá dự báo đầy đủ
+của mô hình, còn bảng trong báo cáo tính trên con số $8{,}42$ tỷ đã làm tròn để
+hiển thị. Đây là chênh lệch làm tròn, không phải hai phép tính khác nhau.
+
+Dòng chú thích dưới lịch trả nợ là chỗ hệ thống nói ra điều mà bảng quảng cáo
+gói vay thường không nói: năm đầu tiên trả $498$ triệu tiền lãi nhưng chỉ giảm
+được $71$ triệu dư nợ.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.34\textwidth]{app-mobile-3-dinh-gia.png}
+\caption[Giao diện trang Định giá trên điện thoại]%
+{Giao diện trang Định giá trên điện thoại, khổ $390$ px}
+\label{fig:app-hou-mobile}
+\end{figure}

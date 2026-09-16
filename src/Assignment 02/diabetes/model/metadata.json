@@ -1,0 +1,153 @@
+{
+  "application": "diabetes",
+  "task": "binary_classification",
+  "random_seed": 42,
+  "feature_columns": [
+    "Glucose",
+    "BMI",
+    "Age",
+    "Pregnancies",
+    "DiabetesPedigreeFunction"
+  ],
+  "target": "Outcome",
+  "class_labels": {
+    "0": "Âm tính (nguy cơ thấp)",
+    "1": "Dương tính (nguy cơ cao)"
+  },
+  "invalid_zero_columns": [
+    "Glucose",
+    "BMI"
+  ],
+  "n_samples": 768,
+  "feature_matrix_shape": [
+    768,
+    5
+  ],
+  "split": {
+    "train": 536,
+    "validation": 116,
+    "test": 116
+  },
+  "baseline_accuracy": 0.6552,
+  "best_model": "random_forest",
+  "best_model_label": "Random Forest",
+  "test_metrics": {
+    "random_forest": {
+      "Accuracy": 0.7759,
+      "Precision": 0.6458,
+      "Recall": 0.775,
+      "F1": 0.7045,
+      "ROC-AUC": 0.8526
+    },
+    "logistic_regression": {
+      "Accuracy": 0.7414,
+      "Precision": 0.5962,
+      "Recall": 0.775,
+      "F1": 0.6739,
+      "ROC-AUC": 0.8359
+    },
+    "svm_rbf": {
+      "Accuracy": 0.7414,
+      "Precision": 0.5962,
+      "Recall": 0.775,
+      "F1": 0.6739,
+      "ROC-AUC": 0.8118
+    },
+    "knn": {
+      "Accuracy": 0.7586,
+      "Precision": 0.6667,
+      "Recall": 0.6,
+      "F1": 0.6316,
+      "ROC-AUC": 0.7985
+    },
+    "decision_tree": {
+      "Accuracy": 0.681,
+      "Precision": 0.5231,
+      "Recall": 0.85,
+      "F1": 0.6476,
+      "ROC-AUC": 0.7735
+    }
+  },
+  "validation_metrics": {
+    "logistic_regression": {
+      "Accuracy": 0.7328,
+      "Precision": 0.6042,
+      "Recall": 0.7073,
+      "F1": 0.6517,
+      "ROC-AUC": 0.8354
+    },
+    "knn": {
+      "Accuracy": 0.7759,
+      "Precision": 0.7273,
+      "Recall": 0.5854,
+      "F1": 0.6486,
+      "ROC-AUC": 0.8122
+    },
+    "decision_tree": {
+      "Accuracy": 0.6466,
+      "Precision": 0.5,
+      "Recall": 0.8049,
+      "F1": 0.6168,
+      "ROC-AUC": 0.7985
+    },
+    "random_forest": {
+      "Accuracy": 0.7759,
+      "Precision": 0.6415,
+      "Recall": 0.8293,
+      "F1": 0.7234,
+      "ROC-AUC": 0.8374
+    },
+    "svm_rbf": {
+      "Accuracy": 0.7672,
+      "Precision": 0.64,
+      "Recall": 0.7805,
+      "F1": 0.7033,
+      "ROC-AUC": 0.8111
+    }
+  },
+  "feature_importance": {
+    "Glucose": 0.4011,
+    "BMI": 0.204,
+    "Age": 0.1903,
+    "DiabetesPedigreeFunction": 0.1299,
+    "Pregnancies": 0.0747
+  },
+  "confusion_matrix_best": {
+    "tn": 59,
+    "fp": 17,
+    "fn": 9,
+    "tp": 31
+  },
+  "feature_count_ablation": [
+    {
+      "Mô hình": "Logistic Regression",
+      "ROC-AUC (5 đặc trưng)": 0.8354,
+      "ROC-AUC (8 đặc trưng)": 0.8361,
+      "Chênh lệch": 0.0007
+    },
+    {
+      "Mô hình": "K-Nearest Neighbors",
+      "ROC-AUC (5 đặc trưng)": 0.8122,
+      "ROC-AUC (8 đặc trưng)": 0.7935,
+      "Chênh lệch": -0.0187
+    },
+    {
+      "Mô hình": "Decision Tree",
+      "ROC-AUC (5 đặc trưng)": 0.7985,
+      "ROC-AUC (8 đặc trưng)": 0.7979,
+      "Chênh lệch": -0.0007
+    },
+    {
+      "Mô hình": "Random Forest",
+      "ROC-AUC (5 đặc trưng)": 0.8374,
+      "ROC-AUC (8 đặc trưng)": 0.8237,
+      "Chênh lệch": -0.0137
+    },
+    {
+      "Mô hình": "SVM (RBF)",
+      "ROC-AUC (5 đặc trưng)": 0.8111,
+      "ROC-AUC (8 đặc trưng)": 0.8172,
+      "Chênh lệch": 0.0062
+    }
+  ]
+}

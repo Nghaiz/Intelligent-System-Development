@@ -1,0 +1,39 @@
+# Bí mật — KHÔNG BAO GIỜ commit
+.env
+*.pem
+*.key
+secrets.*
+
+# Môi trường Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Hệ điều hành / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Sản phẩm trung gian của Flutter (mã nguồn lib/ và pubspec.yaml vẫn được commit)
+**/mobile/.dart_tool/
+**/mobile/build/
+**/mobile/android/
+**/mobile/ios/
+**/mobile/web/
+**/mobile/windows/
+**/mobile/linux/
+**/mobile/macos/
+**/mobile/.flutter-plugins*
+**/mobile/pubspec.lock
+
+# Ghi chú vận hành cá nhân — không đưa lên kho mã nguồn
+HUONG-DAN-CHO-BAN/
+
+# Log tam cua script chup anh giao dien
+report/_server_*.log

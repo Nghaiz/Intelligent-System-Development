@@ -1,0 +1,8 @@
+# Ứng dụng REST API + Web/Mobile UI cho bài toán dự đoán tiểu đường (port 5001)
+Flask==3.1.2
+numpy
+pandas
+scikit-learn
+joblib
+python-dotenv
+neo4j

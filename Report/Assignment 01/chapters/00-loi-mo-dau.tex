@@ -1,0 +1,58 @@
+% =====================================================================
+%  Lời mở đầu
+% =====================================================================
+\chapter*{Lời mở đầu}
+\addcontentsline{toc}{chapter}{Lời mở đầu}
+\markboth{Lời mở đầu}{Lời mở đầu}
+
+Một hệ thống thông minh không bắt đầu từ thuật toán. Nó bắt đầu từ câu hỏi:
+\emph{thế giới thực đang được viết lại thành những con số nào, và những con số
+ấy có giữ lại đúng thứ cần giữ hay không}. Đề bài của Assignment 01 gọi tên
+chuỗi ấy rất rõ --- Thế giới thực $\rightarrow$ Dữ liệu $\rightarrow$ Biểu diễn
+$\rightarrow$ Mô hình $\rightarrow$ Dự đoán $\rightarrow$ Ứng dụng --- và yêu
+cầu đi trọn chuỗi ấy chứ không dừng ở một mắt xích.
+
+Báo cáo này trình bày hai hệ thống thông minh cỡ nhỏ, cùng đi trọn một chuỗi
+như vậy trên hai miền khác hẳn nhau. Hệ thống thứ nhất là bài toán
+\textbf{phân lớp} trong y tế: từ tám chỉ số sinh tồn của một người, ước lượng
+nguy cơ mắc đái tháo đường. Hệ thống thứ hai là bài toán \textbf{hồi quy} trong
+bất động sản: từ diện tích, kết cấu và vị trí hành chính của một căn nhà, ước
+lượng giá giao dịch tính bằng tỷ đồng. Mỗi bài toán được giải bằng năm mô hình
+Học máy truyền thống, so sánh dưới cùng một giao thức đánh giá, cộng thêm bốn
+thực nghiệm có kiểm soát và một Đồ thị Tri thức năm tầng.
+
+Điều mà Đồ thị Tri thức mang lại đáng được nói ngay từ đây, vì nó là phần mà
+một mô hình học máy đơn lẻ không làm được. Mô hình trả về xác suất $54{,}5\%$;
+đồ thị biến con số ấy thành một gói chăm sóc gồm năm mặt hàng có thật, chi phí
+ban đầu $1{,}99$--$2{,}75$ triệu đồng và duy trì $1{,}20$--$1{,}66$ triệu đồng
+mỗi tháng, mua được tại hệ thống nhà thuốc. Mô hình trả về giá $8{,}42$ tỷ
+đồng; đồ thị biến con số ấy thành hạn mức vay $5{,}89$ tỷ, khoản trả góp
+$47{,}5$ triệu đồng mỗi tháng trong 25 năm, và mức thu nhập tối thiểu
+$118{,}7$ triệu đồng mỗi tháng để gánh được khoản vay ấy.
+
+Việc đặt hai bài toán cạnh nhau không phải để nhân đôi khối lượng. Nó là một
+thiết kế có chủ đích: khi cùng một thực nghiệm được lặp lại trên hai miền dữ
+liệu, những kết luận nào còn đứng vững và những kết luận nào sụp đổ sẽ tự lộ
+ra. Chương~\ref{ch:ketluan} cho thấy chính cách làm này đã \emph{bác bỏ} một
+giả định phổ biến mà bản thân người viết cũng tin lúc mới bắt đầu --- rằng
+``biểu diễn dữ liệu quan trọng hơn thuật toán''. Phát biểu ấy đúng ở bài toán
+bất động sản và sai ở bài toán tiểu đường, và điều phân biệt hai trường hợp lại
+không nằm ở thuật toán mà nằm ở chỗ phép biểu diễn có \emph{thêm thông tin mới}
+hay chỉ \emph{đổi dạng} thông tin đã có.
+
+Toàn bộ con số trong báo cáo được sinh ra từ một lệnh duy nhất
+(\texttt{python run\_pipeline.py}) với hạt giống ngẫu nhiên cố định, nên mọi
+bảng và mọi hình đều tái lập được. Mã nguồn, hai Jupyter Notebook, bộ 355 bài
+kiểm thử và bản ứng dụng web đã triển khai công khai được liệt kê ở
+Mục~\ref{sec:masource} ngay đầu Chương~\ref{ch:coso}.
+
+Em xin chân thành cảm ơn thầy \textbf{PGS.TS Trần Đình Quế} đã hướng dẫn học
+phần và đưa ra đề bài này --- một đề bài buộc người làm phải đi hết chuỗi xử lý
+thay vì dừng lại ở chỗ mô hình cho ra con số đẹp.
+
+\vspace{8mm}
+\begin{flushright}
+\emph{Hà Nội, tháng 8 năm 2026}\par
+\vspace{2mm}
+\textbf{Nguyễn Duy Nghĩa}
+\end{flushright}

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Định giá bất động sản — Mobile</title>
+<style>
+  :root{
+    --primary:#198754; --primary-dark:#146c43; --accent:#fd7e14;
+    --card:#ffffff; --text:#1c2430; --muted:#6b7480; --border:#e2e6ee;
+    --ok:#198754;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; height:100%;}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(160deg,#1c2430,#2f4a3a 60%,#19875433);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; padding:30px 10px; color:#e9ecf2;
+  }
+  .note{max-width:390px; text-align:center; font-size:12px; color:#c3c9d6; margin-bottom:16px;}
+  .note code{background:#00000040; padding:1px 5px; border-radius:4px;}
+  .phone{
+    width:390px; height:844px; background:#000; border-radius:44px; padding:12px;
+    box-shadow:0 30px 60px rgba(0,0,0,.5); position:relative;
+  }
+  .screen{
+    width:100%; height:100%; background:#f4f7f5; border-radius:34px; overflow:hidden;
+    position:relative; display:flex; flex-direction:column;
+  }
+  .notch{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:150px; height:26px; background:#000; border-radius:0 0 18px 18px; z-index:5;
+  }
+  .status-bar{
+    height:44px; flex:0 0 44px; display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px; font-size:13px; font-weight:600; color:#111; background:#f4f7f5;
+  }
+  .status-bar .icons{display:flex; gap:5px; align-items:center;}
+  .content{flex:1; overflow-y:auto; padding:14px 16px 10px;}
+  .content::-webkit-scrollbar{width:0;}
+  h1{margin:6px 0 2px; font-size:19px; color:var(--primary-dark);}
+  .subtitle{color:var(--muted); font-size:12.5px; margin-bottom:10px;}
+  .badge{
+    display:flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:8px 10px; font-size:11px; margin-bottom:6px;
+  }
+  .badge .dot{width:7px; height:7px; border-radius:50%; background:#adb5bd; flex:0 0 auto;}
+  .badge.on .dot{background:var(--ok);}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:14px; margin-top:10px; box-shadow:0 1px 4px rgba(0,0,0,.04);
+  }
+  .card h2{margin:0 0 10px; font-size:14px; color:var(--primary-dark);}
+  .field{margin-bottom:10px;}
+  label{display:block; font-size:11.5px; font-weight:600; margin-bottom:4px;}
+  input[type=number], input[type=text]{
+    width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px;
+    font-size:13px; font-family:inherit; background:#fff; color:var(--text);
+  }
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;}
+  .actions{display:flex; gap:8px; margin-top:12px;}
+  button{
+    flex:1; cursor:pointer; border:none; border-radius:9px; padding:11px 8px;
+    font-size:13px; font-weight:700; font-family:inherit;
+  }
+  .btn-primary{background:var(--primary); color:#fff;}
+  .btn-secondary{background:#eaf2ee; color:var(--text);}
+  .error-box{
+    background:#fdecea; border:1px solid #f5c2c7; color:#842029; border-radius:8px;
+    padding:9px 10px; margin-top:10px; font-size:12px; display:none;
+  }
+  .loading{color:var(--muted); font-size:12px; margin-top:8px; display:none;}
+  .result-empty{color:var(--muted); font-size:12.5px; text-align:center; padding:18px 6px;}
+  .result-body{display:none;}
+  .price-display{font-size:26px; font-weight:800; color:var(--primary-dark);}
+  .price-sub{font-size:12px; color:var(--muted); margin-top:6px;}
+  .price-sub b{color:var(--text);}
+  .segment-badge{display:inline-block; margin-top:10px; padding:5px 11px; border-radius:999px; font-size:11.5px; font-weight:700;}
+  .segment-badge.house_luxury{background:#fde2c8; color:#7a3d00;}
+  .segment-badge.house_mid{background:#fff3cd; color:#664d03;}
+  .segment-badge.house_standard{background:#d1e7dd; color:#0f5132;}
+  .geo-table{width:100%; border-collapse:collapse; margin-top:10px; font-size:11.5px;}
+  .geo-table th, .geo-table td{text-align:left; padding:5px 4px; border-bottom:1px solid var(--border);}
+  .geo-table th{color:var(--muted); font-weight:600;}
+  .tag-ok{color:#146c43; font-weight:700;}
+  .tag-no{color:#a12622; font-weight:700;}
+  .k-note{color:var(--muted); font-size:11px; margin-top:12px; font-style:italic;}
+  .k-group{margin-top:12px;}
+  .k-group h3{font-size:12.5px; margin:0 0 6px; color:var(--primary-dark);}
+  .k-item{padding:8px 9px; background:#f4f8f5; border-radius:8px; margin-bottom:6px;}
+  .k-item .t{font-weight:700; font-size:11.5px;}
+  .k-item .c{font-size:11px; color:var(--text); margin-top:2px;}
+  .tabbar{
+    flex:0 0 60px; display:flex; align-items:center; justify-content:space-around;
+    background:#fff; border-top:1px solid var(--border);
+  }
+  .tabbar .tab{font-size:10px; color:var(--muted); text-align:center;}
+  .tabbar .tab.active{color:var(--primary);}
+  .tabbar .tab .ic{font-size:16px; display:block;}
+</style>
+</head>
+<body>
+  <div class="note">Bản mô phỏng chạy trong trình duyệt — mã nguồn Flutter thật ở <code>mobile/lib/main.dart</code></div>
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="status-bar">
+        <span id="clock">9:41</span>
+        <span class="icons">📶 📡 🔋</span>
+      </div>
+      <div class="content">
+        <h1>Định giá bất động sản</h1>
+        <div class="subtitle">Hệ thống 2 · 150,000 giao dịch bất động sản</div>
+        <div class="badge off" id="badgeModel"><span class="dot"></span>Đang tải mô hình…</div>
+        <div class="badge off" id="badgeGraph"><span class="dot"></span>Đồ thị tri thức: đang kiểm tra…</div>
+
+        <div class="card">
+          <h2>Nhập thông tin bất động sản</h2>
+          <form id="predictForm">
+            <div class="row2">
+              <div class="field">
+                <label for="bed">Phòng ngủ (1–12)</label>
+                <input type="number" id="bed" name="bed" min="1" max="12" step="1" value="3" required>
+              </div>
+              <div class="field">
+                <label for="bath">Phòng tắm (1–12)</label>
+                <input type="number" id="bath" name="bath" min="1" max="12" step="1" value="2" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="house_size">Diện tích sàn (sqft)</label>
+              <input type="number" id="house_size" name="house_size" min="300" max="10000" step="1" value="1800" required>
+            </div>
+            <div class="field">
+              <label for="acre_lot">Diện tích lô đất (acre) — tuỳ chọn</label>
+              <input type="number" id="acre_lot" name="acre_lot" min="0" step="0.01" value="0.25">
+            </div>
+            <div class="field">
+              <label for="city">Thành phố — tuỳ chọn</label>
+              <input type="text" id="city" name="city" value="Houston">
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="state">Tiểu bang — tuỳ chọn</label>
+                <input type="text" id="state" name="state" value="Texas">
+              </div>
+              <div class="field">
+                <label for="zip_code">Mã bưu điện — tuỳ chọn</label>
+                <input type="text" id="zip_code" name="zip_code" value="77002">
+              </div>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn-secondary" id="btnSample">Mẫu</button>
+              <button type="submit" class="btn-primary" id="btnPredict">Dự đoán</button>
+            </div>
+            <div class="loading" id="loading">Đang tính toán…</div>
+            <div class="error-box" id="errorBox"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Kết quả định giá</h2>
+          <div class="result-empty" id="resultEmpty">Nhập thông tin và bấm "Dự đoán".</div>
+          <div class="result-body" id="resultBody">
+            <div class="price-display" id="priceDisplay">$0</div>
+            <div class="price-sub">Giá / sqft: <b id="pricePerSqft">-</b></div>
+            <span class="segment-badge" id="segmentBadge"></span>
+            <table class="geo-table">
+              <thead><tr><th>Cấp mã hoá</th><th>Khớp</th></tr></thead>
+              <tbody>
+                <tr><td>Tiểu bang</td><td id="geoState">-</td></tr>
+                <tr><td>Zip3</td><td id="geoZip3">-</td></tr>
+                <tr><td>Mã bưu điện</td><td id="geoZip5">-</td></tr>
+                <tr><td>Thành phố</td><td id="geoCity">-</td></tr>
+              </tbody>
+            </table>
+            <div class="price-sub">Lô đất dùng tính: <b id="geoAcre">-</b></div>
+            <div class="price-sub">Diện tích TB khu vực: <b id="geoZipSize">-</b></div>
+            <div id="knowledgeArea"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab active"><span class="ic">🏠</span>Định giá</div>
+        <div class="tab"><span class="ic">📊</span>Thị trường</div>
+        <div class="tab"><span class="ic">ℹ️</span>Thông tin</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var PREFIX = '/house-price/v1';
+  var els = {
+    badgeModel: document.getElementById('badgeModel'),
+    badgeGraph: document.getElementById('badgeGraph'),
+    form: document.getElementById('predictForm'),
+    btnPredict: document.getElementById('btnPredict'),
+    btnSample: document.getElementById('btnSample'),
+    loading: document.getElementById('loading'),
+    errorBox: document.getElementById('errorBox'),
+    resultEmpty: document.getElementById('resultEmpty'),
+    resultBody: document.getElementById('resultBody'),
+    priceDisplay: document.getElementById('priceDisplay'),
+    pricePerSqft: document.getElementById('pricePerSqft'),
+    segmentBadge: document.getElementById('segmentBadge'),
+    geoState: document.getElementById('geoState'),
+    geoZip3: document.getElementById('geoZip3'),
+    geoZip5: document.getElementById('geoZip5'),
+    geoCity: document.getElementById('geoCity'),
+    geoAcre: document.getElementById('geoAcre'),
+    geoZipSize: document.getElementById('geoZipSize'),
+    knowledgeArea: document.getElementById('knowledgeArea'),
+    clock: document.getElementById('clock')
+  };
+  var SEGMENT_LABEL = {house_luxury:'Cao cấp', house_mid:'Trung cấp', house_standard:'Bình dân'};
+
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+  function updateClock(){
+    var d = new Date();
+    els.clock.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  updateClock();
+  setInterval(updateClock, 15000);
+
+  function loadHealth(){
+    fetch(PREFIX + '/health').then(function(r){ return r.json(); }).then(function(d){
+      els.badgeModel.className = 'badge on';
+      els.badgeModel.innerHTML = '<span class="dot"></span>' + d.architecture + ' · ' +
+        Number(d.n_params).toLocaleString('vi-VN') + ' tham số · Suy luận thuần NumPy — không dùng framework học sâu';
+      if(d.knowledge_graph === 'connected'){
+        els.badgeGraph.className = 'badge on';
+        els.badgeGraph.innerHTML = '<span class="dot"></span>Đồ thị tri thức: đã kết nối';
+      } else {
+        els.badgeGraph.className = 'badge off';
+        els.badgeGraph.innerHTML = '<span class="dot"></span>Đồ thị tri thức: không khả dụng';
+      }
+    }).catch(function(){
+      els.badgeModel.className = 'badge off';
+      els.badgeModel.innerHTML = '<span class="dot"></span>Không kết nối được máy chủ mô hình';
+    });
+  }
+
+  function showError(msg){ els.errorBox.textContent = msg; els.errorBox.style.display = 'block'; }
+  function hideError(){ els.errorBox.style.display = 'none'; }
+
+  function escapeHtml(s){
+    if(s === null || s === undefined) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderKnowledge(groups, err){
+    var html = '';
+    if(groups && groups.length){
+      groups.forEach(function(g){
+        html += '<div class="k-group"><h3>' + escapeHtml(g.title) + '</h3>';
+        (g.items || []).forEach(function(it){
+          html += '<div class="k-item"><div class="t">' + escapeHtml(it.title) + '</div>' +
+                  (it.content ? '<div class="c">' + escapeHtml(it.content) + '</div>' : '') + '</div>';
+        });
+        html += '</div>';
+      });
+    }
+    if(err){ html += '<div class="k-note">Ghi chú: ' + escapeHtml(err) + '</div>'; }
+    els.knowledgeArea.innerHTML = html;
+  }
+
+  function matchTag(v){
+    return v ? '<span class="tag-ok">✓</span>' : '<span class="tag-no">✗</span>';
+  }
+
+  function renderResult(data){
+    els.resultEmpty.style.display = 'none';
+    els.resultBody.style.display = 'block';
+    els.priceDisplay.textContent = data.price_display;
+    els.pricePerSqft.textContent = '$' + Number(data.price_per_sqft).toLocaleString('vi-VN', {maximumFractionDigits:2}) + '/sqft';
+    els.segmentBadge.style.display = 'inline-block';
+    els.segmentBadge.className = 'segment-badge ' + data.segment;
+    els.segmentBadge.textContent = SEGMENT_LABEL[data.segment] || data.segment;
+    var geo = data.geo_encoding || {};
+    els.geoState.innerHTML = matchTag(geo.state_matched);
+    els.geoZip3.innerHTML = matchTag(geo.zip3_matched);
+    els.geoZip5.innerHTML = matchTag(geo.zip_code_matched);
+    els.geoCity.innerHTML = matchTag(geo.city_matched);
+    els.geoAcre.textContent = geo.acre_lot_used !== undefined ? Number(geo.acre_lot_used).toFixed(2) + ' acre' : '-';
+    els.geoZipSize.textContent = geo.zip_mean_house_size !== undefined ? Number(geo.zip_mean_house_size).toLocaleString('vi-VN', {maximumFractionDigits:0}) + ' sqft' : '-';
+    renderKnowledge(data.knowledge, data.knowledge_error);
+  }
+
+  function submitForm(e){
+    e.preventDefault();
+    hideError();
+    var acreVal = els.form.acre_lot.value;
+    var payload = {
+      bed: Number(els.form.bed.value),
+      bath: Number(els.form.bath.value),
+      house_size: Number(els.form.house_size.value),
+      acre_lot: acreVal === '' ? null : Number(acreVal),
+      city: els.form.city.value,
+      state: els.form.state.value,
+      zip_code: els.form.zip_code.value
+    };
+    els.btnPredict.disabled = true;
+    els.loading.style.display = 'block';
+    fetch(PREFIX + '/predict', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+    .then(function(res){
+      els.btnPredict.disabled = false;
+      els.loading.style.display = 'none';
+      if(!res.ok){ showError(res.data.error || 'Đã có lỗi xảy ra.'); return; }
+      renderResult(res.data);
+    }).catch(function(){
+      els.btnPredict.disabled = false;
+      els.loading.style.display = 'none';
+      showError('Không thể kết nối tới máy chủ. Kiểm tra API cổng 5002.');
+    });
+  }
+
+  els.form.addEventListener('submit', submitForm);
+  els.btnSample.addEventListener('click', function(){
+    els.form.bed.value = 3;
+    els.form.bath.value = 2;
+    els.form.house_size.value = 1800;
+    els.form.acre_lot.value = 0.25;
+    els.form.city.value = 'Houston';
+    els.form.state.value = 'Texas';
+    els.form.zip_code.value = '77002';
+  });
+
+  loadHealth();
+})();
+</script>
+</body>
+</html>

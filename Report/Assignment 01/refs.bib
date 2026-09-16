@@ -1,0 +1,254 @@
+% =====================================================================
+%  Tài liệu tham khảo — Assignment 01
+%  Biên dịch bằng biber (không phải bibtex): tệp mã hoá UTF-8 và có dấu
+%  tiếng Việt trong trường note.
+% =====================================================================
+
+% ---------------------------------------------------------------------
+%  Nguồn dữ liệu
+% ---------------------------------------------------------------------
+
+@misc{pima,
+  author       = {{National Institute of Diabetes and Digestive and Kidney Diseases}},
+  title        = {Pima Indians Diabetes Database},
+  year         = {2016},
+  howpublished = {Kaggle},
+  url          = {https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database},
+  note         = {Tập dữ liệu của Hệ thống 1, 768 hồ sơ y sinh}
+}
+
+@misc{vnhousing,
+  author       = {Nguyen, Huu Tri},
+  title        = {Vietnam Housing Dataset},
+  year         = {2024},
+  howpublished = {Kaggle},
+  url          = {https://www.kaggle.com/datasets/huutri148/vietnam-housing-dataset},
+  note         = {Tập dữ liệu của Hệ thống 2, 30.229 tin đăng bất động sản}
+}
+
+@article{smith1988,
+  author  = {Smith, Jack W. and Everhart, J. E. and Dickson, W. C. and
+             Knowler, W. C. and Johannes, R. S.},
+  title   = {Using the {ADAP} Learning Algorithm to Forecast the Onset of
+             Diabetes Mellitus},
+  journal = {Proceedings of the Annual Symposium on Computer Application in
+             Medical Care},
+  pages   = {261--265},
+  year    = {1988},
+  note    = {Công bố gốc của tập Pima; nguồn của mốc tham chiếu 0,77--0,79 Accuracy}
+}
+
+% ---------------------------------------------------------------------
+%  Nền tảng học máy
+% ---------------------------------------------------------------------
+
+@book{hastie2009,
+  author    = {Hastie, Trevor and Tibshirani, Robert and Friedman, Jerome},
+  title     = {The Elements of Statistical Learning: Data Mining, Inference,
+               and Prediction},
+  edition   = {2},
+  publisher = {Springer},
+  year      = {2009},
+  note      = {Đánh đổi độ chệch -- phương sai; điều chuẩn $L_2$; hồi quy về trung bình}
+}
+
+@book{bishop2006,
+  author    = {Bishop, Christopher M.},
+  title     = {Pattern Recognition and Machine Learning},
+  publisher = {Springer},
+  year      = {2006},
+  note      = {Hàm sigmoid, entropy chéo và mô hình xác suất cho bài toán phân lớp}
+}
+
+@book{geron2022,
+  author    = {G\'eron, Aur\'elien},
+  title     = {Hands-On Machine Learning with Scikit-Learn, Keras and
+               TensorFlow},
+  edition   = {3},
+  publisher = {O'Reilly Media},
+  year      = {2022},
+  note      = {Pipeline chống rò rỉ dữ liệu; quy trình thực nghiệm}
+}
+
+@book{raschka2019,
+  author    = {Raschka, Sebastian and Mirjalili, Vahid},
+  title     = {Python Machine Learning},
+  edition   = {3},
+  publisher = {Packt Publishing},
+  year      = {2019},
+  note      = {Tài liệu trong thư mục TAILIEU của dự án}
+}
+
+@book{chollet2021,
+  author    = {Chollet, Fran\c{c}ois},
+  title     = {Deep Learning with Python},
+  edition   = {2},
+  publisher = {Manning Publications},
+  year      = {2021},
+  note      = {Tài liệu trong thư mục TAILIEU của dự án}
+}
+
+% ---------------------------------------------------------------------
+%  Thuật toán cụ thể
+% ---------------------------------------------------------------------
+
+@article{breiman2001,
+  author  = {Breiman, Leo},
+  title   = {Random Forests},
+  journal = {Machine Learning},
+  volume  = {45},
+  number  = {1},
+  pages   = {5--32},
+  year    = {2001}
+}
+
+@inproceedings{chen2016,
+  author    = {Chen, Tianqi and Guestrin, Carlos},
+  title     = {{XGBoost}: A Scalable Tree Boosting System},
+  booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on
+               Knowledge Discovery and Data Mining},
+  pages     = {785--794},
+  year      = {2016}
+}
+
+@article{cortes1995,
+  author  = {Cortes, Corinna and Vapnik, Vladimir},
+  title   = {Support-Vector Networks},
+  journal = {Machine Learning},
+  volume  = {20},
+  number  = {3},
+  pages   = {273--297},
+  year    = {1995}
+}
+
+@article{cover1967,
+  author  = {Cover, Thomas M. and Hart, Peter E.},
+  title   = {Nearest Neighbor Pattern Classification},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {13},
+  number  = {1},
+  pages   = {21--27},
+  year    = {1967}
+}
+
+% ---------------------------------------------------------------------
+%  Đánh giá mô hình
+% ---------------------------------------------------------------------
+
+@article{fawcett2006,
+  author  = {Fawcett, Tom},
+  title   = {An Introduction to {ROC} Analysis},
+  journal = {Pattern Recognition Letters},
+  volume  = {27},
+  number  = {8},
+  pages   = {861--874},
+  year    = {2006},
+  note    = {Cơ sở của Hình 2.7; vì sao ROC-AUC độc lập với ngưỡng quyết định}
+}
+
+@article{saito2015,
+  author  = {Saito, Takaya and Rehmsmeier, Marc},
+  title   = {The Precision-Recall Plot Is More Informative than the {ROC} Plot
+             When Evaluating Binary Classifiers on Imbalanced Datasets},
+  journal = {PLoS ONE},
+  volume  = {10},
+  number  = {3},
+  pages   = {e0118432},
+  year    = {2015},
+  note    = {Cơ sở cho việc chấm điểm bằng $F_1$ thay vì Accuracy}
+}
+
+@article{kaufman2012,
+  author  = {Kaufman, Shachar and Rosset, Saharon and Perlich, Claudia and
+             Stitelman, Ori},
+  title   = {Leakage in Data Mining: Formulation, Detection, and Avoidance},
+  journal = {ACM Transactions on Knowledge Discovery from Data},
+  volume  = {6},
+  number  = {4},
+  pages   = {1--21},
+  year    = {2012},
+  note    = {Khung phân loại rò rỉ dữ liệu; nền tảng cho Phát hiện 1}
+}
+
+% ---------------------------------------------------------------------
+%  Đồ thị Tri thức
+% ---------------------------------------------------------------------
+
+@article{hogan2021,
+  author  = {Hogan, Aidan and Blomqvist, Eva and Cochez, Michael and others},
+  title   = {Knowledge Graphs},
+  journal = {ACM Computing Surveys},
+  volume  = {54},
+  number  = {4},
+  pages   = {1--37},
+  year    = {2021},
+  note    = {Định nghĩa hình thức $\mathcal{KG} = (V, E, R)$ dùng ở công thức (1.16)}
+}
+
+@article{ji2022,
+  author  = {Ji, Shaoxiong and Pan, Shirui and Cambria, Erik and
+             Marttinen, Pekka and Yu, Philip S.},
+  title   = {A Survey on Knowledge Graphs: Representation, Acquisition and
+             Applications},
+  journal = {IEEE Transactions on Neural Networks and Learning Systems},
+  volume  = {33},
+  number  = {2},
+  pages   = {494--514},
+  year    = {2022}
+}
+
+@misc{icd10,
+  author       = {{World Health Organization}},
+  title        = {International Statistical Classification of Diseases and
+                  Related Health Problems, 10th Revision ({ICD-10})},
+  year         = {2019},
+  url          = {https://icd.who.int/browse10},
+  note         = {Nguồn của các mã E11, R73.0 và Z13.1 dùng trong đồ thị y sinh}
+}
+
+@techreport{who2000,
+  author      = {{World Health Organization}},
+  title       = {Obesity: Preventing and Managing the Global Epidemic},
+  institution = {WHO Technical Report Series 894},
+  year        = {2000},
+  note        = {Ngưỡng phân loại BMI dùng cho đặc trưng thiết kế BMI\_Class}
+}
+
+% ---------------------------------------------------------------------
+%  Công cụ và hạ tầng
+% ---------------------------------------------------------------------
+
+@article{scikit2011,
+  author  = {Pedregosa, Fabian and Varoquaux, Ga\"el and Gramfort, Alexandre
+             and others},
+  title   = {Scikit-learn: Machine Learning in {P}ython},
+  journal = {Journal of Machine Learning Research},
+  volume  = {12},
+  pages   = {2825--2830},
+  year    = {2011}
+}
+
+@misc{neo4j,
+  author       = {{Neo4j, Inc.}},
+  title        = {Neo4j Graph Database --- Aura Cloud Service},
+  year         = {2026},
+  url          = {https://neo4j.com/docs/},
+  note         = {Máy chủ đồ thị dùng để nạp 117 thực thể và 133 cạnh}
+}
+
+@misc{streamlit,
+  author       = {{Snowflake Inc.}},
+  title        = {Streamlit --- A Faster Way to Build and Share Data Apps},
+  year         = {2026},
+  url          = {https://docs.streamlit.io},
+  note         = {Nền tảng của ứng dụng web ở Mục 2.13 và 3.12}
+}
+
+@misc{repo,
+  author       = {Nguyễn, Duy Nghĩa},
+  title        = {Assignment 01 --- Từ Biểu diễn Dữ liệu đến Hệ thống Thông minh Đầu tiên},
+  year         = {2026},
+  howpublished = {GitHub},
+  url          = {https://github.com/Nghaiz/Assignment-01-Intelligent-System},
+  note         = {Toàn bộ mã nguồn, notebook, bộ kiểm thử và mã LaTeX của báo cáo này}
+}

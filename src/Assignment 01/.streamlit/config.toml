@@ -1,0 +1,22 @@
+# Cấu hình giao diện dùng chung cho ứng dụng web Phase 6.
+#
+# Tệp này được commit; mật khẩu Neo4j KHÔNG nằm ở đây mà nằm trong
+# `.streamlit/secrets.toml` (đã bị .gitignore chặn) hoặc trong mục Secrets của
+# Streamlit Cloud — xem `setup-guides/02-streamlit-cloud.md`.
+
+[theme]
+base = "light"
+# Xanh của bảng màu báo cáo (`src/config.py` → PALETTE[0]), để giao diện web và
+# biểu đồ trong báo cáo LaTeX nhìn ra cùng một hệ thống.
+primaryColor = "#2E86AB"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F4F7FA"
+textColor = "#1F2933"
+
+[server]
+# Streamlit Cloud tự đặt cổng; hai dòng dưới chỉ có tác dụng khi chạy cục bộ.
+headless = true
+port = 8501
+
+[browser]
+gatherUsageStats = false

@@ -1,0 +1,44 @@
+# Core data stack
+#
+# scikit-learn và xgboost có trần phiên bản: các tệp `models/*.joblib` được pickle
+# bằng sklearn 1.9.0 / xgboost 3.4.1, nạp lại qua một bản major khác là tình huống
+# sklearn không bảo đảm. Các gói còn lại giữ phiên bản tối thiểu để Streamlit Cloud
+# tự chọn bản hợp với phiên bản Python của nó.
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.9,<2.0
+xgboost>=3.4,<4.0
+
+# Visualization
+matplotlib>=3.8
+seaborn>=0.13
+# scipy được scikit-learn kéo về như một phụ thuộc bắc cầu, nhưng `src/viz.py`
+# gọi thẳng `scipy.stats.probplot` cho đồ thị Q–Q ở hình phân tích phần dư. Đã
+# dùng trực tiếp thì phải khai trực tiếp: dựa vào phụ thuộc bắc cầu nghĩa là một
+# bản scikit-learn tương lai bỏ scipy đi sẽ làm hỏng pipeline mà không báo trước.
+scipy>=1.11
+
+# Knowledge Graph
+neo4j>=5.20
+networkx>=3.3
+pyvis>=0.3.2
+
+# Web application
+#
+# Ghim đúng một bản, không để dải rộng. Lý do đo được: máy cục bộ chạy 1.61.1
+# còn Streamlit Cloud tự cài 1.62.0, và giữa hai bản ấy `st.container` xếp khối
+# con khác nhau — thanh điều hướng nằm ngang ở máy nhưng xếp dọc trên bản
+# deploy, cùng một mã, không lỗi nào được ném ra. Ghim bản thì thứ chạy lúc
+# kiểm thử đúng là thứ chạy lúc deploy.
+streamlit==1.62.0
+
+# Model persistence
+joblib>=1.4
+
+# Notebook (Phase 4 — hai notebook nộp kèm, cần nbconvert để chạy kiểm tra)
+jupyterlab>=4.2
+nbconvert>=7.16
+ipykernel>=6.29
+
+# Kiểm thử — chạy bằng: python -m pytest
+pytest>=8.2

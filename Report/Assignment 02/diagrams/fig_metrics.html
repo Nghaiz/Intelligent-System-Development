@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  *{box-sizing:border-box;font-family:"Segoe UI","Be Vietnam Pro","Noto Sans",Arial,sans-serif;}
+  .canvas{width:1200px;height:560px;position:relative;background:#fff;overflow:hidden;}
+  .title{position:absolute;top:12px;left:0;width:1200px;text-align:center;font-size:17px;font-weight:700;color:#1e293b;}
+  .card{position:absolute;top:52px;width:580px;height:480px;border-radius:12px;border:1.5px solid #cbd5e1;box-shadow:0 2px 6px rgba(0,0,0,.06);background:#fff;padding:16px;}
+  .cardL{left:20px;} .cardR{left:610px;}
+  .pill{display:inline-block;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:6px;margin-bottom:14px;}
+  .pillBlue{background:#2563eb;} .pillPurple{background:#7c3aed;}
+  /* confusion matrix */
+  .cmwrap{display:flex;justify-content:center;margin-bottom:14px;}
+  .cmaxis{font-size:10.5px;color:#64748b;font-weight:700;}
+  .cmgrid{display:grid;grid-template-columns:70px 90px 90px;grid-template-rows:22px 70px 70px;gap:3px;align-items:center;justify-items:center;}
+  .cmcell{width:90px;height:70px;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .tn{background:#ecfdf5;border:1.3px solid #6ee7b7;color:#065f46;}
+  .tp{background:#ecfdf5;border:1.3px solid #6ee7b7;color:#065f46;}
+  .fp{background:#fffbeb;border:1.3px solid #fcd34d;color:#92400e;}
+  .fn{background:#fef2f2;border:1.3px solid #fca5a5;color:#7f1d1d;}
+  .celllabel{font-size:9.5px;font-weight:400;margin-top:2px;}
+  .rotlabel{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10.5px;color:#64748b;font-weight:700;}
+  .formularow{background:#f8fafc;border-radius:6px;padding:7px 10px;margin-bottom:7px;font-family:"Cascadia Mono",Consolas,monospace;font-size:12px;color:#1e293b;}
+  .meaning{font-size:10.7px;color:#64748b;margin:0 0 10px 4px;font-family:"Segoe UI",Arial,sans-serif;}
+  .rocline{font-size:11.5px;color:#334155;margin-top:8px;padding:8px 10px;background:#eff6ff;border-radius:6px;border:1px solid #bfdbfe;}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Các độ đo đánh giá mô hình</div>
+
+  <div class="card cardL">
+    <span class="pill pillBlue">Phân loại</span>
+    <div class="cmwrap">
+      <div style="display:flex;align-items:center;">
+        <div class="rotlabel">Thực tế</div>
+        <div>
+          <div style="display:grid;grid-template-columns:70px 90px 90px;text-align:center;">
+            <div></div>
+            <div class="cmaxis">Dự đoán Âm</div>
+            <div class="cmaxis">Dự đoán Dương</div>
+          </div>
+          <div style="display:grid;grid-template-columns:70px 90px 90px;gap:4px;">
+            <div class="cmaxis" style="display:flex;align-items:center;justify-content:center;">Âm tính</div>
+            <div class="cmcell tn">TN<span class="celllabel">Đúng âm</span></div>
+            <div class="cmcell fp">FP<span class="celllabel">Sai dương</span></div>
+            <div class="cmaxis" style="display:flex;align-items:center;justify-content:center;">Dương tính</div>
+            <div class="cmcell fn">FN<span class="celllabel">Sai âm</span></div>
+            <div class="cmcell tp">TP<span class="celllabel">Đúng dương</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="formularow">Accuracy = (TP + TN) / (TP + TN + FP + FN)</div>
+    <div class="formularow">Precision = TP / (TP + FP)</div>
+    <div class="formularow">Recall = TP / (TP + FN)</div>
+    <div class="formularow">F1 = 2·(Precision·Recall) / (Precision+Recall)</div>
+    <div class="rocline">ROC-AUC: khả năng phân tách hai lớp, không phụ thuộc ngưỡng.</div>
+  </div>
+
+  <div class="card cardR">
+    <span class="pill pillPurple">Hồi quy</span>
+    <div class="formularow">MAE = (1/N) Σ |yᵢ − ŷᵢ|</div>
+    <div class="meaning">Sai lệch trung bình, cùng đơn vị với biến mục tiêu</div>
+    <div class="formularow">MSE = (1/N) Σ (yᵢ − ŷᵢ)²</div>
+    <div class="meaning">Phạt nặng các cú trượt lớn</div>
+    <div class="formularow">RMSE = √MSE</div>
+    <div class="meaning">Đưa MSE về lại đơn vị gốc</div>
+    <div class="formularow">R² = 1 − (SS_res / SS_tot)</div>
+    <div class="meaning">Tỷ lệ phương sai giải thích được; 0 = ngang mô hình cơ sở</div>
+  </div>
+</div>
+</body>
+</html>

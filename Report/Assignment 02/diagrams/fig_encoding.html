@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  *{box-sizing:border-box;font-family:"Segoe UI","Be Vietnam Pro","Noto Sans",Arial,sans-serif;}
+  .canvas{width:1150px;height:470px;position:relative;background:#fff;overflow:hidden;}
+  .title{position:absolute;top:12px;left:0;width:1150px;text-align:center;font-size:17px;font-weight:700;color:#1e293b;}
+  .card{position:absolute;top:52px;width:545px;height:330px;border-radius:12px;border:1.5px solid #cbd5e1;box-shadow:0 2px 6px rgba(0,0,0,.06);background:#fff;padding:16px;}
+  .cardL{left:20px;} .cardR{left:585px;}
+  .pill{display:inline-block;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:6px;margin-bottom:14px;}
+  .pillAmber{background:#d97706;} .pillGreen{background:#059669;}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;}
+  th{background:#f1f5f9;padding:7px 8px;border:1px solid #cbd5e1;font-weight:700;color:#1e293b;text-align:left;}
+  td{padding:7px 8px;border:1px solid #e2e8f0;}
+  tr:nth-child(even) td{background:#f8fafc;}
+  .num{font-family:"Cascadia Mono",Consolas,monospace;font-weight:700;text-align:center;}
+  .warn{margin-top:16px;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.5;}
+  .warnRed{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d;}
+  .warnGreen{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;}
+  .warnHead{font-weight:700;margin-bottom:3px;}
+  .veccell{font-family:"Cascadia Mono",Consolas,monospace;text-align:center;}
+  .bottomnote{position:absolute;top:404px;left:20px;width:1110px;height:44px;background:#f5f3ff;border:1.3px solid #c4b5fd;border-radius:8px;display:flex;align-items:center;padding:0 16px;font-size:12px;color:#4c1d95;}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Mã hoá biến phân loại</div>
+
+  <div class="card cardL">
+    <span class="pill pillAmber">Label Encoding</span>
+    <table>
+      <tr><th>Giá trị gốc</th><th style="text-align:center;">Mã hoá</th></tr>
+      <tr><td>Have certificate</td><td class="num">0</td></tr>
+      <tr><td>Sale contract</td><td class="num">1</td></tr>
+      <tr><td>Không rõ</td><td class="num">2</td></tr>
+    </table>
+    <div class="warn warnRed">
+      <div class="warnHead">⚠ Vấn đề</div>
+      Áp đặt thứ tự không có thật: mô hình hiểu rằng 2 lớn hơn 1 và khoảng cách 0→2 gấp đôi 0→1.
+    </div>
+  </div>
+
+  <div class="card cardR">
+    <span class="pill pillGreen">One-Hot Encoding</span>
+    <table>
+      <tr><th>Giá trị gốc</th><th style="text-align:center;">Mã hoá</th></tr>
+      <tr><td>Have certificate</td><td class="veccell">[1, 0, 0]</td></tr>
+      <tr><td>Sale contract</td><td class="veccell">[0, 1, 0]</td></tr>
+      <tr><td>Không rõ</td><td class="veccell">[0, 0, 1]</td></tr>
+    </table>
+    <div class="warn warnGreen">
+      <div class="warnHead">✓ Ưu điểm</div>
+      Không giả định thứ tự. Đổi lại: số chiều tăng theo số hạng mục.
+    </div>
+  </div>
+
+  <div class="bottomnote">
+    Ví dụ trong Ứng dụng 2: 6 biến phân loại → one-hot làm số chiều tăng từ 16 lên 49 cột.
+  </div>
+</div>
+</body>
+</html>

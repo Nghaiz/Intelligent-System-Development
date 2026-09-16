@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dự đoán nguy cơ tiểu đường</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --bg: #eef2f9;
+    --card: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #dbe3ef;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: linear-gradient(160deg, #eef2f9 0%, #e3ebf9 45%, #eef2f9 100%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 16px 60px;
+  }
+  .page { max-width: 1040px; margin: 0 auto; }
+  header.hero {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  header.hero h1 {
+    font-size: clamp(24px, 4vw, 32px);
+    margin: 0 0 8px;
+    color: #0f2f6b;
+  }
+  header.hero p {
+    color: var(--muted);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.55;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 14px 40px rgba(15, 47, 107, 0.10);
+    padding: 26px 28px;
+    border: 1px solid var(--border);
+  }
+  .card h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    color: #0f2f6b;
+  }
+  .card .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 20px; }
+  form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 14px; }
+  .field { display: grid; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  label { font-weight: 600; font-size: 13.5px; color: #334155; }
+  input, select {
+    font: inherit;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: #f8fafc;
+    transition: border-color .15s, background .15s;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: #fff;
+  }
+  .hint { font-size: 11.5px; color: #94a3b8; }
+  button.submit {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    border: 0;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, .35);
+    transition: transform .1s, box-shadow .15s;
+  }
+  button.submit:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(37, 99, 235, .45); }
+  button.submit:disabled { opacity: .6; cursor: wait; transform: none; }
+
+  .result-card { position: sticky; top: 20px; }
+  .placeholder { color: var(--muted); font-size: 14px; line-height: 1.6; padding: 10px 0; }
+  .result-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: 14.5px;
+    margin-bottom: 14px;
+  }
+  .result-badge.low { background: var(--success-bg); color: var(--success); }
+  .result-badge.high { background: var(--danger-bg); color: var(--danger); }
+  .result-badge.err { background: var(--danger-bg); color: var(--danger); }
+  .conf-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .conf-bar { height: 10px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin-bottom: 18px; }
+  .conf-fill { height: 100%; border-radius: 999px; transition: width .5s ease; background: linear-gradient(90deg, #60a5fa, #2563eb); }
+  .conf-fill.high { background: linear-gradient(90deg, #f87171, #dc2626); }
+  .interpretation {
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; font-size: 13.8px; line-height: 1.6; color: #334155;
+  }
+  .knowledge { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border); }
+  .knowledge h3 { font-size: 14.5px; margin: 0 0 10px; color: #0f2f6b; }
+  .knowledge .group { margin-bottom: 12px; }
+  .knowledge .group h4 { margin: 0 0 6px; font-size: 13px; color: #1d4ed8; }
+  .knowledge ul { margin: 0; padding-left: 18px; }
+  .knowledge li { font-size: 12.8px; line-height: 1.5; margin-bottom: 6px; color: #475569; }
+  .knowledge-note { font-size: 12.5px; color: var(--muted); font-style: italic; }
+  .tier-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 13.5px;
+    margin: 4px 0 14px;
+  }
+  .tier-badge.tier-high { background: var(--danger-bg); color: var(--danger); }
+  .tier-badge.tier-moderate { background: #fffbeb; color: #b45309; }
+  .tier-badge.tier-low { background: var(--success-bg); color: var(--success); }
+  .knowledge-warning {
+    background: #f8fafc; border: 1px dashed var(--border); border-radius: 10px;
+    padding: 10px 12px; font-size: 12.6px; color: var(--muted); font-style: italic;
+  }
+  .knowledge .item-price {
+    display: inline-block; margin-top: 3px; font-size: 11.3px; font-weight: 700;
+    color: #1d4ed8; background: #eff6ff; border-radius: 999px; padding: 2px 9px;
+  }
+  .knowledge .item-content { display: block; color: #64748b; }
+  .knowledge-source {
+    margin-top: 10px; font-size: 11.3px; color: #94a3b8; font-style: italic;
+  }
+  footer.meta {
+    margin-top: 28px; text-align: center; font-size: 12px; color: #94a3b8;
+  }
+  #metrics-line { margin-top: 4px; }
+  .spinner {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff;
+    display: inline-block; animation: spin .7s linear infinite; margin-right: 8px; vertical-align: -3px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .samples button {
+    font: inherit; font-size: 12.5px; font-weight: 700; padding: 8px 13px; border-radius: 999px;
+    border: 1.5px solid var(--border); background: #f8fafc; color: #334155; cursor: pointer;
+    transition: all .15s;
+  }
+  .samples button:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+  .samples button.clear { color: var(--muted); }
+
+  .importance { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border); }
+  .importance h3 { font-size: 14.5px; margin: 0 0 4px; color: #0f2f6b; }
+  .importance .note { font-size: 11.8px; color: var(--muted); margin: 0 0 12px; font-style: italic; }
+  .imp-row { margin-bottom: 10px; }
+  .imp-row .imp-head { display: flex; justify-content: space-between; font-size: 12.6px; margin-bottom: 4px; }
+  .imp-row .imp-name { font-weight: 600; color: #334155; }
+  .imp-row .imp-value { color: var(--muted); }
+  .imp-row .imp-track { height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+  .imp-row .imp-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #93c5fd, #2563eb); }
+
+  .compare-card { margin-top: 22px; }
+  table.compare { width: 100%; border-collapse: collapse; font-size: 12.8px; }
+  table.compare th, table.compare td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--border); }
+  table.compare th:first-child, table.compare td:first-child { text-align: left; }
+  table.compare th { color: var(--muted); font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; }
+  table.compare tr.selected { background: #eff6ff; }
+  table.compare tr.selected td:first-child { font-weight: 800; color: var(--primary-dark); }
+  table.compare td.best-tag { color: var(--primary); font-weight: 700; }
+  @media (max-width: 640px) { table.compare { font-size: 11.5px; } table.compare th, table.compare td { padding: 7px 6px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="hero">
+    <h1>🩺 Dự đoán nguy cơ tiểu đường</h1>
+    <p>Nhập các chỉ số sức khỏe để mô hình học máy ước lượng nguy cơ mắc tiểu đường. Kết quả chỉ mang tính tham khảo, không thay thế chẩn đoán y khoa.</p>
+  </header>
+
+  <div class="layout">
+    <section class="card">
+      <h2>Thông tin sức khỏe</h2>
+      <p class="sub">Điền đầy đủ các trường bên dưới rồi bấm "Dự đoán", hoặc dùng ví dụ mẫu bên dưới.</p>
+      <div class="samples" id="samples"></div>
+      <form id="prediction-form">
+        <div class="field">
+          <label for="Glucose">Glucose (mg/dL)</label>
+          <input id="Glucose" name="Glucose" type="number" min="1" step="1" placeholder="Ví dụ: 120" required>
+        </div>
+        <div class="field">
+          <label for="BMI">Chỉ số BMI</label>
+          <input id="BMI" name="BMI" type="number" min="0.1" step="0.1" placeholder="Ví dụ: 28.5" required>
+        </div>
+        <div class="field">
+          <label for="Age">Tuổi</label>
+          <input id="Age" name="Age" type="number" min="1" max="120" step="1" placeholder="Ví dụ: 45" required>
+        </div>
+        <div class="field">
+          <label for="Pregnancies">Số lần mang thai</label>
+          <input id="Pregnancies" name="Pregnancies" type="number" min="0" step="1" placeholder="Ví dụ: 2" required>
+        </div>
+        <div class="field full">
+          <label for="DiabetesPedigreeFunction">Diabetes Pedigree Function (yếu tố di truyền)</label>
+          <input id="DiabetesPedigreeFunction" name="DiabetesPedigreeFunction" type="number" min="0" step="0.001" placeholder="Ví dụ: 0.35" required>
+          <span class="hint">Chỉ số phản ánh khả năng di truyền tiểu đường trong gia đình (0 - 2.5).</span>
+        </div>
+        <div class="field full">
+          <label for="model">Mô hình dự đoán</label>
+          <select id="model" name="model"></select>
+        </div>
+        <button class="submit" type="submit" id="submit-btn">Dự đoán</button>
+      </form>
+    </section>
+
+    <section class="card result-card">
+      <h2>Kết quả dự đoán</h2>
+      <p class="sub">Kết quả và độ tin cậy của mô hình sẽ hiển thị tại đây.</p>
+      <div id="result-body">
+        <p class="placeholder">Chưa có dữ liệu dự đoán. Hãy điền form bên trái và bấm "Dự đoán".</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="card compare-card">
+    <h2>So sánh các mô hình</h2>
+    <p class="sub">Chỉ số đo trên tập kiểm tra (test set). Hàng tô đậm là mô hình đang được chọn ở form bên trên.</p>
+    <div id="compare-table"><p class="placeholder">Đang tải bảng so sánh...</p></div>
+  </section>
+
+  <footer class="meta">
+    <div id="metrics-line">Đang tải thông tin mô hình...</div>
+    <div>Ứng dụng demo học máy — Assignment 02 Intelligent System</div>
+  </footer>
+</div>
+
+<script>
+  const form = document.querySelector("#prediction-form");
+  const modelSelect = document.querySelector("#model");
+  const resultBody = document.querySelector("#result-body");
+  const submitBtn = document.querySelector("#submit-btn");
+  const metricsLine = document.querySelector("#metrics-line");
+  const numericFields = ["Glucose", "BMI", "Age", "Pregnancies", "DiabetesPedigreeFunction"];
+
+  const escapeHtml = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+
+  let METADATA = null;
+  const compareTableEl = document.querySelector("#compare-table");
+  const samplesEl = document.querySelector("#samples");
+
+  const modelLabelFromKey = (key) => {
+    const labels = {
+      logistic_regression: "Logistic Regression",
+      knn: "K-Nearest Neighbors",
+      decision_tree: "Decision Tree",
+      random_forest: "Random Forest",
+      svm_rbf: "SVM (RBF)",
+    };
+    return labels[key] || key;
+  };
+
+  // Ba hồ sơ mẫu (nguy cơ cao / thấp / trung bình) để bấm điền nhanh form —
+  // giá trị hợp lý về mặt lâm sàng, không lấy từ bệnh nhân thật nào cụ thể.
+  const SAMPLES = [
+    { label: "🔴 Nguy cơ cao", values: { Glucose: 180, BMI: 38.5, Age: 52, Pregnancies: 6, DiabetesPedigreeFunction: 1.2 } },
+    { label: "🟡 Trung bình", values: { Glucose: 130, BMI: 29, Age: 40, Pregnancies: 3, DiabetesPedigreeFunction: 0.5 } },
+    { label: "🟢 Nguy cơ thấp", values: { Glucose: 95, BMI: 22.5, Age: 28, Pregnancies: 1, DiabetesPedigreeFunction: 0.2 } },
+  ];
+
+  function fillSample(values) {
+    for (const [key, val] of Object.entries(values)) {
+      const el = form.querySelector(`[name="${key}"]`);
+      if (el) el.value = val;
+    }
+  }
+
+  function renderSamples() {
+    samplesEl.innerHTML = SAMPLES.map((s, i) =>
+      `<button type="button" data-sample="${i}">${escapeHtml(s.label)}</button>`
+    ).join("") + `<button type="button" class="clear" data-clear="1">↺ Xoá form</button>`;
+    samplesEl.querySelectorAll("[data-sample]").forEach((btn) => {
+      btn.addEventListener("click", () => fillSample(SAMPLES[Number(btn.dataset.sample)].values));
+    });
+    samplesEl.querySelector("[data-clear]").addEventListener("click", () => form.reset());
+  }
+
+  function metricFmt(v) {
+    if (v === undefined || v === null) return "—";
+    return Number(v).toFixed(4);
+  }
+
+  function renderCompareTable() {
+    const testMetrics = METADATA?.test_metrics || {};
+    const models = Object.keys(testMetrics);
+    if (!models.length) { compareTableEl.innerHTML = '<p class="placeholder">Không có dữ liệu so sánh.</p>'; return; }
+    const cols = ["Accuracy", "Precision", "Recall", "F1", "ROC-AUC"];
+    const selected = modelSelect.value;
+    const rows = models.map((key) => {
+      const m = testMetrics[key];
+      const isSelected = key === selected;
+      const isBest = key === METADATA.best_model;
+      return `<tr class="${isSelected ? "selected" : ""}">
+        <td>${escapeHtml(modelLabelFromKey(key))}${isBest ? ' <span class="best-tag">★ tốt nhất</span>' : ""}</td>
+        ${cols.map((c) => `<td>${metricFmt(m[c])}</td>`).join("")}
+      </tr>`;
+    }).join("");
+    compareTableEl.innerHTML = `<table class="compare"><thead><tr><th>Mô hình</th>${cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  async function loadMetadata() {
+    try {
+      const res = await fetch("/metadata");
+      METADATA = await res.json();
+      const models = Object.keys(METADATA.test_metrics || {});
+      modelSelect.innerHTML = models.map((key) => {
+        const isBest = key === METADATA.best_model;
+        return `<option value="${escapeHtml(key)}"${isBest ? " selected" : ""}>${escapeHtml(modelLabelFromKey(key))}${isBest ? " (khuyến nghị)" : ""}</option>`;
+      }).join("");
+      const best = METADATA.test_metrics?.[METADATA.best_model];
+      if (best) {
+        metricsLine.textContent = `Mô hình tốt nhất: ${modelLabelFromKey(METADATA.best_model)} · Accuracy=${best.Accuracy} · ROC-AUC=${best["ROC-AUC"]}`;
+      }
+      renderCompareTable();
+      modelSelect.addEventListener("change", renderCompareTable);
+    } catch (err) {
+      metricsLine.textContent = "Không thể tải metadata mô hình.";
+      compareTableEl.innerHTML = '<p class="placeholder">Không thể tải bảng so sánh.</p>';
+    }
+  }
+
+  function importanceHtml(enteredValues) {
+    const fi = METADATA?.feature_importance;
+    if (!fi) return "";
+    const entries = Object.entries(fi).sort((a, b) => b[1] - a[1]);
+    const maxVal = entries[0][1];
+    const rows = entries.map(([name, val]) => {
+      const pct = Math.round((val / maxVal) * 100);
+      const userVal = enteredValues[name];
+      return `<div class="imp-row">
+        <div class="imp-head"><span class="imp-name">${escapeHtml(name)}</span><span class="imp-value">trọng số ${(val * 100).toFixed(1)}%${userVal !== undefined ? ` · bạn nhập: ${escapeHtml(userVal)}` : ""}</span></div>
+        <div class="imp-track"><div class="imp-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join("");
+    return `<div class="importance"><h3>📊 Mức độ quan trọng của đặc trưng</h3><p class="note">Trọng số học được từ toàn bộ tập huấn luyện (Random Forest) — cho biết đặc trưng nào ảnh hưởng nhiều nhất tới dự đoán nói chung, kèm giá trị bạn vừa nhập để đối chiếu.</p>${rows}</div>`;
+  }
+
+  function tierClass(tier) {
+    if (!tier) return "tier-low";
+    if (tier.includes("Nguy cơ Cao")) return "tier-high";
+    if (tier.includes("Tiền Đái tháo đường")) return "tier-moderate";
+    return "tier-low";
+  }
+
+  function knowledgeHtml(body) {
+    if (body.knowledge_error) {
+      return `<div class="knowledge"><div class="knowledge-warning">⚠️ ${escapeHtml(body.knowledge_error)}</div></div>`;
+    }
+    if (!body.risk_tier && (!body.knowledge || !body.knowledge.length)) return "";
+    const tierBadge = body.risk_tier
+      ? `<span class="tier-badge ${tierClass(body.risk_tier)}">${escapeHtml(body.risk_tier)}</span>`
+      : "";
+    if (!body.knowledge || !body.knowledge.length) {
+      return `<div class="knowledge">${tierBadge}<p class="knowledge-note">Chưa có nội dung tư vấn phù hợp từ đồ thị tri thức.</p></div>`;
+    }
+    const groups = body.knowledge.map((group) => {
+      const items = group.items.map((item) => {
+        const priceHtml = item.price ? `<span class="item-price">${escapeHtml(item.price)}</span>` : "";
+        const titleHtml = item.url
+          ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.title)}</a>`
+          : escapeHtml(item.title);
+        const contentHtml = item.content ? `<span class="item-content">${escapeHtml(item.content)}</span>` : "";
+        return `<li><strong>${titleHtml}</strong>${contentHtml}${priceHtml}</li>`;
+      }).join("");
+      return `<div class="group"><h4>${escapeHtml(group.title)}</h4><ul>${items}</ul></div>`;
+    }).join("");
+    return `<div class="knowledge"><h3>📚 Kiến thức tham khảo</h3>${tierBadge}${groups}<div class="knowledge-source">Nguồn: đồ thị tri thức Neo4j — chỉ bổ sung tư vấn, không ảnh hưởng tới dự đoán của mô hình.</div></div>`;
+  }
+
+  function renderResult(body, enteredValues) {
+    const isHigh = body.risk_level === "high";
+    const confidence = body.confidence ?? null;
+    resultBody.innerHTML = `
+      <span class="result-badge ${isHigh ? "high" : "low"}">${isHigh ? "⚠️ Nguy cơ cao" : "✅ Nguy cơ thấp"}</span>
+      <div style="font-weight:700;font-size:16px;margin-bottom:14px;">${escapeHtml(body.prediction)}</div>
+      ${confidence !== null ? `
+        <div class="conf-label"><span>Độ tin cậy mô hình</span><span>${confidence}%</span></div>
+        <div class="conf-bar"><div class="conf-fill ${isHigh ? "high" : ""}" style="width:${confidence}%"></div></div>
+      ` : `<p class="hint">Mô hình này không cung cấp xác suất dự đoán.</p>`}
+      <div class="interpretation">${escapeHtml(body.interpretation)}</div>
+      ${importanceHtml(enteredValues || {})}
+      ${knowledgeHtml(body)}
+      <p class="hint" style="margin-top:14px;">Mô hình sử dụng: ${escapeHtml(body.model_label)}</p>
+    `;
+  }
+
+  function renderError(message) {
+    resultBody.innerHTML = `<span class="result-badge err">❌ Lỗi</span><div class="interpretation">${escapeHtml(message)}</div>`;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    for (const key of numericFields) {
+      const num = Number(data[key]);
+      if (data[key] === "" || Number.isNaN(num)) {
+        renderError(`Trường "${key}" phải là một số hợp lệ.`);
+        return;
+      }
+      data[key] = num;
+    }
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span>Đang dự đoán...';
+    resultBody.innerHTML = '<p class="placeholder">Đang xử lý dự đoán...</p>';
+    try {
+      const response = await fetch("/diabetes/v1/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || "Không thể dự đoán.");
+      renderResult(body, data);
+      renderCompareTable();
+    } catch (err) {
+      renderError(err.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Dự đoán";
+    }
+  });
+
+  renderSamples();
+  loadMetadata();
+</script>
+</body>
+</html>

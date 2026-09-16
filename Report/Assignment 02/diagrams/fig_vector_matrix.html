@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  *{box-sizing:border-box;font-family:"Segoe UI","Be Vietnam Pro","Noto Sans",Arial,sans-serif;}
+  .canvas{width:1200px;height:660px;position:relative;background:#fff;overflow:hidden;}
+  .title{position:absolute;top:12px;left:0;width:1200px;text-align:center;font-size:17px;font-weight:700;color:#1e293b;}
+  .card{position:absolute;top:52px;width:580px;height:430px;border-radius:12px;border:1.5px solid #cbd5e1;box-shadow:0 2px 6px rgba(0,0,0,.06);background:#fff;padding:16px 16px 12px 16px;}
+  .cardL{left:20px;} .cardR{left:610px;}
+  .pill{display:inline-block;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:6px;margin-bottom:12px;}
+  .pillBlue{background:#2563eb;} .pillGreen{background:#059669;}
+  .mono{font-family:"Cascadia Mono",Consolas,monospace;}
+  /* left card */
+  .person{width:46px;height:46px;border-radius:50%;background:#dbeafe;border:1.5px solid #2563eb;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px auto;}
+  .vecrow{display:flex;justify-content:center;gap:6px;margin-bottom:8px;}
+  .vecbox{width:58px;}
+  .vecidx{text-align:center;font-size:11px;color:#64748b;margin-bottom:3px;}
+  .vecval{text-align:center;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:6px;padding:6px 2px;font-size:12px;font-weight:700;color:#1e293b;}
+  .formula{text-align:center;font-size:13px;margin:10px 0 12px 0;color:#1e293b;background:#f8fafc;border-radius:6px;padding:8px;}
+  .tint{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px;margin-bottom:10px;}
+  .tint .h{font-size:11px;font-weight:700;color:#2563eb;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em;}
+  .tint p{font-size:11.5px;color:#334155;margin:2px 0;}
+  .dotrow{display:flex;align-items:flex-start;gap:6px;font-size:11.3px;color:#334155;margin:3px 0;}
+  .dot{width:9px;height:9px;border-radius:50%;margin-top:3px;flex:none;}
+  .d1{background:#2563eb;} .d2{background:#059669;} .d3{background:#d97706;} .d4{background:#dc2626;}
+  .exlabel{font-size:11px;font-weight:700;color:#1e293b;margin:8px 0 4px 0;}
+  /* right card table */
+  table{border-collapse:collapse;width:100%;font-size:11.5px;}
+  th{background:#f1f5f9;color:#1e293b;font-weight:700;padding:5px 6px;border:1px solid #cbd5e1;text-align:center;}
+  td{padding:5px 6px;border:1px solid #e2e8f0;text-align:center;font-family:"Cascadia Mono",Consolas,monospace;}
+  tr:nth-child(even) td{background:#f8fafc;}
+  .rowlabel{font-family:"Segoe UI",Arial,sans-serif !important;font-weight:700;background:#ecfdf5 !important;color:#1e293b;}
+  .tblwrap{position:relative;margin-bottom:10px;}
+  .brace{position:absolute;right:-30px;top:22px;bottom:22px;width:28px;display:flex;align-items:center;justify-content:center;}
+  .bracetext{font-size:10.5px;color:#059669;font-weight:700;writing-mode:vertical-rl;}
+  .dlabel{text-align:center;font-size:10.5px;color:#059669;font-weight:700;margin-top:2px;}
+  /* bottom strip */
+  .strip{position:absolute;top:500px;left:20px;width:1160px;height:64px;border-radius:10px;border:1.5px solid #cbd5e1;background:#f8fafc;display:flex;align-items:center;padding:0 16px;box-shadow:0 2px 6px rgba(0,0,0,.05);}
+  .striptitle{position:absolute;top:-11px;left:20px;background:#1e293b;color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:5px;text-transform:uppercase;}
+  .flow{display:flex;align-items:center;gap:8px;font-size:11.5px;color:#1e293b;font-weight:600;flex:1;justify-content:space-between;}
+  .flowbox{background:#fff;border:1.3px solid #cbd5e1;border-radius:6px;padding:6px 10px;text-align:center;}
+  .fa{color:#94a3b8;font-weight:700;}
+  .note{position:absolute;top:500px;left:900px;width:280px;height:100px;display:none;}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Biểu diễn dữ liệu dưới dạng vectơ và ma trận</div>
+
+  <div class="card cardL">
+    <span class="pill pillBlue">1. Vectơ đặc trưng (Feature Vector)</span>
+    <div class="person">👤</div>
+    <div class="vecrow">
+      <div class="vecbox"><div class="vecidx">x₁</div><div class="vecval">25</div></div>
+      <div class="vecbox"><div class="vecidx">x₂</div><div class="vecval">23.5</div></div>
+      <div class="vecbox"><div class="vecidx">x₃</div><div class="vecval">120</div></div>
+      <div class="vecbox"><div class="vecidx">…</div><div class="vecval">…</div></div>
+      <div class="vecbox"><div class="vecidx">x_d</div><div class="vecval">0</div></div>
+    </div>
+    <div class="formula mono">x = [x₁, x₂, …, x_d]ᵀ ∈ ℝᵈ</div>
+    <div class="tint">
+      <div class="h">Ý nghĩa</div>
+      <p>x: vectơ đặc trưng của một mẫu</p>
+      <p>xᵢ: giá trị của đặc trưng thứ i</p>
+      <p>d: số lượng đặc trưng</p>
+    </div>
+    <div class="exlabel">Ví dụ các đặc trưng:</div>
+    <div class="dotrow"><div class="dot d1"></div><div>x₁: Tuổi (Age)</div></div>
+    <div class="dotrow"><div class="dot d2"></div><div>x₂: BMI</div></div>
+    <div class="dotrow"><div class="dot d3"></div><div>x₃: Glucose</div></div>
+    <div class="dotrow"><div class="dot d4"></div><div>x₄: Kết quả (0: Không tiểu đường, 1: Tiểu đường)</div></div>
+  </div>
+
+  <div class="card cardR">
+    <span class="pill pillGreen">2. Ma trận đặc trưng (Feature Matrix)</span>
+    <div class="tblwrap">
+      <table>
+        <tr><th></th><th>x₁</th><th>x₂</th><th>x₃</th><th>…</th><th>x_d</th></tr>
+        <tr><td class="rowlabel">Mẫu 1</td><td>25</td><td>23.5</td><td>120</td><td>…</td><td>0</td></tr>
+        <tr><td class="rowlabel">Mẫu 2</td><td>35</td><td>28.1</td><td>150</td><td>…</td><td>1</td></tr>
+        <tr><td class="rowlabel">Mẫu 3</td><td>45</td><td>24.0</td><td>98</td><td>…</td><td>0</td></tr>
+        <tr><td class="rowlabel">⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr>
+        <tr><td class="rowlabel">Mẫu N</td><td>N₁</td><td>N₂</td><td>N₃</td><td>…</td><td>N_d</td></tr>
+      </table>
+      <div class="brace"><div class="bracetext">N mẫu</div></div>
+    </div>
+    <div class="dlabel">d đặc trưng</div>
+    <div class="tint" style="background:#ecfdf5;border-color:#a7f3d0;margin-top:10px;">
+      <div class="h" style="color:#059669;">Ý nghĩa</div>
+      <p>X: ma trận đặc trưng</p>
+      <p>N: số lượng mẫu</p>
+      <p>d: số lượng đặc trưng</p>
+      <p>Mỗi hàng tương ứng với một mẫu</p>
+      <p>Mỗi cột tương ứng với một đặc trưng</p>
+    </div>
+    <div class="tint" style="background:#fffbeb;border-color:#fde68a;">
+      <div class="h" style="color:#d97706;">Ví dụ</div>
+      <p>Nếu tập dữ liệu có 1.000 mẫu và 10 đặc trưng ⇒ X ∈ ℝ^(1000×10)</p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="striptitle">Tóm tắt</div>
+    <div class="flow">
+      <div class="flowbox">Một mẫu (quan sát)</div>
+      <div class="fa">→</div>
+      <div class="flowbox">Vectơ đặc trưng x ∈ ℝᵈ</div>
+      <div class="fa">→</div>
+      <div class="flowbox">N mẫu (quan sát)</div>
+      <div class="fa">→</div>
+      <div class="flowbox">Ma trận đặc trưng X ∈ ℝ^(N×d)</div>
+    </div>
+  </div>
+
+  <div class="strip" style="top:578px;height:52px;background:#fff;">
+    <div class="striptitle" style="background:#64748b;">Ghi chú</div>
+    <div class="flow" style="justify-content:flex-start;gap:22px;">
+      <div>N: số lượng mẫu dữ liệu</div>
+      <div>d: số lượng đặc trưng</div>
+      <div>ℝ: tập số thực</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

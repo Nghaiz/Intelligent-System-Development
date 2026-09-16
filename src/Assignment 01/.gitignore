@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+secrets.toml
+.streamlit/secrets.toml
+
+# Build artifacts
+report/build/
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Tài liệu tham khảo (dung lượng lớn, không cần đẩy lên repo)
+TAILIEU/
+
+# Tài liệu tham chiếu của người khác — giữ ở máy, không công bố lên kho công khai
+A01_05_dungvt.194.pdf
+A1_CT_tupv.879.pdf
+slide-assign_01/
+
+# Kiểm thử
+.pytest_cache/
+
+# Thư mục tạm của Playwright khi chụp ảnh giao diện
+.playwright-mcp/

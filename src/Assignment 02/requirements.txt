@@ -1,0 +1,24 @@
+# Assignment 02 — phụ thuộc dùng chung cho cả ba ứng dụng.
+# Cài riêng từng ứng dụng bằng <ứng-dụng>/requirements.txt nếu chỉ chạy một dịch vụ.
+
+# Xử lý dữ liệu và học máy
+numpy>=2.0
+pandas>=2.2
+scikit-learn>=1.5
+joblib>=1.4
+
+# Trực quan hoá (dùng trong notebook)
+matplotlib>=3.9
+seaborn>=0.13
+
+# Notebook
+jupyterlab>=4
+ipykernel>=6
+nbformat>=5
+
+# Dịch vụ Web
+Flask>=3.0
+
+# Tầng tri thức Neo4j (tuỳ chọn — chỉ cho ứng dụng Diabetes)
+neo4j>=5.20
+python-dotenv>=1.0

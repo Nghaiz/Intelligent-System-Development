@@ -1,0 +1,406 @@
+% =====================================================================
+%  Chương 4 — Kết luận và Hướng phát triển
+% =====================================================================
+\chapter{Kết luận và Hướng phát triển}
+\label{ch:ketluan}
+
+\section{Tổng kết kết quả}
+\label{sec:tongket}
+
+Hai hệ thống thông minh đã được xây dựng trọn vẹn, mỗi hệ thống đi hết chuỗi
+sáu tầng ở Hình~\ref{fig:sodo-hethong}: từ dữ liệu thật, qua biểu diễn véc-tơ,
+qua năm mô hình học máy được so sánh dưới cùng một giao thức, tới dự đoán, và
+cuối cùng tới một khuyến nghị hành động \emph{có chi phí xác định}.
+
+\begin{table}[H]
+\centering
+\caption{Tổng kết hai hệ thống}
+\label{tab:tongket}
+\small
+\begin{tabularx}{\textwidth}{@{}L{3.4cm}XX@{}}
+\toprule
+ & \textbf{Hệ thống 1 --- Tiểu đường} & \textbf{Hệ thống 2 --- Bất động sản} \\
+\midrule
+Loại bài toán   & Phân lớp nhị phân & Hồi quy \\
+Quy mô dữ liệu  & 768 hồ sơ & 30.229 tin đăng \\
+Số chiều biểu diễn & 12 & 84 \\
+Mô hình cơ sở   & Accuracy $0{,}6547$, Recall $0{,}0000$ & MAE $1{,}8587$, $R^2 = -0{,}0008$ \\
+Mô hình tốt nhất & K-Nearest Neighbors, $F_1 = 0{,}6809$ & XGBoost, $R^2 = 0{,}6141$ \\
+Độ đo phụ tốt nhất & ROC-AUC $0{,}8709$ (Logistic Regression) & MAE $1{,}0493$ tỷ VNĐ \\
+Cải thiện so với cơ sở & $F_1$: $0 \to 0{,}68$ & MAE giảm $43{,}5\%$ \\
+Thuật toán hay biểu diễn chi phối & \textbf{Thuật toán}, gấp 6 lần & \textbf{Ngang bằng} \\
+Đồ thị tri thức & 5 tầng, gói chăm sóc có chi phí & 5 tầng, gói vay có lịch trả nợ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Về hạ tầng: một lệnh \texttt{python run\_pipeline.py} tái tạo toàn bộ trong
+khoảng 90 giây; 355 bài kiểm thử tự động chạy trong 17 giây; Đồ thị Tri thức
+gồm 117 thực thể, 133 cạnh và 28 loại quan hệ đã nạp thật lên máy chủ Neo4j
+Aura~\cite{neo4j}; ứng dụng web~\cite{streamlit} đã triển khai công khai và truy cập được từ internet~\cite{repo}.
+
+\section{Phân tích khoa học --- bảy phát hiện}
+\label{sec:phantich}
+
+Mục này đáp ứng yêu cầu R10. Điểm chung của bảy phát hiện dưới đây: chúng đều
+\emph{bác bỏ} một giả định mà người viết tin là đúng lúc mới bắt đầu, và mỗi
+phát hiện đều kèm bằng chứng định lượng tái lập được.
+
+\subsection{Phát hiện 1 --- Kết quả vượt trần tài liệu là dấu hiệu của lỗi}
+
+Bản triển khai đầu tiên điền khuyết bằng trung vị theo nhóm \texttt{Outcome} và
+đạt Accuracy $0{,}8705$ --- vượt hẳn trần $0{,}77$--$0{,}79$ mà mọi nghiên cứu
+công bố trên tập Pima đều dừng lại. Nguyên nhân là rò rỉ nhãn: với
+\texttt{Insulin} khuyết $374/768$ và \texttt{SkinThickness} khuyết $227/768$,
+gần một nửa dữ liệu sau khi điền đã mang dấu vết của chính nhãn cần dự đoán.
+Đưa \texttt{SimpleImputer} vào trong \texttt{Pipeline} đưa con số về $0{,}7914$.
+
+\textbf{Bài học phương pháp:} đối chiếu kết quả với trần đã công bố trong tài
+liệu là một bước kiểm tra rẻ tiền và hiệu quả bất ngờ. Một con số đẹp hơn dự
+kiến đáng để đi tìm lỗi, không phải để ăn mừng.
+
+\subsection{Phát hiện 2 --- Quét ngưỡng đòi hỏi mô hình cho xác suất liên tục}
+
+Thực nghiệm quét ngưỡng chạy lần đầu trên Decision Tree sâu 6 tầng cho bảy
+ngưỡng từ $0{,}50$ xuống $0{,}20$ ra \emph{đúng một} kết quả. Cây nông chỉ trả
+về vài giá trị xác suất rời rạc nên phần lớn ngưỡng rơi vào cùng một khoảng.
+Hiện tượng này để lại một dấu vết nhìn thấy được: đường ROC của Decision Tree ở
+Hình~\ref{fig:dia-roc} có dạng gãy khúc thành vài đoạn thẳng dài thay vì cong
+mượt như bốn mô hình còn lại. Chuyển sang XGBoost cho 12 mức kết quả khác nhau
+trên 13 ngưỡng.
+
+\textbf{Bài học:} một thực nghiệm không cho kết quả có thể là do thực nghiệm sai
+thiết kế, không phải do hiệu ứng không tồn tại.
+
+\subsection{Phát hiện 3 --- Cực trị chạm biên dải khảo sát thì chưa phải cực trị}
+
+Bẫy này xuất hiện \textbf{hai lần độc lập}: độ sâu rừng ngẫu nhiên đạt đỉnh ở
+$24$ khi dải quét dừng ở $24$, và ngưỡng quyết định đạt đỉnh ở $0{,}20$ khi dải
+quét dừng ở $0{,}20$. Cả hai lần đều phải nới dải mới xác nhận được đỉnh thật
+(lần lượt là $24$ và $0{,}15$).
+
+\textbf{Bài học:} trước khi kết luận một siêu tham số là tối ưu, hãy kiểm tra nó
+không nằm ở đầu mút dải khảo sát. Kiểm tra này rẻ và tự động hoá được --- hàm vẽ
+biểu đồ quét ngưỡng trong dự án đã được sửa để tự in cảnh báo ``chạm biên dải
+quét'' khi điều đó xảy ra.
+
+\subsection{Phát hiện 4 --- ``Biểu diễn quan trọng hơn thuật toán'' là SAI nếu phát biểu trần}
+\label{sec:phanchieu}
+
+Đây là phát hiện trung tâm của cả báo cáo, và nó đáp ứng trực tiếp yêu cầu R13.
+
+Cùng một thiết kế Thực nghiệm~3 --- giữ nguyên thuật toán, chỉ đổi biểu diễn ---
+chạy trên hai bài toán cho hai kết luận trái ngược:
+
+\begin{table}[H]
+\centering
+\caption{Biên độ do biểu diễn so với biên độ do thuật toán, hai bài toán}
+\label{tab:biendo-ca-hai}
+\small
+\begin{tabularx}{\textwidth}{@{}L{5.4cm}R{3.0cm}R{3.2cm}@{}}
+\toprule
+ & \textbf{Tiểu đường ($F_1$)} & \textbf{Bất động sản ($R^2$)} \\
+\midrule
+Biên độ do đổi \textbf{biểu diễn}  & 0{,}0300 & 0{,}2563 \\
+Biên độ do đổi \textbf{thuật toán} & 0{,}1809 & 0{,}2584 \\
+\midrule
+Bên nào chi phối & \textbf{Thuật toán} (gấp 6) & \textbf{Ngang bằng} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Điều phân biệt hai trường hợp không nằm ở thuật toán, mà nằm ở chỗ phép
+biểu diễn có làm thay đổi \emph{lượng} thông tin hay chỉ đổi \emph{dạng} thông
+tin đã có.}
+
+\begin{itemize}
+  \item Ở bài toán bất động sản, phương án ``chỉ đặc trưng định lượng''
+        \textbf{bỏ đi} toàn bộ nhóm biến định danh --- và \texttt{Province} cùng
+        \texttt{District} không suy ra được từ bất kỳ cột nào khác. Đây là
+        \emph{thêm hoặc bớt thông tin}, nên tác động lớn: $R^2$ mất $0{,}2563$.
+  \item Ở bài toán tiểu đường, cả bốn phương án đều dùng đúng tám cột gốc ấy;
+        chúng chỉ khác nhau ở chỗ có chuẩn hoá hay không, có nhân hai cột với
+        nhau hay không. Đây là \emph{đổi dạng} thông tin đã có, nên tác động nhỏ
+        và nằm trọn trong nhiễu lấy mẫu: bốn phương án chỉ phân loại khác nhau
+        \textbf{1--9 ca trên 139}.
+\end{itemize}
+
+\begin{phathien}{Phát biểu đã được sửa lại cho đúng}
+Phát biểu ban đầu --- ``biểu diễn dữ liệu quan trọng hơn thuật toán'' --- không
+đứng vững qua kiểm chứng. Phát biểu đúng là:
+
+\begin{quote}
+\itshape
+Biểu diễn dữ liệu chi phối kết quả khi và chỉ khi nó \textbf{thay đổi lượng
+thông tin} có trong biểu diễn. Khi nó chỉ đổi \textbf{dạng} của thông tin đã có
+--- chuẩn hoá, rời rạc hoá, nhân hai cột --- thì tác động của nó thường nhỏ hơn
+tác động của việc đổi thuật toán, và có thể nằm trọn trong nhiễu lấy mẫu.
+\end{quote}
+
+Đây là lý do phải chạy \emph{cùng một thực nghiệm trên hai miền dữ liệu}: một
+miền đơn lẻ sẽ cho một kết luận nghe rất thuyết phục và không có cách nào phát
+hiện ra nó chỉ đúng một nửa.
+\end{phathien}
+
+\subsection{Phát hiện 5 --- ``Đặc trưng tốt'' là thuộc tính của cặp đặc trưng -- thuật toán}
+
+Đặc trưng \texttt{Glucose\_BMI\_Risk} đồng thời là:
+
+\begin{itemize}
+  \item đặc trưng \textbf{tương quan mạnh nhất} với nhãn ($\rho = 0{,}5199$,
+        vượt cả \texttt{Glucose} gốc $0{,}4928$);
+  \item đặc trưng \textbf{quan trọng nhất} của XGBoost ($0{,}1874$);
+  \item và là đặc trưng \textbf{làm Logistic Regression kém đi}
+        ($F_1$ giảm từ $0{,}6818$ xuống $0{,}6667$).
+\end{itemize}
+
+Nguyên nhân của điều thứ ba là đa cộng tuyến dưới phạt $L_2$: đặc trưng này
+tương quan $0{,}82$ với \texttt{Glucose} và $0{,}73$ với \texttt{BMI}, nên số
+hạng $\lambda\lVert\bm\theta\rVert_2^2$ ở~\eqref{eq:regularized} phân tán trọng
+số ra ba cột gần trùng nhau.
+
+Hiện tượng đối xứng xảy ra ở phía kia: \texttt{Glucose\_Level} --- bản rời rạc
+hoá của \texttt{Glucose} --- xếp \emph{cuối bảng} mức quan trọng của XGBoost
+($0{,}0330$), vì cây quyết định tự tìm được ngưỡng chia tối ưu và việc rời rạc
+hoá thủ công chỉ giới hạn không gian tìm kiếm của nó. Cùng một phép biến đổi có
+ích cho mô hình tuyến tính và có hại cho mô hình cây.
+
+\textbf{Bài học:} không tồn tại ``bộ đặc trưng tốt nhất'' độc lập với thuật
+toán. Kỹ nghệ đặc trưng và chọn mô hình là một bài toán \emph{chung}, không phải
+hai bước nối tiếp.
+
+\subsection{Phát hiện 6 --- Giả định về phân phối phải được đo trước khi viện dẫn}
+
+Giả định ``giá nhà lệch phải mạnh'' nghe hiển nhiên tới mức suýt trôi qua mà
+không ai kiểm. Đo thật thì: \texttt{Price} có độ lệch $-0{,}029$, độ nhọn
+$-0{,}8464$, trung bình $5{,}8721$ xấp xỉ trung vị $5{,}90$, và toàn bộ dữ liệu
+nằm gọn trong dải $1{,}0$--$11{,}5$ tỷ. Tập dữ liệu đã bị cắt biên từ nguồn.
+
+Giả định đúng với thị trường thật và \emph{sai} với tập dữ liệu này. Nếu tin
+theo nó, ta sẽ áp phép biến đổi log cho biến mục tiêu --- và tạo ra độ lệch trái
+thay vì sửa chữa gì.
+
+Cùng bài học ấy lặp lại ở một chỗ khác: \texttt{Area} thì \emph{thật sự} lệch
+phải mạnh (độ lệch $3{,}889$), và biến \emph{dẫn xuất} đơn giá mỗi m$^2$ cũng
+vậy (độ lệch $2{,}135$, trung vị $102{,}3$ triệu đồng/m$^2$). Hình dáng mà trực
+giác mong đợi có tồn tại trong dữ liệu --- chỉ là ở một biến khác với biến ta
+tưởng.
+
+\subsection{Phát hiện 7 --- Sai số gộp che mất hai chế độ sai khác hẳn nhau}
+
+Mô hình định giá có MAE gộp $1{,}0493$ tỷ VNĐ. Tách theo ngũ phân vị giá thật
+thì con số ấy vỡ ra thành hai chế độ:
+
+\begin{itemize}
+  \item Nhóm rẻ nhất: định giá \textbf{vượt} trung bình $1{,}0488$ tỷ, MAE
+        $1{,}1575$.
+  \item Nhóm giữa: gần như không chệch ($+0{,}2419$), MAE $0{,}7889$.
+  \item Nhóm đắt nhất: định giá \textbf{hụt} trung bình $1{,}4844$ tỷ, MAE
+        $1{,}5335$ --- gần gấp đôi nhóm giữa.
+\end{itemize}
+
+Độ chệch giảm \emph{đơn điệu} qua năm nhóm --- đây là quy luật, không phải nhiễu.
+Nguyên nhân là hồi quy về trung bình cộng với việc mô hình cây không ngoại suy
+ra ngoài khoảng giá trị đã thấy lúc huấn luyện.
+
+\textbf{Hệ quả bắt buộc với người dùng:} với bất động sản cao cấp, con số hệ
+thống đưa ra là \textbf{cận dưới}. Một hệ thống định giá im lặng về điều này sẽ
+khiến người bán nhà cao cấp bị thiệt một cách có hệ thống --- và điều tệ nhất là
+họ không có cách nào biết.
+
+\section{Phản chiếu về vai trò của biểu diễn dữ liệu}
+\label{sec:phanchieu-tong}
+
+Yêu cầu R13 đòi hỏi một phản chiếu về biểu diễn dữ liệu. Ba tầng phản chiếu, đi
+từ cụ thể tới khái quát:
+
+\subsection{Tầng 1 --- Biểu diễn quyết định thuật toán nhìn thấy gì}
+
+Cùng một hiện tượng thực tế cho những biểu diễn khác nhau, và mỗi biểu diễn mở
+ra hoặc đóng lại một họ thuật toán:
+
+\begin{itemize}
+  \item Không chuẩn hoá thì K-Nearest Neighbors vô dụng, vì khoảng cách
+        Euclid~\eqref{eq:euclid} bị cột \texttt{Insulin} thang trăm lấn át hoàn
+        toàn. Nhưng chuẩn hoá lại \emph{không đổi được một ca nào} cho Logistic
+        Regression --- hai phương án ``có'' và ``không có'' cho $F_1$ trùng khít
+        tới bốn chữ số thập phân.
+  \item Không mã hoá biến định danh thì $85{,}4\%$ năng lực quyết định của mô
+        hình định giá biến mất, dù mọi cột định lượng vẫn còn nguyên.
+\end{itemize}
+
+\subsection{Tầng 2 --- Biểu diễn có thể mã hoá lẫn cả câu trả lời}
+
+Đây là mặt tối của tầng 1. Bước điền khuyết ở Phát hiện~1 là một phép biến đổi
+biểu diễn hoàn toàn bình thường về hình thức --- nó chỉ thay giá trị khuyết bằng
+một con số hợp lý. Nhưng con số ấy được tính từ nhãn, nên biểu diễn thu được đã
+chứa sẵn câu trả lời.
+
+Điều nguy hiểm là hiện tượng này \emph{không} biểu hiện thành lỗi. Mã chạy trơn
+tru, mọi bài kiểm thử xanh, và độ đo thì \emph{đẹp hơn} bình thường. Dấu hiệu
+duy nhất là con số quá đẹp --- và nó chỉ thành dấu hiệu nếu ta biết trần tham
+chiếu ở đâu.
+
+\subsection{Tầng 3 --- Giới hạn của việc thiết kế biểu diễn}
+
+Kết quả Thực nghiệm~3 ở cả hai bài toán cho thấy: khi thông tin đã có sẵn trong
+dữ liệu, việc sắp xếp lại nó cho đẹp hơn mang lại rất ít. Bốn phương án biểu
+diễn ở bài toán tiểu đường chỉ chênh nhau 1--9 ca trên 139; ba đặc trưng thiết
+kế ở bài toán bất động sản làm $R^2$ giảm nhẹ chứ không tăng.
+
+Cái mang lại nhiều là việc \textbf{đưa thêm thông tin mới vào}: biến định danh
+về vị trí là thứ không cột nào khác suy ra được, và chính nó tạo ra biên độ
+$0{,}2563$ $R^2$.
+
+\begin{phathien}{Kết luận cuối cùng về biểu diễn dữ liệu}
+Câu hỏi đúng khi thiết kế biểu diễn không phải \emph{``biểu diễn này có tinh vi
+không''} mà là:
+
+\begin{enumerate}
+  \item \textbf{Nó có mang thêm thông tin mà dữ liệu gốc chưa có không?} Nếu
+        không, hãy hạ kỳ vọng về mức cải thiện.
+  \item \textbf{Nó có vô tình mang thông tin từ nhãn vào không?} Nếu có, mọi độ
+        đo sau đó đều vô giá trị.
+  \item \textbf{Nó hợp với thuật toán nào?} Chuẩn hoá bắt buộc với mô hình dựa
+        trên khoảng cách, vô ích với mô hình tuyến tính, vô nghĩa với mô hình
+        cây. Rời rạc hoá có ích cho mô hình tuyến tính, có hại cho mô hình cây.
+\end{enumerate}
+\end{phathien}
+
+\section{Vai trò của Đồ thị Tri thức --- điều mô hình không làm được}
+\label{sec:vaitro-kg}
+
+Hai hệ thống trong báo cáo này có thể dừng lại ở tầng \textsc{Prediction} và vẫn
+đáp ứng đủ yêu cầu về học máy. Việc đi thêm hai tầng nữa cho phép trả lời những
+câu hỏi mà không độ đo nào chạm tới được:
+
+\begin{table}[H]
+\centering
+\caption{Câu hỏi mà mô hình trả lời được và câu hỏi cần tới đồ thị tri thức}
+\label{tab:vaitro-kg}
+\small
+\begin{tabularx}{\textwidth}{@{}L{4.0cm}XX@{}}
+\toprule
+ & \textbf{Mô hình trả lời} & \textbf{Đồ thị tri thức trả lời} \\
+\midrule
+Hệ thống Y sinh &
+Xác suất mắc bệnh $54{,}5\%$ &
+Mã ICD-10 E11; 5 mặt hàng cụ thể; chi phí ban đầu $1{,}99$--$2{,}75$ triệu đ;
+duy trì $1{,}20$--$1{,}66$ triệu đ mỗi tháng; mua ở đâu; dịch vụ miễn phí nào đi
+kèm \\
+\addlinespace
+Hệ thống Bất động sản &
+Giá dự báo $8{,}42$ tỷ VNĐ &
+Hạn mức vay $5{,}89$ tỷ; trả góp $47{,}5$ triệu đ/tháng; tổng lãi $8{,}34$ tỷ;
+thu nhập tối thiểu $118{,}7$ triệu đ/tháng; bốn tiện ích trong bán kính $2$ km \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\nhanxet{Khác biệt về \emph{loại} chứ không phải về \emph{mức độ}. Con số
+$54{,}5\%$ không thể trở thành ``mua máy đo Accu-Chek giá $790$ nghìn'' bằng bất
+kỳ phép tính nào trên dữ liệu huấn luyện --- tri thức ấy đến từ bên ngoài và
+phải được khai báo tường minh.
+
+Một điểm thiết kế đáng nói: nút \emph{gói} ở tầng 4 của cả hai đồ thị không phải
+trang trí. Nó biến một danh sách rời rạc thành một đơn vị \textbf{có chi phí
+tính được}, nhờ đó câu hỏi ``theo lời khuyên này thì tốn bao nhiêu'' có câu trả
+lời ngay trên đồ thị chứ không phải cộng tay ở tầng giao diện. Cùng vai trò ấy,
+nút \emph{trả góp} ở đồ thị bất động sản biến một hạn mức tĩnh thành một nghĩa
+vụ tài chính kéo dài 300 kỳ.}
+
+\section{Hạn chế của hệ thống}
+\label{sec:hanche}
+
+Báo cáo liệt kê hạn chế một cách thẳng thắn, vì một hệ thống được mô tả quá tốt
+so với thực tế còn nguy hiểm hơn một hệ thống yếu được mô tả đúng.
+
+\subsection{Hạn chế về dữ liệu}
+
+\begin{enumerate}
+  \item \textbf{Phạm vi dân số của tập Pima rất hẹp.} Toàn bộ đối tượng là nữ,
+        từ 21 tuổi trở lên, thuộc cộng đồng người Pima --- nhóm có tỷ lệ mắc đái
+        tháo đường thuộc hàng cao nhất thế giới. Áp dụng thẳng cho nam giới hoặc
+        cho dân số Việt Nam là ngoại suy không có cơ sở.
+  \item \textbf{Tập bất động sản đã bị cắt biên.} Hệ thống chỉ áp dụng được
+        trong dải $1$--$11{,}5$ tỷ VNĐ. Ngoài dải ấy, mô hình cây vẫn trả về một
+        con số nhưng con số đó vô nghĩa (Mục~\ref{sec:price-cat-bien}).
+  \item \textbf{Không có yếu tố thời gian.} Cả hai tập là ảnh chụp tĩnh. Giá bất
+        động sản biến động theo chu kỳ thị trường, nhưng mô hình không có cách
+        nào biết tin đăng thuộc thời điểm nào.
+  \item \textbf{Địa chỉ chỉ ở mức hành chính.} Không có toạ độ, nên không thể
+        tính khoảng cách thật tới tiện ích. Đây là lý do cụm tiện ích ở
+        Mục~\ref{sec:kg-hou} là mô hình hoá theo phân khúc chứ không phải khảo
+        sát thực địa.
+\end{enumerate}
+
+\subsection{Hạn chế về mô hình}
+
+\begin{enumerate}
+  \item \textbf{Độ chệch đơn điệu theo phân khúc giá} --- Phát hiện~7. Hệ thống
+        hiển thị cảnh báo nhưng không sửa được độ chệch này.
+  \item \textbf{Trần hiệu năng của tập Pima.} Accuracy dừng ở mức
+        $0{,}77$--$0{,}79$ trong toàn bộ tài liệu công bố, và tín hiệu phân tán
+        mỏng trên nhiều đặc trưng (không đặc trưng nào vượt mức quan trọng
+        $0{,}19$). Đây là giới hạn của dữ liệu, không phải của thuật toán.
+  \item \textbf{Tập ngoại kiểm của bài toán tiểu đường quá nhỏ.} 77 ca không đủ
+        để phân biệt hai mô hình chênh nhau dưới $0{,}05$ $F_1$
+        (Mục~\ref{sec:tn4-dia}).
+  \item \textbf{Không có ước lượng khoảng tin cậy.} Hệ thống trả về một con số
+        điểm; một khoảng dự báo sẽ hữu ích hơn nhiều, đặc biệt ở phân khúc cao
+        cấp nơi sai số lớn gấp đôi.
+\end{enumerate}
+
+\subsection{Hạn chế về tri thức miền trong đồ thị}
+
+Ba ranh giới đã nêu ở Mục~\ref{sec:ranh-gioi-so-lieu} và được nhắc lại ở đây cho
+đầy đủ: giá dược phẩm là khoảng tham khảo có ngày chốt chứ không phải bản ghi
+giá trực tiếp; cụm tiện ích là mô hình hoá theo phân khúc; điều kiện vay là minh
+hoạ theo mặt bằng lãi suất công bố chứ không phải chào giá của một ngân hàng cụ
+thể. Riêng \emph{phép tính} trả góp, tổng lãi và thu nhập tối thiểu thì là toán
+học thuần tuý, kiểm chứng được bằng công thức~\eqref{eq:nienkim} và~\eqref{eq:dti}.
+
+\section{Hướng phát triển}
+\label{sec:huongphattrien}
+
+\begin{table}[H]
+\centering
+\caption{Hướng phát triển, sắp theo tỷ lệ giá trị trên công sức}
+\label{tab:huongphattrien}
+\small
+\begin{tabularx}{\textwidth}{@{}L{4.2cm}XL{1.9cm}@{}}
+\toprule
+\textbf{Hướng} & \textbf{Nội dung và lý do} & \textbf{Công sức} \\
+\midrule
+Khoảng dự báo thay cho số điểm &
+Dùng hồi quy phân vị hoặc conformal prediction để trả về khoảng
+$[\hat y_{\text{thấp}}, \hat y_{\text{cao}}]$. Giải quyết trực tiếp hạn chế lớn
+nhất hiện nay: người dùng không biết con số đáng tin tới đâu. &
+Thấp \\
+\addlinespace
+Hiệu chỉnh độ chệch theo phân khúc &
+Học một hàm hiệu chỉnh trên phần dư theo ngũ phân vị
+(Bảng~\ref{tab:chech-hou}) để bù lại độ chệch đơn điệu. &
+Thấp \\
+\addlinespace
+Bổ sung toạ độ địa lý &
+Mã hoá địa chỉ thành kinh độ -- vĩ độ, tính khoảng cách thật tới tiện ích. Biến
+cụm tiện ích từ mô hình hoá thành đo đạc. &
+Trung bình \\
+\addlinespace
+Diễn giải mức cá thể (SHAP) &
+Mức quan trọng hiện tại là mức toàn cục. SHAP cho biết \emph{với căn nhà này},
+đặc trưng nào đẩy giá lên hay xuống bao nhiêu. &
+Trung bình \\
+\addlinespace
+Yếu tố thời gian &
+Thu thập dữ liệu có mốc thời gian để mô hình hoá chu kỳ thị trường. &
+Cao \\
+\addlinespace
+Mở rộng đồ thị tri thức &
+Nối thêm dữ liệu quy hoạch, hạ tầng giao thông đang xây, và lịch sử giao dịch
+theo khu vực. &
+Cao \\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,0 +1,19 @@
+name: diabetes_mobile
+description: "Ứng dụng Flutter dự đoán nguy cơ tiểu đường — gọi REST API cùng backend với web UI."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

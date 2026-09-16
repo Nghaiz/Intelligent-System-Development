@@ -1,0 +1,134 @@
+﻿Miền,Ca,Chủ thể,Quan hệ,Đối tượng
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Bệnh nhân,HAS_BIOMARKER,Glucose = 159 mg/dL
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Bệnh nhân,HAS_BIOMARKER,BMI = 30.4 kg/m²
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Bệnh nhân,HAS_BIOMARKER,BloodPressure = 66 mmHg
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Bệnh nhân,CALCULATED_RISK,"Glucose × BMI = 4,834"
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Bệnh nhân,EVALUATED_BY,Mô hình K-Nearest Neighbors
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Mô hình K-Nearest Neighbors,PRODUCES,Xác suất rủi ro 54.5%
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Xác suất rủi ro 54.5%,MAPS_TO_DISEASE,ICD-10 E11: Đái tháo đường Type 2
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Bệnh nhân,STRATIFIED_AS,Nhóm Nguy cơ Cao
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,ICD-10 E11: Đái tháo đường Type 2,REQUIRES_DEVICE,Máy đo đường huyết Accu-Chek Instant
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,ICD-10 E11: Đái tháo đường Type 2,REQUIRES_DEVICE,Que thử đường huyết Accu-Chek Instant (hộp 50 que)
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,ICD-10 E11: Đái tháo đường Type 2,REQUIRES_DEVICE,Kim chích máu Accu-Chek Softclix (hộp 25 kim)
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,ICD-10 E11: Đái tháo đường Type 2,RECOMMENDS_NUTRITION,Sữa Abbott Glucerna 850g
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,ICD-10 E11: Đái tháo đường Type 2,RECOMMENDS_NUTRITION,Viên uống Dây thìa canh Diabetna (hộp 40 viên)
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Nhóm Nguy cơ Cao,ADVISES,Khám chuyên khoa Nội tiết để xét nghiệm HbA1c tĩnh mạch
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Nhóm Nguy cơ Cao,ADVISES,Đo đường huyết đói và sau ăn 2 giờ mỗi ngày
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Nhóm Nguy cơ Cao,ADVISES,Tuyệt đối không tự dùng Metformin khi chưa có chỉ định bác sĩ
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Nhóm Nguy cơ Cao,RECOMMENDS_PACKAGE,Gói Theo dõi Chuyên sâu
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Gói Theo dõi Chuyên sâu,INCLUDES_PRODUCT,Máy đo đường huyết Accu-Chek Instant
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Gói Theo dõi Chuyên sâu,INCLUDES_PRODUCT,Que thử đường huyết Accu-Chek Instant (hộp 50 que)
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Gói Theo dõi Chuyên sâu,INCLUDES_PRODUCT,Kim chích máu Accu-Chek Softclix (hộp 25 kim)
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Gói Theo dõi Chuyên sâu,INCLUDES_PRODUCT,Sữa Abbott Glucerna 850g
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Gói Theo dõi Chuyên sâu,INCLUDES_PRODUCT,Viên uống Dây thìa canh Diabetna (hộp 40 viên)
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Gói Theo dõi Chuyên sâu,FULFILLED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Máy đo đường huyết Accu-Chek Instant,SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Que thử đường huyết Accu-Chek Instant (hộp 50 que),SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Kim chích máu Accu-Chek Softclix (hộp 25 kim),SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Sữa Abbott Glucerna 850g,SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Viên uống Dây thìa canh Diabetna (hộp 40 viên),SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Nhà thuốc FPT Long Châu,PROVIDES_SERVICE,Tư vấn Dược sĩ miễn phí về cách sử dụng máy đo
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,Nhà thuốc FPT Long Châu,PROVIDES_SERVICE,Đo đường huyết mao mạch miễn phí tại nhà thuốc
+Đồ thị Tri thức Y sinh,Nhóm Nguy cơ Cao — bệnh nhân #192,ICD-10 E11: Đái tháo đường Type 2,REFERS_TO,Khám Bác sĩ chuyên khoa Nội tiết
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Bệnh nhân,HAS_BIOMARKER,Glucose = 117 mg/dL
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Bệnh nhân,HAS_BIOMARKER,BMI = 29.7 kg/m²
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Bệnh nhân,HAS_BIOMARKER,BloodPressure = 62 mmHg
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Bệnh nhân,CALCULATED_RISK,"Glucose × BMI = 3,475"
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Bệnh nhân,EVALUATED_BY,Mô hình K-Nearest Neighbors
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Mô hình K-Nearest Neighbors,PRODUCES,Xác suất rủi ro 18.2%
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Xác suất rủi ro 18.2%,MAPS_TO_DISEASE,ICD-10 R73.0: Tăng glucose máu bất thường
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Bệnh nhân,STRATIFIED_AS,Nhóm Tiền Đái tháo đường
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,ICD-10 R73.0: Tăng glucose máu bất thường,REQUIRES_DEVICE,Máy đo huyết áp bắp tay Omron HEM-7121
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,ICD-10 R73.0: Tăng glucose máu bất thường,RECOMMENDS_NUTRITION,Sữa Nutricare Cerna 850g
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,ICD-10 R73.0: Tăng glucose máu bất thường,RECOMMENDS_NUTRITION,Đường ăn kiêng cỏ ngọt Equal Stevia (hộp 50 gói)
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,ICD-10 R73.0: Tăng glucose máu bất thường,RECOMMENDS_NUTRITION,Trà khổ qua rừng (hộp 20 túi lọc)
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Nhóm Tiền Đái tháo đường,ADVISES,Cắt giảm đường tinh luyện và tinh bột hấp thu nhanh (GI > 70)
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Nhóm Tiền Đái tháo đường,ADVISES,Vận động tối thiểu 150 phút mỗi tuần để giảm kháng insulin
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Nhóm Tiền Đái tháo đường,ADVISES,Kiểm tra lại đường huyết sau 3 tháng
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Nhóm Tiền Đái tháo đường,RECOMMENDS_PACKAGE,Gói Dự phòng Tiền Đái tháo đường
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Gói Dự phòng Tiền Đái tháo đường,INCLUDES_PRODUCT,Máy đo huyết áp bắp tay Omron HEM-7121
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Gói Dự phòng Tiền Đái tháo đường,INCLUDES_PRODUCT,Sữa Nutricare Cerna 850g
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Gói Dự phòng Tiền Đái tháo đường,INCLUDES_PRODUCT,Đường ăn kiêng cỏ ngọt Equal Stevia (hộp 50 gói)
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Gói Dự phòng Tiền Đái tháo đường,INCLUDES_PRODUCT,Trà khổ qua rừng (hộp 20 túi lọc)
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Gói Dự phòng Tiền Đái tháo đường,FULFILLED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Máy đo huyết áp bắp tay Omron HEM-7121,SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Sữa Nutricare Cerna 850g,SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Đường ăn kiêng cỏ ngọt Equal Stevia (hộp 50 gói),SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Trà khổ qua rừng (hộp 20 túi lọc),SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Nhà thuốc FPT Long Châu,PROVIDES_SERVICE,Tư vấn Dược sĩ về chế độ ăn giảm chỉ số đường huyết
+Đồ thị Tri thức Y sinh,Nhóm Tiền Đái tháo đường — bệnh nhân #444,Nhà thuốc FPT Long Châu,PROVIDES_SERVICE,Đo đường huyết mao mạch miễn phí tại nhà thuốc
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Bệnh nhân,HAS_BIOMARKER,Glucose = 73 mg/dL
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Bệnh nhân,HAS_BIOMARKER,BMI = 21.1 kg/m²
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Bệnh nhân,CALCULATED_RISK,"Glucose × BMI = 1,540"
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Bệnh nhân,EVALUATED_BY,Mô hình K-Nearest Neighbors
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Mô hình K-Nearest Neighbors,PRODUCES,Xác suất rủi ro 0.0%
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Xác suất rủi ro 0.0%,MAPS_TO_DISEASE,ICD-10 Z13.1: Khám sàng lọc đái tháo đường
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Bệnh nhân,STRATIFIED_AS,Nhóm Khoẻ mạnh
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,ICD-10 Z13.1: Khám sàng lọc đái tháo đường,RECOMMENDS_NUTRITION,Viên uống Vitamin tổng hợp & Khoáng chất
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Nhóm Khoẻ mạnh,ADVISES,Duy trì chế độ dinh dưỡng cân bằng
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Nhóm Khoẻ mạnh,ADVISES,Giữ chỉ số BMI trong khoảng 18.5 đến 22.9
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Nhóm Khoẻ mạnh,ADVISES,Khám sức khoẻ định kỳ hàng năm
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Nhóm Khoẻ mạnh,RECOMMENDS_PACKAGE,Gói Duy trì Sức khoẻ
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Gói Duy trì Sức khoẻ,INCLUDES_PRODUCT,Viên uống Vitamin tổng hợp & Khoáng chất
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Gói Duy trì Sức khoẻ,FULFILLED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Viên uống Vitamin tổng hợp & Khoáng chất,SUPPLIED_BY,Nhà thuốc FPT Long Châu
+Đồ thị Tri thức Y sinh,Nhóm Khoẻ mạnh — bệnh nhân #589,Nhà thuốc FPT Long Châu,PROVIDES_SERVICE,Đo đường huyết mao mạch miễn phí tại nhà thuốc
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Bất động sản,HAS_ATTRIBUTE,Diện tích = 100 m²
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Bất động sản,HAS_ATTRIBUTE,Số tầng = 4 tầng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Bất động sản,HAS_ATTRIBUTE,Phòng ngủ = 4 phòng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Bất động sản,HAS_ATTRIBUTE,Phòng tắm = 5 phòng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Bất động sản,LOCATED_IN,Quận/Huyện Nhà Bè
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Quận/Huyện Nhà Bè,PART_OF,Tỉnh/Thành Hồ Chí Minh
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Bất động sản,VALUATED_BY,Mô hình XGBoost
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Mô hình XGBoost,PRODUCES,Giá định giá 8.42 tỷ VNĐ
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Giá định giá 8.42 tỷ VNĐ,BELONGS_TO_SEGMENT,Phân khúc Cao cấp
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Phân khúc Cao cấp,ELIGIBLE_FOR,Gói vay Bất động sản Cao cấp
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Gói vay Bất động sản Cao cấp,AMORTISED_AS,Trả góp 47.4 triệu đ/tháng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Trả góp 47.4 triệu đ/tháng,REQUIRES_INCOME,Thu nhập tối thiểu 118.6 triệu đ/tháng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Gói vay Bất động sản Cao cấp,PROVIDED_BY,Ngân hàng đối tác cho vay mua nhà
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Quận/Huyện Nhà Bè,HAS_INFRASTRUCTURE,Cụm Hạ tầng Đô thị Cao cấp
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Cụm Hạ tầng Đô thị Cao cấp,INCLUDES_UTILITY,Trung tâm thương mại
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Cụm Hạ tầng Đô thị Cao cấp,INCLUDES_UTILITY,Trường quốc tế
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Cụm Hạ tầng Đô thị Cao cấp,INCLUDES_UTILITY,Bệnh viện đa khoa
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Cụm Hạ tầng Đô thị Cao cấp,INCLUDES_UTILITY,Tuyến đường vành đai
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Bất động sản,HAS_LEGAL_STATUS,Pháp lý: Have certificate
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Cao cấp — tin đăng #23933,Pháp lý: Have certificate,QUALIFIES_FOR,Gói vay Bất động sản Cao cấp
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Bất động sản,HAS_ATTRIBUTE,Diện tích = 40 m²
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Bất động sản,HAS_ATTRIBUTE,Số tầng = 4 tầng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Bất động sản,HAS_ATTRIBUTE,Phòng ngủ = 5 phòng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Bất động sản,HAS_ATTRIBUTE,Phòng tắm = 3 phòng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Bất động sản,LOCATED_IN,Quận/Huyện Hai Bà Trưng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Quận/Huyện Hai Bà Trưng,PART_OF,Tỉnh/Thành Hà Nội
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Bất động sản,VALUATED_BY,Mô hình XGBoost
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Mô hình XGBoost,PRODUCES,Giá định giá 6.33 tỷ VNĐ
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Giá định giá 6.33 tỷ VNĐ,BELONGS_TO_SEGMENT,Phân khúc Trung cấp
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Phân khúc Trung cấp,ELIGIBLE_FOR,Gói vay Mua nhà Linh hoạt
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Gói vay Mua nhà Linh hoạt,AMORTISED_AS,Trả góp 39.4 triệu đ/tháng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Trả góp 39.4 triệu đ/tháng,REQUIRES_INCOME,Thu nhập tối thiểu 98.6 triệu đ/tháng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Gói vay Mua nhà Linh hoạt,PROVIDED_BY,Ngân hàng đối tác cho vay mua nhà
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Quận/Huyện Hai Bà Trưng,HAS_INFRASTRUCTURE,Cụm Hạ tầng Đô thị Trung cấp
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Cụm Hạ tầng Đô thị Trung cấp,INCLUDES_UTILITY,Siêu thị
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Cụm Hạ tầng Đô thị Trung cấp,INCLUDES_UTILITY,Trường công lập
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Cụm Hạ tầng Đô thị Trung cấp,INCLUDES_UTILITY,Trạm y tế phường
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Cụm Hạ tầng Đô thị Trung cấp,INCLUDES_UTILITY,Tuyến xe buýt nội đô
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Bất động sản,HAS_LEGAL_STATUS,Pháp lý: Have certificate
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Trung cấp — tin đăng #15103,Pháp lý: Have certificate,QUALIFIES_FOR,Gói vay Mua nhà Linh hoạt
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Bất động sản,HAS_ATTRIBUTE,Diện tích = 100 m²
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Bất động sản,HAS_ATTRIBUTE,Số tầng = 3 tầng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Bất động sản,HAS_ATTRIBUTE,Phòng ngủ = 3 phòng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Bất động sản,HAS_ATTRIBUTE,Phòng tắm = 3 phòng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Bất động sản,LOCATED_IN,Quận/Huyện Phổ Yên
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Quận/Huyện Phổ Yên,PART_OF,Tỉnh/Thành Thái Nguyên
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Bất động sản,VALUATED_BY,Mô hình XGBoost
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Mô hình XGBoost,PRODUCES,Giá định giá 3.58 tỷ VNĐ
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Giá định giá 3.58 tỷ VNĐ,BELONGS_TO_SEGMENT,Phân khúc Bình dân
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Phân khúc Bình dân,ELIGIBLE_FOR,Gói vay Nhà ở Xã hội
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Gói vay Nhà ở Xã hội,AMORTISED_AS,Trả góp 16.4 triệu đ/tháng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Trả góp 16.4 triệu đ/tháng,REQUIRES_INCOME,Thu nhập tối thiểu 36.5 triệu đ/tháng
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Gói vay Nhà ở Xã hội,PROVIDED_BY,Ngân hàng đối tác cho vay mua nhà
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Quận/Huyện Phổ Yên,HAS_INFRASTRUCTURE,Cụm Hạ tầng Đô thị Cơ bản
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Cụm Hạ tầng Đô thị Cơ bản,INCLUDES_UTILITY,Chợ dân sinh
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Cụm Hạ tầng Đô thị Cơ bản,INCLUDES_UTILITY,Trường tiểu học
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Cụm Hạ tầng Đô thị Cơ bản,INCLUDES_UTILITY,Phòng khám đa khoa khu vực
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Cụm Hạ tầng Đô thị Cơ bản,INCLUDES_UTILITY,Tuyến xe buýt liên huyện
+Đồ thị Tri thức Đô thị – Tài chính,Phân khúc Bình dân — tin đăng #181,Bất động sản,HAS_LEGAL_STATUS,Pháp lý: Không rõ

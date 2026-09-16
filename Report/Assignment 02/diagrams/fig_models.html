@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  html,body{margin:0;padding:0;background:#fff;}
+  *{box-sizing:border-box;font-family:"Segoe UI","Be Vietnam Pro","Noto Sans",Arial,sans-serif;}
+  .canvas{width:1220px;height:540px;position:relative;background:#fff;overflow:hidden;}
+  .title{position:absolute;top:14px;left:0;width:1220px;text-align:center;font-size:17px;font-weight:700;color:#1e293b;}
+  .row{position:absolute;top:56px;left:20px;width:1180px;height:340px;display:flex;justify-content:space-between;gap:16px;}
+  .card{width:277px;border-radius:12px;border:1.5px solid #cbd5e1;box-shadow:0 2px 6px rgba(0,0,0,.06);background:#fff;padding:14px;display:flex;flex-direction:column;}
+  .pill{display:inline-block;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 10px;border-radius:6px;margin-bottom:12px;text-align:center;}
+  .pillBlue{background:#2563eb;} .pillTeal{background:#0d9488;} .pillGreen{background:#059669;} .pillAmber{background:#d97706;}
+  .modellist{flex:1;}
+  .modelitem{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 10px;font-size:12px;color:#1e293b;font-weight:600;margin-bottom:8px;}
+  .note{font-size:10.8px;color:#64748b;line-height:1.5;border-top:1px dashed #cbd5e1;padding-top:8px;margin-top:6px;}
+  .cBlue{background:#eff6ff;} .cTeal{background:#f0fdfa;} .cGreen{background:#ecfdf5;} .cAmber{background:#fffbeb;}
+  .strip{position:absolute;top:420px;left:20px;width:1180px;height:78px;border-radius:10px;border:1.5px solid #c4b5fd;background:#f5f3ff;display:flex;align-items:center;padding:0 20px;box-shadow:0 2px 6px rgba(0,0,0,.05);}
+  .striptitle{position:absolute;top:-11px;left:20px;background:#7c3aed;color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:5px;text-transform:uppercase;}
+  .stripcontent{font-size:12.5px;color:#3b0764;line-height:1.5;}
+  .stripcontent b{font-weight:700;}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Các nhóm mô hình học máy sử dụng trong Assignment 02</div>
+  <div class="row">
+
+    <div class="card cBlue">
+      <span class="pill pillBlue">Tuyến tính</span>
+      <div class="modellist">
+        <div class="modelitem">Logistic Regression</div>
+        <div class="modelitem">Linear Regression</div>
+        <div class="modelitem">Ridge Regression</div>
+        <div class="modelitem">Linear SVM</div>
+      </div>
+      <div class="note">Hệ số đọc được; giả định quan hệ tuyến tính.</div>
+    </div>
+
+    <div class="card cTeal">
+      <span class="pill pillTeal">Dựa trên khoảng cách</span>
+      <div class="modellist">
+        <div class="modelitem">K-Nearest Neighbors</div>
+        <div class="modelitem">SVM (RBF)</div>
+      </div>
+      <div class="note">Bắt buộc chuẩn hoá thang đo.</div>
+    </div>
+
+    <div class="card cGreen">
+      <span class="pill pillGreen">Dạng cây</span>
+      <div class="modellist">
+        <div class="modelitem">Decision Tree</div>
+        <div class="modelitem">Decision Tree Regressor</div>
+      </div>
+      <div class="note">Sinh luật đọc được; dễ quá khớp nếu không giới hạn độ sâu.</div>
+    </div>
+
+    <div class="card cAmber">
+      <span class="pill pillAmber">Tập hợp cây</span>
+      <div class="modellist">
+        <div class="modelitem">Random Forest</div>
+        <div class="modelitem">Gradient Boosting</div>
+      </div>
+      <div class="note">Mạnh nhất trên dữ liệu bảng; khó diễn giải hơn.</div>
+    </div>
+
+  </div>
+
+  <div class="strip">
+    <div class="striptitle">Xác suất</div>
+    <div class="stripcontent"><b>Multinomial Naive Bayes</b> — chuẩn cổ điển cho phân loại văn bản.</div>
+  </div>
+</div>
+</body>
+</html>

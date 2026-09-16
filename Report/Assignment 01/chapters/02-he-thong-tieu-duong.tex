@@ -1,0 +1,1049 @@
+% =====================================================================
+%  Chương 2 — Hệ thống Chẩn đoán Nguy cơ Tiểu đường
+% =====================================================================
+\chapter{Hệ thống Chẩn đoán Nguy cơ Tiểu đường}
+\label{ch:tieuduong}
+
+\section{Phát biểu bài toán}
+\label{sec:phatbieu-dia}
+
+\subsection{Hiện tượng thực tế và người dùng}
+
+Đái tháo đường type 2 tiến triển âm thầm: người bệnh thường không có triệu
+chứng rõ rệt cho tới khi biến chứng đã hình thành. Vì vậy giá trị của một hệ
+thống trong miền này không nằm ở chỗ ``chẩn đoán chính xác'' --- việc ấy thuộc
+về xét nghiệm HbA1c tĩnh mạch --- mà nằm ở chỗ \textbf{sàng lọc}: từ những chỉ
+số đo được rẻ và nhanh, chỉ ra ai cần đi làm xét nghiệm khẳng định.
+
+Việc xác định đúng vai trò này quyết định mọi lựa chọn kỹ thuật về sau. Nó là
+lý do báo cáo chấm điểm bằng $F_1$ và Recall chứ không bằng Accuracy
+(Mục~\ref{sec:baseline}), và là lý do Thực nghiệm~2 hạ ngưỡng quyết định xuống
+tận $0{,}15$ (Mục~\ref{sec:tn2-dia}).
+
+\subsection{Phát biểu hình thức}
+
+Cho một hồ sơ y sinh $\mathbf{x}\in\mathbb{R}^{d}$ gồm các chỉ số đo được của
+một người, hãy học hàm
+
+\begin{equation}
+f_{\bm\theta}:\ \mathbb{R}^{d}\longrightarrow[0,1],
+\qquad
+\hat p = f_{\bm\theta}(\mathbf{x}) = P\big(\texttt{Outcome}=1 \mid \mathbf{x}\big),
+\label{eq:baitoan-dia}
+\end{equation}
+
+\noindent rồi quy xác suất về nhãn nhị phân qua một ngưỡng quyết định $\theta$:
+
+\begin{equation}
+\hat y = \mathbb{1}\big[\,\hat p \ge \theta\,\big],
+\qquad \theta \in (0,1).
+\label{eq:nguong-dia}
+\end{equation}
+
+Ngưỡng $\theta$ ở~\eqref{eq:nguong-dia} là một tham số \textbf{của hệ thống},
+không phải của mô hình: nó không được học từ dữ liệu mà được chọn theo mục tiêu
+sử dụng. Việc tách bạch hai thứ này là điều kiện cần để Thực nghiệm~2 có nghĩa.
+
+\begin{table}[H]
+\centering
+\caption{Đặc tả bài toán chẩn đoán nguy cơ tiểu đường}
+\label{tab:dacta-dia}
+\small
+\begin{tabularx}{\textwidth}{@{}L{4.2cm}X@{}}
+\toprule
+\textbf{Hạng mục} & \textbf{Nội dung} \\
+\midrule
+Hiện tượng thực tế   & Tình trạng chuyển hoá glucose và nguy cơ mắc đái tháo đường type 2 \\
+Một quan sát         & Một hồ sơ y sinh của một người trưởng thành \\
+Loại bài toán        & Phân lớp nhị phân (Binary Classification) \\
+Biến mục tiêu        & \texttt{Outcome} $\in\{0,1\}$ \\
+Số quan sát          & 768 hồ sơ \\
+Đặc trưng đầu vào    & 8 cột gốc, tất cả đều là số; không có biến định danh \\
+Đặc trưng sau thiết kế & 12 cột (8 gốc $+$ 4 phái sinh) \\
+Người dùng cuối      & Bác sĩ sàng lọc, và chính người được sàng lọc \\
+Độ đo quyết định     & $F_1$ và Recall --- không phải Accuracy \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Tập dữ liệu và nguồn gốc}
+\label{sec:dulieu-dia}
+
+Tập \textbf{Pima Indians Diabetes}~\cite{pima} do Viện Quốc gia về Đái tháo đường, Bệnh
+Tiêu hoá và Bệnh Thận Hoa Kỳ thu thập, công bố công khai trên Kaggle:
+
+\begin{center}
+\small\url{https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database}
+\end{center}
+
+Toàn bộ đối tượng là nữ, từ 21 tuổi trở lên, thuộc cộng đồng người Pima --- một
+giới hạn về phạm vi áp dụng sẽ được nêu lại ở Mục~\ref{sec:hanche}.
+
+\begin{table}[H]
+\centering
+\caption{Đặc tả tám đặc trưng gốc của tập Pima Indians Diabetes}
+\label{tab:dactrung-dia}
+\small
+\begin{tabularx}{\textwidth}{@{}L{3.5cm}L{1.6cm}R{1.5cm}R{1.5cm}X@{}}
+\toprule
+\textbf{Đặc trưng} & \textbf{Đơn vị} & \textbf{Trung bình} & \textbf{Trung vị} & \textbf{Ý nghĩa} \\
+\midrule
+Pregnancies              & lần   & 3{,}845   & 3{,}0   & Số lần mang thai \\
+Glucose                  & mg/dL & 121{,}656 & 117{,}0 & Đường huyết sau nghiệm pháp dung nạp 2 giờ \\
+BloodPressure            & mmHg  & 72{,}387  & 72{,}0  & Huyết áp tâm trương \\
+SkinThickness            & mm    & 29{,}108  & 29{,}0  & Độ dày nếp gấp da cơ tam đầu \\
+Insulin                  & $\mu$U/mL & 140{,}672 & 125{,}0 & Insulin huyết thanh sau 2 giờ \\
+BMI                      & kg/m$^2$ & 32{,}455 & 32{,}3 & Chỉ số khối cơ thể \\
+DiabetesPedigreeFunction & --    & 0{,}472   & 0{,}372 & Chỉ số di truyền gia đình \\
+Age                      & năm   & 33{,}241  & 29{,}0  & Tuổi \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\nhanxet{Trung bình lớn hơn trung vị ở hầu hết các cột --- dấu hiệu của phân
+phối lệch phải. Riêng \texttt{Age} chênh nhiều nhất ($33{,}2$ so với $29{,}0$),
+cho thấy đuôi phải kéo dài: mẫu chủ yếu là người trẻ, kèm một nhóm nhỏ tuổi
+cao. Các con số trong bảng được tính \textbf{sau} khi áp quy ước ``0 là khuyết''
+ở Mục~\ref{sec:lamsach-dia}; tính trên dữ liệu thô sẽ cho trung bình
+\texttt{Insulin} thấp hơn thực tế gần một nửa.}
+
+\section{Làm sạch dữ liệu: khi số 0 không phải là số đo}
+\label{sec:lamsach-dia}
+
+Tập dữ liệu không có ô trống nào theo nghĩa kỹ thuật --- mọi ô đều có giá trị.
+Nhưng năm cột sinh học chứa giá trị $0$, và trên một người sống thì nồng độ
+glucose bằng $0$, huyết áp bằng $0$ hay BMI bằng $0$ đều là điều bất khả. Đây
+là \textbf{quy ước mã hoá cho ``không đo được''}, không phải số đo thật.
+
+\begin{table}[H]
+\centering
+\caption{Số quan sát mang giá trị 0 phi lý ở năm cột sinh học}
+\label{tab:zero-dia}
+\small
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+\textbf{Cột} & \textbf{Số ca} & \textbf{Tỷ lệ} & \textbf{Vì sao 0 là bất khả} \\
+\midrule
+Insulin       & 374 & 48{,}7\% & Cơ thể luôn tiết insulin nền \\
+SkinThickness & 227 & 29{,}6\% & Da luôn có độ dày đo được \\
+BloodPressure &  35 &  4{,}6\% & Huyết áp 0 nghĩa là ngừng tuần hoàn \\
+BMI           &  11 &  1{,}4\% & BMI 0 nghĩa là khối lượng cơ thể bằng 0 \\
+Glucose       &   5 &  0{,}7\% & Glucose 0 không tương thích với sự sống \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{dia_missing_ratio.png}
+\caption[Tỷ lệ dữ liệu khuyết sau khi áp quy ước ``0 là khuyết'']%
+{Tỷ lệ dữ liệu khuyết ở năm cột sinh học sau khi áp quy ước ``giá trị 0 là dữ
+liệu không đo được''}
+\label{fig:dia-missing}
+\end{figure}
+
+\bieudo{Biểu đồ cột ngang (horizontal bar chart), sắp xếp giảm dần theo tỷ lệ
+khuyết. Trục ngang là tỷ lệ phần trăm, trục dọc là tên cột.}
+
+\phanphoi{Phân bố cực kỳ không đều giữa các cột. Hai cột đầu chiếm gần như toàn
+bộ lượng khuyết, năm cột còn lại gộp lại chưa tới $7\%$.}
+
+\chitiet{\texttt{Insulin} khuyết $48{,}7\%$ --- gần một nửa dữ liệu.
+\texttt{SkinThickness} khuyết $29{,}6\%$. Ba cột còn lại lần lượt $4{,}6\%$,
+$1{,}4\%$ và $0{,}7\%$. Không cột nào vượt ngưỡng loại bỏ $80\%$ nên cả năm cột
+đều được giữ lại và điền khuyết bằng trung vị.}
+
+\begin{phathien}{Rò rỉ nhãn qua bước điền khuyết --- một sai lầm thật đã xảy ra}
+\label{sec:roro}
+Bản triển khai đầu tiên điền khuyết bằng \emph{trung vị theo nhóm} \texttt{Outcome}
+--- tức người bệnh được điền bằng trung vị của người bệnh. Kết quả nhảy lên
+Accuracy $0{,}8705$, vượt xa trần $0{,}77$--$0{,}79$ mà tài liệu công bố trên
+cùng tập dữ liệu này~\cite{smith1988}. Con số đẹp bất thường ấy chính là dấu hiệu của lỗi.
+
+Nguyên nhân: với \texttt{Insulin} khuyết $374/768$ và \texttt{SkinThickness}
+khuyết $227/768$, gần một nửa dữ liệu sau khi điền đã mang dấu vết của chính
+nhãn cần dự đoán. Mô hình không học quan hệ sinh học; nó đọc ngược ra nhãn từ
+giá trị đã điền.
+
+Cách sửa: đưa \texttt{SimpleImputer(strategy="median")} vào \emph{bên trong}
+\texttt{Pipeline}, để \texttt{fit} chỉ nhìn thấy tập huấn luyện. Accuracy trở
+về $0{,}7914$ --- thấp hơn, nhưng là con số thật. \textbf{Bài học: một kết quả
+vượt trần tài liệu là lý do để đi tìm lỗi, không phải lý do để ăn mừng.}
+\end{phathien}
+
+\section{Phân tích khám phá dữ liệu}
+\label{sec:eda-dia}
+
+\subsection{Phân phối biến mục tiêu}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.56\textwidth]{dia_pie_outcome.png}
+\caption[Phân phối hai lớp của biến mục tiêu \texttt{Outcome}]%
+{Phân phối hai lớp của biến mục tiêu \texttt{Outcome}}
+\label{fig:dia-pie}
+\end{figure}
+
+\bieudo{Biểu đồ tròn (pie chart) --- dạng phù hợp khi cần thể hiện tỷ trọng của
+một số ít hạng mục trên tổng thể.}
+
+\phanphoi{Lệch lớp ở mức trung bình, tỷ lệ xấp xỉ $2:1$ nghiêng về lớp âm tính.}
+
+\chitiet{500 ca âm tính chiếm $65{,}1\%$ và 268 ca dương tính chiếm $34{,}9\%$.
+Mức lệch này chưa tới ngưỡng ``mất cân bằng nghiêm trọng'' (thường tính từ
+$10:1$) nên không cần lấy mẫu lại, nhưng đã đủ để làm Accuracy mất ý nghĩa:
+một mô hình đoán bừa ``tất cả đều khoẻ'' đạt ngay $65{,}1\%$.}
+
+\subsection{Phân phối đặc trưng quan trọng nhất}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{dia_hist_glucose.png}
+\caption[Phân phối tần suất của đặc trưng \texttt{Glucose}]%
+{Phân phối tần suất của đặc trưng \texttt{Glucose}}
+\label{fig:dia-hist-glucose}
+\end{figure}
+
+\bieudo{Biểu đồ tần suất (histogram). Dải giá trị liên tục được chia thành các
+khoảng bằng nhau, chiều cao mỗi cột là số quan sát rơi vào khoảng đó.}
+
+\phanphoi{Dạng gần chuẩn nhưng lệch phải nhẹ, một đỉnh duy nhất (unimodal).}
+
+\chitiet{Khối lượng dữ liệu tập trung trong khoảng $90$--$140$ mg/dL, đỉnh tại
+khoảng $105$--$115$ mg/dL với gần 70 quan sát. Đuôi trái mỏng, bắt đầu từ
+khoảng $45$ mg/dL. Đuôi phải dày hơn hẳn và kéo tới $199$ mg/dL --- vùng này
+tương ứng với ngưỡng chẩn đoán đái tháo đường ($\ge 200$ mg/dL sau nghiệm pháp
+dung nạp), nên độ dày của đuôi phải chính là tín hiệu mà mô hình khai thác.}
+
+\subsection{So sánh phân phối giữa hai nhóm}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dia_kde_by_class.png}
+\caption[Phân phối mật độ ba đặc trưng chính, tách theo tình trạng bệnh]%
+{Ước lượng mật độ hạt nhân (KDE) của \texttt{Glucose}, \texttt{BMI} và
+\texttt{Age}, tách theo tình trạng bệnh}
+\label{fig:dia-kde-class}
+\end{figure}
+
+\bieudo{Ba biểu đồ mật độ hạt nhân chồng lớp (overlaid KDE). Khác biểu đồ tần
+suất, KDE dùng đường cong liên tục nên hình dáng phân phối không phụ thuộc vào
+cách chọn độ rộng khoảng. Hai màu là hai nhóm của biến mục tiêu.}
+
+\phanphoi{Cả ba cặp đường cong đều lệch nhau theo cùng một hướng --- nhóm mắc
+bệnh dịch sang phải --- nhưng \emph{mức độ} tách rời rất khác nhau.}
+
+\chitiet{\texttt{Glucose} tách rõ nhất: đỉnh nhóm khoẻ ở khoảng $105$ mg/dL,
+đỉnh nhóm bệnh ở khoảng $135$--$145$ mg/dL, và phần chồng lấn tuy còn lớn nhưng
+hai đỉnh đã tách hẳn. \texttt{BMI} tách vừa phải, hai đỉnh chỉ cách nhau vài đơn
+vị quanh mốc $30$--$35$ kg/m$^2$. \texttt{Age} tách yếu nhất: nhóm khoẻ có một
+đỉnh nhọn ở khoảng $22$--$25$ tuổi, nhóm bệnh phân bố thoải và rộng hơn nhưng
+phần chồng lấn chiếm gần trọn vùng dữ liệu.}
+
+\nhanxet{Thứ tự tách rời ở đây --- \texttt{Glucose} $>$ \texttt{BMI} $>$
+\texttt{Age} --- báo trước đúng thứ tự tương quan với nhãn ở
+Bảng~\ref{tab:corr-dia} và đúng thứ tự mức quan trọng đặc trưng ở
+Hình~\ref{fig:dia-importance}. Ba phương pháp độc lập cùng chỉ về một kết luận
+là bằng chứng mạnh hơn bất kỳ phương pháp nào đứng riêng.}
+
+\subsection{Giá trị ngoại lai}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dia_box_grid.png}
+\caption[Biểu đồ hộp của tám đặc trưng định lượng]%
+{Biểu đồ hộp của tám đặc trưng định lượng}
+\label{fig:dia-box}
+\end{figure}
+
+\bieudo{Lưới tám biểu đồ hộp (boxplot). Hộp bao phủ khoảng tứ phân vị Q1--Q3,
+đường giữa là trung vị, râu kéo dài tối đa $1{,}5\times$IQR, mọi điểm ngoài râu
+được đánh dấu là ngoại lai.}
+
+\phanphoi{Ba nhóm khác hẳn nhau. Nhóm gọn gàng: \texttt{Glucose},
+\texttt{BloodPressure}, \texttt{BMI} --- hộp cân đối, ít điểm ngoài râu. Nhóm
+lệch phải mạnh: \texttt{Insulin}, \texttt{DiabetesPedigreeFunction},
+\texttt{Age}. Nhóm đặc biệt: \texttt{SkinThickness}, có hộp rất hẹp.}
+
+\chitiet{\texttt{Insulin} có hộp nén sát đáy với một dải điểm ngoại lai dày đặc
+kéo lên tới hơn $800$ $\mu$U/mL --- hệ quả trực tiếp của việc $48{,}7\%$ giá trị
+được điền bằng cùng một con số trung vị, khiến hộp co lại quanh giá trị ấy.
+\texttt{SkinThickness} cũng cho hình dáng tương tự vì lý do y hệt.
+\texttt{Age} có hộp trải từ khoảng $25$ tới $41$ tuổi với đuôi trên kéo tới
+$81$. \texttt{Pregnancies} là biến đếm nên hình dáng bậc thang, tối đa $17$ lần.}
+
+\nhanxet{Không giá trị ngoại lai nào bị loại bỏ. Với dữ liệu y sinh, một chỉ số
+cực đoan thường là \emph{ca bệnh nặng} --- đúng nhóm mà hệ thống sàng lọc cần
+phát hiện nhất. Loại bỏ chúng là loại bỏ tín hiệu, không phải loại bỏ nhiễu.}
+
+\section{Thiết kế đặc trưng}
+\label{sec:dactrung-dia}
+
+Bốn đặc trưng phái sinh được xây từ tri thức y học, không phải từ tìm kiếm mù:
+
+\begin{table}[H]
+\centering
+\caption{Bốn đặc trưng thiết kế và căn cứ y học}
+\label{tab:engineered-dia}
+\small
+\begin{tabularx}{\textwidth}{@{}L{3.2cm}L{4.0cm}X@{}}
+\toprule
+\textbf{Đặc trưng} & \textbf{Công thức} & \textbf{Căn cứ} \\
+\midrule
+\texttt{Glucose\_BMI\_Risk} & $\texttt{Glucose}\times\texttt{BMI}$ &
+Tăng đường huyết đi kèm béo phì có rủi ro cao hơn tổng rủi ro của hai yếu tố
+riêng lẻ --- một tương tác mà mô hình tuyến tính không tự tạo ra được \\
+\addlinespace
+\texttt{Glucose\_Level} & Rời rạc hoá theo ngưỡng lâm sàng &
+Ba mức: bình thường, tiền đái tháo đường, đái tháo đường \\
+\addlinespace
+\texttt{BMI\_Class} & Rời rạc hoá theo phân loại WHO &
+Bốn mức: gầy, bình thường, thừa cân, béo phì \\
+\addlinespace
+\texttt{Age\_Group} & Rời rạc hoá theo nhóm tuổi &
+Rủi ro tăng không tuyến tính theo tuổi \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Ma trận tương quan và sàng lọc đặc trưng}
+\label{sec:corr-dia}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dia_corr_heatmap.png}
+\caption[Ma trận tương quan Pearson của 8 đặc trưng gốc và 4 đặc trưng thiết kế]%
+{Ma trận tương quan Pearson --- 8 đặc trưng gốc, 4 đặc trưng thiết kế và biến
+mục tiêu}
+\label{fig:dia-corr}
+\end{figure}
+
+\bieudo{Bản đồ nhiệt (heatmap) đối xứng. Màu đỏ là tương quan dương, màu xanh là
+tương quan âm, độ đậm tỷ lệ với độ lớn hệ số.}
+
+\phanphoi{Toàn bộ ma trận nghiêng về phía đỏ nhạt --- không có cặp nào tương
+quan âm đáng kể. Ba cụm đậm nổi lên rõ, tất cả đều là cặp gốc -- phái sinh.}
+
+\chitiet{Ba cặp đậm nhất đều do định nghĩa mà có:
+\texttt{Glucose}--\texttt{Glucose\_Level} $=0{,}87$,
+\texttt{Glucose}--\texttt{Glucose\_BMI\_Risk} $=0{,}82$,
+\texttt{Age}--\texttt{Age\_Group} $=0{,}95$ và
+\texttt{BMI}--\texttt{BMI\_Class} $=0{,}78$. Với biến mục tiêu, cột
+\texttt{Outcome} có màu nhạt hơn hẳn: hệ số cao nhất chỉ là $0{,}52$.}
+
+\begin{table}[H]
+\centering
+\caption{Tương quan Pearson với biến mục tiêu \texttt{Outcome}, sắp giảm dần}
+\label{tab:corr-dia}
+\small
+\begin{tabular}{@{}lrlr@{}}
+\toprule
+\textbf{Đặc trưng} & \textbf{$\rho$} & \textbf{Đặc trưng} & \textbf{$\rho$} \\
+\midrule
+\texttt{Glucose\_BMI\_Risk} & \textbf{0{,}5199} & \texttt{Age\_Group}     & 0{,}2322 \\
+\texttt{Glucose}            & 0{,}4928 & \texttt{Pregnancies}    & 0{,}2219 \\
+\texttt{Glucose\_Level}     & 0{,}4356 & \texttt{SkinThickness}  & 0{,}2149 \\
+\texttt{BMI}                & 0{,}3120 & \texttt{Insulin}        & 0{,}2038 \\
+\texttt{BMI\_Class}         & 0{,}3098 & \texttt{DiabetesPedigreeFunction} & 0{,}1738 \\
+\texttt{Age}                & 0{,}2384 & \texttt{BloodPressure}  & 0{,}1657 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\nhanxet{Đặc trưng thiết kế \texttt{Glucose\_BMI\_Risk} tương quan với nhãn
+\emph{mạnh hơn} cả \texttt{Glucose} gốc ($0{,}5199$ so với $0{,}4928$) ---
+bằng chứng định lượng cho thấy tri thức y học đưa vào đúng chỗ có giá trị. Ngưỡng
+sàng lọc $|\rho|\ge0{,}20$ giữ lại năm đặc trưng gốc: \texttt{Glucose},
+\texttt{SkinThickness}, \texttt{Insulin}, \texttt{BMI}, \texttt{Age}.
+
+Cần nói rõ giới hạn: hệ số Pearson chỉ đo quan hệ \textbf{tuyến tính}. Giá trị
+gần $0$ không loại trừ quan hệ phi tuyến mạnh, nên bảng này được dùng để
+\emph{xếp hạng} chứ không dùng làm căn cứ duy nhất để loại đặc trưng --- mọi mô
+hình trong chương vẫn nhận đủ 12 cột.}
+
+\section{Chia dữ liệu và mô hình cơ sở}
+
+Áp dụng giao thức ba tập ở Mục~\ref{sec:giaothuc}, có phân tầng theo nhãn để
+giữ nguyên tỷ lệ $65/35$ trong cả ba tập:
+
+\begin{table}[H]
+\centering
+\caption{Kích thước ba tập dữ liệu và kết quả mô hình cơ sở}
+\label{tab:split-dia}
+\small
+\begin{tabular}{@{}lrr@{\hspace{1.5cm}}lr@{}}
+\toprule
+\textbf{Tập} & \textbf{Số ca} & \textbf{Tỷ lệ} & \textbf{Mô hình cơ sở} & \textbf{Giá trị} \\
+\midrule
+Huấn luyện & 552 & 71{,}9\% & Accuracy  & 0{,}6547 \\
+Kiểm tra   & 139 & 18{,}1\% & Precision & 0{,}0000 \\
+Ngoại kiểm &  77 & 10{,}0\% & Recall    & \textbf{0{,}0000} \\
+\textbf{Tổng} & \textbf{768} & \textbf{100\%} & $F_1$ & 0{,}0000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{phathien}{Vì sao Accuracy $0{,}6547$ là một con số nguy hiểm}
+Mô hình cơ sở luôn đoán ``khoẻ mạnh''. Nó đúng $65{,}47\%$ số lần --- nghe không
+tệ. Nhưng Recall bằng $0$: nó \textbf{bỏ sót toàn bộ 48 người bệnh} trong tập
+kiểm tra. Một hệ thống sàng lọc như vậy vô dụng hoàn toàn, dù chỉ số Accuracy
+của nó cao hơn cả XGBoost ($0{,}7194$)~\dots{} không, thực ra thấp hơn --- nhưng
+khoảng cách chỉ là $6$ điểm phần trăm, đủ nhỏ để một báo cáo chỉ nhìn Accuracy
+kết luận sai rằng ``mô hình học được chẳng hơn bao nhiêu''. $F_1$ nói đúng sự
+thật: $0{,}0000$ so với $0{,}5895$.
+\end{phathien}
+
+\section{Thực nghiệm 1 --- Đối đầu năm mô hình}
+\label{sec:tn1-dia}
+
+\textbf{Câu hỏi.} Trong năm nguyên lý học khác nhau, nguyên lý nào hợp với cấu
+trúc của dữ liệu y sinh này?
+
+\textbf{Thiết kế.} Năm mô hình nhận \emph{cùng} một biểu diễn, \emph{cùng} một
+phép chia dữ liệu, \emph{cùng} một hạt giống ngẫu nhiên. Chỉ thuật toán thay đổi.
+
+\begin{table}[H]
+\centering
+\caption{Kết quả năm mô hình phân lớp trên tập kiểm tra, sắp theo $F_1$}
+\label{tab:ketqua-dia}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Mô hình} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{$F_1$} & \textbf{ROC-AUC} \\
+\midrule
+Mô hình cơ sở        & 0{,}6547 & 0{,}0000 & 0{,}0000 & 0{,}0000 & --- \\
+\midrule
+K-Nearest Neighbors  & 0{,}7842 & 0{,}6957 & \textbf{0{,}6667} & \textbf{0{,}6809} & 0{,}8462 \\
+Logistic Regression  & \textbf{0{,}7914} & \textbf{0{,}7436} & 0{,}6042 & 0{,}6667 & \textbf{0{,}8709} \\
+XGBoost              & 0{,}7194 & 0{,}5957 & 0{,}5833 & 0{,}5895 & 0{,}7905 \\
+Random Forest        & 0{,}7194 & 0{,}6154 & 0{,}5000 & 0{,}5517 & 0{,}8191 \\
+Decision Tree        & 0{,}7266 & 0{,}6786 & 0{,}3958 & 0{,}5000 & 0{,}7446 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dia_model_comparison.png}
+\caption[So sánh năm mô hình phân lớp trên bốn độ đo]%
+{So sánh năm mô hình phân lớp trên cùng tập kiểm tra, bốn độ đo}
+\label{fig:dia-comparison}
+\end{figure}
+
+\bieudo{Biểu đồ cột nhóm (grouped bar chart). Mỗi nhóm là một mô hình, bốn cột
+trong nhóm là bốn độ đo.}
+
+\nhanxet{Ba điều đáng chú ý.
+
+\textbf{(1) Cả năm mô hình đều vượt mô hình cơ sở} ở $F_1$ và Recall --- việc
+học mang lại giá trị thật, không phải chỉ là trang trí.
+
+\textbf{(2) Hai mô hình đơn giản nhất thắng.} K-Nearest Neighbors và Logistic
+Regression đứng đầu, còn hai mô hình tổ hợp phức tạp hơn hẳn --- Random Forest
+và XGBoost --- lại xếp sau. Với 552 mẫu huấn luyện và 12 đặc trưng, các mô hình
+có phương sai cao không đủ dữ liệu để phát huy; đây là minh hoạ sách giáo khoa
+cho đánh đổi độ chệch -- phương sai.
+
+\textbf{(3) Không có mô hình nào thắng trên mọi độ đo.} Logistic Regression dẫn
+đầu Accuracy, Precision và ROC-AUC; K-Nearest Neighbors dẫn đầu Recall và $F_1$.
+Với mục tiêu sàng lọc, KNN là lựa chọn đúng --- nó bỏ sót ít người bệnh hơn.}
+
+\subsection{Đường cong ROC --- khả năng xếp hạng độc lập với ngưỡng}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{dia_roc_curves.png}
+\caption[Đường cong ROC của năm mô hình phân lớp]%
+{Đường cong ROC của năm mô hình phân lớp trên tập kiểm tra, kèm diện tích dưới
+đường cong (AUC)}
+\label{fig:dia-roc}
+\end{figure}
+
+\bieudo{Đường cong ROC (Receiver Operating Characteristic). Trục ngang là tỷ lệ
+Dương tính giả, trục dọc là Recall; mỗi điểm trên đường cong ứng với một ngưỡng
+quyết định. Đường chéo nét đứt là mốc đoán ngẫu nhiên.}
+
+\phanphoi{Cả năm đường đều nằm hẳn phía trên đường chéo --- mọi mô hình đều xếp
+hạng tốt hơn ngẫu nhiên. Chúng bó lại thành một chùm hẹp ở góc trên bên trái rồi
+toả ra ở vùng giữa.}
+
+\chitiet{Logistic Regression dẫn đầu với AUC $=0{,}8709$, bám sát là K-Nearest
+Neighbors $0{,}8462$ và Random Forest $0{,}8191$. XGBoost đạt $0{,}7905$, còn
+Decision Tree tụt hẳn xuống $0{,}7446$ --- đường cong của nó có dạng gãy khúc
+thành vài đoạn thẳng dài thay vì cong mượt.}
+
+\begin{phathien}{Thứ tự trên ROC không trùng thứ tự trên $F_1$ --- và đó không phải mâu thuẫn}
+Logistic Regression dẫn đầu AUC nhưng chỉ đứng thứ hai về $F_1$; K-Nearest
+Neighbors thì ngược lại. Hai độ đo trả lời hai câu hỏi khác nhau:
+
+\begin{itemize}
+  \item \textbf{AUC} hỏi \emph{mô hình có xếp người bệnh lên trên người khoẻ
+        không}, xét trên mọi ngưỡng cùng lúc.
+  \item \textbf{$F_1$} hỏi \emph{tại ngưỡng $0{,}50$, mô hình cắt có tốt không}.
+\end{itemize}
+
+Một mô hình xếp hạng giỏi mà bị cắt sai chỗ vẫn cho $F_1$ thấp. Đó chính là khe
+hở mà Thực nghiệm~2 khai thác ở Mục~\ref{sec:tn2-dia}: giữ nguyên mô hình, chỉ
+đổi điểm cắt, và $F_1$ tăng trong khi AUC không đổi một chút nào.
+
+Dạng gãy khúc của đường cong Decision Tree cũng là một tín hiệu chẩn đoán: cây
+sâu 6 tầng chỉ trả về vài giá trị xác suất rời rạc, nên đường cong chỉ có vài
+điểm gấp. Chi tiết này sẽ quay lại ở Mục~\ref{sec:tn2-dia}.
+\end{phathien}
+
+\subsection{Lưới ma trận nhầm lẫn --- sai theo kiểu gì}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dia_confusion_grid.png}
+\caption[Ma trận nhầm lẫn của năm mô hình trên cùng một thang màu]%
+{Ma trận nhầm lẫn của năm mô hình phân lớp, dùng chung một thang màu để so sánh
+trực tiếp}
+\label{fig:dia-cm-grid}
+\end{figure}
+
+\bieudo{Lưới bản đồ nhiệt (heatmap grid), mỗi ô là một ma trận nhầm lẫn $2\times2$.
+Mọi ô dùng chung một thang màu nên độ đậm so sánh được trực tiếp giữa các mô
+hình. Số FN và FP ghi ngay dưới tên mô hình.}
+
+\phanphoi{Cấu trúc giống nhau ở cả năm ô: ô góc trên trái (TN) luôn đậm nhất,
+ba ô còn lại nhạt hơn hẳn --- hệ quả của việc lớp âm tính đông gần gấp đôi.
+Điều thay đổi giữa các mô hình là \emph{tỷ lệ} giữa hai ô sai.}
+
+\chitiet{K-Nearest Neighbors có FN thấp nhất ($16$) --- nó bỏ sót ít người bệnh
+nhất. Decision Tree có FN cao nhất ($29$), gần gấp đôi, dù Accuracy của nó
+($0{,}7266$) còn cao hơn XGBoost ($0{,}7194$). Ở chiều ngược lại, Decision Tree
+lại có FP thấp nhất ($9$): nó thận trọng tới mức hiếm khi báo động, và cái giá
+phải trả là bỏ sót.}
+
+\nhanxet{Đây là bằng chứng trực quan cho luận điểm ở Mục~\ref{sec:baseline}:
+\textbf{Accuracy che mất đúng loại sai lầm đắt nhất}. Hai mô hình chênh nhau
+$0{,}7$ điểm phần trăm Accuracy nhưng chênh nhau $13$ người bệnh bị bỏ sót trên
+tổng số $48$ --- tức hơn một phần tư số ca cần tìm.}
+
+\section{Thực nghiệm 2 --- Siêu tham số và ngưỡng quyết định}
+\label{sec:tn2-dia}
+
+\subsection{Khảo sát số láng giềng $k$}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{dia_knn_k_sweep.png}
+\caption[Ảnh hưởng của số láng giềng $k$ tới bốn độ đo]%
+{Ảnh hưởng của số láng giềng $k$ tới bốn độ đo của K-Nearest Neighbors}
+\label{fig:dia-k-sweep}
+\end{figure}
+
+\bieudo{Biểu đồ đường đa tuyến (multi-line plot). Trục ngang là giá trị $k$,
+mỗi đường là một độ đo.}
+
+\phanphoi{Dạng chữ U ngược đúng như lý thuyết đánh đổi độ chệch -- phương sai
+dự báo, với một đỉnh rõ ràng ở đầu dải và một vùng bằng phẳng kéo dài về sau.}
+
+\chitiet{Tại $k=1$, cả bốn độ đo đều thấp nhất ($F_1=0{,}4222$) --- mô hình học
+thuộc từng điểm huấn luyện, phương sai cực đại. $F_1$ tăng vọt lên $0{,}6596$ ở
+$k=3$ rồi đạt đỉnh $0{,}7292$ tại $k=5$. Từ $k=7$ trở đi đường cong đi ngang
+trong dải $0{,}6667$--$0{,}6882$ mà không sụt hẳn.}
+
+\begin{table}[H]
+\centering
+\caption{Khảo sát số láng giềng $k$ --- kết quả đầy đủ}
+\label{tab:k-sweep}
+\small
+\begin{tabular}{@{}rrrrr@{}}
+\toprule
+\textbf{$k$} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{$F_1$} \\
+\midrule
+1  & 0{,}6259 & 0{,}4524 & 0{,}3958 & 0{,}4222 \\
+3  & 0{,}7698 & 0{,}6739 & 0{,}6458 & 0{,}6596 \\
+\textbf{5}  & \textbf{0{,}8129} & \textbf{0{,}7292} & \textbf{0{,}7292} & \textbf{0{,}7292} \\
+7  & 0{,}7842 & 0{,}6875 & 0{,}6875 & 0{,}6875 \\
+9  & 0{,}7770 & 0{,}6667 & 0{,}7083 & 0{,}6869 \\
+11 & 0{,}7842 & 0{,}6957 & 0{,}6667 & 0{,}6809 \\
+15 & 0{,}7914 & 0{,}7209 & 0{,}6458 & 0{,}6813 \\
+21 & 0{,}7842 & 0{,}7143 & 0{,}6250 & 0{,}6667 \\
+31 & 0{,}7914 & 0{,}7111 & 0{,}6667 & 0{,}6882 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\nhanxet{Giá trị $k=11$ dùng trong danh mục mô hình ở Thực nghiệm~1 là quy tắc
+kinh nghiệm $k\approx\sqrt{n}$; khảo sát cho thấy $k=5$ tốt hơn ($F_1$ $0{,}7292$
+so với $0{,}6809$). Chênh lệch $0{,}048$ $F_1$ tương ứng khoảng 3 ca trên 139 ---
+nằm trong biên độ nhiễu lấy mẫu của một tập kiểm tra cỡ này, nên đây là một cải
+thiện \emph{có hướng} chứ chưa phải một khẳng định chắc chắn.}
+
+\subsection{Quét ngưỡng quyết định}
+
+Đây là thực nghiệm quan trọng nhất của cả chương, vì nó thay đổi hệ thống mà
+\emph{không} đụng tới mô hình.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dia_threshold_curve.png}
+\caption[Ảnh hưởng của ngưỡng quyết định $\theta$ tới bốn độ đo]%
+{Ảnh hưởng của ngưỡng quyết định $\theta$ tới bốn độ đo, mô hình XGBoost}
+\label{fig:dia-threshold}
+\end{figure}
+
+\bieudo{Biểu đồ đường đa tuyến. Trục ngang là ngưỡng $\theta$ quét từ $0{,}60$
+xuống $0{,}05$; đường nét đứt dọc đánh dấu ngưỡng tối ưu theo $F_1$.}
+
+\phanphoi{Hai đường chính chạy ngược chiều nhau và cắt nhau --- dấu hiệu kinh
+điển của một đánh đổi. Hai đường còn lại biến thiên nhẹ.}
+
+\chitiet{Recall tăng đơn điệu khi $\theta$ giảm: từ $0{,}4583$ tại
+$\theta=0{,}60$ lên $0{,}9167$ tại $\theta=0{,}05$. Precision đi ngược lại, từ
+$0{,}5946$ xuống $0{,}4583$. Hai đường cắt nhau quanh $\theta=0{,}50$. $F_1$ ---
+trung bình điều hoà của hai đường ấy --- đạt đỉnh $0{,}6508$ tại
+$\theta=0{,}15$. Accuracy gần như đi ngang trong dải $0{,}60$--$0{,}72$ suốt cả
+quá trình, một lần nữa cho thấy nó không nhạy với điều đang thay đổi.}
+
+\begin{table}[H]
+\centering
+\caption{Quét ngưỡng quyết định --- bốn ô ma trận nhầm lẫn tại mỗi ngưỡng}
+\label{tab:threshold-dia}
+\small
+\begin{tabular}{@{}rrrrrrrrr@{}}
+\toprule
+\textbf{$\theta$} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{$F_1$} & \textbf{TP} & \textbf{FN} & \textbf{FP} & \textbf{TN} \\
+\midrule
+0{,}60 & 0{,}7050 & 0{,}5946 & 0{,}4583 & 0{,}5176 & 22 & 26 & 15 & 76 \\
+0{,}50 & 0{,}7194 & 0{,}5957 & 0{,}5833 & 0{,}5895 & 28 & 20 & 19 & 72 \\
+0{,}40 & 0{,}7194 & 0{,}5789 & 0{,}6875 & 0{,}6286 & 33 & 15 & 24 & 67 \\
+0{,}30 & 0{,}7050 & 0{,}5538 & 0{,}7500 & 0{,}6372 & 36 & 12 & 29 & 62 \\
+0{,}25 & 0{,}7122 & 0{,}5606 & 0{,}7708 & 0{,}6491 & 37 & 11 & 29 & 62 \\
+0{,}20 & 0{,}6978 & 0{,}5417 & 0{,}8125 & 0{,}6500 & 39 &  9 & 33 & 58 \\
+\textbf{0{,}15} & 0{,}6835 & 0{,}5256 & \textbf{0{,}8542} & \textbf{0{,}6508} & \textbf{41} & \textbf{7} & 37 & 54 \\
+0{,}10 & 0{,}6403 & 0{,}4886 & 0{,}8958 & 0{,}6324 & 43 &  5 & 45 & 46 \\
+0{,}05 & 0{,}5971 & 0{,}4583 & 0{,}9167 & 0{,}6111 & 44 &  4 & 52 & 39 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.485\textwidth}
+  \includegraphics[width=\textwidth]{dia_confusion_default.png}
+  \caption{Ngưỡng mặc định $\theta=0{,}50$}
+  \label{fig:dia-cm-default}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.485\textwidth}
+  \includegraphics[width=\textwidth]{dia_confusion_tuned.png}
+  \caption{Ngưỡng tối ưu $\theta=0{,}15$}
+  \label{fig:dia-cm-tuned}
+\end{subfigure}
+\caption[Ma trận nhầm lẫn trước và sau khi hạ ngưỡng quyết định]%
+{Ma trận nhầm lẫn của cùng một mô hình XGBoost, trước và sau khi hạ ngưỡng
+quyết định}
+\label{fig:dia-cm-pair}
+\end{figure}
+
+\nhanxet{Đọc thẳng từ Bảng~\ref{tab:threshold-dia}: hạ ngưỡng từ $0{,}50$ xuống
+$0{,}15$ đưa số người bệnh bị bỏ sót từ \textbf{20 xuống 7} --- cứu được 13 ca
+trên tổng số 48. Cái giá là số báo động nhầm tăng từ 19 lên 37, tức thêm 18
+người khoẻ phải đi xét nghiệm lại.
+
+Trong bài toán sàng lọc, đây là một đổi chác rõ ràng có lợi: một lần xét nghiệm
+thừa tốn vài trăm nghìn đồng, còn một ca đái tháo đường bị bỏ sót có thể dẫn tới
+biến chứng thận, mắt hoặc tim mạch sau nhiều năm. \textbf{Điểm quan trọng nhất:
+mô hình không hề thay đổi} --- cùng bộ trọng số, cùng ROC-AUC $0{,}7905$. Thứ
+thay đổi là chỗ ta cắt.}
+
+\begin{phathien}{Hai bẫy phương pháp gặp phải trong chính thực nghiệm này}
+\textbf{Bẫy 1 --- quét ngưỡng cần mô hình cho xác suất liên tục.} Bản chạy đầu
+tiên thực hiện trên Decision Tree sâu 6 tầng. Bảy ngưỡng từ $0{,}50$ xuống
+$0{,}20$ cho ra \emph{đúng một} kết quả giống hệt nhau. Nguyên nhân: cây nông
+chỉ trả về vài giá trị xác suất rời rạc, nên phần lớn ngưỡng rơi vào cùng một
+khoảng và không đổi được nhãn nào --- đúng hiện tượng đã thấy qua dạng gãy khúc
+của đường ROC ở Hình~\ref{fig:dia-roc}. Chuyển sang XGBoost mới thấy được hiệu
+ứng thật, với 12 mức kết quả khác nhau trên 13 ngưỡng.
+
+\textbf{Bẫy 2 --- cực trị chạm biên dải khảo sát thì chưa phải cực trị.} Dải
+quét ban đầu dừng ở $\theta=0{,}20$ và $F_1$ đạt đỉnh đúng tại đầu mút ấy. Chỉ
+sau khi nới dải xuống $0{,}05$ mới xác nhận được đỉnh thật nằm ở $0{,}15$. Bẫy
+này lặp lại lần thứ hai ở bài toán bất động sản với độ sâu rừng ngẫu nhiên ---
+xem Mục~\ref{sec:tn2-hou}.
+\end{phathien}
+
+\section{Thực nghiệm 3 --- Ảnh hưởng của cách biểu diễn dữ liệu}
+\label{sec:tn3-dia}
+
+\textbf{Câu hỏi.} Giữ nguyên thuật toán, chỉ đổi cách biểu diễn --- kết quả thay
+đổi bao nhiêu, và so với biên độ do đổi thuật toán thì thế nào?
+
+\textbf{Thiết kế.} Bốn phương án biểu diễn, cùng chạy trên Logistic Regression,
+cùng phép chia dữ liệu. Bốn phương án phản ánh đúng ba tầng chuyển hoá đã định
+nghĩa ở Mục~\ref{sec:ba-tang-bieudien}.
+
+\begin{table}[H]
+\centering
+\caption{Bốn phương án biểu diễn dữ liệu và kết quả trên Logistic Regression}
+\label{tab:rep-dia}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Phương án biểu diễn} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{$F_1$} \\
+\midrule
+Làm sạch, chưa chuẩn hoá                    & \textbf{0{,}8058} & 0{,}7561 & \textbf{0{,}6458} & \textbf{0{,}6966} \\
+Thô --- giữ nguyên giá trị 0 phi lý         & 0{,}7986 & 0{,}7500 & 0{,}6250 & 0{,}6818 \\
+Làm sạch $+$ chuẩn hoá                      & 0{,}7986 & 0{,}7500 & 0{,}6250 & 0{,}6818 \\
+Làm sạch $+$ chuẩn hoá $+$ đặc trưng thiết kế & 0{,}7914 & 0{,}7436 & 0{,}6042 & 0{,}6667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dia_representation.png}
+\caption[Ảnh hưởng của cách biểu diễn dữ liệu tới $F_1$]%
+{Ảnh hưởng của cách biểu diễn dữ liệu tới $F_1$ của Logistic Regression}
+\label{fig:dia-representation}
+\end{figure}
+
+\bieudo{Biểu đồ cột ngang, sắp giảm dần theo $F_1$, giá trị ghi ở đầu mỗi cột.}
+
+\phanphoi{Bốn cột gần bằng nhau. Khoảng cách giữa cột cao nhất và cột thấp nhất
+nhỏ tới mức phải đọc con số mới thấy.}
+
+\chitiet{$F_1$ trải từ $0{,}6667$ tới $0{,}6966$ --- biên độ $0{,}0300$. Hai
+phương án giữa cho kết quả \emph{trùng khít nhau tới bốn chữ số thập phân}
+($0{,}6818$), tức việc chuẩn hoá không đổi được một ca nào.}
+
+\begin{phathien}{Kết quả đi ngược giả thuyết ban đầu --- và đây là phát hiện chính}
+\label{sec:dactrung-tot}
+Giả thuyết trước khi chạy là biểu diễn tốt hơn sẽ cho kết quả tốt hơn, với
+phương án đầy đủ nhất đứng đầu. Kết quả \textbf{ngược lại}: phương án đầy đủ
+nhất --- có cả chuẩn hoá lẫn bốn đặc trưng thiết kế --- xếp \textbf{cuối cùng}.
+
+Ba lời giải thích, mỗi lời giải thích kiểm chứng được:
+
+\begin{enumerate}
+  \item \textbf{Chuẩn hoá không giúp gì cho Logistic Regression ở đây.} Hai
+        phương án ``có'' và ``không có'' chuẩn hoá cho kết quả trùng khít. Điều
+        này đúng lý thuyết: hồi quy logistic không dựa trên khoảng cách, phép
+        chuẩn hoá tuyến tính chỉ đổi thang trọng số chứ không đổi ranh giới
+        quyết định. Nó \emph{bắt buộc} với K-Nearest Neighbors, nhưng vô hại và
+        vô ích với mô hình này.
+  \item \textbf{Đặc trưng thiết kế \emph{làm hại} Logistic Regression.} $F_1$
+        giảm từ $0{,}6818$ xuống $0{,}6667$. Nguyên nhân là đa cộng tuyến dưới
+        phạt $L_2$: \texttt{Glucose\_BMI\_Risk} tương quan $0{,}82$ với
+        \texttt{Glucose} và $0{,}73$ với \texttt{BMI}
+        (Hình~\ref{fig:dia-corr}), nên số hạng
+        $\lambda\lVert\bm\theta\rVert_2^2$ ở~\eqref{eq:regularized} phân tán
+        trọng số ra ba cột gần trùng nhau thay vì dồn vào một cột.
+  \item \textbf{Toàn bộ biên độ nằm trong nhiễu lấy mẫu.} $0{,}0300$ $F_1$ trên
+        139 ca kiểm tra tương ứng chênh lệch chỉ \textbf{1--9 ca} giữa các
+        phương án. Không phương án nào tách khỏi phần còn lại một cách có ý
+        nghĩa thống kê.
+\end{enumerate}
+
+\textbf{Hệ quả khái quát:} ``đặc trưng tốt'' không phải thuộc tính của riêng đặc
+trưng, mà là thuộc tính của \emph{cặp đặc trưng -- thuật toán}. Chính
+\texttt{Glucose\_BMI\_Risk} vừa là đặc trưng tương quan mạnh nhất với nhãn
+($0{,}5199$) vừa là đặc trưng quan trọng nhất của XGBoost ($0{,}1874$, xem
+Hình~\ref{fig:dia-importance}) --- nhưng lại làm Logistic Regression kém đi.
+\end{phathien}
+
+\subsection{So sánh biên độ: biểu diễn hay thuật toán?}
+
+\begin{table}[H]
+\centering
+\caption{Biên độ do đổi biểu diễn so với biên độ do đổi thuật toán, bài toán tiểu đường}
+\label{tab:biendo-dia}
+\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Nguồn biến thiên} & \textbf{Biên độ $F_1$} & \textbf{Ghi chú} \\
+\midrule
+Đổi cách biểu diễn (4 phương án) & 0{,}0300 & $0{,}6667 \to 0{,}6966$ \\
+Đổi thuật toán (5 mô hình)       & \textbf{0{,}1809} & $0{,}5000 \to 0{,}6809$ \\
+\midrule
+\textbf{Tỷ số} & \multicolumn{2}{l}{\textbf{Thuật toán chi phối, gấp 6 lần}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Kết luận này sẽ được đối chiếu với kết quả \emph{trái ngược} ở bài toán bất động
+sản tại Mục~\ref{sec:phanchieu}.
+
+\section{Thực nghiệm 4 --- Kiểm chuẩn ngoài phân phối}
+\label{sec:tn4-dia}
+
+\textbf{Câu hỏi.} Điểm số trên tập kiểm tra có lạc quan quá không?
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{dia_ood_comparison.png}
+\caption[So sánh $F_1$ giữa tập kiểm tra và tập ngoại kiểm]%
+{So sánh $F_1$ của năm mô hình giữa tập kiểm tra và tập ngoại kiểm}
+\label{fig:dia-ood}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả trên tập ngoại kiểm (77 ca chưa từng dùng trong phát triển)}
+\label{tab:ood-dia}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Mô hình} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{$F_1$} & \textbf{ROC-AUC} \\
+\midrule
+XGBoost             & \textbf{0{,}7922} & 0{,}6897 & \textbf{0{,}7407} & \textbf{0{,}7143} & 0{,}8800 \\
+Random Forest       & \textbf{0{,}7922} & 0{,}7037 & 0{,}7037 & 0{,}7037 & \textbf{0{,}8904} \\
+K-Nearest Neighbors & \textbf{0{,}7922} & \textbf{0{,}7391} & 0{,}6296 & 0{,}6800 & \textbf{0{,}8904} \\
+Logistic Regression & 0{,}7403 & 0{,}6400 & 0{,}5926 & 0{,}6154 & 0{,}8511 \\
+Decision Tree       & 0{,}7403 & 0{,}6842 & 0{,}4815 & 0{,}5652 & 0{,}7774 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\nhanxet{Kết quả trên tập ngoại kiểm \textbf{cao hơn} tập kiểm tra ở hầu hết mô
+hình --- XGBoost tăng $F_1$ từ $0{,}5895$ lên $0{,}7143$. Đây không phải bằng
+chứng mô hình tổng quát hoá xuất sắc; nó chủ yếu là dao động lấy mẫu trên một
+tập chỉ 77 ca. Điều đáng tin hơn là \emph{thứ hạng đảo lộn}: XGBoost từ hạng ba
+lên hạng nhất, Logistic Regression từ hạng hai xuống hạng tư.
+
+Hệ quả phương pháp: chênh lệch $F_1$ dưới khoảng $0{,}05$ giữa hai mô hình trên
+tập cỡ này \textbf{không đủ để kết luận mô hình nào tốt hơn}. Đây cũng là lý do
+Mục~\ref{sec:tn3-dia} không tuyên bố phương án biểu diễn nào thắng.}
+
+\section{Mức độ quan trọng của đặc trưng}
+\label{sec:importance-dia}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{dia_feature_importance.png}
+\caption[Mức độ quan trọng của đặc trưng theo XGBoost]%
+{Mức độ quan trọng của đặc trưng theo mô hình XGBoost}
+\label{fig:dia-importance}
+\end{figure}
+
+\bieudo{Biểu đồ cột ngang, sắp tăng dần từ trên xuống. Độ quan trọng đo bằng
+mức giảm độ vẩn tích luỹ mà mỗi đặc trưng mang lại qua toàn bộ cây.}
+
+\phanphoi{Phân bố khá đều, không có đặc trưng nào áp đảo. Hai cột đầu tách khỏi
+phần còn lại, chín cột sau tạo thành một dải liên tục.}
+
+\chitiet{\texttt{Glucose\_BMI\_Risk} dẫn đầu với $0{,}1874$, kế đến
+\texttt{Glucose} gốc $0{,}1233$. Nhóm giữa gồm \texttt{Age} $0{,}0940$,
+\texttt{Age\_Group} $0{,}0815$, \texttt{BMI} $0{,}0778$ và \texttt{Pregnancies}
+$0{,}0776$. Cuối bảng là \texttt{Glucose\_Level} với $0{,}0330$.}
+
+\nhanxet{Ba quan sát.
+
+\textbf{(1) Đặc trưng thiết kế đứng đầu} --- bằng chứng thứ hai (sau
+Bảng~\ref{tab:corr-dia}) rằng tri thức y học đưa vào đúng chỗ có giá trị đo
+được, ít nhất là với mô hình cây.
+
+\textbf{(2) Rời rạc hoá làm mất thông tin với mô hình cây.}
+\texttt{Glucose\_Level} xếp cuối trong khi \texttt{Glucose} gốc xếp thứ hai.
+Điều này hợp lý: cây quyết định \emph{tự} tìm ngưỡng chia tối ưu trên biến liên
+tục, nên việc rời rạc hoá thủ công thành ba mức chỉ giới hạn không gian tìm kiếm
+của nó. Rời rạc hoá có ích cho mô hình tuyến tính, không có ích cho cây.
+
+\textbf{(3) Không có đặc trưng nào vượt $0{,}19$} --- tín hiệu phân tán mỏng
+trên nhiều biến. Điều này giải thích vì sao trần hiệu năng trên tập Pima nằm ở
+mức $0{,}77$--$0{,}79$ Accuracy trong toàn bộ tài liệu công bố, và vì sao mọi
+kết quả vượt xa mốc ấy đều đáng nghi (xem lại khung ở Mục~\ref{sec:roro}).}
+
+\section{Tích hợp Đồ thị Tri thức Y sinh}
+\label{sec:kg-dia}
+
+\subsection{Từ xác suất tới tầng nguy cơ}
+
+Ngưỡng phân tầng lấy trực tiếp từ Thực nghiệm~2, không phải chọn tuỳ ý:
+
+\begin{table}[H]
+\centering
+\caption{Ba tầng nguy cơ lâm sàng và ánh xạ sang mã bệnh quốc tế}
+\label{tab:tang-dia}
+\small
+\begin{tabularx}{\textwidth}{@{}L{3.6cm}L{1.7cm}L{1.7cm}X@{}}
+\toprule
+\textbf{Tầng nguy cơ} & \textbf{Ngưỡng $\hat p$} & \textbf{ICD-10} & \textbf{Tên mã bệnh} \\
+\midrule
+Nhóm Nguy cơ Cao        & $\ge 0{,}25$ & E11   & Đái tháo đường Type 2 \\
+Nhóm Tiền Đái tháo đường & $\ge 0{,}15$ & R73.0 & Tăng glucose máu bất thường \\
+Nhóm Khoẻ mạnh          & $\ge 0{,}00$ & Z13.1 & Khám sàng lọc đái tháo đường \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Đồ thị của một ca cụ thể}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{kg_medical.png}
+\caption[Đồ thị Tri thức Y sinh của bệnh nhân \#192]%
+{Đồ thị Tri thức Y sinh của bệnh nhân \#192 --- Nhóm Nguy cơ Cao, 22 thực thể
+và 31 cạnh}
+\label{fig:kg-medical}
+\end{figure}
+
+\bieudo{Đồ thị có hướng vẽ theo bố cục phân tầng (layered graph layout). Màu nút
+mã hoá loại thực thể theo chú giải bên phải, nhãn trên cạnh là tên quan hệ.}
+
+\phanphoi{Cấu trúc hình quạt mở dần từ trái sang phải: một nút gốc duy nhất
+(Bệnh nhân) phân nhánh qua các tầng suy luận rồi mở rộng ra tầng hàng hoá và
+dịch vụ.}
+
+\chitiet{Tầng 1 bên trái gồm bốn chỉ số sinh học cùng đặc trưng tương tác
+$\text{Glucose}\times\text{BMI}=4.834$. Tầng 2 ở giữa là chuỗi Mô hình
+K-Nearest Neighbors $\to$ Xác suất $54{,}5\%$ $\to$ ICD-10 E11 $\to$ Nhóm Nguy
+cơ Cao. Tầng 3 toả ra ba nhóm: hai thiết bị, ba mặt hàng dinh dưỡng, ba hướng
+dẫn lâm sàng. Tầng 4 gom lại thành một nút Gói Theo dõi Chuyên sâu. Tầng 5 bên
+phải hội tụ về nút Nhà thuốc FPT Long Châu cùng hai dịch vụ tại quầy và một
+đường chuyển tuyến chuyên khoa.}
+
+\subsection{Chuỗi suy luận đầy đủ}
+
+\begin{table}[H]
+\centering
+\caption{Chuỗi bộ ba tri thức của bệnh nhân \#192, từ số đo tới nơi mua hàng}
+\label{tab:triplet-dia}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}L{4.1cm}L{3.5cm}X@{}}
+\toprule
+\textbf{Chủ thể} & \textbf{Quan hệ} & \textbf{Đối tượng} \\
+\midrule
+Bệnh nhân & \texttt{HAS\_BIOMARKER} & Glucose $=159$ mg/dL \\
+Bệnh nhân & \texttt{HAS\_BIOMARKER} & BMI $=30{,}4$ kg/m$^2$ \\
+Bệnh nhân & \texttt{CALCULATED\_RISK} & Glucose $\times$ BMI $=4.834$ \\
+Bệnh nhân & \texttt{EVALUATED\_BY} & Mô hình K-Nearest Neighbors \\
+Mô hình K-Nearest Neighbors & \texttt{PRODUCES} & Xác suất rủi ro $54{,}5\%$ \\
+Xác suất rủi ro $54{,}5\%$ & \texttt{MAPS\_TO\_DISEASE} & ICD-10 E11 \\
+Bệnh nhân & \texttt{STRATIFIED\_AS} & Nhóm Nguy cơ Cao \\
+ICD-10 E11 & \texttt{REQUIRES\_DEVICE} & Máy đo đường huyết Accu-Chek Instant \\
+ICD-10 E11 & \texttt{RECOMMENDS\_NUTRITION} & Sữa Abbott Glucerna 850g \\
+Nhóm Nguy cơ Cao & \texttt{ADVISES} & Khám chuyên khoa Nội tiết \\
+Nhóm Nguy cơ Cao & \texttt{RECOMMENDS\_PACKAGE} & \textbf{Gói Theo dõi Chuyên sâu} \\
+Gói Theo dõi Chuyên sâu & \texttt{INCLUDES\_PRODUCT} & (5 mặt hàng) \\
+Gói Theo dõi Chuyên sâu & \texttt{FULFILLED\_BY} & \textbf{Nhà thuốc FPT Long Châu} \\
+Nhà thuốc FPT Long Châu & \texttt{PROVIDES\_SERVICE} & Đo đường huyết miễn phí tại quầy \\
+ICD-10 E11 & \texttt{REFERS\_TO} & Khám Bác sĩ chuyên khoa Nội tiết \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Gói chăm sóc sức khoẻ và giải pháp dược phẩm}
+\label{sec:goi-cham-soc}
+
+Đây là điểm mà hệ thống trả lời được câu hỏi cuối cùng của người dùng:
+\emph{vậy tôi phải mua gì, và hết bao nhiêu tiền}.
+
+\begin{table}[H]
+\centering
+\caption{Gói Theo dõi Chuyên sâu --- danh mục mặt hàng cho Nhóm Nguy cơ Cao}
+\label{tab:goi-cao}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}L{1.9cm}XL{2.6cm}L{1.35cm}@{}}
+\toprule
+\textbf{Mã SKU} & \textbf{Mặt hàng} & \textbf{Khoảng giá} & \textbf{Định kỳ} \\
+\midrule
+LC-DEV-001 & Máy đo đường huyết Accu-Chek Instant        & 790.000 -- 1.090.000 đ & Không \\
+LC-DEV-002 & Que thử đường huyết Accu-Chek (hộp 50 que)  & 300.000 -- 420.000 đ   & Có \\
+LC-DEV-003 & Kim chích máu Accu-Chek Softclix (hộp 25)   & 90.000 -- 150.000 đ    & Có \\
+LC-NUT-001 & Sữa Abbott Glucerna 850g                    & 690.000 -- 890.000 đ   & Có \\
+LC-NUT-003 & Viên uống Dây thìa canh Diabetna (hộp 40)   & 120.000 -- 195.000 đ   & Có \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Chi phí ban đầu}}          & \textbf{1.990.000 -- 2.745.000 đ} & \\
+\multicolumn{2}{@{}l}{\textbf{Duy trì hằng tháng}}       & \textbf{1.200.000 -- 1.655.000 đ} & \\
+\multicolumn{2}{@{}l}{\textbf{Tổng 12 tháng đầu}}        & \textbf{15.190.000 -- 20.950.000 đ} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Ba gói chăm sóc theo tầng nguy cơ}
+\label{tab:ba-goi}
+\small
+\begin{tabularx}{\textwidth}{@{}L{3.9cm}rL{2.8cm}X@{}}
+\toprule
+\textbf{Gói} & \textbf{Số mặt hàng} & \textbf{Chi phí ban đầu} & \textbf{Tần suất theo dõi} \\
+\midrule
+Theo dõi Chuyên sâu       & 5 & 1{,}99 -- 2{,}75 tr.đ & Đo đường huyết đói và sau ăn 2 giờ, mỗi ngày \\
+Dự phòng Tiền Đái tháo đường & 4 & 1{,}43 -- 2{,}08 tr.đ & Kiểm tra lại đường huyết sau 3 tháng \\
+Duy trì Sức khoẻ          & 1 & 0{,}15 -- 0{,}32 tr.đ & Khám sức khoẻ định kỳ hằng năm \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\nhanxet{Chi phí ban đầu và chi phí duy trì được tách riêng có chủ đích. Gói
+Theo dõi Chuyên sâu có máy đo là khoản mua một lần trị giá tới $1{,}09$ triệu
+đồng; gộp chung hai con số sẽ khiến gói trông đắt gấp rưỡi thực tế của tháng thứ
+hai trở đi. Đây là loại minh bạch mà một bảng khuyến nghị chỉ liệt kê tên hàng
+không thể cung cấp.
+
+Về nguồn số liệu, xin nhắc lại ranh giới đã nêu ở Mục~\ref{sec:ranh-gioi-so-lieu}:
+tên mặt hàng là tên thật, giá là khoảng tham khảo chốt ngày 26/08/2026, và mỗi
+mặt hàng mang một đường dẫn tra cứu giá hiện hành. Thuốc kê đơn --- Metformin và
+nhóm hạ đường huyết khác --- \textbf{không} nằm trong danh mục này; đồ thị chỉ
+ghi lời khuyến cáo ``tuyệt đối không tự dùng khi chưa có chỉ định bác sĩ''.}
+
+\section{Ứng dụng web}
+\label{sec:app-dia}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{app-desktop-2-chan-doan.png}
+\caption[Giao diện trang Chẩn đoán Tiểu đường trên máy tính]%
+{Giao diện trang Chẩn đoán Tiểu đường trên máy tính --- biểu mẫu nhập liệu, kết
+quả dự báo và đồ thị tri thức dựng tại chỗ}
+\label{fig:app-dia-desktop}
+\end{figure}
+
+\bieudo{Ảnh chụp màn hình bản đã triển khai công khai, khổ máy tính $1440$ px.}
+
+\chitiet{Bố cục hai cột. Cột trái là biểu mẫu chia ba khối --- thông tin cá
+nhân, kết quả xét nghiệm, tiền sử gia đình --- với ô để trống được xử lý như dữ
+liệu khuyết chứ không phải giá trị $0$. Cột phải hiển thị vòng tròn xác suất,
+nhãn tầng nguy cơ, mã ICD-10 và cảnh báo chuyển tuyến. Phía dưới là bốn tab:
+Khuyến nghị, Gói chăm sóc, So sánh, Vì sao.}
+
+\nhanxet{Ứng dụng nạp lại đúng các tệp \texttt{models/*.joblib} do
+\texttt{run\_pipeline.py} sinh ra, nên biểu diễn lúc dự đoán trùng khít biểu
+diễn lúc huấn luyện --- toàn bộ bước điền khuyết, thiết kế đặc trưng và chuẩn
+hoá đều nằm bên trong \texttt{Pipeline} được lưu.
+
+Chi tiết đáng chú ý về mặt thiết kế: khi người dùng để trống một ô, ứng dụng
+hiển thị dòng cảnh báo cho biết có bao nhiêu chỉ số đang được điền bằng trung vị
+của tập huấn luyện. Điều này giữ cho người dùng biết mức độ tin cậy của con số
+họ vừa nhận --- một dự báo dựa trên 8 chỉ số đo đủ khác hẳn một dự báo mà 5
+trong 8 chỉ số là giá trị điền.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.86\textwidth]{app-desktop-4-goi-cham-soc.png}
+\caption[Tab Gói chăm sóc --- giải pháp dược phẩm khuyến nghị]%
+{Tab \emph{Gói chăm sóc} --- năm mặt hàng của Gói Theo dõi Chuyên sâu, mỗi thẻ
+mang mã SKU, khoảng giá và đường dẫn tra giá hiện hành}
+\label{fig:app-dia-goi}
+\end{figure}
+
+\bieudo{Ảnh chụp màn hình tab thứ hai của trang Chẩn đoán.}
+
+\chitiet{Phần trên là biểu mẫu đã nạp sẵn hồ sơ bệnh nhân \#192 --- Glucose
+$159$ mg/dL, BMI $30{,}4$ --- cùng kết quả $55\%$ và mã ICD-10 E11. Trong tab,
+ba thẻ số cho chi phí ban đầu $1{,}99$--$2{,}75$ triệu đồng, chi phí duy trì
+$1{,}20$--$1{,}66$ triệu đồng mỗi tháng, và tần suất theo dõi. Bên dưới là lưới
+năm thẻ mặt hàng, mỗi thẻ ghi mã SKU, nhóm hàng, khoảng giá theo đơn vị bán,
+công dụng, nhãn ``mua một lần'' hoặc ``mua định kỳ'', và một liên kết tra giá.
+Cuộn tiếp xuống dưới khung hình còn có bảng tóm tắt nhà thuốc --- với con số chi
+phí 12 tháng đầu $15{,}19$--$20{,}95$ triệu đồng --- và khung cảnh báo nguồn giá.}
+
+\nhanxet{Khung cảnh báo ở cuối tab là phần không được lược bỏ: nó nêu rõ ngày
+chốt giá, nói rằng đây là gợi ý mua sắm chứ \textbf{không phải đơn thuốc}, và
+nhắc rằng thuốc kê đơn không nằm trong danh mục. Một giao diện bán hàng bỏ dòng
+này đi sẽ biến một công cụ sàng lọc thành một quảng cáo dược phẩm.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.34\textwidth]{app-mobile-2-chan-doan.png}
+\caption[Giao diện trang Chẩn đoán trên điện thoại]%
+{Giao diện trang Chẩn đoán trên điện thoại, khổ $390$ px --- biểu mẫu xếp dọc,
+thanh điều hướng tự xuống dòng}
+\label{fig:app-dia-mobile}
+\end{figure}

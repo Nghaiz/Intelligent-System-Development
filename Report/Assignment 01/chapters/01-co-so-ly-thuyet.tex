@@ -1,0 +1,664 @@
+% =====================================================================
+%  Chương 1 — Cơ sở lý thuyết và Nguyên lý hệ thống thông minh
+% =====================================================================
+\chapter{Cơ sở lý thuyết và Nguyên lý Hệ thống Thông minh}
+\label{ch:coso}
+
+\section{Mã nguồn dự án và sản phẩm bàn giao}
+\label{sec:masource}
+
+Toàn bộ sản phẩm của báo cáo này là mã nguồn mở và chạy lại được từ đầu:
+
+\begin{itemize}
+  \item \textbf{Kho mã nguồn:}\\
+        \url{https://github.com/Nghaiz/Assignment-01-Intelligent-System}
+  \item \textbf{Ứng dụng web đã triển khai công khai:}\\
+        \url{https://httm-nguyen-duy-nghia-assignment-01-intelligent-system.streamlit.app}
+  \item \textbf{Đồ thị Tri thức:} nạp thật lên máy chủ Neo4j Aura
+        (Kernel 5.27-aura, bản enterprise), có bản offline dự phòng.
+\end{itemize}
+
+\noindent Cấu trúc kho mã và vai trò từng thành phần được tóm tắt ở
+Bảng~\ref{tab:cautruc-kho}.
+
+\begin{table}[H]
+\centering
+\caption{Cấu trúc kho mã nguồn và vai trò từng thành phần}
+\label{tab:cautruc-kho}
+\small
+\begin{tabularx}{\textwidth}{@{}L{4.3cm}X@{}}
+\toprule
+\textbf{Đường dẫn} & \textbf{Nội dung} \\
+\midrule
+\texttt{src/config.py}     & Đường dẫn, hằng số, hạt giống ngẫu nhiên, kiểu vẽ biểu đồ (nguồn duy nhất --- SSOT) \\
+\texttt{src/preprocess.py} & Làm sạch dữ liệu và xây dựng biểu diễn đặc trưng \\
+\texttt{src/train.py}      & Định nghĩa và huấn luyện $5+5$ mô hình \\
+\texttt{src/evaluate.py}   & Bộ độ đo và bốn thực nghiệm có kiểm soát \\
+\texttt{src/viz.py}        & Sinh toàn bộ 44 biểu đồ của báo cáo \\
+\texttt{src/kg/ontology.py} & Bản thể học, phân tầng nguy cơ và phân khúc thị trường \\
+\texttt{src/kg/catalog\_pharmacy.py} & Danh mục bán lẻ dược phẩm --- mã hàng, khoảng giá, gói chăm sóc \\
+\texttt{src/kg/catalog\_urban.py}    & Hạ tầng tiện ích đô thị và phép tính tài chính vay mua nhà \\
+\texttt{notebooks/}        & Hai Jupyter Notebook, đủ 22 mục theo đề bài \\
+\texttt{app/}              & Ứng dụng web Streamlit --- ba trang, bốn tab mỗi trang công cụ \\
+\texttt{report/}           & Mã nguồn \LaTeX{} của chính báo cáo này \\
+\texttt{tests/}            & 355 bài kiểm thử tự động \\
+\texttt{run\_pipeline.py}  & Một lệnh tái tạo toàn bộ kết quả, khoảng 90 giây \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Nguồn dữ liệu}
+\label{sec:nguondulieu}
+
+Hệ thống sử dụng hai tập dữ liệu có cấu trúc thực tế thu thập từ nền tảng
+Kaggle, cả hai đều đáp ứng đủ các tiêu chí: mang ý nghĩa thực tiễn, có biến mục
+tiêu rõ ràng và đủ dữ liệu để huấn luyện thuật toán học máy.
+
+\begin{itemize}
+  \item \textbf{Tập Pima Indians Diabetes} --- dữ liệu chẩn đoán y tế phục vụ
+        bài toán đánh giá nguy cơ tiểu đường \emph{(Link dataset:}
+        \url{https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database}\emph{)}
+  \item \textbf{Tập Vietnam Housing} --- dữ liệu thuộc tính vật lý và vị trí của
+        các bất động sản tại Việt Nam phục vụ bài toán định giá
+        \emph{(Link dataset:}
+        \url{https://www.kaggle.com/datasets/huutri148/vietnam-housing-dataset}\emph{)}
+\end{itemize}
+
+\noindent Đặc tả chi tiết của từng tập --- hiện tượng thực tế, quan sát, đặc
+trưng, biến mục tiêu, loại bài toán --- được trình bày ở Mục~\ref{sec:dulieu-dia}
+và Mục~\ref{sec:dulieu-hou}.
+
+\section{Hệ thống thông minh: định nghĩa và dòng chảy thông tin}
+\label{sec:dinhnghia-httm}
+
+\subsection{Định nghĩa}
+
+Một \textbf{hệ thống thông minh} (Intelligent System) là hệ thống nhận thông
+tin từ môi trường, biểu diễn thông tin ấy dưới dạng máy tính xử lý được, học
+một ánh xạ từ biểu diễn sang kết luận, rồi \emph{tác động ngược trở lại} môi
+trường bằng một quyết định hoặc một khuyến nghị. Ba mệnh đề trong định nghĩa
+này đều là điều kiện cần:
+
+\begin{enumerate}
+  \item \textbf{Có biểu diễn.} Không có bước chuyển từ hiện tượng sang véc-tơ
+        số thì không có gì để học.
+  \item \textbf{Có học từ dữ liệu.} Nếu ánh xạ được viết tay bằng luật cứng thì
+        đó là hệ chuyên gia, không phải hệ thống học máy.
+  \item \textbf{Có tác động trở lại.} Một mô hình chỉ in ra con số rồi dừng lại
+        chưa phải là hệ thống; nó mới là một thành phần của hệ thống.
+\end{enumerate}
+
+Mệnh đề thứ ba là mệnh đề dễ bị bỏ qua nhất, và cũng chính là lý do báo cáo này
+dành hẳn hai tầng cuối của Đồ thị Tri thức (Mục~\ref{sec:kg-lythuyet}) cho phần
+việc ấy: mô hình trả về xác suất $0{,}545$ hoặc con số $8{,}42$ tỷ đồng, còn đồ
+thị mới là thứ biến hai con số ấy thành \emph{một giỏ hàng gồm năm mặt hàng với
+chi phí xác định} và \emph{một khoản trả góp $47{,}5$ triệu đồng mỗi tháng cùng
+mức thu nhập tối thiểu cần có}.
+
+\subsection{Dòng chảy thông tin sáu tầng}
+
+Hình~\ref{fig:sodo-hethong} trình bày kiến trúc chung mà cả hai hệ thống trong
+báo cáo đều tuân theo. Đây là sản phẩm bàn giao số~4 theo Mục~24 của đề bài
+(Sơ đồ kiến trúc hệ thống).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.54\textwidth]{fig_system_diagram.png}
+\caption[Dòng chảy thông tin sáu tầng của một hệ thống thông minh]%
+{Dòng chảy thông tin sáu tầng của một hệ thống thông minh, áp dụng đồng thời
+cho hệ thống chẩn đoán tiểu đường và hệ thống định giá bất động sản}
+\label{fig:sodo-hethong}
+\end{figure}
+
+\bieudo{Sơ đồ khối tuần tự (sequential block diagram). Mỗi khối là một tầng xử
+lý, mũi tên một chiều thể hiện hướng đi của thông tin; không có vòng lặp ngược
+vì đây là kiến trúc suy luận một lượt (single-pass inference), không phải vòng
+học tăng cường.}
+
+\nhanxet{Tầng \textsc{Representation} được đặt ở vị trí trung tâm chứ không phải
+tầng \textsc{Learning Model}. Đó là một phát biểu có chủ đích của đề bài: mọi
+tầng phía sau chỉ thao tác trên véc-tơ đặc trưng, nên bất kỳ thông tin nào bị
+đánh mất ở tầng biểu diễn thì không tầng nào sau đó khôi phục lại được.
+Mục~\ref{sec:phanchieu} là phần kiểm định thực nghiệm cho nhận định này --- và
+kết quả kiểm định không đơn giản như phát biểu.}
+
+\noindent Ánh xạ cụ thể của sáu tầng sang hai bài toán được trình bày ở
+Bảng~\ref{tab:sau-tang}.
+
+\begin{table}[H]
+\centering
+\caption{Ánh xạ sáu tầng kiến trúc sang hai bài toán cụ thể}
+\label{tab:sau-tang}
+\small
+\begin{tabularx}{\textwidth}{@{}L{2.5cm}XX@{}}
+\toprule
+\textbf{Tầng} & \textbf{Hệ thống 1 --- Tiểu đường} & \textbf{Hệ thống 2 --- Bất động sản} \\
+\midrule
+Môi trường     & Bệnh nhân đến khám sàng lọc & Thị trường nhà đất Việt Nam \\
+Dữ liệu vào    & 768 hồ sơ Pima Indians Diabetes & 30.229 tin đăng rao bán \\
+Biểu diễn      & $\mathbf{x}\in\mathbb{R}^{12}$ (8 gốc $+$ 4 thiết kế) & $\mathbf{x}\in\mathbb{R}^{84}$ sau mã hoá one-hot \\
+Mô hình học    & 5 bộ phân lớp $+$ 1 mô hình cơ sở & 5 bộ hồi quy $+$ 1 mô hình cơ sở \\
+Dự đoán        & Xác suất mắc bệnh $\hat p\in[0,1]$ & Giá dự báo $\hat y$ (tỷ VNĐ) \\
+Ứng dụng       & Phân tầng nguy cơ, gói chăm sóc có chi phí & Phân khúc, hạn mức vay và trả góp \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Biểu diễn dữ liệu --- bản chất và vai trò}
+\label{sec:bieudien}
+
+\subsection{Không gian véc-tơ đặc trưng}
+
+Mọi thuật toán học máy truyền thống đều làm việc trên một không gian số. Cho
+tập dữ liệu gồm $n$ quan sát, mỗi quan sát được viết thành một véc-tơ $d$ chiều
+
+\begin{equation}
+\mathbf{x}_i = \big[x_{i1},\, x_{i2},\, \dots,\, x_{id}\big]^{\!\top} \in \mathbb{R}^{d},
+\qquad i = 1,\dots,n,
+\label{eq:vector-dactrung}
+\end{equation}
+
+\noindent và toàn bộ tập dữ liệu thành ma trận đặc trưng
+$\mathbf{X}\in\mathbb{R}^{n\times d}$ đi kèm véc-tơ nhãn $\mathbf{y}$. Bài toán
+học có giám sát là bài toán tìm một hàm $f_{\bm\theta}:\mathbb{R}^{d}\to\mathcal{Y}$
+sao cho $f_{\bm\theta}(\mathbf{x})$ xấp xỉ tốt nhãn thật.
+
+Điểm mấu chốt: \emph{hình học của không gian $\mathbb{R}^{d}$ quyết định thuật
+toán nhìn thấy gì}. Với K-Nearest Neighbors, khái niệm ``gần nhau'' là khoảng
+cách Euclid
+
+\begin{equation}
+D(\mathbf{x}_a,\mathbf{x}_b)=\sqrt{\sum_{j=1}^{d}\big(x_{aj}-x_{bj}\big)^{2}}.
+\label{eq:euclid}
+\end{equation}
+
+\noindent Nếu một cột có thang đo hàng trăm (Insulin, đơn vị $\mu$U/mL) đứng
+cạnh một cột có thang đo phần mười (DiabetesPedigreeFunction), thì trong
+công thức~\eqref{eq:euclid} cột thứ nhất lấn át hoàn toàn cột thứ hai --- không
+phải vì nó quan trọng hơn về mặt y học, mà chỉ vì đơn vị đo của nó lớn hơn. Đây
+là lý do bước chuẩn hoá không phải là thủ tục hình thức.
+
+\subsection{Ba tầng chuyển hoá biểu diễn}
+\label{sec:ba-tang-bieudien}
+
+Báo cáo phân biệt rõ ba phép biến đổi thường bị gộp chung dưới tên ``tiền xử
+lý'', vì Thực nghiệm~3 ở cả hai chương sau đo tác động của chúng một cách
+riêng rẽ:
+
+\begin{enumerate}
+  \item \textbf{Làm sạch (cleaning).} Sửa lại những giá trị mã hoá sai --- ví
+        dụ giá trị $0$ ở cột Glucose không phải nồng độ đường huyết bằng không
+        mà là quy ước cho ``không đo được''. Phép này \emph{sửa lại thông tin
+        sai lệch}.
+  \item \textbf{Thiết kế đặc trưng (feature engineering).} Tạo cột mới từ các
+        cột đã có, ví dụ $\mathrm{Glucose}\times\mathrm{BMI}$. Phép này
+        \emph{đổi dạng thông tin đã có} --- nó không mang thêm dữ kiện mới nào
+        vào hệ thống.
+  \item \textbf{Chuẩn hoá (standardisation).} Đưa mọi cột về cùng thang đo:
+        \begin{equation}
+          z_{ij} = \frac{x_{ij}-\mu_j}{\sigma_j},
+          \label{eq:zscore}
+        \end{equation}
+        với $\mu_j,\sigma_j$ là trung bình và độ lệch chuẩn của cột $j$
+        \textbf{học trên riêng tập huấn luyện}. Phép này cũng chỉ
+        \emph{đổi dạng}.
+\end{enumerate}
+
+Sự phân biệt giữa ``đổi dạng thông tin'' và ``thêm hoặc bớt thông tin'' chính
+là chìa khoá giải thích vì sao cùng một thực nghiệm cho hai kết luận trái ngược
+trên hai bài toán --- xem Mục~\ref{sec:phanchieu}.
+
+\begin{phathien}{Rò rỉ dữ liệu qua bước tiền xử lý}
+Các tham số $\mu_j$, $\sigma_j$ ở công thức~\eqref{eq:zscore}, cũng như giá trị
+trung vị dùng để điền khuyết, \textbf{bắt buộc} phải được ước lượng chỉ từ tập
+huấn luyện rồi áp lại y nguyên cho tập kiểm tra. Tính trên toàn bộ dữ liệu là
+rò rỉ dữ liệu (data leakage)~\cite{kaufman2012}: tập kiểm tra đã gián tiếp góp phần định nghĩa
+phép biến đổi mà nó sắp được đánh giá. Trong dự án này, mọi bước tiền xử lý
+được gói bên trong đối tượng \texttt{Pipeline} của scikit-learn, nên
+\texttt{fit} về mặt cấu trúc không thể nhìn thấy tập kiểm tra.
+Mục~\ref{sec:roro} trình bày một trường hợp rò rỉ thật đã xảy ra trong dự án và
+hậu quả đo được của nó.
+\end{phathien}
+
+\section{Hai lớp bài toán học có giám sát}
+
+\subsection{Phân lớp nhị phân và hàm sigmoid}
+
+Bài toán phân lớp nhị phân có $\mathcal{Y}=\{0,1\}$. Hồi quy Logistic mô hình
+hoá \emph{xác suất} thuộc lớp dương bằng cách đưa một tổ hợp tuyến tính qua
+hàm sigmoid (còn gọi là hàm logistic)~\cite{bishop2006}:
+
+\begin{equation}
+\sigma(z) = \frac{1}{1+e^{-z}}, \qquad z \in \mathbb{R},
+\label{eq:sigmoid}
+\end{equation}
+
+\begin{equation}
+\hat p(\mathbf{x}) \;=\; P(y=1\mid \mathbf{x})
+\;=\; \sigma\!\big(\mathbf{w}^{\!\top}\mathbf{x}+b\big)
+\;=\; \frac{1}{1+\exp\!\big[-(\mathbf{w}^{\!\top}\mathbf{x}+b)\big]}.
+\label{eq:logistic}
+\end{equation}
+
+\noindent Hàm $\sigma$ ép mọi số thực về khoảng $(0,1)$, đơn điệu tăng, đối
+xứng qua điểm $(0,\,0{,}5)$, và có đạo hàm
+$\sigma'(z)=\sigma(z)\big[1-\sigma(z)\big]$ --- tính chất khiến việc tối ưu
+bằng gradient trở nên gọn gàng.
+
+Hàm mất mát tương ứng là entropy chéo nhị phân (binary cross-entropy, còn gọi
+là log-loss):
+
+\begin{equation}
+\mathcal{L}_{\mathrm{log}}(\bm\theta)
+= -\frac{1}{n}\sum_{i=1}^{n}
+\Big[\, y_i \log \hat p_i \;+\; (1-y_i)\log\big(1-\hat p_i\big) \Big].
+\label{eq:logloss}
+\end{equation}
+
+\subsection{Hồi quy và hàm mất mát bình phương sai số}
+
+Bài toán hồi quy có $\mathcal{Y}=\mathbb{R}$. Hàm mất mát chuẩn là sai số bình
+phương trung bình:
+
+\begin{equation}
+\mathcal{L}_{\mathrm{MSE}}(\bm\theta)
+= \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat y_i\big)^{2},
+\qquad \hat y_i = f_{\bm\theta}(\mathbf{x}_i).
+\label{eq:mse}
+\end{equation}
+
+\subsection{Hàm mất mát có điều chuẩn}
+
+Cực tiểu hoá trần các hàm~\eqref{eq:logloss} hoặc~\eqref{eq:mse} dễ dẫn tới học
+thuộc (overfitting): mô hình khớp cả nhiễu của tập huấn luyện. Điều chuẩn
+(regularisation) thêm một số hạng phạt vào độ lớn tham số~\cite{hastie2009}:
+
+\begin{equation}
+\mathcal{J}(\bm\theta)
+\;=\; \underbrace{\frac{1}{n}\sum_{i=1}^{n} \ell\big(y_i,\, f_{\bm\theta}(\mathbf{x}_i)\big)}_{\text{sai số trên dữ liệu}}
+\;+\; \underbrace{\lambda \,\lVert \bm\theta \rVert_{2}^{2}}_{\text{số hạng điều chuẩn } L_2},
+\qquad
+\lVert \bm\theta \rVert_{2}^{2}=\sum_{j=1}^{d}\theta_j^{2}.
+\label{eq:regularized}
+\end{equation}
+
+\noindent Tham số $\lambda>0$ điều tiết đánh đổi giữa khớp dữ liệu và giữ mô
+hình đơn giản. Trong scikit-learn~\cite{scikit2011}, \texttt{LogisticRegression} mặc định dùng
+phạt $L_2$ với $C=1/\lambda=1$ --- chi tiết này sẽ trực tiếp giải thích một kết
+quả phản trực giác ở Mục~\ref{sec:dactrung-tot}, nơi một đặc trưng thiết kế
+\emph{tốt} lại làm Hồi quy Logistic \emph{kém đi}.
+
+\section{Nguyên lý mô hình cơ sở}
+\label{sec:baseline}
+
+Một con số độ đo đứng một mình không mang thông tin. Accuracy $0{,}79$ là tốt
+hay tồi phụ thuộc hoàn toàn vào việc đoán mù đạt bao nhiêu. \textbf{Mô hình cơ
+sở} (baseline) là quy tắc đơn giản nhất có thể, không học gì từ đặc trưng, đóng
+vai trò mốc so sánh bắt buộc (yêu cầu R6 của đề bài):
+
+\begin{itemize}
+  \item \textbf{Phân lớp} --- luôn đoán lớp chiếm đa số
+        (\texttt{DummyClassifier(strategy="most\_frequent")}).
+  \item \textbf{Hồi quy} --- luôn đoán trung vị của tập huấn luyện
+        (\texttt{DummyRegressor(strategy="median")}).
+\end{itemize}
+
+Ở bài toán tiểu đường, mô hình cơ sở đạt Accuracy $0{,}6547$ --- một con số
+thoạt nhìn không tệ --- nhưng Recall bằng $0$, tức \emph{bỏ sót toàn bộ người
+bệnh}. Đây là minh hoạ trực tiếp cho nghịch lý Accuracy trên dữ liệu lệch lớp,
+và là lý do mọi kết luận trong Chương~\ref{ch:tieuduong} đều căn theo $F_1$ và
+Recall chứ không căn theo Accuracy.
+
+\section{Sáu họ thuật toán học máy sử dụng}
+
+Năm mô hình cho mỗi bài toán được chọn theo tiêu chí \emph{khác nhau về nguyên
+lý học}, để phép so sánh nói lên điều gì đó về bản chất dữ liệu chứ không chỉ
+so sánh các biến thể của cùng một ý tưởng.
+
+\begin{table}[H]
+\centering
+\caption{Nguyên lý học, giả định và siêu tham số của các thuật toán sử dụng}
+\label{tab:thuattoan}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}L{2.3cm}XL{2.95cm}@{}}
+\toprule
+\textbf{Thuật toán} & \textbf{Nguyên lý học và giả định} & \textbf{Siêu tham số dùng} \\
+\midrule
+Linear Regression &
+Khớp siêu phẳng cực tiểu hoá~\eqref{eq:mse}. Giả định quan hệ tuyến tính giữa đặc trưng và mục tiêu; trần hiệu năng bị chặn bởi độ mạnh tương quan tuyến tính. &
+Mặc định \\
+\addlinespace
+Logistic Regression &
+Ranh giới tuyến tính trong không gian log-odds qua~\eqref{eq:logistic}, phạt $L_2$ theo~\eqref{eq:regularized}. Nhạy với đa cộng tuyến. &
+\texttt{max\_iter=1000} \\
+\addlinespace
+K-Nearest Neighbors &
+Không học tham số~\cite{cover1967}; nhãn quyết định bởi $k$ láng giềng gần nhất theo~\eqref{eq:euclid}. \textbf{Bắt buộc} chuẩn hoá. &
+\texttt{n\_neighbors=11} \\
+\addlinespace
+Decision Tree &
+Chia đệ quy không gian đặc trưng bằng ngưỡng trên từng trục, cực tiểu hoá độ vẩn (Gini hoặc MSE). Bất biến với phép chuẩn hoá đơn điệu. &
+\texttt{max\_depth=6} (phân lớp), \texttt{12} (hồi quy) \\
+\addlinespace
+Random Forest &
+Tổng hợp nhiều cây trên mẫu bootstrap~\cite{breiman2001} cộng với chọn ngẫu nhiên tập con đặc trưng; giảm phương sai bằng trung bình hoá. &
+\texttt{n\_estimators=300/200}, \texttt{max\_depth=10/18}, \texttt{min\_samples\_leaf=5} \\
+\addlinespace
+Support Vector Regression &
+Tìm ống $\varepsilon$ mỏng nhất chứa phần lớn điểm~\cite{cortes1995}; độ phức tạp bậc hai theo số mẫu. &
+\texttt{C=10.0}, \texttt{epsilon=0.2} \\
+\addlinespace
+XGBoost &
+Cộng dồn tuần tự các cây yếu~\cite{chen2016}, mỗi cây sửa phần dư của tổ hợp trước đó; có điều chuẩn nội tại. &
+\texttt{n\_estimators=300/500}, \texttt{max\_depth=4/6}, \texttt{learning\_rate=0.05} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Hệ thống độ đo đánh giá}
+\label{sec:dodo}
+
+\subsection{Ma trận nhầm lẫn và bốn độ đo phân lớp}
+
+Với bài toán nhị phân, đối chiếu nhãn thật và nhãn dự đoán cho bốn ô của
+\textbf{ma trận nhầm lẫn} (Bảng~\ref{tab:confusion-schema}).
+
+\begin{table}[H]
+\centering
+\caption{Ma trận nhầm lẫn --- ý nghĩa lâm sàng của từng ô}
+\label{tab:confusion-schema}
+\small
+\begin{tabularx}{\textwidth}{@{}L{2.1cm}L{2.6cm}X@{}}
+\toprule
+\textbf{Ký hiệu} & \textbf{Tên} & \textbf{Ý nghĩa trong bài toán chẩn đoán} \\
+\midrule
+TP & Dương tính thật & Người bệnh, được phát hiện đúng \\
+TN & Âm tính thật    & Người khoẻ, được kết luận đúng \\
+FP & Dương tính giả  & Người khoẻ bị báo động nhầm --- tốn thêm một lần xét nghiệm \\
+FN & Âm tính giả     & \textbf{Người bệnh bị bỏ sót} --- sai lầm nghiêm trọng nhất \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Bốn độ đo chuẩn được định nghĩa từ bốn ô này:
+
+\begin{align}
+\text{Accuracy}  &= \frac{TP+TN}{TP+TN+FP+FN}, \label{eq:accuracy}\\[4pt]
+\text{Precision} &= \frac{TP}{TP+FP}, \label{eq:precision}\\[4pt]
+\text{Recall}    &= \frac{TP}{TP+FN}, \label{eq:recall}\\[4pt]
+F_1 &= 2\cdot\frac{\text{Precision}\cdot\text{Recall}}
+                  {\text{Precision}+\text{Recall}}. \label{eq:f1}
+\end{align}
+
+\noindent Cách đọc bốn công thức trên trong ngữ cảnh y tế:
+
+\begin{itemize}
+  \item \textbf{Accuracy}~\eqref{eq:accuracy} --- tỷ lệ đúng chung. Mất ý nghĩa
+        khi hai lớp lệch nhau: ở tập Pima, đoán ``tất cả đều khoẻ'' đã đạt
+        $65{,}5\%$.
+  \item \textbf{Precision}~\eqref{eq:precision} --- trong những ca bị báo động,
+        bao nhiêu phần trăm là báo động thật. Precision thấp nghĩa là hệ thống
+        gây phiền nhiễu.
+  \item \textbf{Recall}~\eqref{eq:recall} --- trong toàn bộ người bệnh, bao
+        nhiêu phần trăm được tìm ra. \textbf{Đây là độ đo quan trọng nhất của
+        bài toán sàng lọc}, vì FN là sai lầm đắt nhất.
+  \item $F_1$~\eqref{eq:f1} --- trung bình điều hoà của hai độ đo trên. Trung
+        bình điều hoà (chứ không phải trung bình cộng) phạt nặng trường hợp một
+        trong hai độ đo gần $0$: mô hình cơ sở có Precision $=$ Recall $=0$ nên
+        $F_1=0$, phản ánh đúng thực chất.
+\end{itemize}
+
+Ngoài bốn độ đo trên, báo cáo dùng \textbf{ROC-AUC} --- diện tích dưới đường
+cong biểu diễn Recall theo tỷ lệ Dương tính giả khi ngưỡng quyết định quét từ
+$1$ về $0$. ROC-AUC~\cite{fawcett2006} đo \emph{khả năng xếp hạng} của mô hình và độc lập
+với ngưỡng, nên nó là độ đo duy nhất trong nhóm không thay đổi khi ta chỉnh ngưỡng
+ở Thực nghiệm~1.
+
+\subsection{Ba độ đo hồi quy}
+
+\begin{align}
+\text{MAE}  &= \frac{1}{n}\sum_{i=1}^{n}\big| y_i - \hat y_i \big|, \label{eq:mae}\\[4pt]
+\text{RMSE} &= \sqrt{\frac{1}{n}\sum_{i=1}^{n}\big( y_i - \hat y_i \big)^{2}}, \label{eq:rmse}\\[4pt]
+R^{2} &= 1 - \frac{\sum_{i=1}^{n}\big( y_i - \hat y_i \big)^{2}}
+                  {\sum_{i=1}^{n}\big( y_i - \bar y \big)^{2}}. \label{eq:r2}
+\end{align}
+
+\noindent MAE~\eqref{eq:mae} giữ nguyên đơn vị của biến mục tiêu, nên
+``MAE $=1{,}05$'' đọc thẳng được là ``sai trung bình $1{,}05$ tỷ đồng mỗi căn''.
+RMSE~\eqref{eq:rmse} bình phương sai số trước khi lấy trung bình nên phạt nặng
+các ca sai lớn; khoảng cách giữa RMSE và MAE do đó là một chỉ báo về mức độ tồn
+tại của các ca sai cực đoan. $R^{2}$~\eqref{eq:r2} là tỷ lệ phương sai của biến
+mục tiêu được mô hình giải thích: $R^{2}=1$ là dự báo hoàn hảo, $R^{2}=0$ là
+ngang với việc luôn đoán giá trị trung bình, và $R^{2}<0$ nghĩa là mô hình còn
+tệ hơn cả đoán trung bình.
+
+\begin{phathien}{$R^2$ không so sánh được giữa hai tập dữ liệu khác nhau}
+Mẫu số của~\eqref{eq:r2} là phương sai của chính biến mục tiêu. Nếu một tập dữ
+liệu có mục tiêu bị thu hẹp dải giá trị --- đúng trường hợp của tập bất động
+sản, xem Mục~\ref{sec:price-cat-bien} --- thì mẫu số nhỏ đi và cùng một sai số
+tuyệt đối sẽ cho $R^{2}$ thấp hơn. Do đó $R^{2}=0{,}61$ ở đây khắt khe hơn con
+số $0{,}61$ trên một tập có dải giá trải rộng.
+\end{phathien}
+
+\section{Đồ thị Tri thức}
+\label{sec:kg-lythuyet}
+
+\subsection{Giới hạn cố hữu của mô hình hộp đen}
+
+Một mô hình học máy được huấn luyện tốt trả lời được câu hỏi ``bao nhiêu'' và
+``khả năng nào'', nhưng không trả lời được ``vì vậy thì phải làm gì''. Xác suất
+$0{,}545$ không tự nó nói cho bác sĩ biết cần chỉ định xét nghiệm nào, cũng
+không nói cho người bệnh biết phải mua máy đo nào và tốn bao nhiêu; con số
+$8{,}42$ tỷ không tự nó nói cho người mua biết ngân hàng cho vay tối đa bao
+nhiêu và mỗi tháng phải trả bao nhiêu. Khoảng trống giữa \emph{con số dự báo} và
+\emph{hành động cụ thể} là khoảng trống mà tri thức miền phải lấp, và Đồ thị Tri
+thức là cấu trúc dữ liệu để mã hoá tri thức ấy dưới dạng máy suy luận được.
+
+\subsection{Định nghĩa hình thức}
+
+Một \textbf{Đồ thị Tri thức}~\cite{hogan2021,ji2022} là bộ ba
+
+\begin{equation}
+\mathcal{KG} \;=\; \big(V,\; E,\; R\big),
+\label{eq:kg}
+\end{equation}
+
+\noindent trong đó $V$ là tập \emph{thực thể} (đỉnh), $R$ là tập \emph{loại
+quan hệ}, và $E\subseteq V\times R\times V$ là tập \emph{cạnh có nhãn}. Mỗi
+phần tử của $E$ là một \textbf{bộ ba tri thức} (knowledge triplet)
+
+\begin{equation}
+\big(h,\; r,\; t\big) \in E,
+\qquad h,t \in V,\; r \in R,
+\label{eq:triplet}
+\end{equation}
+
+\noindent đọc là ``chủ thể $h$ có quan hệ $r$ với đối tượng $t$''. Ví dụ thật
+lấy từ đồ thị của hệ thống thứ nhất:
+
+\begin{center}
+\small
+\begin{tabular}{@{}l@{}}
+\texttt{(Bệnh nhân \#192, HAS\_BIOMARKER, Glucose = 159 mg/dL)}\\
+\texttt{(Mô hình K-Nearest Neighbors, PRODUCES, Xác suất rủi ro 54.5\%)}\\
+\texttt{(Xác suất rủi ro 54.5\%, MAPS\_TO\_DISEASE, ICD-10 E11)}\\
+\texttt{(Nhóm Nguy cơ Cao, RECOMMENDS\_PACKAGE, Gói Theo dõi Chuyên sâu)}\\
+\texttt{(Gói Theo dõi Chuyên sâu, FULFILLED\_BY, Nhà thuốc FPT Long Châu)}\\
+\end{tabular}
+\end{center}
+
+Năm bộ ba trên nối liền một mạch từ số đo sinh học tới nơi mua được hàng ---
+năng lực mà mô hình đơn lẻ không có. Đồ thị của dự án này có $|V|=117$,
+$|E|=133$ và $|R|=28$ trên 6 ca mẫu, đã nạp thật lên máy chủ Neo4j Aura.
+
+\subsection{Kiến trúc năm tầng}
+\label{sec:kg-5-tang}
+
+Bộ ba $(V,E,R)$ ở~\eqref{eq:kg} mô tả \emph{cấu trúc}, nhưng không nói gì về
+\emph{tổ chức}. Đồ thị của dự án này được tổ chức thành năm tầng ở cả hai miền
+--- Hình~\ref{fig:kg-arch-medical} và Hình~\ref{fig:kg-arch-property}. Mỗi tầng
+là một nhóm loại thực thể, và thông tin chỉ chảy theo một chiều từ tầng trên
+xuống tầng dưới.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_kg_architecture_medical.png}
+\caption[Kiến trúc năm tầng của Đồ thị Tri thức Y sinh]%
+{Kiến trúc năm tầng của Đồ thị Tri thức Y sinh --- từ chỉ số sinh tồn tới gói
+chăm sóc mua được tại nhà thuốc}
+\label{fig:kg-arch-medical}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_kg_architecture_property.png}
+\caption[Kiến trúc năm tầng của Đồ thị Tri thức Đô thị -- Tài chính]%
+{Kiến trúc năm tầng của Đồ thị Tri thức Đô thị -- Tài chính --- từ thuộc tính
+căn nhà tới hạn mức vay và tiện ích hạ tầng quanh đó}
+\label{fig:kg-arch-property}
+\end{figure}
+
+\bieudo{Sơ đồ tầng (layered schema diagram). Khác với ảnh chụp đồ thị của một
+ca cụ thể ở Hình~\ref{fig:kg-medical} và Hình~\ref{fig:kg-property} --- vốn cho
+thấy \emph{dữ liệu} --- hai hình trên cho thấy \emph{lược đồ}: đồ thị có mấy
+tầng, mỗi tầng chứa loại thực thể nào, thông tin chảy theo hướng nào.}
+
+\nhanxet{Hai kiến trúc song song nhau đến từng tầng, và đó là thiết kế có chủ
+đích. Tầng 1--2 là \emph{quan sát}, tầng 3 là \emph{suy luận của mô hình}, tầng
+4 là \emph{gói giải pháp có chi phí}, tầng 5 là \emph{hạ tầng cung ứng}. Nhờ
+cùng khung, một câu hỏi đặt ra ở miền này luôn có câu hỏi đối ứng ở miền kia:
+``gói chăm sóc tốn bao nhiêu mỗi tháng'' đối ứng với ``khoản vay trả góp bao
+nhiêu mỗi tháng''.
+
+Hai hình trên được vẽ tự động từ chính khai báo \texttt{KG\_LAYERS} trong
+\texttt{src/kg/ontology.py}, nên chúng không thể mô tả một kiến trúc mà mã nguồn
+không còn dùng. Một bài kiểm thử canh đúng điều đó: mọi loại thực thể mà mã
+nguồn thật sự sinh ra đều phải thuộc đúng một tầng.}
+
+\subsection{Ba vai trò của đồ thị trong hệ thống}
+
+\begin{enumerate}
+  \item \textbf{Diễn giải (interpretability).} Đường đi từ đỉnh ``Bệnh nhân''
+        tới đỉnh ``Gói chăm sóc'' là một chuỗi bước đọc được bằng ngôn ngữ tự
+        nhiên, khác hẳn trọng số của một cây tăng cường.
+  \item \textbf{Nối tri thức miền.} Bảng phân loại ICD-10~\cite{icd10}, ngưỡng BMI của WHO~\cite{who2000},
+        danh mục hàng của nhà thuốc, tỷ lệ LTV và ngưỡng DTI của ngân hàng ---
+        những tri thức này không có trong dữ liệu huấn luyện và cũng không nên
+        học từ dữ liệu; chúng được khai báo tường minh thành đỉnh và cạnh.
+  \item \textbf{Sinh hành động có chi phí.} Truy vấn đồ thị theo tầng nguy cơ
+        hoặc phân khúc giá trả về ngay một gói kèm con số: chi phí ban đầu, chi
+        phí duy trì hằng tháng, hoặc khoản trả góp và mức thu nhập tối thiểu.
+        Đây chính là đầu ra của tầng \textsc{Application} ở
+        Hình~\ref{fig:sodo-hethong}.
+\end{enumerate}
+
+\subsection{Ranh giới trung thực về nguồn số liệu}
+\label{sec:ranh-gioi-so-lieu}
+
+Hai tầng cuối của mỗi đồ thị chứa số liệu \emph{không} đến từ tập dữ liệu huấn
+luyện, nên nguồn gốc của chúng phải được nói rõ chứ không được trình bày lẫn
+với kết quả đo được:
+
+\begin{itemize}
+  \item \textbf{Tên mặt hàng là tên thật} đang được bán tại hệ thống nhà thuốc.
+        \textbf{Giá là khoảng tham khảo có ghi ngày chốt} (26/08/2026), biên
+        soạn tay từ danh mục công khai --- không phải bản ghi giá trực tiếp. Mỗi
+        mặt hàng mang theo một đường dẫn tra cứu để người dùng đối chiếu giá
+        hiện hành.
+  \item \textbf{Cụm tiện ích đô thị được mô hình hoá theo phân khúc}, không
+        phải kết quả khảo sát thực địa từng quận: tập dữ liệu gốc chỉ có địa chỉ
+        hành chính, không có toạ độ.
+  \item \textbf{Điều kiện vay là minh hoạ} theo mặt bằng lãi suất công bố, không
+        phải chào giá của một ngân hàng cụ thể. Ngược lại, \emph{phép tính} trả
+        góp là toán học thuần tuý và kiểm chứng được --- xem
+        Mục~\ref{sec:cong-thuc-nien-kim}.
+\end{itemize}
+
+Phương án thu thập giá trực tiếp từ website bán lẻ đã được cân nhắc và bị loại,
+vì nó phá vỡ yêu cầu R14 về tính tái lập: giá đổi theo ngày nên hai lần chạy
+cách nhau một tuần sẽ cho hai bộ số khác nhau, trong khi cả báo cáo được xây
+trên cam kết ``chạy lại cho kết quả trùng khít''.
+
+\subsection{Phép tính tài chính}
+\label{sec:cong-thuc-nien-kim}
+
+Khoản trả góp cố định hằng tháng của một khoản vay niên kim là
+
+\begin{equation}
+M \;=\; P \cdot \frac{r}{1-(1+r)^{-n}},
+\qquad r=\frac{r_{\text{năm}}}{12},\quad n = 12\,T,
+\label{eq:nienkim}
+\end{equation}
+
+\noindent với $P$ là dư nợ gốc, $r_{\text{năm}}$ là lãi suất danh nghĩa theo
+năm và $T$ là kỳ hạn tính bằng năm. Tổng tiền lãi phải trả trong toàn bộ kỳ hạn
+là $Mn - P$. Mức thu nhập tối thiểu suy ra từ ngưỡng tỷ lệ nợ trên thu nhập
+(Debt-To-Income):
+
+\begin{equation}
+I_{\min} \;=\; \frac{M}{\text{DTI}_{\max}}.
+\label{eq:dti}
+\end{equation}
+
+Ba công thức này được kiểm thử tự động bằng một phép tính độc lập viết lại tay,
+chứ không đối chiếu với chính hàm cần kiểm.
+
+\section{Giao thức thực nghiệm chung}
+\label{sec:giaothuc}
+
+Hai chương sau dùng chung một giao thức, để mọi so sánh giữa hai bài toán là so
+sánh công bằng.
+
+\subsection{Chia dữ liệu ba phần}
+
+Dữ liệu được cắt làm ba, theo đúng thứ tự sau:
+
+\begin{enumerate}
+  \item \textbf{Tập ngoại kiểm (OOD), $10\%$} --- cắt ra \emph{trước tiên} và
+        không tham gia bất kỳ bước nào của quá trình phát triển, kể cả tinh
+        chỉnh siêu tham số.
+  \item \textbf{Tập kiểm tra, $20\%$ phần còn lại} --- dùng để so sánh mô hình.
+  \item \textbf{Tập huấn luyện, phần còn lại} --- dùng để học tham số.
+\end{enumerate}
+
+Lý do tách riêng tập ngoại kiểm: sau nhiều vòng thử nghiệm, tập kiểm tra thông
+thường đã \emph{gián tiếp} ảnh hưởng tới lựa chọn mô hình, nên nó không còn là
+ước lượng không chệch của hiệu năng thực tế. Tập ngoại kiểm đóng vai trò ``dữ
+liệu thế giới thực'' chưa từng bị nhìn thấy.
+
+\subsection{Bốn thực nghiệm có kiểm soát}
+
+Mỗi bài toán chạy bốn thực nghiệm cùng khuôn (đề bài yêu cầu tối thiểu ba ---
+R8), mỗi thực nghiệm chỉ đổi \emph{một} biến và giữ nguyên mọi thứ còn lại:
+
+\begin{table}[H]
+\centering
+\caption{Bốn thực nghiệm có kiểm soát, áp dụng song song cho hai bài toán}
+\label{tab:bon-thucnghiem}
+\small
+\begin{tabularx}{\textwidth}{@{}L{0.8cm}L{3.5cm}XL{2.3cm}@{}}
+\toprule
+\textbf{TN} & \textbf{Biến được thay đổi} & \textbf{Câu hỏi trả lời} & \textbf{Kết quả ở} \\
+\midrule
+1 & Đối đầu 5 thuật toán & Nguyên lý học nào hợp với dữ liệu này? & \ref{sec:tn1-dia}, \ref{sec:tn1-hou} \\
+2 & Siêu tham số cốt lõi & Cực trị nằm ở đâu, có chạm biên dải khảo sát không? & \ref{sec:tn2-dia}, \ref{sec:tn2-hou} \\
+3 & Cách biểu diễn dữ liệu & Biểu diễn hay thuật toán chi phối kết quả? & \ref{sec:tn3-dia}, \ref{sec:tn3-hou} \\
+4 & Tập đánh giá (kiểm tra $\to$ ngoại kiểm) & Mô hình tổng quát hoá được tới đâu? & \ref{sec:tn4-dia}, \ref{sec:tn4-hou} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Tính tái lập}
+\label{sec:tailap}
+
+Hạt giống ngẫu nhiên cố định tại \texttt{RANDOM\_STATE = 42} khai báo một lần
+duy nhất trong \texttt{src/config.py} và được mọi thành phần dùng lại. Một lệnh
+\texttt{python run\_pipeline.py} sinh lại toàn bộ mô hình, biểu đồ, bảng số và
+đồ thị tri thức trong khoảng 90 giây.
+
+Một lưu ý trung thực về mức độ tái lập: các tệp \texttt{models/*.joblib} chạy
+lại cho kết quả trùng khít, nhưng vài tệp CSV của bài toán bất động sản có thể
+lệch ở chữ số cuối của số thực (bậc $10^{-16}$) --- ví dụ MAE của Random Forest
+đổi từ $1{,}0818214861905244$ thành $1{,}0818214861905247$. Nguyên nhân là phép
+cộng dồn song song trong rừng ngẫu nhiên không có tính kết hợp. Ở độ chính xác
+báo cáo --- bốn chữ số thập phân --- mọi con số đều trùng khớp.

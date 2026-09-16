@@ -1,0 +1,247 @@
+{
+  "application": "customer_behavior",
+  "task": "binary_classification",
+  "random_seed": 42,
+  "numeric_features": [
+    "Age",
+    "Positive Feedback Count",
+    "word_count"
+  ],
+  "categorical_features": [
+    "Division Name",
+    "Department Name",
+    "Class Name"
+  ],
+  "text_column": "full_text",
+  "tabular_features": [
+    "Age",
+    "Positive Feedback Count",
+    "word_count",
+    "Division Name",
+    "Department Name",
+    "Class Name"
+  ],
+  "categorical_options": {
+    "Division Name": [
+      "General",
+      "General Petite",
+      "Initmates",
+      "Unknown"
+    ],
+    "Department Name": [
+      "Bottoms",
+      "Dresses",
+      "Intimate",
+      "Jackets",
+      "Tops",
+      "Trend",
+      "Unknown"
+    ],
+    "Class Name": [
+      "Blouses",
+      "Casual bottoms",
+      "Chemises",
+      "Dresses",
+      "Fine gauge",
+      "Intimates",
+      "Jackets",
+      "Jeans",
+      "Knits",
+      "Layering",
+      "Legwear",
+      "Lounge",
+      "Outerwear",
+      "Pants",
+      "Shorts",
+      "Skirts",
+      "Sleep",
+      "Sweaters",
+      "Swim",
+      "Trend",
+      "Unknown"
+    ]
+  },
+  "target": "Recommended IND",
+  "class_labels": {
+    "0": "Không khuyến nghị sản phẩm",
+    "1": "Khuyến nghị sản phẩm"
+  },
+  "excluded_features": {
+    "Rating": "rò rỉ nhãn — quy tắc 'Rating >= 4' đã đạt accuracy 0.9365 mà không học gì",
+    "Clothing ID": "định danh sản phẩm, không khái quát sang mã hàng mới"
+  },
+  "n_samples_raw": 23486,
+  "n_samples_clean": 22639,
+  "representation_shapes": {
+    "tabular": [
+      15846,
+      34
+    ],
+    "hybrid": [
+      15846,
+      20034
+    ],
+    "text_only": [
+      15846,
+      20000
+    ]
+  },
+  "tensor_demo": {
+    "B": 4,
+    "T": 24,
+    "d": 16,
+    "vocab_size": 8513,
+    "shape": [
+      4,
+      24,
+      16
+    ]
+  },
+  "split": {
+    "train": 15846,
+    "validation": 3397,
+    "test": 3396
+  },
+  "baseline_accuracy": 0.8189,
+  "best_model": "logistic_regression_hybrid",
+  "best_model_label": "Logistic Regression (bảng + văn bản)",
+  "best_model_repr": "hybrid",
+  "model_repr": {
+    "logistic_regression_tabular": "tabular",
+    "decision_tree_tabular": "tabular",
+    "random_forest_tabular": "tabular",
+    "logistic_regression_hybrid": "hybrid",
+    "linear_svm_hybrid": "hybrid",
+    "multinomial_nb_text": "text"
+  },
+  "model_labels": {
+    "logistic_regression_tabular": "Logistic Regression (chỉ bảng)",
+    "decision_tree_tabular": "Decision Tree (chỉ bảng)",
+    "random_forest_tabular": "Random Forest (chỉ bảng)",
+    "logistic_regression_hybrid": "Logistic Regression (bảng + văn bản)",
+    "linear_svm_hybrid": "Linear SVM (bảng + văn bản)",
+    "multinomial_nb_text": "Multinomial Naive Bayes (chỉ văn bản)"
+  },
+  "test_metrics": {
+    "logistic_regression_hybrid": {
+      "Accuracy": 0.8958,
+      "Precision": 0.953,
+      "Recall": 0.918,
+      "F1": 0.9352,
+      "F1 (lớp 0)": 0.7342,
+      "ROC-AUC": 0.9431
+    },
+    "linear_svm_hybrid": {
+      "Accuracy": 0.8955,
+      "Precision": 0.9509,
+      "Recall": 0.9198,
+      "F1": 0.9351,
+      "F1 (lớp 0)": 0.7313,
+      "ROC-AUC": 0.9414
+    },
+    "multinomial_nb_text": {
+      "Accuracy": 0.8772,
+      "Precision": 0.8855,
+      "Recall": 0.9763,
+      "F1": 0.9287,
+      "F1 (lớp 0)": 0.5587,
+      "ROC-AUC": 0.9346
+    },
+    "logistic_regression_tabular": {
+      "Accuracy": 0.5389,
+      "Precision": 0.8415,
+      "Recall": 0.5383,
+      "F1": 0.6566,
+      "F1 (lớp 0)": 0.2984,
+      "ROC-AUC": 0.5519
+    },
+    "decision_tree_tabular": {
+      "Accuracy": 0.5197,
+      "Precision": 0.832,
+      "Recall": 0.5182,
+      "F1": 0.6386,
+      "F1 (lớp 0)": 0.2843,
+      "ROC-AUC": 0.5389
+    },
+    "random_forest_tabular": {
+      "Accuracy": 0.6066,
+      "Precision": 0.8244,
+      "Recall": 0.6602,
+      "F1": 0.7332,
+      "F1 (lớp 0)": 0.2511,
+      "ROC-AUC": 0.5304
+    }
+  },
+  "text_vs_tabular": {
+    "Chỉ đặc trưng bảng (tốt nhất)": {
+      "ROC-AUC": 0.5519,
+      "F1 (lớp 1)": 0.7332,
+      "F1 (lớp 0)": 0.2984,
+      "Accuracy": 0.6066
+    },
+    "Có kèm văn bản (tốt nhất)": {
+      "ROC-AUC": 0.9431,
+      "F1 (lớp 1)": 0.9352,
+      "F1 (lớp 0)": 0.7342,
+      "Accuracy": 0.8958
+    },
+    "Cải thiện tuyệt đối": {
+      "ROC-AUC": 0.3912,
+      "F1 (lớp 1)": 0.202,
+      "F1 (lớp 0)": 0.4358,
+      "Accuracy": 0.2892
+    },
+    "Cải thiện tương đối %": {
+      "ROC-AUC": 70.88,
+      "F1 (lớp 1)": 27.55,
+      "F1 (lớp 0)": 146.05,
+      "Accuracy": 47.68
+    }
+  },
+  "top_positive_terms": {
+    "love": 10.447,
+    "perfect": 8.2313,
+    "great": 7.4732,
+    "unique": 6.7146,
+    "comfortable": 6.1834,
+    "little": 5.4073,
+    "fits": 5.1494,
+    "compliments": 5.0824,
+    "easy": 5.052,
+    "comfy": 4.9801,
+    "soft": 4.9535,
+    "amazing": 4.951,
+    "beautiful": 4.8155,
+    "happy": 4.8117,
+    "nice": 4.5489,
+    "gorgeous": 4.5076,
+    "lovely": 4.3065,
+    "dressed": 4.2798
+  },
+  "top_negative_terms": {
+    "disappointed": -10.0142,
+    "wanted love": -9.3385,
+    "unflattering": -6.7107,
+    "returning": -6.5842,
+    "huge": -6.3975,
+    "disappointing": -6.2615,
+    "meh": -6.0009,
+    "bad": -5.9371,
+    "poor": -5.9314,
+    "returned": -5.8259,
+    "cheap": -5.4138,
+    "return": -5.1596,
+    "awful": -5.0894,
+    "going": -4.7803,
+    "odd": -4.7724,
+    "fabric": -4.7581,
+    "shame": -4.6629,
+    "strange": -4.6527
+  },
+  "confusion_matrix_best": {
+    "tn": 489,
+    "fp": 126,
+    "fn": 228,
+    "tp": 2553
+  }
+}
