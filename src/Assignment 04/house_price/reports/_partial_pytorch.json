@@ -1,7 +1,7 @@
 {
   "framework": "PyTorch",
   "params": 1377,
-  "train_time_s": 114.74435019493103,
+  "train_time_s": 43.35730242729187,
   "epochs": 40,
   "best_epoch": 40,
   "rmse_usd": 555235.1155893365,
