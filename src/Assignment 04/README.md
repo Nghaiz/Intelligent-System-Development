@@ -101,6 +101,15 @@ miền. Hai tập ảnh tải về dưới dạng `.npz`:
 | MNIST | [Yann LeCun / Kaggle mirror](https://www.kaggle.com/datasets/hojjatk/mnist-dataset) |
 | CIFAR-10 | [University of Toronto](https://www.cs.toronto.edu/~kriz/cifar.html) |
 
+Bốn tập đầu nằm sẵn trong kho. Riêng **CIFAR-10** không được commit: tệp `.npz` sau khi
+nén vẫn khoảng 150 MB, vượt giới hạn 100 MB cho một tệp của GitHub. Dựng lại nó bằng:
+
+```bash
+python "src/Assignment 04/download_cifar10.py"
+```
+
+Script tải có hỗ trợ tiếp tục giữa chừng và tự chuyển sang `cifar10/data/cifar10.npz`.
+
 ---
 
 ## Ghi chú về môi trường chạy

@@ -58,3 +58,8 @@ desktop.ini
 tmp/
 temp/
 .claude/
+
+# ===== Du lieu anh qua lon cho GitHub (>100MB/file) =====
+# Dung lai bang: python "src/Assignment 04/download_cifar10.py"
+src/Assignment 04/cifar10/data/cifar10.npz
+src/Assignment 04/cifar10/data/cifar-10-python.tar.gz
