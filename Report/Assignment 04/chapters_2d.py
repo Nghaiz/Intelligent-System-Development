@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import report_lib as R
-from chapters_1d import dev, device_note, num, pct, thousands
+from chapters_1d import dev, num, pct, thousands
 
 M_LABEL = {
     "numpy_baseline": "NumPy cơ sở",
@@ -190,7 +190,6 @@ def _chapter6(r: R.Report, data: dict) -> None:
          "Thiết bị", "Thời gian (s)"],
         _rows(m),
         "Đối chuẩn bốn cách cài đặt 2D CNN trên MNIST, sắp theo Macro-F1."))
-    r.p(device_note(m))
     _threeway_commentary(r, m, "MNIST")
     r.p(R.figure("mn_fig_mnist_3way_benchmark.png",
                  "So sánh Accuracy, Macro-Precision, Macro-Recall và Macro-F1 giữa các cách "
@@ -316,7 +315,6 @@ def _chapter7(r: R.Report, data: dict) -> None:
          "Thiết bị", "Thời gian (s)"],
         _rows(m),
         "Đối chuẩn bốn cách cài đặt 2D CNN trên CIFAR-10, sắp theo Macro-F1."))
-    r.p(device_note(m))
     _threeway_commentary(r, m, "CIFAR-10")
     r.p(R.figure("cf_fig_cifar10_3way_benchmark.png",
                  "So sánh đa chỉ số giữa các cách cài đặt trên CIFAR-10."))

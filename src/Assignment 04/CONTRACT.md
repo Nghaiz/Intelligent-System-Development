@@ -32,27 +32,50 @@ trỏ sang một venv khác ở thư mục cha và đã gây ra một giờ ch�
 | **PyTorch** | **2.13.0+cu126** | **GPU: RTX 4060 Laptop, 8,6 GB, CUDA 12.6** |
 | TensorFlow / Keras | 2.21.0 / 3.15.1 | **CPU**, vì TF từ 2.11 bỏ hỗ trợ GPU native trên Windows |
 
-### Quy tắc thiết bị, bắt buộc tuân thủ
+### Quy tắc chọn thiết bị: theo đo đạc, không theo mặc định
+
+**GPU không phải lúc nào cũng nhanh hơn.** Đây là kết quả đo được trên chính máy này, không
+phải phỏng đoán: mô hình 1D CNN của bài định giá bất động sản chạy **423,1 giây trên GPU** so
+với **43,4 giây trên CPU**, tức GPU chậm hơn gần 10 lần, trong khi R² gần như không đổi
+(0,4043 so với 0,4039).
+
+Nguyên nhân là mô hình chỉ có 1.377 tham số. Với một mạng nhỏ như vậy, mỗi mini-batch tốn
+nhiều thời gian cho **chi phí khởi chạy kernel và truyền dữ liệu qua PCIe** hơn là cho phần
+tính toán thực sự. CPU giữ toàn bộ trong cache và không phải truyền gì cả.
+
+**Quy tắc:**
+
+| Loại mô hình | Thiết bị | Lý do |
+|---|---|---|
+| 2D CNN trên ảnh (MNIST, CIFAR-10) | **GPU** | Tich chập 2D trên tensor lớn, phần tính toán áp đảo chi phí truyền |
+| 1D CNN trên bảng và văn bản | **CPU** | Mô hình dưới ~10.000 tham số, chi phí khởi chạy kernel áp đảo |
+| Mọi mô hình NumPy thuần | CPU | Bản chất đề bài, không phải hạn chế phần cứng |
+| Mọi mô hình TensorFlow | CPU | TF từ 2.11 bỏ hỗ trợ GPU native trên Windows |
+
+Khi không chắc, **đo thử cả hai rồi chọn**, và ghi con số đo được vào `notes`. Tuyệt đối
+không mặc định GPU chỉ vì có GPU.
 
 ```python
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-assert torch.cuda.is_available(), "Phai chay tren GPU; kiem tra lai venv"
+DEVICE = torch.device(DEVICE_NAME)   # do Muc 1 quy dinh cho tung loai mo hinh
+print("Thiet bi:", DEVICE,
+      torch.cuda.get_device_name(0) if DEVICE.type == "cuda" else "")
 ```
 
-Mọi notebook PyTorch **phải** dùng GPU và **phải in ra tên thiết bị** trong output. Đo thời gian
-thì bọc `torch.cuda.synchronize()` trước và sau, nếu không sẽ đo nhầm thời gian xếp hàng lệnh
-chứ không phải thời gian tính toán.
+Mọi notebook **phải in ra thiết bị đã dùng** trong output, và ghi trường `"device"` (`"cuda"`
+hoặc `"cpu"`) vào từng khối model trong tep JSON. Đo thời gian trên GPU thì bọc
+`torch.cuda.synchronize()` cả hai đầu, không thì sẽ đo nhầm thời gian xếp hàng lệnh.
 
-**Ba mô hình chạy trên ba thiết bị khác nhau, và đây là điều phải nói thẳng trong báo cáo:**
-PyTorch trên GPU, TensorFlow trên CPU, NumPy trên CPU. Hệ quả là **cột thời gian không còn là
-phép so sánh khung thư viện mà là phép so sánh phần cứng**. Mọi bảng có cột thời gian phải ghi
-rõ thiết bị bên cạnh, và phần diễn giải không được kết luận khung nào nhanh hơn khung nào. Các
-chỉ số chất lượng (accuracy, F1, R²) vẫn so sánh được bình thường vì không phụ thuộc thiết bị.
+### Hệ quả cho báo cáo
 
-Ngân sách thời gian mỗi notebook: 20 phút. Với GPU, một epoch CNN trên 40.000 ảnh CIFAR-10 mất
-khoảng 2,3 giây, nên **không còn lý do gì để lấy mẫu con cho PyTorch**. Chỉ hai mô hình NumPy
-thuần vẫn phải dùng tập con, vì NumPy chạy CPU là bản chất của bài tập chứ không phải hạn chế
-phần cứng.
+Ba loại mô hình chạy trên thiết bị khác nhau, nên **cột thời gian không phải phép so sánh
+khung thư viện**. Mọi bảng có cột thời gian phải ghi kèm thiết bị, và phần diễn giải không
+được kết luận khung nào nhanh hơn khung nào. Các chỉ số chất lượng không phụ thuộc thiết bị
+nên vẫn so sánh được bình thường.
+
+Việc chọn thiết bị là quyết định **vận hành**, không phải nội dung nghiên cứu. Báo cáo không
+có chương nào về đo hiệu năng phần cứng, vì đó là đặc tính của một máy cụ thể chứ không phải
+phát hiện về mạng tích chập. Chỉ giữ đúng một ghi chú phương pháp ở Chương 2 để người đọc không
+hiểu nhầm cột thời gian.
 
 `RANDOM_SEED = 42` ở mọi nơi, trừ các thực nghiệm đa hạt giống ở Mục 8.
 

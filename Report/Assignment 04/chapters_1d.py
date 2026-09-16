@@ -19,24 +19,6 @@ def dev(m: dict) -> str:
     return DEVICE_LABEL.get(m.get("device"), "—")
 
 
-def device_note(models: dict) -> str:
-    """O canh bao khi cac mo hinh trong bang khong chay cung thiet bi."""
-    devs = {m.get("device") for m in models.values() if isinstance(m, dict)}
-    devs.discard(None)
-    if len(devs) < 2:
-        return ""
-    return R.note(
-        "Cột thời gian không so sánh được giữa các khung.",
-        "Các mô hình trong bảng chạy trên <strong>thiết bị khác nhau</strong>: PyTorch trên "
-        "GPU (RTX 4060), TensorFlow và NumPy trên CPU. TensorFlow từ bản 2.11 không còn hỗ trợ "
-        "GPU native trên Windows, còn NumPy chạy CPU là bản chất của bài tập chứ không phải hạn "
-        "chế phần cứng. Vì vậy cột thời gian ở đây là phép so sánh <em>phần cứng</em>, không "
-        "phải phép so sánh khung thư viện, và báo cáo không rút ra kết luận nào về tốc độ tương "
-        "đối giữa ba khung. Các chỉ số chất lượng không phụ thuộc thiết bị nên vẫn so sánh được "
-        "bình thường.", "warn")
-
-
-
 # ---------------------------------------------------------------------------
 # Tiện ích định dạng — mọi con số đều đi qua đây, không gõ tay vào văn bản
 # ---------------------------------------------------------------------------
@@ -216,6 +198,16 @@ def _chapter2(r: R.Report, data: dict) -> None:
 
 model.load_state_dict(best_state)                     # khôi phục trước khi chạm test''',
         "Khung vòng lặp huấn luyện dùng chung cho mọi hiện thực NumPy trong báo cáo."))
+    r.p(R.note(
+        "Một ghi chú về cột thời gian trong mọi bảng đối chuẩn.",
+        "Ba cách cài đặt không chạy trên cùng một thiết bị. Các mô hình tích chập hai chiều "
+        "trên ảnh dùng GPU, còn các mô hình một chiều trên bảng và văn bản dùng CPU, vì ở quy "
+        "mô dưới mười nghìn tham số thì chi phí khởi chạy kernel và truyền dữ liệu lớn hơn chính "
+        "phần tính toán. Ngoài ra TensorFlow từ bản 2.11 không còn hỗ trợ GPU native trên Windows, "
+        "và các mô hình NumPy thuần chạy CPU là bản chất của bài tập. Vì vậy <strong>cột thời gian "
+        "chỉ cho biết chi phí tuyệt đối của từng cấu hình, không dùng để so sánh khung thư viện "
+        "với nhau</strong>. Mỗi bảng đều ghi kèm thiết bị ở cột bên cạnh. Các chỉ số chất lượng "
+        "không phụ thuộc thiết bị nên vẫn so sánh được bình thường."))
     r.p(
         "Hai chi tiết đáng chú ý. Thứ nhất, optimizer chỉ nhìn thấy train loss; validation "
         "chỉ dùng để theo dõi và chọn checkpoint. Thứ hai, trạng thái tốt nhất được khôi "
@@ -351,7 +343,6 @@ def backward(self, dZ):
           pct(m[k]["recall"]), pct(m[k]["f1"]),
           f'{m[k]["params"]:,}', dev(m[k]), num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
         "Đối chuẩn 1D CNN trên tập đánh giá khách hàng, đo trên cùng một tập kiểm thử."))
-    r.p(device_note(m))
     _benchmark_commentary(r, m, "f1", "F1")
     r.p(R.figure("cm_fig_comments_benchmark.png",
                  "So sánh Accuracy, Precision, Recall và F1 giữa ba cách cài đặt trên tập "
@@ -428,7 +419,6 @@ def _chapter4(r: R.Report, data: dict) -> None:
           pct(m[k]["recall"]), pct(m[k]["f1"]), num(m[k].get("roc_auc", 0)),
           dev(m[k]), num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
         "Hiệu năng 1D CNN trên bài toán chẩn đoán tiểu đường, chỉ số tính trên lớp dương."))
-    r.p(device_note(m))
     _benchmark_commentary(r, m, "f1", "F1")
     r.p(R.figure("db_fig_diabetes_benchmark.png",
                  "So sánh bốn chỉ số phân loại giữa ba cách cài đặt trên bài toán tiểu đường."))
@@ -541,7 +531,6 @@ def _chapter5(r: R.Report, data: dict) -> None:
           dev(m[k]), num(m[k]["train_time_s"], 1)] for k in FW_ORDER],
         "Các chỉ số hồi quy của mô hình 1D CNN trên bài toán định giá bất động sản."))
 
-    r.p(device_note(m))
     best_k, best_m = best_of(m, "r2")
     worst_k, worst_m = worst_of(m, "r2")
     r.p(
