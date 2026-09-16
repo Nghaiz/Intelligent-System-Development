@@ -1,0 +1,60 @@
+{
+  "description": "Hằng số chuẩn hóa CIFAR-10 theo từng kênh màu, học từ 40000 ảnh nhánh train (train_test_split test_size=0.2, stratify=y, random_state=42).",
+  "mean": [
+    0.4910935163497925,
+    0.48214712738990784,
+    0.4465753734111786
+  ],
+  "std": [
+    0.24700766801834106,
+    0.24354353547096252,
+    0.26164260506629944
+  ],
+  "mean_per_channel": [
+    0.4910935163497925,
+    0.48214712738990784,
+    0.4465753734111786
+  ],
+  "std_per_channel": [
+    0.24700766801834106,
+    0.24354353547096252,
+    0.26164260506629944
+  ],
+  "channel_order": [
+    "R",
+    "G",
+    "B"
+  ],
+  "scale": 255.0,
+  "formula": "x_norm = (x_uint8 / 255.0 - mean_c) / std_c, áp dụng riêng cho từng kênh",
+  "input_layout": "NCHW (N, 3, 32, 32) cho PyTorch; dữ liệu gốc trong .npz là NHWC",
+  "n_train": 40000,
+  "n_val": 10000,
+  "n_test": 10000,
+  "n_classes": 10,
+  "class_names_en": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ],
+  "class_names_vi": [
+    "máy bay",
+    "ô tô",
+    "chim",
+    "mèo",
+    "hươu",
+    "chó",
+    "ếch",
+    "ngựa",
+    "tàu thủy",
+    "xe tải"
+  ],
+  "random_seed": 42
+}

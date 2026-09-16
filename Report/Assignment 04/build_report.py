@@ -133,8 +133,9 @@ def main() -> int:
     chapters_theory.write(rep, data)
     chapters_1d.write(rep, data)
     chapters_2d.write(rep, data)
-    chapters_analysis.write(rep, data)
-    chapters_final.write(rep, data)
+    chapters_final.write_ch8(rep, data)      # Chuong 8 truoc cac chuong bo sung
+    chapters_analysis.write(rep, data)       # Chuong 9, 10, 11
+    chapters_final.write_ch12(rep, data)     # Chuong 12 tong hop, cuoi cung
 
     html_path = REPORT / "Assignment_04.html"
     pdf_path = REPORT / "A04_CT_nghiand.600.pdf"

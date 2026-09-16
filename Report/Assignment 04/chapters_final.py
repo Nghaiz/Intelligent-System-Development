@@ -8,7 +8,18 @@ from chapters_2d import M_LABEL, _best
 
 
 def write(r: R.Report, data: dict) -> None:
+    """Giu lai cho tuong thich: viet ca hai chuong lien tiep."""
+    write_ch8(r, data)
+    write_ch12(r, data)
+
+
+def write_ch8(r: R.Report, data: dict) -> None:
+    """Chuong 8 phai nam truoc ba chuong bo sung 9, 10, 11."""
     _chapter8(r, data)
+
+
+def write_ch12(r: R.Report, data: dict) -> None:
+    """Chuong 12 tong hop, luon nam cuoi cung."""
     _chapter12(r, data)
 
 

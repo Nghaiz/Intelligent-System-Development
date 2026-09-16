@@ -426,13 +426,34 @@ def _improvement_commentary(r: R.Report, m: dict) -> None:
     if not base or not imp:
         return
     delta = imp["accuracy"] - base["accuracy"]
+    d_f1 = imp.get("macro_f1", 0) - base.get("macro_f1", 0)
     r.p(
         f"Mô hình cơ sở đạt độ chính xác {pct(base['accuracy'])} trên tập kiểm thử, mô hình "
-        f"cải tiến đạt {pct(imp['accuracy'])}. Mức tăng {pct(delta)} điểm phần trăm tuyệt "
-        f"đối đến hoàn toàn từ ba thay đổi kỹ thuật, không từ thêm dữ liệu hay thêm tham "
-        f"số đáng kể: đệm viền giữ lại thông tin biên qua các tầng, He Normal giữ phương "
-        f"sai tín hiệu không tắt dần, và lịch giảm tốc độ học cho phép mô hình tinh chỉnh ở "
-        f"giai đoạn cuối thay vì dao động quanh cực tiểu.")
+        f"cải tiến đạt {pct(imp['accuracy'])}.")
+
+    if delta > 0.005:
+        r.p(
+            f"Mức tăng {pct(delta)} điểm phần trăm tuyệt đối đến từ ba thay đổi kỹ thuật chứ "
+            f"không từ thêm dữ liệu hay thêm tham số đáng kể: đệm viền giữ lại thông tin biên "
+            f"qua các tầng, He Normal giữ phương sai tín hiệu không tắt dần, và lịch giảm tốc độ "
+            f"học cho phép tinh chỉnh ở giai đoạn cuối thay vì dao động quanh cực tiểu.")
+    else:
+        verb = "hầu như không đổi" if abs(delta) <= 0.005 else "giảm"
+        r.p(
+            f"Đây là một kết quả <strong>trái với kỳ vọng</strong> và báo cáo giữ nguyên nó thay "
+            f"vì diễn giải cho xuôi. Gói cải tiến làm độ chính xác {verb} "
+            f"({pct(delta)} điểm phần trăm), "
+            + (f"trong khi Macro-F1 nhích lên {pct(d_f1)} điểm. "
+               if d_f1 > 0.001 else
+               f"và Macro-F1 cũng chỉ đổi {pct(d_f1)} điểm. ")
+            + "Nói cách khác, ba thay đổi gộp lại không mang lại lợi ích rõ rệt nào.")
+        r.p(
+            "Ở mức quan sát này không thể biết nguyên nhân, vì cải tiến ở đây là một gói bật cùng "
+            "lúc ba thứ: đệm viền, khởi tạo He Normal và lịch giảm tốc độ học. Một gói hòa điểm "
+            "có thể là do cả ba đều vô dụng, cũng có thể là do một yếu tố tốt bị một yếu tố xấu triệt "
+            "tiêu. <strong>Chương 11 tách riêng ba yếu tố này bằng thiết kế giai thừa đầy đủ và trả lời "
+            "đúng câu hỏi đó</strong>, nên kết quả hòa ở đây không phải một ngõ cụt mà chính là lý do "
+            "chương đó tồn tại.")
     b_ep, i_ep = base.get("best_epoch"), imp.get("best_epoch")
     if b_ep and i_ep:
         r.p(

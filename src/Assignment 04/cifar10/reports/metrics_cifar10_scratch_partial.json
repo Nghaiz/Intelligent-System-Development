@@ -1,8 +1,9 @@
 {
   "numpy_baseline": {
     "framework": "NumPy From Scratch (Baseline)",
+    "device": "cpu",
     "params": 153962,
-    "train_time_s": 214.2554018497467,
+    "train_time_s": 865.2196264266968,
     "epochs": 12,
     "best_epoch": 12,
     "accuracy": 0.5694,
@@ -255,8 +256,9 @@
   },
   "numpy_improved": {
     "framework": "NumPy From Scratch (Improved)",
+    "device": "cpu",
     "params": 268650,
-    "train_time_s": 266.3549749851227,
+    "train_time_s": 271.55517196655273,
     "epochs": 12,
     "best_epoch": 12,
     "accuracy": 0.5691,
