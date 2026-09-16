@@ -1,0 +1,426 @@
+{
+  "factorial": {
+    "combinations": [
+      {
+        "padding": false,
+        "he_init": false,
+        "lr_decay": false,
+        "accuracy": 0.9746666666666667,
+        "accuracy_std": 0.0012918548250050695,
+        "accuracy_seeds": [
+          0.9764,
+          0.9733,
+          0.9743
+        ],
+        "val_accuracy": 0.9771111111111112,
+        "best_epoch_mean": 15.666666666666666,
+        "params": 27562,
+        "train_time_s": 64.30091834068298
+      },
+      {
+        "padding": false,
+        "he_init": false,
+        "lr_decay": true,
+        "accuracy": 0.9717000000000001,
+        "accuracy_std": 0.001979898987322324,
+        "accuracy_seeds": [
+          0.9745,
+          0.9703,
+          0.9703
+        ],
+        "val_accuracy": 0.9725555555555556,
+        "best_epoch_mean": 13.0,
+        "params": 27562,
+        "train_time_s": 70.75842595100403
+      },
+      {
+        "padding": false,
+        "he_init": true,
+        "lr_decay": false,
+        "accuracy": 0.9789,
+        "accuracy_std": 0.00021602468994690488,
+        "accuracy_seeds": [
+          0.9792,
+          0.9787,
+          0.9788
+        ],
+        "val_accuracy": 0.9779999999999999,
+        "best_epoch_mean": 13.0,
+        "params": 27562,
+        "train_time_s": 63.22889161109924
+      },
+      {
+        "padding": false,
+        "he_init": true,
+        "lr_decay": true,
+        "accuracy": 0.9771000000000001,
+        "accuracy_std": 0.0009416297927883556,
+        "accuracy_seeds": [
+          0.9772,
+          0.9759,
+          0.9782
+        ],
+        "val_accuracy": 0.9778888888888888,
+        "best_epoch_mean": 10.666666666666666,
+        "params": 27562,
+        "train_time_s": 68.92621541023254
+      },
+      {
+        "padding": true,
+        "he_init": false,
+        "lr_decay": false,
+        "accuracy": 0.9747,
+        "accuracy_std": 0.001651262143533451,
+        "accuracy_seeds": [
+          0.9732,
+          0.977,
+          0.9739
+        ],
+        "val_accuracy": 0.9762222222222222,
+        "best_epoch_mean": 14.333333333333334,
+        "params": 52138,
+        "train_time_s": 61.43771028518677
+      },
+      {
+        "padding": true,
+        "he_init": false,
+        "lr_decay": true,
+        "accuracy": 0.9720333333333334,
+        "accuracy_std": 0.004737322262863517,
+        "accuracy_seeds": [
+          0.9676,
+          0.9786,
+          0.9699
+        ],
+        "val_accuracy": 0.9718888888888889,
+        "best_epoch_mean": 14.333333333333334,
+        "params": 52138,
+        "train_time_s": 67.18505549430847
+      },
+      {
+        "padding": true,
+        "he_init": true,
+        "lr_decay": false,
+        "accuracy": 0.9786999999999999,
+        "accuracy_std": 0.0010801234497346273,
+        "accuracy_seeds": [
+          0.9777,
+          0.9802,
+          0.9782
+        ],
+        "val_accuracy": 0.9813333333333333,
+        "best_epoch_mean": 14.333333333333334,
+        "params": 52138,
+        "train_time_s": 73.22651648521423
+      },
+      {
+        "padding": true,
+        "he_init": true,
+        "lr_decay": true,
+        "accuracy": 0.9779666666666667,
+        "accuracy_std": 0.0011785113019776065,
+        "accuracy_seeds": [
+          0.9763,
+          0.9788,
+          0.9788
+        ],
+        "val_accuracy": 0.9803333333333333,
+        "best_epoch_mean": 13.0,
+        "params": 52138,
+        "train_time_s": 82.18121433258057
+      }
+    ],
+    "main_effects": {
+      "padding": 0.00025833333333324937,
+      "he_init": 0.0048916666666665165,
+      "lr_decay": -0.0020416666666664973
+    },
+    "interactions": {
+      "padding_he": 7.499999999999174e-05,
+      "padding_lr": 0.00034166666666668455,
+      "he_lr": 0.0007750000000000257
+    },
+    "n_train": 12000,
+    "epochs": 16,
+    "n_val": 3000,
+    "n_test": 10000,
+    "batch_size": 128,
+    "lr0": 0.002,
+    "lr_decay_gamma": 0.5,
+    "lr_decay_every": 4,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "seed_sigma_pooled": 0.0020690174801903777,
+    "effect_standard_error": 0.0008446728492275713,
+    "main_effects_pp": {
+      "padding": 0.025833333333324937,
+      "he_init": 0.48916666666665165,
+      "lr_decay": -0.20416666666664973
+    },
+    "interactions_pp": {
+      "padding_he": 0.007499999999999174,
+      "padding_lr": 0.034166666666668455,
+      "he_lr": 0.07750000000000257
+    },
+    "ranking": [
+      "he_init",
+      "padding",
+      "lr_decay"
+    ],
+    "robustness": {
+      "lr0": 0.001,
+      "combinations": [
+        {
+          "padding": false,
+          "he_init": false,
+          "lr_decay": false,
+          "accuracy": 0.9691666666666666,
+          "accuracy_std": 0.0009463379711052599,
+          "accuracy_seeds": [
+            0.9704,
+            0.969,
+            0.9681
+          ],
+          "val_accuracy": 0.9693333333333335,
+          "best_epoch_mean": 15.0,
+          "params": 27562,
+          "train_time_s": 105.9437837600708
+        },
+        {
+          "padding": false,
+          "he_init": false,
+          "lr_decay": true,
+          "accuracy": 0.9628,
+          "accuracy_std": 0.001525341491819685,
+          "accuracy_seeds": [
+            0.9645,
+            0.9608,
+            0.9631
+          ],
+          "val_accuracy": 0.9633333333333334,
+          "best_epoch_mean": 14.666666666666666,
+          "params": 27562,
+          "train_time_s": 91.88899445533752
+        },
+        {
+          "padding": false,
+          "he_init": true,
+          "lr_decay": false,
+          "accuracy": 0.9762,
+          "accuracy_std": 0.0004966554808583755,
+          "accuracy_seeds": [
+            0.9765,
+            0.9755,
+            0.9766
+          ],
+          "val_accuracy": 0.9771111111111113,
+          "best_epoch_mean": 14.0,
+          "params": 27562,
+          "train_time_s": 94.46100306510925
+        },
+        {
+          "padding": false,
+          "he_init": true,
+          "lr_decay": true,
+          "accuracy": 0.9741333333333334,
+          "accuracy_std": 0.00023570226039554222,
+          "accuracy_seeds": [
+            0.9738,
+            0.9743,
+            0.9743
+          ],
+          "val_accuracy": 0.9733333333333333,
+          "best_epoch_mean": 14.0,
+          "params": 27562,
+          "train_time_s": 85.0105447769165
+        },
+        {
+          "padding": true,
+          "he_init": false,
+          "lr_decay": false,
+          "accuracy": 0.9689,
+          "accuracy_std": 0.000927361849549552,
+          "accuracy_seeds": [
+            0.9681,
+            0.9684,
+            0.9702
+          ],
+          "val_accuracy": 0.9674444444444444,
+          "best_epoch_mean": 14.666666666666666,
+          "params": 52138,
+          "train_time_s": 77.64227294921875
+        },
+        {
+          "padding": true,
+          "he_init": false,
+          "lr_decay": true,
+          "accuracy": 0.9573666666666667,
+          "accuracy_std": 0.003996943276499641,
+          "accuracy_seeds": [
+            0.9566,
+            0.9529,
+            0.9626
+          ],
+          "val_accuracy": 0.9553333333333333,
+          "best_epoch_mean": 15.333333333333334,
+          "params": 52138,
+          "train_time_s": 110.30161237716675
+        },
+        {
+          "padding": true,
+          "he_init": true,
+          "lr_decay": false,
+          "accuracy": 0.9776000000000001,
+          "accuracy_std": 0.00032659863237109976,
+          "accuracy_seeds": [
+            0.9776,
+            0.9772,
+            0.978
+          ],
+          "val_accuracy": 0.9794444444444445,
+          "best_epoch_mean": 14.333333333333334,
+          "params": 52138,
+          "train_time_s": 106.61753726005554
+        },
+        {
+          "padding": true,
+          "he_init": true,
+          "lr_decay": true,
+          "accuracy": 0.9752000000000001,
+          "accuracy_std": 0.0012027745701778864,
+          "accuracy_seeds": [
+            0.9744,
+            0.9769,
+            0.9743
+          ],
+          "val_accuracy": 0.9771111111111112,
+          "best_epoch_mean": 14.333333333333334,
+          "params": 52138,
+          "train_time_s": 91.32946300506592
+        }
+      ],
+      "main_effects": {
+        "padding": -0.0008083333333331888,
+        "he_init": 0.011225000000000152,
+        "lr_decay": -0.0055916666666666615
+      },
+      "interactions": {
+        "padding_he": 0.002041666666666664,
+        "padding_lr": -0.001375000000000015,
+        "he_lr": 0.0033583333333332965
+      },
+      "effect_standard_error": 0.0006756683933541518
+    }
+  },
+  "learning_curve": {
+    "n_values": [
+      500,
+      1000,
+      2000,
+      5000,
+      10000,
+      12000,
+      20000,
+      40000
+    ],
+    "mean": [
+      0.9555666666666666,
+      0.9689333333333333,
+      0.9769666666666668,
+      0.9835333333333334,
+      0.9867666666666667,
+      0.9876999999999999,
+      0.9874,
+      0.9886333333333334
+    ],
+    "std": [
+      0.002397684067780597,
+      0.0007760297817881929,
+      0.0013523641850067083,
+      0.0015691469727919904,
+      0.0005312459150170062,
+      0.001151810169544696,
+      0.0014764823060233153,
+      0.0006018490028422446
+    ],
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "per_seed": {
+      "500": [
+        0.9582,
+        0.9524,
+        0.9561
+      ],
+      "1000": [
+        0.9689,
+        0.968,
+        0.9699
+      ],
+      "2000": [
+        0.9787,
+        0.9768,
+        0.9754
+      ],
+      "5000": [
+        0.9856,
+        0.9818,
+        0.9832
+      ],
+      "10000": [
+        0.9874,
+        0.9861,
+        0.9868
+      ],
+      "12000": [
+        0.9892,
+        0.9864,
+        0.9875
+      ],
+      "20000": [
+        0.9876,
+        0.9855,
+        0.9891
+      ],
+      "40000": [
+        0.9889,
+        0.9878,
+        0.9892
+      ]
+    },
+    "total_steps": 2000,
+    "batch_size": 128,
+    "lr": 0.001,
+    "eval_every": 100,
+    "architecture": "MnistCNN (mnist/models/mnist_cnn_def.py)",
+    "log_error_slope": -0.3196526597762212
+  },
+  "gap_decomposition": {
+    "a_numpy": 0.9823,
+    "a_small": 0.9876999999999999,
+    "a_full": 0.9886333333333334,
+    "n_small": 12000,
+    "n_full": 40000,
+    "data_component": 0.0009333333333334526,
+    "residual_component": 0.00539999999999996,
+    "total_gap": 0.006333333333333413,
+    "data_component_pp": 0.09333333333334526,
+    "residual_component_pp": 0.539999999999996,
+    "total_gap_pp": 0.6333333333333413,
+    "data_share": 0.14736842105264855,
+    "residual_share": 0.8526315789473514,
+    "a_small_std": 0.001151810169544696,
+    "a_full_std": 0.0006018490028422446,
+    "a_numpy_baseline_chapter6": 0.9703,
+    "a_pytorch_chapter7": 0.9906,
+    "a_tensorflow_chapter7": 0.9902,
+    "n_train_chapter7": 48000,
+    "source_metrics_mtime": "2026-09-16 14:43:55"
+  },
+  "notes": "Notebook 06 (mien analysis). Phan A: thiet ke giai thua day du 2^3 tren ban sao PyTorch cua CNN NumPy Chuong 6 (12000 anh, 16 epoch, batch 128, Adam lr0=0.002), moi to hop lap lai voi 3 hat giong; khoa accuracy la trung binh 3 hat giong, accuracy_seeds giu day du gia tri tung lan chay. So tham so cua ban sao trung khop tuyet doi voi numpy_baseline (27562) va numpy_improved (52138) cua Chuong 6. SAI LECH CO CHU DINH so voi Chuong 6: batch 128 thay vi 64 (o batch 64 mo hinh qua nho nen thoi gian bi chi phi goi nhan GPU chi phoi, do duoc 4,13 s/epoch so voi 1,13 s/epoch); batch duoc giu nguyen cho ca 8 to hop nen khong lam lech phep so sanh giua cac to hop, chi lam accuracy tuyet doi thap hon Chuong 6 mot chut. PHAT HIEN VE THIET KE: goi \"Improved\" cua Chuong 6 thuc ra doi BON thu chu khong phai ba, vi no con nang toc do hoc nen tu 1e-3 len 2e-3; notebook giu co dinh toc do hoc nen trong ca 8 to hop va chay lai toan bo thiet ke o ca hai muc (khoi robustness) de kiem tra tinh ben vung cua ket luan. Phan B: duong cong theo co du lieu dung DUNG kien truc MnistCNN cua Chuong 7, cap ngan sach 2000 buoc cap nhat cho MOI diem n thay vi co dinh so epoch, de do doc cua duong cong khong tron lan \"it du lieu\" voi \"it duoc huan luyen\"; checkpoint chon theo validation do moi 100 buoc. Co tap con NumPy (12000) duoc chen them vao day khao sat de A_nho duoc DO chu khong phai noi suy; o hat giong 42 tap con nay trung khop tung anh voi tap con Chuong 6. Moi hat giong rut lai tap con nen dai bong bao gom ca nhieu lay mau lan nhieu khoi tao. GIOI HAN CUA PHEP BOC TACH: thiet ke chi ho tro tach HAI phan chu khong phai ba; phan con lai (A_nho - A_numpy) van gop chung kien truc voi tang hien thuc nen no la CAN TREN cua anh huong kien truc, khong phai phep do rieng kien truc. A_day do tai n=40000 trong khi Chuong 7 huan luyen tren 48000 anh, nen phan do du lieu bi uoc luong THIEU mot chut chu khong bi thoi phong. Vi Chuong 6 va 7 dang duoc chay lai song song, metrics_mnist.json duoc doc lai ngay truoc cho dung (phien ban 2026-09-16 14:43:55, ghi o khoa source_metrics_mtime) chu khong dung ban doc tu dau notebook. Khoa mang hau to _pp la gia tri quy doi sang diem phan tram; moi khoa con lai o thang [0,1]. Toan bo chay tren GPU RTX 4060 Laptop, PyTorch 2.13.0+cu126."
+}

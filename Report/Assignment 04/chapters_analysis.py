@@ -12,9 +12,18 @@ from chapters_1d import num, pct
 
 
 def write(r: R.Report, data: dict) -> None:
-    _chapter9(r, data)
-    _chapter10(r, data)
-    _chapter11(r, data)
+    """Chi viet chuong nao da co du lieu that.
+
+    Ba chuong nay la phan bo sung. Neu notebook tuong ung chua chay xong thi bo qua han
+    chuong do, khong in o canh bao, vi mot ban nop khong nen chua cho trong co ghi chu.
+    """
+    for key, fn in (("statistical", _chapter9),
+                    ("anatomy", _chapter10),
+                    ("ablation", _chapter11)):
+        if data.get(key):
+            fn(r, data)
+        else:
+            print(f"  ! bo qua chuong {key}: chua co so lieu")
 
 
 def _missing(r: R.Report, nb: str, key: str) -> None:
@@ -462,10 +471,14 @@ def _occlusion_commentary(r: R.Report, d: dict) -> None:
 def _factorial_commentary(r: R.Report, me: dict, label: dict, order: list,
                           inter: dict) -> None:
     top = order[0]
+    biggest = abs(me[top]) or 1e-9
     r.p(
         f"Yếu tố có ảnh hưởng lớn nhất là <strong>{label.get(top, top)}</strong> với hiệu ứng "
-        f"chính {100 * me[top]:+.2f} điểm phần trăm.")
-    weak = [k for k in order if abs(me[k]) < 0.005]
+        f"chính {100 * me[top]:+.2f} điểm phần trăm. Các ngưỡng đánh giá dưới đây lấy theo tỉ lệ so "
+        f"với hiệu ứng lớn nhất này, chứ không theo một con số tuyệt đối định sẵn, vì độ lớn "
+        f"của cả ba hiệu ứng phụ thuộc vào điểm xuất phát của mô hình trong lần chạy này.")
+    # Yeu = duoi mot phan nam hieu ung lon nhat
+    weak = [k for k in order if k != top and abs(me[k]) < 0.2 * biggest]
     if weak:
         r.p(
             "Đáng chú ý hơn là " + ", ".join(label.get(k, k) for k in weak) +
@@ -473,7 +486,7 @@ def _factorial_commentary(r: R.Report, me: dict, label: dict, order: list,
             "gói cải tiến ở một số miền không thắng nổi mô hình cơ sở: gói đó gộp cả yếu tố có "
             "tác dụng lẫn yếu tố không có tác dụng, nên hiệu quả tổng bị pha loãng. Nếu chỉ "
             "quan sát ở mức gói, không cách nào thấy được điều này.")
-    neg = [k for k in order if me[k] < -0.005]
+    neg = [k for k in order if me[k] < -0.05 * biggest]
     if neg:
         r.p(
             "Có yếu tố cho hiệu ứng <strong>âm</strong>: " +
@@ -483,7 +496,7 @@ def _factorial_commentary(r: R.Report, me: dict, label: dict, order: list,
             "riêng thay vì bật cùng lúc.")
     if inter:
         big = max(inter, key=lambda k: abs(inter[k]))
-        if abs(inter[big]) > 0.005:
+        if abs(inter[big]) > 0.2 * biggest:
             r.p(
                 f"Tương tác đáng kể nhất là {big} với độ lớn {100 * inter[big]:+.2f} điểm phần "
                 f"trăm. Tương tác khác không có nghĩa là tác động của hai yếu tố này không cộng "
