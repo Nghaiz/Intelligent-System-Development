@@ -56,12 +56,12 @@ def _chapter9(r: R.Report, data: dict) -> None:
         'nhau, giữ nguyên tuyệt đối kiến trúc, cách chia dữ liệu và siêu tham số. Hạt giống là '
         'biến duy nhất thay đổi, nên mọi chênh lệch quan sát được đều quy về dao động khởi tạo '
         'và thứ tự mini-batch.</li>'
-        '<li><strong>Kiểm định McNemar.</strong> Hai mô hình được đánh giá trên <em>cùng</em> tập '
+        '<li><strong>Kiểm định McNemar</strong> (chỉ cho bài phân loại). Hai mô hình được đánh giá trên <em>cùng</em> tập '
         'kiểm thử nên hai dãy dự đoán tương quan rất mạnh. Dùng kiểm định t hai mẫu ở đây là sai '
         'phương pháp, vì nó giả định hai mẫu độc lập. McNemar điều kiện hoá trên đúng những mẫu '
         'mà hai mô hình <em>bất đồng</em>, bỏ qua phần chúng đồng ý, nên là phép kiểm đúng cho '
         'tình huống này.</li>'
-        '<li><strong>Khoảng tin cậy Wilson.</strong> Ưu thế so với khoảng Wald là không bao giờ '
+        '<li><strong>Khoảng tin cậy Wilson</strong> (chỉ cho bài phân loại). Ưu thế so với khoảng Wald là không bao giờ '
         'tràn ra ngoài đoạn [0, 1] và vẫn chuẩn khi tỉ lệ tiến sát 1, đúng vùng làm việc của một '
         'mô hình MNIST đạt trên 99%.</li>'
         '</ol>')
@@ -88,6 +88,25 @@ def _chapter9(r: R.Report, data: dict) -> None:
 
     # ---- 9.3
     r.h(2, "9.3. Kiểm định McNemar theo từng cặp khung")
+    r.p(
+        "Trước khi trình bày kết quả, cần nói rõ một giới hạn về phạm vi áp dụng. "
+        "Kiểm định McNemar và khoảng tin cậy Wilson ở mục sau <strong>chỉ áp dụng cho bài toán "
+        "phân loại</strong>, nên bài định giá bất động sản ở Chương 5 không xuất hiện trong hai bảng "
+        "dưới đây.")
+    r.p(
+        "Lý do nằm ở định nghĩa của hai phép kiểm chứ không phải ở việc thiếu dữ liệu. McNemar "
+        "được xây trên bảng 2×2 đếm số mẫu mà <em>đúng một</em> trong hai mô hình dự đoán sai, "
+        "tức nó đòi hỏi một nhãn đúng hoặc sai cho từng mẫu. Khoảng tin cậy Wilson là khoảng cho "
+        "một <em>tỉ lệ nhị thức</em>, cũng giả định mỗi phép thử chỉ có hai kết cục. Với bài hồi quy, "
+        "một dự đoán lệch 5.000 đô-la không phải đúng cũng không phải sai, nên không tồn tại cái "
+        "bảng 2×2 đó để mà đếm. Muốn áp dụng thì phải tự đặt ra một ngưỡng sai số để chia "
+        "đúng/sai, mà ngưỡng ấy là do người phân tích tự chọn chứ không đến từ bài toán, nên "
+        "kết luận thu được sẽ phụ thuộc vào lựa chọn đó nhiều hơn là vào dữ liệu.")
+    r.p(
+        "Vì vậy bài hồi quy chỉ được báo cáo qua trung bình và độ lệch chuẩn của R² qua năm hạt "
+        "giống ở mục 9.2. Đó vẫn là một thước đo bất định hợp lệ, chỉ là nó không đi kèm một phép "
+        "kiểm giả thuyết. Báo cáo nêu rõ điều này thay vì lặng lẽ bỏ bài hồi quy ra khỏi bảng, vì "
+        "một ô trống không giải thích dễ bị đọc thành sơ suất hơn là thành một quyết định có căn cứ.")
     mc = d.get("mcnemar") or {}
     if mc:
         rows, n_sig, n_tot = [], 0, 0
