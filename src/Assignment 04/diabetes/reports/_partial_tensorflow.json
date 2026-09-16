@@ -1,7 +1,7 @@
 {
   "framework": "TensorFlow/Keras",
   "params": 1377,
-  "train_time_s": 29.512425661087036,
+  "train_time_s": 79.24796509742737,
   "epochs": 20,
   "best_epoch": 20,
   "accuracy": 0.9676144244105409,
@@ -111,5 +111,6 @@
     ]
   ],
   "tf_version": "2.21.0",
-  "keras_version": "3.15.1"
+  "keras_version": "3.15.1",
+  "device": "cpu"
 }

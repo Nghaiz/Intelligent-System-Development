@@ -122,86 +122,87 @@
           416,
           857
         ]
-      ]
+      ],
+      "device": "cpu"
     },
     "pytorch": {
       "framework": "PyTorch",
       "params": 1377,
-      "train_time_s": 292.17309308052063,
+      "train_time_s": 112.9327118396759,
       "epochs": 20,
       "best_epoch": 20,
-      "accuracy": 0.970249653259362,
-      "precision": 0.982837528604119,
-      "recall": 0.6747839748625295,
-      "f1": 0.80018630647415,
-      "roc_auc": 0.9746989014366582,
-      "loss": 0.08786936104297638,
+      "accuracy": 0.9701803051317615,
+      "precision": 0.9828178694158075,
+      "recall": 0.6739984289080911,
+      "f1": 0.7996272134203168,
+      "roc_auc": 0.9746711172373113,
+      "loss": 0.08786474913358688,
       "history": {
         "train_loss": [
-          0.11457924544811249,
-          0.10527194291353226,
+          0.11457925289869308,
+          0.10527192801237106,
           0.09997440129518509,
           0.09651606529951096,
           0.09362688660621643,
-          0.09080581367015839,
+          0.09080580621957779,
           0.08908625692129135,
-          0.0879378691315651,
-          0.08778484165668488,
-          0.08605006337165833,
-          0.08592863380908966,
-          0.08521484583616257,
-          0.08477820456027985,
-          0.08532663434743881,
-          0.08415520191192627,
-          0.08439186960458755,
-          0.08431851863861084,
-          0.08410888910293579,
-          0.08509904146194458,
-          0.08318326622247696
+          0.08793528378009796,
+          0.08780309557914734,
+          0.08605654537677765,
+          0.08593030273914337,
+          0.08519153296947479,
+          0.08476623147726059,
+          0.0853426456451416,
+          0.0841161385178566,
+          0.08433552831411362,
+          0.08431347459554672,
+          0.08412108570337296,
+          0.0853692963719368,
+          0.08318199962377548
         ],
         "val_loss": [
           0.11892946064472198,
-          0.1089923307299614,
+          0.1089923232793808,
           0.10389139503240585,
           0.10060246288776398,
-          0.09722673147916794,
-          0.09488756209611893,
-          0.09352879971265793,
-          0.09253668785095215,
-          0.09225427359342575,
-          0.0904809981584549,
-          0.09058579802513123,
-          0.08991731703281403,
-          0.08934163302183151,
-          0.0901263952255249,
-          0.08806471526622772,
-          0.08912578225135803,
-          0.08886412531137466,
-          0.08823440968990326,
-          0.08920129388570786,
-          0.08735046535730362
+          0.09722672402858734,
+          0.09488755464553833,
+          0.09352879226207733,
+          0.09252791851758957,
+          0.09228736162185669,
+          0.09049270302057266,
+          0.09056388586759567,
+          0.08996976166963577,
+          0.08932127058506012,
+          0.09012123942375183,
+          0.08804649859666824,
+          0.08907037228345871,
+          0.08886221051216125,
+          0.08829712122678757,
+          0.08939480781555176,
+          0.08740328997373581
         ],
         "train_acc": [
           0.9609445929527283,
-          0.9637236595153809,
-          0.9658339619636536,
+          0.9637235999107361,
+          0.9658339023590088,
           0.9658190608024597,
           0.9676470160484314,
           0.9682711958885193,
           0.9687913060188293,
-          0.9693560600280762,
-          0.9698464870452881,
-          0.9699504971504211,
-          0.970054566860199,
-          0.970515251159668,
-          0.9703666567802429,
-          0.9697573184967041,
-          0.9705895185470581,
-          0.970574676990509,
-          0.970663845539093,
-          0.970797598361969,
+          0.9693411588668823,
+          0.9699059128761292,
+          0.9699802398681641,
+          0.970024824142456,
           0.970530092716217,
-          0.970886766910553
+          0.9704409241676331,
+          0.9696681499481201,
+          0.970604419708252,
+          0.9706786870956421,
+          0.9707381725311279,
+          0.9708273410797119,
+          0.970515251159668,
+          0.970842182636261
         ],
         "val_acc": [
           0.9603994488716125,
@@ -213,16 +214,16 @@
           0.9689298868179321,
           0.9696233868598938,
           0.9701088666915894,
-          0.9701088666915894,
-          0.9696927666664124,
           0.9702475666999817,
+          0.9698314666748047,
           0.9703169465065002,
-          0.969137966632843,
-          0.9709411263465881,
-          0.9702475666999817,
-          0.9705250263214111,
+          0.970386266708374,
+          0.9692072868347168,
           0.9707330465316772,
-          0.9709411263465881,
+          0.9702475666999817,
+          0.9705249667167664,
+          0.9707330465316772,
+          0.9708024263381958,
           0.9707330465316772
         ]
       },
@@ -232,15 +233,16 @@
           15
         ],
         [
-          414,
-          859
+          415,
+          858
         ]
-      ]
+      ],
+      "device": "cuda"
     },
     "tensorflow": {
       "framework": "TensorFlow/Keras",
       "params": 1377,
-      "train_time_s": 29.512425661087036,
+      "train_time_s": 79.24796509742737,
       "epochs": 20,
       "best_epoch": 20,
       "accuracy": 0.9676144244105409,
@@ -348,7 +350,8 @@
           415,
           858
         ]
-      ]
+      ],
+      "device": "cpu"
     }
   },
   "permutation_experiment": {
@@ -357,5 +360,5 @@
     "permuted_accuracy": 0.9685852981969487,
     "permuted_f1": 0.7919154800183739
   },
-  "notes": "Kiến trúc theo CONTRACT.md Muc 4: 8 -> Conv1D(16,K=3,same) -> ReLU -> Conv1D(16,K=3,same) -> ReLU -> MaxPool1D(2) -> Flatten -> Dense(8) -> ReLU -> Dense(1) -> Sigmoid + BCE. Ca ba framework deu co dung 1377 tham so, dung chung mot phep chia 70/15/15 phan tang (random_state=42), 20 epoch, batch 256, Adam lr=1e-3, chon epoch theo val_loss nho nhat. n_clean = 96128 (CONTRACT.md neu 96146 la so sau khi chi khu trung lap; sau khi loai them 18 ban ghi gender=='Other' theo dung yeu cau tien xu ly thi con 96128). Du lieu mat can bang 8.82% lop duong: accuracy nen cua bo phan loai tam thuong la 0.9117, nen phai doc kem precision/recall/F1 tren lop duong. Recall chi khoang 0.67 den 0.69, tuc bo sot khoang mot phan ba benh nhan mac benh; nguyen nhan la BCE khong trong so tren du lieu lech 10.33:1. Khong ap dung trong so lop hay doi nguong de giu tinh so sanh giua cac mien. Notebook 01 kiem dinh cai dat bang hai cach doc lap: vi du tich chap tinh tay khop tuyet doi, va kiem tra gradient sai phan huu han cho sai so tuong doi lon nhat 6.644e-09 tren 76 toa do tron (1 toa do bi loai vi nam tai diem gay ReLU). Notebook 02 doi chung truc tiep Conv1D thuan NumPy voi nn.Conv1d cua PyTorch, sai lech tuyet doi lon nhat 3.366e-07. THI NGHIEM HOAN VI COT (Notebook 01, Muc 10): du lieu bang khong co to-po khong gian, nen ap dung tich chap 1D o day la mot nghien cuu so sanh co kiem soat chu khong phai khang dinh toi uu. Hoan vi ngau nhien thu tu 8 cot (pi = [3, 4, 2, 7, 6, 1, 5, 0]) roi huan luyen lai tu dau chi lam accuracy doi 0.001456 va ROC-AUC doi 0.000442, tuc trong bien do nhieu ngau nhien. Dieu nay chung minh tang tich chap khong khai thac duoc quan he lan can giua cac cot, trai nguoc voi du lieu van ban noi xao tron thu tu token se pha huy hieu nang."
+  "notes": "Kiến trúc theo CONTRACT.md Muc 4: 8 -> Conv1D(16,K=3,same) -> ReLU -> Conv1D(16,K=3,same) -> ReLU -> MaxPool1D(2) -> Flatten -> Dense(8) -> ReLU -> Dense(1) -> Sigmoid + BCE. Ca ba framework deu co dung 1377 tham so, dung chung mot phep chia 70/15/15 phan tang (random_state=42), 20 epoch, batch 256, Adam lr=1e-3, chon epoch theo val_loss nho nhat. n_clean = 96128 (CONTRACT.md neu 96146 la so sau khi chi khu trung lap; sau khi loai them 18 ban ghi gender=='Other' theo dung yeu cau tien xu ly thi con 96128). Du lieu mat can bang 8.82% lop duong: accuracy nen cua bo phan loai tam thuong la 0.9117, nen phai doc kem precision/recall/F1 tren lop duong. Recall chi khoang 0.67 den 0.69, tuc bo sot khoang mot phan ba benh nhan mac benh; nguyen nhan la BCE khong trong so tren du lieu lech 10.33:1. Khong ap dung trong so lop hay doi nguong de giu tinh so sanh giua cac mien. Notebook 01 kiem dinh cai dat bang hai cach doc lap: vi du tich chap tinh tay khop tuyet doi, va kiem tra gradient sai phan huu han cho sai so tuong doi lon nhat 6.644e-09 tren 76 toa do tron (1 toa do bi loai vi nam tai diem gay ReLU). THIET BI: pytorch chay tren GPU (RTX 4060 Laptop, CUDA 12.6), con numpy va tensorflow chay tren CPU vi TensorFlow tu 2.11 bo ho tro GPU native tren Windows va NumPy thuan von la cai dat CPU. Khoa device cua tung khoi mo hinh ghi ro thiet bi tuong ung. He qua: cot train_time_s la phep so sanh PHAN CUNG chu khong phai phep so sanh khung thu vien, va bao cao khong rut ra bat ky ket luan nao ve toc do tuong doi giua ba khung. Cac chi so chat luong khong phu thuoc thiet bi nen van so sanh duoc. Notebook 02 doi chung truc tiep Conv1D thuan NumPy voi nn.Conv1d cua PyTorch, sai lech tuyet doi lon nhat 3.366e-07. THI NGHIEM HOAN VI COT (Notebook 01, Muc 10): du lieu bang khong co to-po khong gian, nen ap dung tich chap 1D o day la mot nghien cuu so sanh co kiem soat chu khong phai khang dinh toi uu. Hoan vi ngau nhien thu tu 8 cot (pi = [3, 4, 2, 7, 6, 1, 5, 0]) roi huan luyen lai tu dau chi lam accuracy doi 0.001456 va ROC-AUC doi 0.000442, tuc trong bien do nhieu ngau nhien. Dieu nay chung minh tang tich chap khong khai thac duoc quan he lan can giua cac cot, trai nguoc voi du lieu van ban noi xao tron thu tu token se pha huy hieu nang."
 }
