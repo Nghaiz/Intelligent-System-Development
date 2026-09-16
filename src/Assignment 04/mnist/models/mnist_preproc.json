@@ -1,0 +1,12 @@
+{
+  "description": "Hằng số chuẩn hóa MNIST, học từ 48000 ảnh nhánh train (train_test_split test_size=0.2, stratify=y, random_state=42).",
+  "mean": 0.1307886838912964,
+  "std": 0.3082403540611267,
+  "scale": 255.0,
+  "formula": "x_norm = (x_uint8 / 255.0 - mean) / std",
+  "input_layout": "NCHW (N, 1, 28, 28) cho PyTorch",
+  "n_train": 48000,
+  "n_val": 12000,
+  "n_test": 10000,
+  "random_seed": 42
+}

@@ -346,7 +346,8 @@ def _chapter7(r: R.Report, data: dict) -> None:
 # Các đoạn bình luận sinh tự động từ số liệu
 # ===========================================================================
 def _subset_note(r: R.Report, d: dict, name: str) -> None:
-    sub = d.get("numpy_subset")
+    # Notebook co the ghi khoa nay o cap cao nhat hoac long trong "dataset"
+    sub = d.get("numpy_subset") or (d.get("dataset") or {}).get("numpy_subset")
     if not sub:
         return
     r.p(R.note(
@@ -384,13 +385,26 @@ def _gradcheck_commentary(r: R.Report, d: dict) -> None:
         "hạn: nhiễu từng tham số một lượng ε rất nhỏ, đo thay đổi tương ứng của hàm mất "
         "mát, rồi so với gradient giải tích mà mã nguồn tính ra.")
     r.p('<div class="formula">∂L/∂θ ≈ (L(θ + ε) − L(θ − ε)) / 2ε</div>')
-    rows = [[layer, f"{v['analytic']:.6e}", f"{v['numeric']:.6e}", f"{v['rel_error']:.2e}"]
-            for layer, v in gc.items()]
+    if isinstance(gc.get("rows"), list):          # dang co cau truc day du
+        src = gc["rows"]
+        rows = [[f'{it.get("layer", "?")}.{it.get("param", "?")}',
+                 f'{it["analytic"]:.6e}', f'{it["numeric"]:.6e}', f'{it["rel_error"]:.2e}']
+                for it in src[:12]]
+        worst = gc.get("max_rel_error") or max(it["rel_error"] for it in src)
+        n_checks = gc.get("n_checks", len(src))
+        eps, dtype = gc.get("eps"), gc.get("dtype")
+    else:                                          # dang phang {ten_tang: {...}}
+        rows = [[layer, f"{v['analytic']:.6e}", f"{v['numeric']:.6e}", f"{v['rel_error']:.2e}"]
+                for layer, v in gc.items()]
+        worst = max(v["rel_error"] for v in gc.values())
+        n_checks, eps, dtype = len(gc), None, None
+
+    cap = "Kiểm chứng lan truyền ngược bằng sai phân hữu hạn trên các tham số học được"
+    if eps and dtype:
+        cap += f" (ε = {eps}, số thực {dtype}, {n_checks} toạ độ được kiểm)"
     r.p(R.table(
         ["Tham số được kiểm", "Gradient giải tích", "Gradient sai phân", "Sai số tương đối"],
-        rows,
-        "Kiểm chứng lan truyền ngược bằng sai phân hữu hạn trên từng tầng có tham số học được."))
-    worst = max(v["rel_error"] for v in gc.values())
+        rows, cap + "."))
     r.p(
         f"Sai số tương đối lớn nhất trên toàn bộ các tầng là {worst:.2e}. Ngưỡng thường "
         f"được chấp nhận cho kiểm chứng kiểu này là 10⁻⁵ với số thực 32 bit và 10⁻⁷ với số "
