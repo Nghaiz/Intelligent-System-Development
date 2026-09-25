@@ -1,0 +1,15 @@
+% Ba hàm kích hoạt và đạo hàm, dữ liệu figdata/act.dat do notebook 00 xuất.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=3 by 1, horizontal sep=12mm},
+  a05, width=5.3cm, height=4.4cm, xmin=-4, xmax=4, xlabel={$z$}]
+  \nextgroupplot[title={ReLU}, ymin=-0.3, ymax=4.2, legend pos=north west]
+    \addplot[m1] table[x=z, y=relu]{figdata/act.dat}; \addlegendentry{$f(z)$}
+    \addplot[m2, dashed] table[x=z, y=drelu]{figdata/act.dat}; \addlegendentry{$f'(z)$}
+  \nextgroupplot[title={Sigmoid}, ymin=-0.05, ymax=1.05]
+    \addplot[m1] table[x=z, y=sigmoid]{figdata/act.dat};
+    \addplot[m2, dashed] table[x=z, y=dsigmoid]{figdata/act.dat};
+  \nextgroupplot[title={Tanh}, ymin=-1.1, ymax=1.1]
+    \addplot[m1] table[x=z, y=tanh]{figdata/act.dat};
+    \addplot[m2, dashed] table[x=z, y=dtanh]{figdata/act.dat};
+\end{groupplot}
+\end{tikzpicture}

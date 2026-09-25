@@ -1,0 +1,78 @@
+% Sáu cơ chế kiến trúc, mỗi ô là sơ đồ khối của một hàm trong a05/blocks.py.
+\begin{tikzpicture}[node distance=4mm, every node/.append style={font=\scriptsize},
+    k/.style={khoi, minimum width=17mm, minimum height=5mm, font=\scriptsize},
+    kc/.style={khoiC, minimum width=17mm, minimum height=5mm, font=\scriptsize},
+    kg/.style={khoiG, minimum width=17mm, minimum height=5mm, font=\scriptsize},
+    tron/.style={draw=ptitblue, circle, inner sep=1pt, font=\scriptsize, fill=white},
+    tieude/.style={font=\small\bfseries\sffamily, text=ptitblue},
+    m/.style={-{Stealth[length=1.6mm]}, thick, ptitblue}]
+
+  % (a) VGG
+  \begin{scope}[shift={(0,0)}]
+    \node[tieude] at (0, 0.6) {(a) VGG};
+    \node[k] (a1) at (0,0) {Conv $3{\times}3$ + ReLU};
+    \node[k, below=of a1] (a2) {Conv $3{\times}3$ + ReLU};
+    \node[kc, below=of a2] (a3) {MaxPool $2{\times}2$};
+    \draw[m] (0, 0.3) -- (a1); \draw[m] (a1) -- (a2); \draw[m] (a2) -- (a3); \draw[m] (a3) -- ++(0, -0.7);
+    \node[nhan, align=center] at (0, -3.0) {vùng nhìn $5{\times}5$ với $18C^2$\\thay vì $25C^2$ trọng số};
+  \end{scope}
+
+  % (b) Inception
+  \begin{scope}[shift={(5.4,0)}]
+    \node[tieude] at (0, 0.6) {(b) Inception};
+    \node[khoiX, minimum width=12mm] (bx) at (0, 0) {$x$};
+    \foreach \i/\t in {0/{$1{\times}1$}, 1/{$1{\times}1\to3{\times}3$}, 2/{$1{\times}1\to5{\times}5$}, 3/{pool$\to1{\times}1$}} {
+      \node[k, minimum width=11mm, align=center, text width=10mm] (b\i) at (-1.95+1.3*\i, -1.2) {\t};
+      \draw[m] (bx) -- (b\i);}
+    \node[kg, minimum width=26mm] (bc) at (0, -2.4) {nối theo kênh (concat)};
+    \foreach \i in {0,...,3} \draw[m] (b\i) -- (bc);
+    \node[nhan] at (0, -3.0) {nhiều cỡ vùng nhìn trong cùng một tầng};
+  \end{scope}
+
+  % (c) Residual
+  \begin{scope}[shift={(10.5,0)}]
+    \node[tieude] at (0, 0.6) {(c) Residual};
+    \node[khoiX, minimum width=12mm] (cx) at (0, 0) {$x$};
+    \node[k, below=of cx] (c1) {Conv-BN-ReLU};
+    \node[k, below=of c1] (c2) {Conv-BN};
+    \node[tron, below=4mm of c2] (cp) {$+$};
+    \draw[m] (cx) -- (c1); \draw[m] (c1) -- (c2); \draw[m] (c2) -- (cp);
+    \draw[m, mTwo] (cx.east) -- ++(0.9, 0) |- node[pos=0.25, right, text=mTwo] {$x$} (cp.east);
+    \draw[m] (cp) -- ++(0, -0.5) node[below] {$\mathrm{ReLU}(F(x) + x)$};
+  \end{scope}
+
+  % (d) Dense
+  \begin{scope}[shift={(0,-4.6)}]
+    \node[tieude] at (0, 0.6) {(d) Dense};
+    \foreach \i in {0,...,3} \node[khoiX, minimum width=9mm] (d\i) at (-2.1+1.4*\i, 0) {$x_{\i}$};
+    \foreach \i in {1,...,3} \node[k, minimum width=9mm] (h\i) at (-2.1+1.4*\i, -1.3) {$H_{\i}$};
+    \foreach \i in {1,...,3} \draw[m] (h\i) -- (d\i);
+    \foreach \j/\i in {0/1, 0/2, 1/2, 0/3, 1/3, 2/3} \draw[-{Stealth[length=1.3mm]}, mThree!80!black] (d\j.south) to[bend right=12] (h\i.north west);
+    \node[nhan] at (0, -2.2) {$x_l = H_l([x_0,\dots,x_{l-1}])$: tái dùng mọi đặc trưng trước};
+  \end{scope}
+
+  % (e) Depthwise separable
+  \begin{scope}[shift={(5.4,-4.6)}]
+    \node[tieude] at (0, 0.6) {(e) Depthwise separable};
+    \foreach \c in {0,1,2} {
+      \node[khoiX, minimum width=6mm, minimum height=5mm] (e\c) at (-1.2+1.2*\c, 0) {$x^{(\c)}$};
+      \node[k, minimum width=6mm, align=center] (k\c) at (-1.2+1.2*\c, -1.0) {$3{\times}3$};
+      \draw[m] (e\c) -- (k\c);}
+    \node[kc, minimum width=30mm] (pw) at (0, -2.0) {pointwise $1{\times}1$: $C_{\mathrm{in}}\to C_{\mathrm{out}}$};
+    \foreach \c in {0,1,2} \draw[m] (k\c) -- (pw);
+    \node[nhan] at (0, -2.7) {$9C_{\mathrm{in}} + C_{\mathrm{in}}C_{\mathrm{out}}$ thay vì $9C_{\mathrm{in}}C_{\mathrm{out}}$};
+  \end{scope}
+
+  % (f) Squeeze-and-Excitation
+  \begin{scope}[shift={(10.5,-4.6)}]
+    \node[tieude] at (0, 0.6) {(f) Squeeze-and-Excitation};
+    \node[khoiX, minimum width=12mm] (fx) at (-0.7, 0) {$x$};
+    \node[k, minimum width=11mm] (g1) at (-0.7, -0.8) {GAP};
+    \node[k, minimum width=11mm] (g2) at (-0.7, -1.5) {FC-ReLU};
+    \node[k, minimum width=11mm] (g3) at (-0.7, -2.2) {FC-$\sigma$};
+    \node[tron] (fm) at (1.2, -2.2) {$\odot$};
+    \draw[m] (fx) -- (g1); \draw[m] (g1) -- (g2); \draw[m] (g2) -- (g3); \draw[m] (g3) -- node[above] {$w$} (fm);
+    \draw[m, mThree] (fx.east) -| (fm.north);
+    \draw[m] (fm) -- ++(0, -0.6) node[below] {$x \odot w$, $w\in(0,1)^C$};
+  \end{scope}
+\end{tikzpicture}

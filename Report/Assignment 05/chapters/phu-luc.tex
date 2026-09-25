@@ -1,0 +1,63 @@
+% =====================================================================
+%  Phụ lục — tái lập
+% =====================================================================
+\chapter{Tái lập kết quả}
+\label{ch:phuluc}
+
+\section{Môi trường}
+
+\begin{table}[H]
+  \centering
+  \caption{Môi trường chạy thực nghiệm (ghi tự động bởi notebook 06)}
+  \label{tab:moitruong}
+  \begin{tabular}{ll}
+    \toprule
+    Hệ điều hành & \SL{compare/env/os} \\
+    Python & \SL{compare/env/python} \\
+    PyTorch & \SL{compare/env/torch} (CUDA \SL{compare/env/cuda}, cuDNN \SL{compare/env/cudnnRaw}) \\
+    NumPy, pandas, scikit-learn & \SL{compare/env/numpy}, \SL{compare/env/pandas}, \SL{compare/env/sklearn} \\
+    GPU & \SL{compare/env/gpu} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Các bước}
+
+Toàn bộ mã nguồn nằm trong \texttt{src/Assignment 05/}. Chạy lại từ đầu gồm bốn bước:
+
+\begin{minted}[linenos=false]{bash}
+cd "src/Assignment 05"
+pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu126
+pip install -r requirements.txt
+python -m ipykernel install --user --name a05
+
+# 1. Dữ liệu ảnh (CSV Diabetes đã có sẵn trong data/diabetes/)
+curl -L -o data/cifar10/cifar-10-python.tar.gz   https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
+curl -L -o data/cifar100/cifar-100-python.tar.gz https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz
+
+# 2. Bảy notebook theo thứ tự (06 đọc kết quả của 03, 04, 05)
+cd notebooks
+for nb in 00 01 02 03 04 05 06; do
+  python -m jupyter nbconvert --to notebook --execute --inplace \
+      --ExecutePreprocessor.kernel_name=a05 --ExecutePreprocessor.timeout=-1 ${nb}_*.ipynb
+done
+
+# 3. Báo cáo: chép dữ liệu hình, trích mã, sinh macro số liệu, gọi latexmk -lualatex
+python "../../../Report/Assignment 05/build.py"
+\end{minted}
+
+\section{Từ mã nguồn đến báo cáo}
+
+Báo cáo này không chứa con số, đoạn mã hay hình vẽ nào được chép tay:
+
+\begin{itemize}
+  \item \textbf{Số liệu.} Mỗi notebook ghi kết quả vào \texttt{outputs/metrics/*.json}. \texttt{build.py} biến mỗi khoá
+        JSON thành một macro, ví dụ khoá \texttt{cifar10 → models → resnet → acc} thành \verb|\SL{cifar10/models/resnet/acc}|,
+        in theo định dạng số tiếng Việt. Bảng kết quả cũng được sinh từ các tệp JSON này.
+  \item \textbf{Mã nguồn.} Mỗi lệnh \verb|\maNguon{<module>__<ten>}{...}| trong chương khiến \texttt{build.py} dùng
+        \texttt{ast} cắt đúng thân hàm hoặc lớp \texttt{<ten>} trong \texttt{a05/<module>.py}. Sửa mã nguồn thì báo cáo
+        đổi theo ở lần dựng sau.
+  \item \textbf{Hình vẽ.} Mọi hình là TikZ/pgfplots, đọc từ \texttt{outputs/figdata/*.dat}. Ảnh mẫu, bộ lọc và
+        feature map được ghi thành bảng giá trị điểm ảnh rồi vẽ bằng \texttt{matrix plot*}. Mỗi hình được biên dịch
+        riêng một lần (TikZ externalize); \texttt{build.py} băm mã hình cùng dữ liệu nó đọc để biết hình nào cần vẽ lại.
+\end{itemize}

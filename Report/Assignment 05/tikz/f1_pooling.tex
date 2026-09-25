@@ -1,0 +1,12 @@
+% Max pooling 2x2, bước 2, số đọc từ concepts.json.
+\begin{tikzpicture}[x=7mm, y=7mm]
+  \foreach \i in {0,...,3} \foreach \j in {0,...,3} {
+    \pgfmathtruncatemacro{\q}{2*floor(\i/2) + floor(\j/2)}
+    \ifcase\q \def\c{lightBlue}\or \def\c{lightOrange}\or \def\c{lightGreen}\or \def\c{lightGray}\fi
+    \node[o, minimum size=7mm, fill=\c] at (\j, -\i) {\SL{concepts/pool_example/X/\i/\j}};}
+  \node[above] at (1.5, 0.6) {$X$ (4×4)};
+  \draw[-{Stealth}, thick, gray] (4, -1.5) -- node[above, font=\footnotesize] {max 2×2} (6.2, -1.5);
+  \foreach \i/\c in {0/lightBlue,1/lightOrange} \node[o, minimum size=7mm, fill=\c] at (7+\i, -1) {\SL{concepts/pool_example/Y/0/\i}};
+  \foreach \i/\c in {0/lightGreen,1/lightGray} \node[o, minimum size=7mm, fill=\c] at (7+\i, -2) {\SL{concepts/pool_example/Y/1/\i}};
+  \node[above] at (7.5, -0.4) {$Y$ (2×2)};
+\end{tikzpicture}

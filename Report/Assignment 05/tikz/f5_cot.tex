@@ -1,0 +1,26 @@
+% Chất lượng (hàng trên) và chi phí huấn luyện (hàng dưới) của 4 mô hình trên 3 tập, từ summary_<tập>.dat.
+% Chú thích đặt dưới mỗi ô của hàng trên để không che cột.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=3 by 2, horizontal sep=13mm, vertical sep=24mm},
+  a05, width=5.5cm, height=4.6cm, ybar, /pgf/bar width=4.5pt, xtick={0,1,2,3},
+  xticklabels={M0, M1, M2, M3}, enlarge x limits=0.18, grid=major, ymajorgrids, xmajorgrids=false,
+  legend style={font=\scriptsize, at={(0.5,-0.2)}, anchor=north, legend columns=-1, draw=none,
+                /tikz/every even column/.append style={column sep=2mm}}]
+  \nextgroupplot[title={CIFAR-10}, ylabel={\%}, ymin=80, ymax=100]
+    \addplot[fill=mOne!60, draw=mOne] table[x=idx, y=acc]{figdata/summary_cifar10.dat}; \addlegendentry{acc}
+    \addplot[fill=mTwo!60, draw=mTwo] table[x=idx, y=f1]{figdata/summary_cifar10.dat}; \addlegendentry{macro-F1}
+  \nextgroupplot[title={CIFAR-100}, ymin=40, ymax=100]
+    \addplot[fill=mOne!60, draw=mOne] table[x=idx, y=acc]{figdata/summary_cifar100.dat}; \addlegendentry{top-1}
+    \addplot[fill=mThree!60, draw=mThree] table[x=idx, y=top5]{figdata/summary_cifar100.dat}; \addlegendentry{top-5}
+  \nextgroupplot[title={Diabetes}, ymin=60, ymax=100]
+    \addplot[fill=mOne!60, draw=mOne] table[x=idx, y=f1]{figdata/summary_diabetes.dat}; \addlegendentry{F1}
+    \addplot[fill=mTwo!60, draw=mTwo] table[x=idx, y=recall]{figdata/summary_diabetes.dat}; \addlegendentry{recall}
+    \addplot[fill=mThree!60, draw=mThree] table[x=idx, y=precision]{figdata/summary_diabetes.dat}; \addlegendentry{precision}
+  \nextgroupplot[ylabel={giây / epoch}, ymin=0]
+    \addplot[fill=mZero!50, draw=mZero] table[x=idx, y=epoch_s]{figdata/summary_cifar10.dat};
+  \nextgroupplot[ymin=0]
+    \addplot[fill=mZero!50, draw=mZero] table[x=idx, y=epoch_s]{figdata/summary_cifar100.dat};
+  \nextgroupplot[ymin=0]
+    \addplot[fill=mZero!50, draw=mZero] table[x=idx, y=epoch_s]{figdata/summary_diabetes.dat};
+\end{groupplot}
+\end{tikzpicture}

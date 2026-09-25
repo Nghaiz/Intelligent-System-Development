@@ -1,0 +1,57 @@
+% =====================================================================
+%  Style dùng chung cho mọi hình TikZ/pgfplots của báo cáo.
+%  Mỗi hình nằm ở tikz/<tên>.tex và đọc dữ liệu từ figdata/*.dat.
+% =====================================================================
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{external,positioning,arrows.meta,matrix,fit,calc,shapes.geometric,
+                backgrounds,decorations.pathreplacing}
+\usepgfplotslibrary{groupplots,colormaps}
+
+% Externalize: mỗi hình biên dịch một lần thành tikzcache/<tên>.pdf.
+\tikzexternalize[prefix=tikzcache/]
+% Khi chạy bằng LuaLaTeX, external tự gọi lualatex cho từng hình, không cần khai system call.
+% \hinh{tên}: nạp tikz/<tên>.tex, đặt tên tệp cache theo chính tên hình.
+\newcommand{\hinh}[1]{\tikzsetnextfilename{#1}\input{tikz/#1}}
+
+% Một màu cho mỗi mô hình, dùng thống nhất ở mọi hình (bảng màu an toàn cho người mù màu).
+\definecolor{mZero}{HTML}{7F7F7F}   % M0 BasicCNN
+\definecolor{mOne}{HTML}{0072B2}    % M1 VGGNet
+\definecolor{mTwo}{HTML}{E69F00}    % M2 ResNet
+\definecolor{mThree}{HTML}{009E73}  % M3 SE-ResNet
+\definecolor{accentRed}{HTML}{C0392B}
+\definecolor{lightBlue}{HTML}{DCE8F5}
+\definecolor{lightOrange}{HTML}{FCE9CF}
+\definecolor{lightGreen}{HTML}{D5F0E6}
+\definecolor{lightGray}{HTML}{EDEDED}
+
+\pgfplotsset{
+  a05/.style={
+    width=7.2cm, height=5.2cm, grid=major, grid style={gray!25},
+    tick label style={font=\footnotesize}, label style={font=\small},
+    legend style={font=\footnotesize, draw=gray!50, fill=white, fill opacity=0.9, text opacity=1},
+    title style={font=\small\bfseries},
+    /pgf/number format/use comma, /pgf/number format/1000 sep={.}},
+  m0/.style={mZero, thick, mark=none},
+  m1/.style={mOne, thick, mark=none},
+  m2/.style={mTwo, thick, mark=none},
+  m3/.style={mThree, thick, mark=none},
+  % Ảnh RGB từng điểm ảnh: tệp .dat có cột x y c, c dạng rgb255=r,g,b.
+  anhRGB/.style={matrix plot*, mesh/cols=#1, mesh/color input=explicit,
+                 point meta=explicit symbolic},
+  anhRGB/.default=32,
+  truc anh/.style={axis equal image, hide axis, enlargelimits=false, scale only axis},
+}
+
+\tikzset{
+  khoi/.style={draw=ptitblue, fill=lightBlue, rounded corners=2pt, minimum height=7mm,
+               align=center, font=\footnotesize, inner sep=3pt},
+  khoiC/.style={khoi, fill=lightOrange, draw=mTwo!80!black},
+  khoiG/.style={khoi, fill=lightGreen, draw=mThree!80!black},
+  khoiX/.style={khoi, fill=lightGray, draw=gray},
+  mui/.style={-{Stealth[length=2mm]}, thick, ptitblue},
+  nhan/.style={font=\scriptsize, text=black!70},
+  o/.style={draw=gray!70, minimum size=6mm, inner sep=0pt, font=\footnotesize},
+}

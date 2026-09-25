@@ -1,0 +1,20 @@
+% Accuracy theo số tham số và theo MACs cho hai tập ảnh (summary_<tập>.dat). Nhãn ngắn M0-M3;
+% M1, M2, M3 gần như trùng chi phí nên nhãn của chúng xếp chồng, xem Bảng tổng hợp.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=16mm}, a05, width=7.2cm, height=5.4cm,
+  ylabel={test accuracy (\%)}, legend pos=south east, nodes near coords, point meta=explicit symbolic,
+  every node near coord/.append style={font=\tiny, inner sep=1pt}]
+  \nextgroupplot[xlabel={số tham số (triệu)}, xmin=0, xmax=3.2]
+    \addplot[only marks, mark=*, mOne, every node near coord/.append style={anchor=south east}]
+      table[x=params, y=acc, meta=short]{figdata/summary_cifar10.dat};
+    \addlegendentry{CIFAR-10}
+    \addplot[only marks, mark=square*, accentRed, every node near coord/.append style={anchor=north west}]
+      table[x=params, y=acc, meta=short]{figdata/summary_cifar100.dat};
+    \addlegendentry{CIFAR-100}
+  \nextgroupplot[xlabel={MACs mỗi ảnh (triệu)}, xmode=log]
+    \addplot[only marks, mark=*, mOne, every node near coord/.append style={anchor=south east}]
+      table[x=macs, y=acc, meta=short]{figdata/summary_cifar10.dat};
+    \addplot[only marks, mark=square*, accentRed, every node near coord/.append style={anchor=north west}]
+      table[x=macs, y=acc, meta=short]{figdata/summary_cifar100.dat};
+\end{groupplot}
+\end{tikzpicture}

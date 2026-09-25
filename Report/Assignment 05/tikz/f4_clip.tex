@@ -1,0 +1,12 @@
+% BasicCNN trên CIFAR-10 với và không với cắt chuẩn gradient: không cắt thì phân kỳ khi lr lên đỉnh.
+\begin{tikzpicture}
+\begin{axis}[a05, width=11cm, height=5.2cm, xmin=1, xmax=30, ymin=0, ymax=100,
+  xlabel={epoch}, ylabel={val accuracy (\%)}, legend pos=south east, unbounded coords=jump]
+  \addplot[m0, dashed, mark=x, mark size=1.6pt] table[x=epoch, y=val_acc]{figdata/cifar10_basic_noclip_history.dat};
+  \addlegendentry{không cắt gradient (lượt chạy đầu, bị huỷ)}
+  \addplot[m0, mark=*, mark size=1pt] table[x=epoch, y=val_acc]{figdata/cifar10_basic_history.dat};
+  \addlegendentry{cắt $\lVert\nabla\rVert_2 \le \SL{cifar10/config/grad_clip}$ (lượt chạy chính thức)}
+  \draw[accentRed, dashed] (axis cs:\SL{compare/lr_peak_epoch}, 0) -- (axis cs:\SL{compare/lr_peak_epoch}, 100)
+    node[pos=0.93, left, font=\scriptsize, text=accentRed] {lr đạt đỉnh \SL{cifar10/config/max_lr}};
+\end{axis}
+\end{tikzpicture}

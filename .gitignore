@@ -66,3 +66,17 @@ src/Assignment 04/cifar10/data/cifar-10-python.tar.gz
 
 # Thu muc hinh cua bao cao la ban sao sinh tu cac mien, build_report.py tu gom lai
 Report/Assignment 04/figures/
+
+# ===== Assignment 05 =====
+# Dữ liệu ảnh gốc và bản cache .npz (tải lại theo src/Assignment 05/README.md)
+src/Assignment 05/data/cifar10/
+src/Assignment 05/data/cifar100/
+# Báo cáo 05: các thư mục build.py tự sinh lại từ src/Assignment 05/outputs và a05/
+Report/Assignment 05/figdata/
+Report/Assignment 05/code/
+Report/Assignment 05/generated/
+Report/Assignment 05/tikzcache/
+Report/Assignment 05/_minted*/
+Report/Assignment 05/main.*
+!Report/Assignment 05/main.tex
+Report/Assignment 05/build.out

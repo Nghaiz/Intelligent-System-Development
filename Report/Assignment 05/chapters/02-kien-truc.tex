@@ -1,0 +1,162 @@
+% =====================================================================
+%  Chương 2 — Mục 2 của đề: các mô hình phát triển của CNN
+%  Mã nguồn: a05/blocks.py · Notebook: notebooks/01_kien_truc_phat_trien.ipynb
+% =====================================================================
+\chapter{Các mô hình phát triển của CNN}
+\label{ch:kientruc}
+
+Chương 1 cho thấy CNN là hợp của các hàm. Từ năm 1998 đến nay, mỗi kiến trúc mới thường chỉ đổi \emph{một}
+trong các hàm ấy, hoặc đổi cách chúng được nối với nhau, để sửa một điểm yếu cụ thể của kiến trúc trước.
+Chương này đi qua chín mốc chính (Hình~\ref{fig:dongthoigian}). Với mỗi mốc, chương nêu vấn đề nó giải quyết,
+viết cơ chế mới thành công thức, rồi đưa ra một lớp PyTorch ngắn trong \texttt{a05/blocks.py}. Notebook 01
+chạy mỗi lớp một lượt trên tensor giả để kiểm tra shape và đếm tham số; mục này không huấn luyện.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_dong_thoi_gian}
+  \caption{Dòng thời gian các kiến trúc CNN và cơ chế mà mỗi kiến trúc đưa vào}
+  \label{fig:dongthoigian}
+\end{figure}
+
+\section{LeNet-5 (1998): khuôn mẫu Conv, Pool, FC}
+
+LeCun và cộng sự~\cite{lecun1998} đặt ra khuôn mẫu mà mọi CNN sau này vẫn giữ: vài lần lặp
+(tích chập, hàm kích hoạt, pooling) để trích đặc trưng, rồi các tầng nối đầy đủ để phân loại,
+\[
+  f = \mathrm{FC}_3\circ\tanh\circ\mathrm{FC}_2\circ\tanh\circ\mathrm{FC}_1\circ\mathrm{flatten}\circ
+      (\mathrm{pool}\circ\tanh\circ\mathrm{conv}_{5\times5})^{2}.
+\]
+Bản dựng lại cho ảnh $32\times32\times3$ có \SL{blocks/blocks/lenet/params} tham số.
+
+\maNguon{blocks__LeNet5}{LeNet-5}
+
+\section{AlexNet (2012): sâu hơn, ReLU và Dropout}
+
+LeNet dùng $\tanh$, có đạo hàm nhỏ ở hai đầu. Khi mạng sâu thêm, tích của nhiều đạo hàm nhỏ làm gradient
+ở các tầng đầu gần như bằng 0. AlexNet~\cite{krizhevsky2012} thay $\tanh$ bằng $\mathrm{ReLU}(z)=\max(0,z)$,
+có đạo hàm bằng 1 trên miền dương. Để chống quá khớp ở các tầng nối đầy đủ lớn, AlexNet dùng Dropout:
+khi huấn luyện, mỗi đơn vị bị đặt về 0 với xác suất $p$, tức nhân đầu ra với mặt nạ ngẫu nhiên
+$\mathbf{m}\sim\mathrm{Bernoulli}(1-p)$. Bản thu nhỏ trong \texttt{blocks.py} có \SL{blocks/blocks/alexnet/params}
+tham số, phần lớn nằm ở tầng nối đầy đủ đầu tiên.
+
+\maNguon{blocks__AlexNetMini}{AlexNet thu nhỏ cho ảnh $32\times32$}
+
+\section{VGG (2014): chồng các tích chập $3\times3$}
+
+Simonyan và Zisserman~\cite{simonyan2015} chỉ dùng một loại bộ lọc: $3\times3$. Hai tầng $3\times3$ liên tiếp
+có vùng nhìn $5\times5$, giống một tầng $5\times5$, nhưng với $C$ kênh vào và ra thì cần $2\cdot9C^2=18C^2$
+trọng số thay vì $25C^2$, đồng thời có thêm một hàm phi tuyến ở giữa. Với $C=64$, notebook 01 đếm được
+\SL{blocks/compare/conv5} trọng số cho một conv $5\times5$ và \SL{blocks/compare/two3} cho hai conv $3\times3$,
+ít hơn \SL{blocks/compare/vgg_saving}\,\%. Một khối VGG là hàm
+$\mathrm{pool}\circ(\mathrm{ReLU}\circ\mathrm{conv}_{3\times3})^{n}$.
+
+\maNguon{blocks__VGGBlock}{Khối VGG}
+
+\section{Inception (2014): nhiều cỡ bộ lọc song song}
+
+Chọn bộ lọc $3\times3$ hay $5\times5$ là chọn trước một cỡ vùng nhìn. Inception~\cite{szegedy2015} không chọn:
+nó chạy song song bốn nhánh rồi nối kết quả theo chiều kênh,
+\[
+  y = \mathrm{concat}\bigl(f_{1\times1}(x),\; f_{3\times3}(x),\; f_{5\times5}(x),\; f_{\mathrm{pool}}(x)\bigr).
+\]
+Để nhánh $3\times3$ và $5\times5$ không quá đắt, một conv $1\times1$ giảm số kênh trước đó. Conv $1\times1$ là một
+tầng nối đầy đủ áp dụng riêng tại từng điểm ảnh, trộn các kênh mà không nhìn sang điểm bên cạnh.
+
+\maNguon{blocks__InceptionBlock}{Khối Inception}
+
+\section{ResNet (2015): đường tắt}
+
+Khi VGG được làm sâu hơn khoảng 20 tầng, sai số trên cả tập \emph{huấn luyện} lại tăng lên. Đây không phải
+quá khớp mà là mạng khó tối ưu. He và cộng sự~\cite{he2016} đổi mục tiêu của mỗi khối: thay vì học trực tiếp
+ánh xạ $H(x)$, khối học phần dư $F(x) = H(x) - x$,
+\[
+  y = \mathrm{ReLU}\bigl(F(x) + x\bigr).
+\]
+Hai hệ quả trực tiếp của công thức này. Thứ nhất, nếu $F\equiv0$ thì khối là ánh xạ đồng nhất, nên thêm một khối
+không thể làm mạng tệ đi. Notebook 01 kiểm tra điều này bằng cách đặt $\gamma$ của BatchNorm cuối về 0:
+đầu ra khớp đầu vào (\SL{blocks/identity_ok}). Thứ hai, đạo hàm
+$\partial y/\partial x = \partial F/\partial x + I$ luôn có thành phần $I$, nên gradient đi thẳng qua đường tắt
+mà không bị thu nhỏ qua từng tầng. Khối minh hoạ với 64 kênh có \SL{blocks/blocks/residual/params} tham số.
+
+\maNguon{blocks__ResidualBlock}{Khối Residual}
+
+\section{DenseNet (2017): nối mọi tầng với nhau}
+
+DenseNet~\cite{huang2017} đẩy ý tưởng đường tắt đi xa hơn. Mỗi tầng nhận \emph{tất cả} đầu ra trước nó, nối
+theo kênh chứ không cộng:
+\[
+  x_l = H_l\bigl([x_0, x_1, \dots, x_{l-1}]\bigr).
+\]
+Mỗi tầng chỉ thêm $k$ kênh mới (tốc độ tăng trưởng, \emph{growth rate}), nên các tầng có thể rất hẹp. Khối trong
+notebook bắt đầu từ 16 kênh, qua 4 tầng với $k=12$, ra $16+4\cdot12=64$ kênh, dùng
+\SL{blocks/blocks/dense/params} tham số.
+
+\maNguon{blocks__DenseBlock}{Khối Dense}
+
+\section{MobileNet (2017): tách tích chập thành hai bước}
+
+Một tầng conv $3\times3$ thường vừa lọc theo không gian vừa trộn kênh, tốn $9\,C_{\mathrm{in}}C_{\mathrm{out}}$
+trọng số. MobileNet~\cite{howard2017} tách hai việc đó: \emph{depthwise} lọc từng kênh riêng
+($9\,C_{\mathrm{in}}$ trọng số), rồi \emph{pointwise} $1\times1$ trộn kênh ($C_{\mathrm{in}}C_{\mathrm{out}}$).
+Với $64\to128$ kênh, conv thường cần \SL{blocks/compare/std} trọng số, còn bản tách chỉ cần
+\SL{blocks/compare/dws}, ít hơn \SL{blocks/compare/dws_ratio} lần.
+
+\maNguon{blocks__DepthwiseSeparable}{Tích chập depthwise separable}
+
+\section{SE-Net (2017) và CBAM (2018): chú ý}
+
+Các kiến trúc trên đều coi mọi kênh đặc trưng như nhau. Squeeze-and-Excitation~\cite{hu2018} cho mạng tự
+học một trọng số cho từng kênh, tính từ chính dữ liệu đầu vào:
+\[
+  \mathbf{s} = \mathrm{GAP}(x)\in\mathbb{R}^{C},\qquad
+  \mathbf{w} = \sigma\bigl(W_2\,\mathrm{ReLU}(W_1\mathbf{s})\bigr)\in(0,1)^{C},\qquad
+  y_c = w_c\, x_c .
+\]
+Bước \emph{squeeze} nén mỗi kênh về một số bằng trung bình toàn cục, bước \emph{excitation} là một MLP nhỏ với
+tỉ lệ nén $r$ ($W_1\in\mathbb{R}^{C/r\times C}$). Khối này rất rẻ: với 64 kênh chỉ thêm
+\SL{blocks/blocks/se/params} tham số. Trên tensor ngẫu nhiên, notebook 01 đo được các hệ số nằm trong
+khoảng (\SL{blocks/se_min}; \SL{blocks/se_max}). CBAM~\cite{woo2018} làm thêm một bước chú ý theo
+\emph{không gian}: gộp các kênh bằng trung bình và max, qua một conv $7\times7$ và sigmoid để có trọng số cho từng vị trí.
+
+\maNguon{blocks__SEBlock}{Khối Squeeze-and-Excitation}
+\maNguon{blocks__CBAM}{CBAM: chú ý theo kênh rồi theo không gian}
+
+\section{Vision Transformer (2020): bỏ tích chập}
+
+ViT~\cite{dosovitskiy2021} cắt ảnh thành các ô $p\times p$, chiếu mỗi ô thành một vectơ (\emph{token}), rồi dùng
+self-attention để mọi ô nhìn thấy mọi ô khác ngay từ tầng đầu. Tích chập chỉ nhìn một vùng lân cận nhỏ; self-attention thì
+tính trọng số giữa hai ô bất kỳ:
+\[
+  \mathrm{Attn}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d}}\right)V .
+\]
+Điều thú vị là bước nhúng ô chính là một tầng conv có kích thước bộ lọc bằng bước trượt bằng $p$
+(Mã nguồn~\ref{code:blocks__PatchEmbed}). Với $p=4$, ảnh $32\times32$ thành $8\cdot8=64$ token.
+
+\maNguon{blocks__PatchEmbed}{Nhúng ô ảnh của ViT là một tầng tích chập}
+\maNguon{blocks__TinyViTBlock}{Một khối encoder của ViT}
+
+\section{Tổng hợp}
+
+Hình~\ref{fig:coche} vẽ sáu cơ chế chính dưới dạng sơ đồ khối, và Bảng~\ref{tab:khoi} ghi shape cùng số tham số
+mà notebook 01 đo được cho từng khối.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_co_che}
+  \caption{Sáu cơ chế kiến trúc viết thành sơ đồ khối}
+  \label{fig:coche}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Shape và số tham số của các khối minh hoạ (notebook 01, tensor giả, lô 2)}
+  \label{tab:khoi}
+  \input{generated/tab_blocks}
+\end{table}
+
+\begin{phathien}{Ba mô hình phát triển được chọn cho Chương 4}
+Trong chín mốc trên, ba cơ chế được đem đi huấn luyện ở Chương~\ref{ch:mohinh}: chồng conv $3\times3$ kèm
+BatchNorm (VGG), đường tắt (ResNet) và chú ý theo kênh (SE). Lý do chọn ba cơ chế này: mỗi cơ chế thêm được
+vào mô hình trước mà không phải đổi phần còn lại, nên mỗi bước so sánh chỉ khác đúng một cơ chế.
+Inception, DenseNet và ViT đổi cả khung kiến trúc, nên không so sánh theo cách này được.
+\end{phathien}

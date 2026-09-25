@@ -1,0 +1,171 @@
+% =====================================================================
+%  Chương 3 — Mục 3 của đề: hai tập ảnh và một tập về bệnh tiểu đường
+%  Mã nguồn: a05/data.py · Notebook: notebooks/02_du_lieu.ipynb
+% =====================================================================
+\chapter{Dữ liệu}
+\label{ch:dulieu}
+
+Mục 3 của đề yêu cầu hai tập ảnh và một tập về bệnh tiểu đường, có đường dẫn và mô tả. Bảng~\ref{tab:batap}
+tóm tắt ba tập được dùng. Hai đường dẫn đã được kiểm tra còn truy cập được (HTTP 200) ngày 25/9/2026.
+
+\begin{table}[H]
+  \centering
+  \caption{Ba tập dữ liệu của bài}
+  \label{tab:batap}
+  \small
+  \begin{tabular}{L{2.3cm}L{6.6cm}L{5.8cm}}
+    \toprule
+    Tập & Nguồn & Quy mô \\
+    \midrule
+    CIFAR-10 & \url{https://www.cs.toronto.edu/~kriz/cifar.html}~\cite{krizhevsky2009} &
+      \SL{data/cifar10/n_train}\,+\,\SL{data/cifar10/n_val}\,+\,\SL{data/cifar10/n_test} ảnh $32\times32\times3$,
+      \SL{data/cifar10/n_classes} lớp \\
+    CIFAR-100 & cùng trang trên, tệp \texttt{cifar-100-python.tar.gz} &
+      \SL{data/cifar100/n_train}\,+\,\SL{data/cifar100/n_val}\,+\,\SL{data/cifar100/n_test} ảnh $32\times32\times3$,
+      \SL{data/cifar100/n_classes} lớp mịn, 20 siêu lớp \\
+    Diabetes & \url{https://www.kaggle.com/datasets/iammustafatz/diabetes-prediction-dataset}~\cite{mustafa2023} &
+      \SL{data/diabetes/n_raw} dòng, \SL{data/diabetes/n_features_raw} đặc trưng, nhãn nhị phân \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{phathien}{Về tên ``MNIST-100'' trong đề}
+Đề ghi hai tập ảnh là CIFAR-10 và ``MNIST-100''. Không có bộ dữ liệu chuẩn nào mang tên MNIST-100. Bài hiểu
+đây là \textbf{CIFAR-100}: cùng tác giả, cùng kích thước ảnh và cùng định dạng tệp với CIFAR-10, chỉ khác số lớp
+(100 thay vì 10). Cặp CIFAR-10/CIFAR-100 cũng cho một phép thử có ý nghĩa: cùng kiến trúc, cùng cấu hình, chỉ tăng
+số lớp lên mười lần.
+\end{phathien}
+
+\section{CIFAR-10}
+
+CIFAR-10~\cite{krizhevsky2009} gồm 60.000 ảnh màu tự nhiên kích thước $32\times32$ thuộc 10 lớp. Mỗi lớp có đúng
+\SL{data/cifar10/per_class_max} ảnh huấn luyện và \SL{data/cifar10/test_per_class} ảnh kiểm tra, tức hoàn toàn cân bằng.
+Hình~\ref{fig:cifar10mau} là ảnh huấn luyện đầu tiên của mỗi lớp, vẽ lại từng điểm ảnh bằng pgfplots từ tệp dữ liệu mà
+notebook 02 xuất ra.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_cifar10_mau}
+  \caption{Mỗi lớp CIFAR-10 một ảnh, vẽ từ $32\times32$ giá trị RGB}
+  \label{fig:cifar10mau}
+\end{figure}
+
+\section{CIFAR-100}
+
+CIFAR-100 có cùng 60.000 ảnh $32\times32$ nhưng chia thành \SL{data/cifar100/n_classes} lớp mịn, mỗi lớp chỉ
+\SL{data/cifar100/per_class_max} ảnh huấn luyện, ít hơn CIFAR-10 mười lần. 100 lớp mịn được gom thành 20 siêu lớp,
+mỗi siêu lớp đúng \SL{data/cifar100/fine_per_coarse} lớp mịn. Mô hình được huấn luyện trên nhãn mịn; siêu lớp chỉ
+dùng ở Chương~\ref{ch:sosanh} để vẽ ma trận nhầm lẫn ở mức 20 nhóm cho dễ đọc.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_cifar100_mau}
+  \caption{Mỗi siêu lớp CIFAR-100 một ảnh, kèm tên siêu lớp}
+  \label{fig:cifar100mau}
+\end{figure}
+
+\section{Mô tả và tiền xử lý hai tập ảnh}
+
+\paragraph{Chia tập.} 50.000 ảnh huấn luyện được tách \SL{data/cifar10/n_train} ảnh train và \SL{data/cifar10/n_val}
+ảnh validation, phân tầng theo nhãn, hạt giống 42. Validation dùng để chọn checkpoint. \SL{data/cifar10/n_test} ảnh test chính thức
+chỉ được dùng một lần, ở cuối.
+
+\maNguon{data__split_train_val}{Tách validation phân tầng}
+
+\paragraph{Chuẩn hoá.} Mỗi kênh được trừ trung bình rồi chia độ lệch chuẩn, cả hai tính trên nhánh train. Với CIFAR-10,
+trung bình ba kênh R, G, B là \SL{data/cifar10/mean/0}, \SL{data/cifar10/mean/1}, \SL{data/cifar10/mean/2} và độ lệch chuẩn
+là \SL{data/cifar10/std/0}, \SL{data/cifar10/std/1}, \SL{data/cifar10/std/2} (theo thang $[0,1]$). Con số của CIFAR-100 lần lượt
+là \SL{data/cifar100/mean/0}, \SL{data/cifar100/mean/1}, \SL{data/cifar100/mean/2} và \SL{data/cifar100/std/0},
+\SL{data/cifar100/std/1}, \SL{data/cifar100/std/2}. Hình~\ref{fig:histpixel} cho thấy kênh xanh dương lệch về phía tối
+hơn hai kênh còn lại ở cả hai tập, và có đỉnh ở giá trị 255 do nền trời và nền trắng.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_hist_pixel}
+  \caption{Phân bố cường độ điểm ảnh theo kênh trên nhánh train}
+  \label{fig:histpixel}
+\end{figure}
+
+\paragraph{Nạp dữ liệu.} Hai tệp \texttt{.tar.gz} gốc được đọc thẳng bằng \texttt{tarfile} và \texttt{pickle},
+không giải nén ra đĩa, rồi lưu đệm thành \texttt{.npz}.
+
+\maNguon{data__load_cifar}{Đọc CIFAR-10/100 từ tệp gốc}
+
+\paragraph{Dữ liệu nằm sẵn trên GPU.} Trên Windows, \texttt{DataLoader} nhiều tiến trình vừa chậm vừa dễ lỗi. Ở dạng
+\texttt{uint8}, cả tập ảnh đủ nhỏ để nằm gọn trong VRAM, nên được đưa hết lên GPU một lần. Mỗi lô được cắt ra bằng chỉ số
+ngẫu nhiên, chuẩn hoá và tăng cường ngay trên GPU. Tăng cường gồm hai phép: đệm 4 điểm ảnh rồi cắt ngẫu nhiên lại
+$32\times32$ (dịch ảnh tối đa 4 điểm theo mỗi chiều), và lật ngang với xác suất 0,5. Chỉ nhánh train được tăng cường.
+
+\maNguon{data__gpu_augment}{Tăng cường dữ liệu chạy trên GPU}
+\maNguon{data__GPUImageData.batches}{Sinh lô từ tensor nằm sẵn trên GPU}
+
+\paragraph{Dạng tensor.} Mỗi lô đưa vào mạng có dạng \texttt{[B, 3, 32, 32]} kiểu \texttt{float32}, $B=256$.
+
+\section{Diabetes Prediction Dataset}
+
+\subsection{Mô tả}
+
+Tập Diabetes Prediction~\cite{mustafa2023} gồm \SL{data/diabetes/n_raw} hồ sơ bệnh nhân, mỗi hồ sơ có
+\SL{data/diabetes/n_features_raw} đặc trưng và nhãn \texttt{diabetes} (1 là mắc bệnh):
+
+\begin{itemize}
+  \item Nhân khẩu: \texttt{gender} (\SL{data/diabetes/categories/gender/0}, \SL{data/diabetes/categories/gender/1},
+        \SL{data/diabetes/categories/gender/2}) và \texttt{age}.
+  \item Tiền sử: \texttt{hypertension}, \texttt{heart\_disease} (0/1) và \texttt{smoking\_history} (6 mức).
+  \item Chỉ số cơ thể và xét nghiệm: \texttt{bmi}, \texttt{HbA1c\_level} (\%), \texttt{blood\_glucose\_level} (mg/dL).
+\end{itemize}
+
+Tập có \SL{data/diabetes/n_dup} dòng trùng lặp hoàn toàn. Các dòng này bị bỏ trước khi chia tập, nếu không một bản
+sao có thể nằm ở train còn bản kia nằm ở test. Sau khi bỏ trùng còn \SL{data/diabetes/n_rows} dòng, trong đó
+\SL{data/diabetes/n_pos} dòng dương tính (\SL{data/diabetes/pos_rate}\,\%). Mất cân bằng này quyết định cách đánh giá
+ở Chương~\ref{ch:sosanh}: trên tập test, đoán mọi người đều khoẻ đã đạt accuracy \SL{diabetes/majority_acc}\,\%, nên accuracy
+một mình không nói được gì.
+
+\begin{table}[H]
+  \centering
+  \caption{Thống kê mô tả bốn đặc trưng số (sau khi bỏ trùng)}
+  \label{tab:diabdesc}
+  \input{generated/tab_diab_desc}
+\end{table}
+
+Giá trị \texttt{"No Info"} của \texttt{smoking\_history} chiếm \SL{data/diabetes/no_info_rate}\,\% số dòng. Đây không phải
+giá trị thiếu ngẫu nhiên mà là một nhóm bệnh nhân không khai báo, nên được giữ lại như một mức riêng.
+
+\subsection{Quan hệ giữa đặc trưng và nhãn}
+
+Hình~\ref{fig:diabhist} tách phân bố của ba đặc trưng theo nhãn. Hai chỉ số xét nghiệm tách hai lớp rõ nhất. Notebook 02
+tìm được hai ngưỡng mà phía trên đó \emph{mọi} bệnh nhân đều mắc bệnh: HbA1c từ \SL{data/diabetes/pure_threshold/HbA1c_level}\,\%
+và đường huyết từ \SL{data/diabetes/pure_threshold/blood_glucose_level} mg/dL. Có \SL{data/diabetes/pos_covered}\,\% ca dương
+tính vượt ít nhất một trong hai ngưỡng này, nên phần lớn ca dương rất dễ nhận ra; phần khó của bài toán là số ca còn lại,
+có chỉ số xét nghiệm nằm trong vùng chồng lấn với người khoẻ. Histogram của hai chỉ số này có dạng răng cưa vì trong
+tập dữ liệu chúng chỉ nhận một số ít giá trị rời rạc, không phải số đo liên tục. Ma trận tương quan (Hình~\ref{fig:diabcorr}) cho kết quả khớp: hệ số tương quan với nhãn cao
+nhất là của \texttt{blood\_glucose\_level} (\SL{data/diabetes/corr_target/blood_glucose_level}) và \texttt{HbA1c\_level}
+(\SL{data/diabetes/corr_target/HbA1c_level}), còn \texttt{age} là \SL{data/diabetes/corr_target/age}.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_diabetes_hist}
+  \caption{Phân bố HbA1c, đường huyết và tuổi theo hai lớp (mật độ, sau khi bỏ trùng)}
+  \label{fig:diabhist}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_diabetes_corr}
+  \caption{Hệ số tương quan Pearson giữa các đặc trưng số, nhị phân và nhãn}
+  \label{fig:diabcorr}
+\end{figure}
+
+\subsection{Tiền xử lý và dạng tensor}
+
+Sau khi bỏ trùng, dữ liệu được chia 70/15/15 phân tầng theo nhãn thành \SL{data/diabetes/n_train} dòng train,
+\SL{data/diabetes/n_val} dòng validation và \SL{data/diabetes/n_test} dòng test. Mọi phép biến đổi có tham số đều
+\emph{chỉ học trên nhánh train} rồi áp dụng nguyên cho hai nhánh còn lại: \texttt{StandardScaler} cho bốn cột số, và danh
+mục one-hot cho \texttt{gender} và \texttt{smoking\_history}. Kết quả là \SL{data/diabetes/n_features_encoded} đặc trưng.
+
+\maNguon{data__prepare_diabetes}{Chuẩn bị dữ liệu Diabetes, không rò rỉ từ test}
+
+Mỗi bệnh nhân là một vectơ $\mathbf{x}\in\mathbb{R}^{\SL{data/diabetes/n_features_encoded}}$, được đưa vào mạng dưới dạng
+\texttt{[B, 1, \SL{data/diabetes/n_features_encoded}]}: một kênh, chiều dài bằng số đặc trưng. Bộ lọc Conv1D kích thước 3
+trượt dọc các cột đặc trưng kề nhau. Thứ tự cột là cố định (số, nhị phân, rồi one-hot) nhưng không mang ý nghĩa không gian
+như điểm ảnh. Chương~\ref{ch:sosanh} sẽ cho thấy điều này ảnh hưởng thế nào đến lợi ích của các cơ chế kiến trúc.

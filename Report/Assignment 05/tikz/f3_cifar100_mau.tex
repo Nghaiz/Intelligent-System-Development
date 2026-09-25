@@ -1,0 +1,14 @@
+% Hai mươi ảnh CIFAR-100, mỗi siêu lớp một ảnh; lưới 4x5, ô 32 px, khe 9 px (notebook 02).
+\begin{tikzpicture}
+\begin{axis}[truc anh, width=13cm, clip=false]
+  \addplot[anhRGB=196] table[meta=c]{figdata/cifar100_samples.dat};
+  \foreach \k in {0,...,19} {
+    \pgfmathtruncatemacro{\r}{int(\k/5)}
+    \pgfmathtruncatemacro{\c}{mod(\k,5)}
+    \edef\tmp{\noexpand\node[font=\noexpand\tiny, anchor=north, align=center, text width=24mm, inner sep=1pt]
+      at (axis cs:{\c*41+15.5}, {154-\r*41-32})
+      {\noexpand\SL{data/cifar100/coarse_names/\k}};}
+    \tmp
+  }
+\end{axis}
+\end{tikzpicture}

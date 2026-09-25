@@ -1,0 +1,181 @@
+% =====================================================================
+%  Chương 4 — Mục 4 của đề: một CNN cơ bản và ba mô hình phát triển
+%  Mã nguồn: a05/models.py, a05/train.py, a05/experiment.py
+%  Notebook: 03_cifar10.ipynb, 04_cifar100.ipynb, 05_diabetes.ipynb
+% =====================================================================
+\chapter{Một CNN cơ bản và ba mô hình phát triển}
+\label{ch:mohinh}
+
+Chương này trả lời mục 4 của đề: xây một CNN cơ bản và ba mô hình phát triển, rồi huấn luyện cả bốn trên ba tập
+dữ liệu của Chương~\ref{ch:dulieu}. Cả bốn mô hình được viết từ đầu bằng PyTorch~\cite{paszke2019}, không dùng trọng số
+huấn luyện sẵn.
+
+\section{Nguyên tắc thiết kế: mỗi bước thêm đúng một cơ chế}
+
+Nếu bốn mô hình khác nhau ở nhiều chỗ cùng lúc thì không thể biết chênh lệch kết quả đến từ đâu. Vì vậy mỗi mô hình
+được dựng từ mô hình trước bằng cách thêm \emph{một} cơ chế ở Chương~\ref{ch:kientruc}:
+
+\begin{itemize}
+  \item \textbf{M0 BasicCNN}: khuôn LeNet/AlexNet, ba lần lặp Conv--ReLU--MaxPool rồi hai tầng nối đầy đủ. Không
+        BatchNorm, không đường tắt.
+  \item \textbf{M1 VGGNet}: ba tầng, mỗi tầng hai khối, mỗi khối là hai conv $3\times3$ có BatchNorm~\cite{ioffe2015};
+        cuối mạng là Global Average Pooling thay cho các tầng nối đầy đủ lớn.
+  \item \textbf{M2 ResNet}: đúng khung của M1, mỗi khối thêm đường tắt $y=\mathrm{ReLU}(F(x)+x)$. Khi số kênh đổi,
+        đường tắt đi qua một conv $1\times1$.
+  \item \textbf{M3 SE-ResNet}: đúng M2, thêm khối SE trên nhánh $F$ trước phép cộng.
+\end{itemize}
+
+Bước M0$\to$M1 gộp ba thay đổi (sâu hơn, BatchNorm, GAP), vì đó chính là bước chuyển từ AlexNet sang VGG trong lịch sử.
+Hai bước sau thì mỗi bước chỉ khác đúng một cơ chế: M1 và M2 chỉ khác nhau ở đường tắt, M2 và M3 chỉ khác nhau ở khối SE.
+Hình~\ref{fig:kientruc} đặt bốn mô hình cạnh nhau. Shape ghi bên phải mỗi khối được đọc từ một lượt forward thật trong
+notebook 06, không phải tính tay.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f4_kien_truc}
+  \caption{Bốn mô hình cho ảnh $32\times32\times3$; M1, M2, M3 dùng chung khung và chỉ khác nhau ở nội dung của khối}
+  \label{fig:kientruc}
+\end{figure}
+
+\section{Mã nguồn bốn mô hình}
+
+M0 là một lớp riêng. M1, M2, M3 dùng chung lớp \texttt{StagedCNN}, chỉ khác hai cờ \texttt{residual} và \texttt{se}
+của lớp \texttt{Block}. Nhờ vậy ``chỉ khác một cơ chế'' được đảm bảo ngay trong mã nguồn: hai mô hình liền kề chạy qua
+cùng một đoạn mã, chỉ khác một nhánh \texttt{if}.
+
+\maNguon{models__BasicCNN}{M0: CNN cơ bản}
+\maNguon{models__Block}{Khối hai conv $3\times3$, bật tắt đường tắt và SE bằng cờ}
+\maNguon{models__StagedCNN}{Khung chung của M1, M2, M3}
+
+Hàm \texttt{build\_model} dựng mô hình theo tên và theo số chiều. Tham số \texttt{dim} chọn giữa bộ
+(\texttt{Conv2d}, \texttt{BatchNorm2d}, \texttt{MaxPool2d}) và bộ 1D tương ứng, nên cùng một định nghĩa phục vụ cả ảnh
+lẫn dữ liệu bảng. Mọi tầng tích chập được khởi tạo He (\texttt{kaiming\_normal\_}), phù hợp với ReLU.
+
+\maNguon{models__build_model}{Dựng mô hình theo tên, cho cả 2D và 1D}
+
+\section{Dò shape tầng theo tầng}
+
+Bảng~\ref{tab:traceM0} là đầu ra thật của từng tầng con khi một tensor $1\times3\times32\times32$ đi qua M0. Ba lần
+MaxPool đưa $32\times32$ về $4\times4$; tầng Flatten nối $128\cdot4\cdot4$ giá trị vào tầng nối đầy đủ, và riêng tầng này
+chiếm phần lớn số tham số của M0. Ở M1, M2, M3, Global Average Pooling nén mỗi kênh về một số, nên tầng nối đầy đủ cuối
+chỉ còn $256\times K$ trọng số (Bảng~\ref{tab:traceM3}).
+
+\begin{table}[H]
+  \centering
+  \begin{minipage}[t]{0.47\textwidth}
+    \centering
+    \caption{Dò shape của M0 (2D, $K=10$)}
+    \label{tab:traceM0}
+    \small\input{generated/tab_trace_basic}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.47\textwidth}
+    \centering
+    \caption{Dò shape của M3 (2D, $K=10$)}
+    \label{tab:traceM3}
+    \small\input{generated/tab_trace_seresnet}
+  \end{minipage}
+\end{table}
+
+Hình~\ref{fig:fmapm0} cho thấy tầng tích chập đầu của M0 (sau khi huấn luyện trên CIFAR-10) làm gì với một ảnh test: mỗi
+kênh là ảnh vào sau khi qua một bộ lọc $3\times3\times3$. Có kênh làm nổi biên theo một hướng, có kênh phản ứng với
+vùng sáng hoặc với một màu. Đây là đầu vào của các tầng sau.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f4_fmap_m0}
+  \caption{Ảnh test lớp horse và 8 feature map đầu tiên sau tầng tích chập đầu của M0}
+  \label{fig:fmapm0}
+\end{figure}
+
+\section{Bản 1D cho Diabetes}
+
+Với Diabetes, \texttt{build\_model(name, dim=1, ...)} giữ nguyên bốn cơ chế, chỉ đổi mọi tầng 2D sang 1D, giảm độ rộng
+xuống 16/32/64 kênh và cho ra một logit. Đầu vào là \texttt{[B, 1, \SL{data/diabetes/n_features_encoded}]}.
+Bảng~\ref{tab:trace1d} là shape của M0 bản 1D; ba lần MaxPool làm chiều dài giảm từ \SL{data/diabetes/n_features_encoded}
+xuống 1.
+
+\begin{table}[H]
+  \centering
+  \caption{Dò shape của M0 bản 1D cho Diabetes}
+  \label{tab:trace1d}
+  \small\input{generated/tab_trace_basic1d}
+\end{table}
+
+\section{Huấn luyện}
+
+\subsection{Cấu hình}
+
+Trong cùng một tập, bốn mô hình dùng đúng một cấu hình (Bảng~\ref{tab:cauhinh}) và cùng hạt giống 42. Mỗi mô hình chạy
+một lần. Checkpoint được giữ ở epoch có loss validation nhỏ nhất và được nạp lại trước khi đánh giá trên tập test.
+
+\begin{table}[H]
+  \centering
+  \caption{Cấu hình huấn luyện}
+  \label{tab:cauhinh}
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    & CIFAR-10 và CIFAR-100 & Diabetes \\
+    \midrule
+    Thiết bị & GPU \SL{cifar10/device}, AMP fp16 & CPU, \SL{diabetes/config/threads} luồng \\
+    Tối ưu & SGD nesterov, momentum \SL{cifar10/config/momentum} & AdamW \\
+    Tốc độ học & OneCycle, đỉnh \SL{cifar10/config/max_lr} & cố định \SL{diabetes/config/lr} \\
+    Weight decay & \SL{cifar10/config/weight_decay} & \SL{diabetes/config/weight_decay} \\
+    Epoch, cỡ lô & \SL{cifar10/config/epochs}, \SL{cifar10/config/batch_size} &
+                   tối đa \SL{diabetes/config/epochs}, \SL{diabetes/config/batch_size} \\
+    Dừng sớm & không & sau \SL{diabetes/config/patience} epoch không giảm val loss \\
+    Cắt gradient & $\lVert\nabla\rVert_2\le\SL{cifar10/config/grad_clip}$ & không \\
+    Hàm mất mát & cross-entropy & BCE, \texttt{pos\_weight} = số âm / số dương \\
+    Ngưỡng phân loại & argmax & chọn trên validation theo F1 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Lịch OneCycle~\cite{smith2019} tăng tốc độ học từ nhỏ lên đỉnh trong 30\,\% số bước đầu, rồi giảm dần về gần 0.
+Pha giảm cuối giúp mô hình hội tụ vào một điểm tốt trong \SL{cifar10/config/epochs} epoch mà không cần dò lịch giảm bằng tay.
+
+\subsection{Vòng lặp huấn luyện}
+
+Một epoch là một lượt qua dữ liệu: với mỗi lô, tính $L(f_\theta(x), y)$, lan truyền ngược, rồi cập nhật $\theta$. Hàm
+\texttt{train\_one\_epoch} dùng chung cho cả đánh giá: khi \texttt{opt=None}, nó chỉ tính loss và accuracy. Với AMP, phép
+tính chạy ở fp16, còn \texttt{GradScaler} nhân loss lên trước khi lan truyền ngược để gradient nhỏ không bị làm tròn về 0.
+
+\maNguon{train__train_one_epoch}{Một epoch huấn luyện hoặc đánh giá}
+\maNguon{train__fit}{Huấn luyện nhiều epoch, giữ checkpoint theo val loss}
+
+Hai hàm dưới đây gói phần riêng của từng loại dữ liệu: bộ tối ưu, lịch tốc độ học, hàm mất mát và cách sinh lô.
+
+\maNguon{train__train_image_model}{Huấn luyện một mô hình 2D trên CIFAR}
+\maNguon{train__train_tabular_model}{Huấn luyện một mô hình 1D trên Diabetes}
+
+\subsection{Sự cố phân kỳ của M0 và vai trò của BatchNorm}
+
+Lượt chạy đầu tiên của M0 trên CIFAR-10 chưa cắt gradient và đã phân kỳ: loss trở thành NaN ở epoch
+\SL{compare/noclip_diverged_epoch}, đúng lúc lịch OneCycle đưa tốc độ học lên đỉnh
+\SL{cifar10/config/max_lr} (Hình~\ref{fig:clip}). Giải thích hợp lý nhất là M0 thiếu BatchNorm: BatchNorm chuẩn hoá đầu ra
+mỗi tầng về trung bình 0 và phương sai 1, nên độ lớn của tín hiệu và của gradient không tăng dần qua các tầng, và vì thế
+chịu được tốc độ học lớn hơn~\cite{ioffe2015}. Đây là suy luận từ cơ chế, không phải kết quả của một thí nghiệm tách riêng.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f4_clip}
+  \caption{M0 trên CIFAR-10: không cắt gradient thì phân kỳ khi tốc độ học lên đỉnh}
+  \label{fig:clip}
+\end{figure}
+
+Để bốn mô hình vẫn dùng chung một cấu hình, lượt chạy chính thức bật cắt chuẩn gradient cho \emph{cả bốn}. Bài không
+chạy riêng M1, M2, M3 khi tắt cắt gradient, cũng không đo ngưỡng bị chạm bao nhiêu lần, nên không kết luận được việc cắt
+có ảnh hưởng tới ba mô hình này hay không. Lượt phân kỳ được giữ lại trong
+\texttt{cifar10\_basic\_noclip\_history.dat} làm bằng chứng.
+
+\subsection{Một lượt thí nghiệm}
+
+Notebook 03, 04, 05 đều chỉ gọi một hàm: huấn luyện đủ bốn mô hình, lưu checkpoint và \texttt{metadata.json}, ghi đường
+học ra \texttt{.dat}, rồi đo chất lượng và chi phí trên tập test. Ba tập vì thế đi qua đúng cùng một quy trình.
+
+\maNguon{experiment__run_image_experiment}{Một lượt thí nghiệm đầy đủ trên một tập ảnh}
+
+\paragraph{Ghi chú về thời gian.} Máy dùng GPU laptop \SL{cifar10/device}. Trong suốt các lượt huấn luyện ảnh, GPU chạy
+nóng và tự hạ xung nhịp vì nhiệt (\texttt{nvidia-smi} báo cờ \emph{SW thermal slowdown}). Số giây mỗi epoch ở
+Chương~\ref{ch:sosanh} vì vậy chậm hơn nhiều so với lúc máy còn mát. Chúng vẫn so sánh được với nhau vì cả tám lượt chạy
+trong cùng điều kiện, nhưng không nên đọc như thời gian chuẩn của loại GPU này.

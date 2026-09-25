@@ -1,0 +1,21 @@
+% Phân bố ba đặc trưng tương quan mạnh nhất với nhãn, tách theo lớp (mật độ, notebook 02).
+% Tệp .dat ghi tâm bin, nên vẽ bậc thang căn giữa (const plot mark mid) để cột nằm đúng vị trí.
+\begin{tikzpicture}[am/.style={const plot mark mid, fill=mOne!35, draw=mOne, fill opacity=0.6},
+                    duong/.style={const plot mark mid, fill=accentRed!35, draw=accentRed, fill opacity=0.6}]
+\begin{groupplot}[group style={group size=3 by 1, horizontal sep=10mm},
+  a05, width=5.4cm, height=4.6cm, ymin=0, scaled y ticks=false,
+  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2}]
+  \nextgroupplot[title={HbA1c (\%)}, ylabel={mật độ}, legend to name=legDiab, legend columns=2]
+    \addplot[am] table[x=x, y=neg]{figdata/diabetes_hist_HbA1c_level.dat} \closedcycle;
+    \addlegendentry{không mắc (0)}
+    \addplot[duong] table[x=x, y=pos]{figdata/diabetes_hist_HbA1c_level.dat} \closedcycle;
+    \addlegendentry{mắc (1)}
+  \nextgroupplot[title={Đường huyết (mg/dL)}]
+    \addplot[am] table[x=x, y=neg]{figdata/diabetes_hist_blood_glucose_level.dat} \closedcycle;
+    \addplot[duong] table[x=x, y=pos]{figdata/diabetes_hist_blood_glucose_level.dat} \closedcycle;
+  \nextgroupplot[title={Tuổi}]
+    \addplot[am] table[x=x, y=neg]{figdata/diabetes_hist_age.dat} \closedcycle;
+    \addplot[duong] table[x=x, y=pos]{figdata/diabetes_hist_age.dat} \closedcycle;
+\end{groupplot}
+\node[below=9mm] at (group c2r1.south) {\pgfplotslegendfromname{legDiab}};
+\end{tikzpicture}

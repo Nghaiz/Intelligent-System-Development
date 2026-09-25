@@ -1,0 +1,25 @@
+% Ảnh test (lớp horse) và 8 feature map đầu tiên sau tầng conv đầu của M0 (notebook 06, chuẩn hoá min-max).
+% Viết tường minh từng ô: \nextgroupplot + \addplot table trong \foreach gây lỗi 'thisrow already exists'.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=9 by 1, horizontal sep=1.5mm},
+  truc anh, width=1.45cm, colormap/viridis, point meta min=0, point meta max=1]
+  \nextgroupplot[title={\scriptsize ảnh vào}]
+    \addplot[anhRGB] table[meta=c]{figdata/probe_image.dat};
+  \nextgroupplot[title={\scriptsize kênh 0}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_0.dat};
+  \nextgroupplot[title={\scriptsize kênh 1}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_1.dat};
+  \nextgroupplot[title={\scriptsize kênh 2}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_2.dat};
+  \nextgroupplot[title={\scriptsize kênh 3}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_3.dat};
+  \nextgroupplot[title={\scriptsize kênh 4}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_4.dat};
+  \nextgroupplot[title={\scriptsize kênh 5}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_5.dat};
+  \nextgroupplot[title={\scriptsize kênh 6}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_6.dat};
+  \nextgroupplot[title={\scriptsize kênh 7}]
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_7.dat};
+\end{groupplot}
+\end{tikzpicture}

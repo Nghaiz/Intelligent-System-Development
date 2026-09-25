@@ -1,0 +1,20 @@
+% Ma trận nhầm lẫn CIFAR-10 của mô hình tốt nhất, chuẩn hoá theo hàng (%), notebook 06.
+\begin{tikzpicture}
+\begin{axis}[a05, grid=none, width=10cm, height=10cm, enlargelimits=false, axis equal image,
+  colormap={xanh}{rgb255=(255,255,255) rgb255=(110,160,215)}, point meta min=0, point meta max=100,
+  colorbar, colorbar style={width=3mm, ylabel={\% của hàng}},
+  xtick={0,...,9}, ytick={0,...,9}, xlabel={nhãn dự đoán}, ylabel={nhãn thật},
+  xticklabels={\SL{data/cifar10/class_names/0},\SL{data/cifar10/class_names/1},\SL{data/cifar10/class_names/2},
+    \SL{data/cifar10/class_names/3},\SL{data/cifar10/class_names/4},\SL{data/cifar10/class_names/5},
+    \SL{data/cifar10/class_names/6},\SL{data/cifar10/class_names/7},\SL{data/cifar10/class_names/8},
+    \SL{data/cifar10/class_names/9}},
+  yticklabels={\SL{data/cifar10/class_names/9},\SL{data/cifar10/class_names/8},\SL{data/cifar10/class_names/7},
+    \SL{data/cifar10/class_names/6},\SL{data/cifar10/class_names/5},\SL{data/cifar10/class_names/4},
+    \SL{data/cifar10/class_names/3},\SL{data/cifar10/class_names/2},\SL{data/cifar10/class_names/1},
+    \SL{data/cifar10/class_names/0}},
+  x tick label style={rotate=45, anchor=north east, font=\scriptsize}, y tick label style={font=\scriptsize},
+  nodes near coords={\pgfmathprintnumber[fixed, precision=1, use comma]{\pgfplotspointmeta}},
+  every node near coord/.append style={font=\tiny, anchor=center}]
+  \addplot[matrix plot*, mesh/cols=10, point meta=explicit] table[meta=v]{figdata/confusion_cifar10.dat};
+\end{axis}
+\end{tikzpicture}

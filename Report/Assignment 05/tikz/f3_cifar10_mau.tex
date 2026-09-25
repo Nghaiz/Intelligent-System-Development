@@ -1,0 +1,13 @@
+% Mười ảnh CIFAR-10 (mỗi lớp một ảnh) vẽ từng điểm ảnh; lưới 2x5, ô 32 px, khe 9 px (notebook 02).
+\begin{tikzpicture}
+\begin{axis}[truc anh, width=13cm, clip=false]
+  \addplot[anhRGB=196] table[meta=c]{figdata/cifar10_samples.dat};
+  \foreach \k in {0,...,9} {
+    \pgfmathtruncatemacro{\r}{int(\k/5)}
+    \pgfmathtruncatemacro{\c}{mod(\k,5)}
+    \edef\tmp{\noexpand\node[font=\noexpand\footnotesize, anchor=north] at (axis cs:{\c*41+15.5}, {72-\r*41-32})
+      {\noexpand\SL{data/cifar10/class_names/\k}};}
+    \tmp
+  }
+\end{axis}
+\end{tikzpicture}

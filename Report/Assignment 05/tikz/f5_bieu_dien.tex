@@ -1,0 +1,65 @@
+% Mỗi hàng một mô hình CIFAR-10: 16 bộ lọc lớp 1 (RGB, min-max từng bộ lọc) và 6 feature map
+% của cùng ảnh test sau tầng conv đầu (notebook 06). Viết tường minh, không dùng \foreach (xem f4_fmap_m0).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=7 by 4, horizontal sep=1.8mm, vertical sep=2mm},
+  truc anh, width=1.75cm, colormap/viridis, point meta min=0, point meta max=1]
+  \nextgroupplot[ylabel={\scriptsize BasicCNN}, hide axis=false, axis line style={draw=none}, xtick=\empty, ytick=\empty]
+    \addplot[anhRGB=15] table[meta=c]{figdata/filters_basic.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_0.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_1.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_2.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_3.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_4.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_basic_5.dat};
+  \nextgroupplot[ylabel={\scriptsize VGGNet}, hide axis=false, axis line style={draw=none}, xtick=\empty, ytick=\empty]
+    \addplot[anhRGB=15] table[meta=c]{figdata/filters_vgg.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_vgg_0.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_vgg_1.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_vgg_2.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_vgg_3.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_vgg_4.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_vgg_5.dat};
+  \nextgroupplot[ylabel={\scriptsize ResNet}, hide axis=false, axis line style={draw=none}, xtick=\empty, ytick=\empty]
+    \addplot[anhRGB=15] table[meta=c]{figdata/filters_resnet.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_resnet_0.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_resnet_1.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_resnet_2.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_resnet_3.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_resnet_4.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_resnet_5.dat};
+  \nextgroupplot[ylabel={\scriptsize SE-ResNet}, hide axis=false, axis line style={draw=none}, xtick=\empty, ytick=\empty]
+    \addplot[anhRGB=15] table[meta=c]{figdata/filters_seresnet.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_seresnet_0.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_seresnet_1.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_seresnet_2.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_seresnet_3.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_seresnet_4.dat};
+  \nextgroupplot
+    \addplot[matrix plot*, mesh/cols=32, point meta=explicit] table[meta=v]{figdata/fmap_seresnet_5.dat};
+\end{groupplot}
+\node[font=\scriptsize, above] at (group c1r1.north) {16 bộ lọc};
+\node[font=\scriptsize, above] at (group c4r1.north) {feature map kênh 0 -- 5};
+\end{tikzpicture}

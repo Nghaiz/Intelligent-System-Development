@@ -1,0 +1,18 @@
+% Đường học của 4 mô hình Conv1D trên Diabetes (dừng sớm nên số epoch khác nhau).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=16mm}, a05, width=7.3cm, height=5.2cm,
+  xmin=1, xlabel={epoch}]
+  \nextgroupplot[ylabel={BCE có trọng số}, title={Loss (liền: train, đứt: val)}, legend to name=legDia, legend columns=4]
+    \foreach \m/\s/\lab in {basic/m0/BasicCNN, vgg/m1/VGGNet, resnet/m2/ResNet, seresnet/m3/SE-ResNet} {
+      \edef\tmp{\noexpand\addplot[\s, mark=*, mark size=0.8pt] table[x=epoch, y=train_loss]{figdata/diabetes_\m_history.dat};
+                \noexpand\addlegendentry{\lab}
+                \noexpand\addplot[\s, dashed, forget plot] table[x=epoch, y=val_loss]{figdata/diabetes_\m_history.dat};}
+      \tmp}
+  \nextgroupplot[ylabel={accuracy tại ngưỡng 0,5 (\%)}, title={Accuracy (liền: train, đứt: val)}]
+    \foreach \m/\s in {basic/m0, vgg/m1, resnet/m2, seresnet/m3} {
+      \edef\tmp{\noexpand\addplot[\s, mark=*, mark size=0.8pt] table[x=epoch, y=train_acc]{figdata/diabetes_\m_history.dat};
+                \noexpand\addplot[\s, dashed] table[x=epoch, y=val_acc]{figdata/diabetes_\m_history.dat};}
+      \tmp}
+\end{groupplot}
+\node[below=10mm] at ($(group c1r1.south)!0.5!(group c2r1.south)$) {\pgfplotslegendfromname{legDia}};
+\end{tikzpicture}

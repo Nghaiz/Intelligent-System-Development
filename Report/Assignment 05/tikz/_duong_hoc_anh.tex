@@ -1,0 +1,19 @@
+% Đường học của 4 mô hình trên một tập ảnh; tham số #1 = cifar10 hoặc cifar100.
+% Dùng: \def\taphinh{cifar10}\hinh{f5_duong_hoc_cifar10} (xem hai tệp bọc cùng tên).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=16mm}, a05, width=7.3cm, height=5.4cm,
+  xmin=1, xmax=30, xlabel={epoch}]
+  \nextgroupplot[ylabel={loss}, title={Loss (nét liền: train, đứt: val)}, legend to name=legHoc, legend columns=4]
+    \foreach \m/\s/\lab in {basic/m0/BasicCNN, vgg/m1/VGGNet, resnet/m2/ResNet, seresnet/m3/SE-ResNet} {
+      \edef\tmp{\noexpand\addplot[\s] table[x=epoch, y=train_loss]{figdata/\taphinh_\m_history.dat};
+                \noexpand\addlegendentry{\lab}
+                \noexpand\addplot[\s, dashed, forget plot] table[x=epoch, y=val_loss]{figdata/\taphinh_\m_history.dat};}
+      \tmp}
+  \nextgroupplot[ylabel={accuracy (\%)}, title={Accuracy (nét liền: train, đứt: val)}]
+    \foreach \m/\s in {basic/m0, vgg/m1, resnet/m2, seresnet/m3} {
+      \edef\tmp{\noexpand\addplot[\s] table[x=epoch, y=train_acc]{figdata/\taphinh_\m_history.dat};
+                \noexpand\addplot[\s, dashed] table[x=epoch, y=val_acc]{figdata/\taphinh_\m_history.dat};}
+      \tmp}
+\end{groupplot}
+\node[below=10mm] at ($(group c1r1.south)!0.5!(group c2r1.south)$) {\pgfplotslegendfromname{legHoc}};
+\end{tikzpicture}

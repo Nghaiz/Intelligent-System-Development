@@ -1,0 +1,704 @@
+{
+  "delta": {
+    "cifar10": {
+      "basic_vgg": 7.030000000000003,
+      "vgg_resnet": 0.039999999999995595,
+      "resnet_seresnet": -0.6399999999999961,
+      "basic_vgg_params": 2078592,
+      "vgg_resnet_params": 42048,
+      "resnet_seresnet_params": 22456,
+      "best": "ResNet",
+      "best_key": "resnet"
+    },
+    "cifar100": {
+      "basic_vgg": 13.229999999999997,
+      "vgg_resnet": 1.0000000000000009,
+      "resnet_seresnet": 0.15000000000000568,
+      "basic_vgg_params": 2078592,
+      "vgg_resnet_params": 42048,
+      "resnet_seresnet_params": 22456,
+      "best": "SE-ResNet",
+      "best_key": "seresnet"
+    },
+    "diabetes": {
+      "basic_vgg": 0.3651416732602941,
+      "vgg_resnet": 0.0006232069411193919,
+      "resnet_seresnet": 1.1394800780507364,
+      "basic_vgg_params": 45008,
+      "vgg_resnet_params": 2800,
+      "resnet_seresnet_params": 2040,
+      "best": "SE-ResNet",
+      "best_key": "seresnet"
+    }
+  },
+  "confusion": {
+    "cifar10": {
+      "model": "ResNet",
+      "diag_min": 84.1,
+      "diag_max": 96.89999999999999,
+      "worst": "cat",
+      "best": "automobile",
+      "top_pair": [
+        "cat",
+        "dog"
+      ],
+      "top_pair_pct": 7.5
+    },
+    "cifar100": {
+      "model": "SE-ResNet",
+      "diag_min": 69.0,
+      "diag_max": 92.60000000000001,
+      "worst": "reptiles",
+      "best": "trees",
+      "top_pair": [
+        "vehicles_1",
+        "vehicles_2"
+      ],
+      "top_pair_pct": 7.3999999999999995,
+      "coarse_acc": 0.8212
+    }
+  },
+  "filters": {
+    "basic": {
+      "n_filters": 32,
+      "weight_std": 0.31888848543167114
+    },
+    "vgg": {
+      "n_filters": 64,
+      "weight_std": 0.15156181156635284
+    },
+    "resnet": {
+      "n_filters": 64,
+      "weight_std": 0.13254210352897644
+    },
+    "seresnet": {
+      "n_filters": 64,
+      "weight_std": 0.10761967301368713
+    }
+  },
+  "trace": {
+    "basic_2d": [
+      [
+        "Input",
+        "3×32×32",
+        0
+      ],
+      [
+        "Conv2d",
+        "32×32×32",
+        896
+      ],
+      [
+        "ReLU",
+        "32×32×32",
+        0
+      ],
+      [
+        "MaxPool2d",
+        "32×16×16",
+        0
+      ],
+      [
+        "Conv2d",
+        "64×16×16",
+        18496
+      ],
+      [
+        "ReLU",
+        "64×16×16",
+        0
+      ],
+      [
+        "MaxPool2d",
+        "64×8×8",
+        0
+      ],
+      [
+        "Conv2d",
+        "128×8×8",
+        73856
+      ],
+      [
+        "ReLU",
+        "128×8×8",
+        0
+      ],
+      [
+        "MaxPool2d",
+        "128×4×4",
+        0
+      ],
+      [
+        "Flatten",
+        "2048",
+        0
+      ],
+      [
+        "Linear",
+        "256",
+        524544
+      ],
+      [
+        "ReLU",
+        "256",
+        0
+      ],
+      [
+        "Linear",
+        "10",
+        2570
+      ]
+    ],
+    "basic_1d": [
+      [
+        "Input",
+        "1×15",
+        0
+      ],
+      [
+        "Conv1d",
+        "16×15",
+        64
+      ],
+      [
+        "ReLU",
+        "16×15",
+        0
+      ],
+      [
+        "MaxPool1d",
+        "16×7",
+        0
+      ],
+      [
+        "Conv1d",
+        "32×7",
+        1568
+      ],
+      [
+        "ReLU",
+        "32×7",
+        0
+      ],
+      [
+        "MaxPool1d",
+        "32×3",
+        0
+      ],
+      [
+        "Conv1d",
+        "64×3",
+        6208
+      ],
+      [
+        "ReLU",
+        "64×3",
+        0
+      ],
+      [
+        "MaxPool1d",
+        "64×1",
+        0
+      ],
+      [
+        "Flatten",
+        "64",
+        0
+      ],
+      [
+        "Linear",
+        "64",
+        4160
+      ],
+      [
+        "ReLU",
+        "64",
+        0
+      ],
+      [
+        "Linear",
+        "1",
+        65
+      ]
+    ],
+    "vgg_2d": [
+      [
+        "Input",
+        "3×32×32",
+        0
+      ],
+      [
+        "Block",
+        "64×32×32",
+        38848
+      ],
+      [
+        "Block",
+        "64×32×32",
+        73984
+      ],
+      [
+        "MaxPool2d",
+        "64×16×16",
+        0
+      ],
+      [
+        "Block",
+        "128×16×16",
+        221696
+      ],
+      [
+        "Block",
+        "128×16×16",
+        295424
+      ],
+      [
+        "MaxPool2d",
+        "128×8×8",
+        0
+      ],
+      [
+        "Block",
+        "256×8×8",
+        885760
+      ],
+      [
+        "Block",
+        "256×8×8",
+        1180672
+      ],
+      [
+        "AdaptiveAvgPool2d",
+        "256×1×1",
+        0
+      ],
+      [
+        "Flatten",
+        "256",
+        0
+      ],
+      [
+        "Linear",
+        "10",
+        2570
+      ]
+    ],
+    "vgg_1d": [
+      [
+        "Input",
+        "1×15",
+        0
+      ],
+      [
+        "Block",
+        "16×15",
+        880
+      ],
+      [
+        "Block",
+        "16×15",
+        1600
+      ],
+      [
+        "MaxPool1d",
+        "16×7",
+        0
+      ],
+      [
+        "Block",
+        "32×7",
+        4736
+      ],
+      [
+        "Block",
+        "32×7",
+        6272
+      ],
+      [
+        "MaxPool1d",
+        "32×3",
+        0
+      ],
+      [
+        "Block",
+        "64×3",
+        18688
+      ],
+      [
+        "Block",
+        "64×3",
+        24832
+      ],
+      [
+        "AdaptiveAvgPool1d",
+        "64×1",
+        0
+      ],
+      [
+        "Flatten",
+        "64",
+        0
+      ],
+      [
+        "Linear",
+        "1",
+        65
+      ]
+    ],
+    "resnet_2d": [
+      [
+        "Input",
+        "3×32×32",
+        0
+      ],
+      [
+        "Block",
+        "64×32×32",
+        39168
+      ],
+      [
+        "Block",
+        "64×32×32",
+        73984
+      ],
+      [
+        "MaxPool2d",
+        "64×16×16",
+        0
+      ],
+      [
+        "Block",
+        "128×16×16",
+        230144
+      ],
+      [
+        "Block",
+        "128×16×16",
+        295424
+      ],
+      [
+        "MaxPool2d",
+        "128×8×8",
+        0
+      ],
+      [
+        "Block",
+        "256×8×8",
+        919040
+      ],
+      [
+        "Block",
+        "256×8×8",
+        1180672
+      ],
+      [
+        "AdaptiveAvgPool2d",
+        "256×1×1",
+        0
+      ],
+      [
+        "Flatten",
+        "256",
+        0
+      ],
+      [
+        "Linear",
+        "10",
+        2570
+      ]
+    ],
+    "resnet_1d": [
+      [
+        "Input",
+        "1×15",
+        0
+      ],
+      [
+        "Block",
+        "16×15",
+        928
+      ],
+      [
+        "Block",
+        "16×15",
+        1600
+      ],
+      [
+        "MaxPool1d",
+        "16×7",
+        0
+      ],
+      [
+        "Block",
+        "32×7",
+        5312
+      ],
+      [
+        "Block",
+        "32×7",
+        6272
+      ],
+      [
+        "MaxPool1d",
+        "32×3",
+        0
+      ],
+      [
+        "Block",
+        "64×3",
+        20864
+      ],
+      [
+        "Block",
+        "64×3",
+        24832
+      ],
+      [
+        "AdaptiveAvgPool1d",
+        "64×1",
+        0
+      ],
+      [
+        "Flatten",
+        "64",
+        0
+      ],
+      [
+        "Linear",
+        "1",
+        65
+      ]
+    ],
+    "seresnet_2d": [
+      [
+        "Input",
+        "3×32×32",
+        0
+      ],
+      [
+        "Block",
+        "64×32×32",
+        39748
+      ],
+      [
+        "Block",
+        "64×32×32",
+        74564
+      ],
+      [
+        "MaxPool2d",
+        "64×16×16",
+        0
+      ],
+      [
+        "Block",
+        "128×16×16",
+        232328
+      ],
+      [
+        "Block",
+        "128×16×16",
+        297608
+      ],
+      [
+        "MaxPool2d",
+        "128×8×8",
+        0
+      ],
+      [
+        "Block",
+        "256×8×8",
+        927504
+      ],
+      [
+        "Block",
+        "256×8×8",
+        1189136
+      ],
+      [
+        "AdaptiveAvgPool2d",
+        "256×1×1",
+        0
+      ],
+      [
+        "Flatten",
+        "256",
+        0
+      ],
+      [
+        "Linear",
+        "10",
+        2570
+      ]
+    ],
+    "seresnet_1d": [
+      [
+        "Input",
+        "1×15",
+        0
+      ],
+      [
+        "Block",
+        "16×15",
+        1076
+      ],
+      [
+        "Block",
+        "16×15",
+        1748
+      ],
+      [
+        "MaxPool1d",
+        "16×7",
+        0
+      ],
+      [
+        "Block",
+        "32×7",
+        5604
+      ],
+      [
+        "Block",
+        "32×7",
+        6564
+      ],
+      [
+        "MaxPool1d",
+        "32×3",
+        0
+      ],
+      [
+        "Block",
+        "64×3",
+        21444
+      ],
+      [
+        "Block",
+        "64×3",
+        25412
+      ],
+      [
+        "AdaptiveAvgPool1d",
+        "64×1",
+        0
+      ],
+      [
+        "Flatten",
+        "64",
+        0
+      ],
+      [
+        "Linear",
+        "1",
+        65
+      ]
+    ]
+  },
+  "lr_peak_epoch": 9,
+  "env": {
+    "python": "3.13.5",
+    "torch": "2.13.0+cu126",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5",
+    "sklearn": "1.9.0",
+    "cuda": "12.6",
+    "cudnn": 91002,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "os": "Windows-11"
+  },
+  "final": {
+    "cifar10": {
+      "basic": {
+        "train_acc": 90.7422,
+        "val_acc": 86.52,
+        "gap": 4.222200000000001,
+        "max_val_acc": 86.56,
+        "argmax_val_acc": 27
+      },
+      "vgg": {
+        "train_acc": 99.42,
+        "val_acc": 92.7,
+        "gap": 6.719999999999999,
+        "max_val_acc": 92.7,
+        "argmax_val_acc": 30
+      },
+      "resnet": {
+        "train_acc": 99.58,
+        "val_acc": 92.9,
+        "gap": 6.679999999999993,
+        "max_val_acc": 92.9,
+        "argmax_val_acc": 30
+      },
+      "seresnet": {
+        "train_acc": 99.4844,
+        "val_acc": 93.1,
+        "gap": 6.384399999999999,
+        "max_val_acc": 93.1,
+        "argmax_val_acc": 30
+      }
+    },
+    "cifar100": {
+      "basic": {
+        "train_acc": 71.4844,
+        "val_acc": 56.92,
+        "gap": 14.564399999999992,
+        "max_val_acc": 56.96,
+        "argmax_val_acc": 28
+      },
+      "vgg": {
+        "train_acc": 96.1911,
+        "val_acc": 69.82,
+        "gap": 26.371100000000013,
+        "max_val_acc": 70.02,
+        "argmax_val_acc": 29
+      },
+      "resnet": {
+        "train_acc": 97.0778,
+        "val_acc": 71.12,
+        "gap": 25.95779999999999,
+        "max_val_acc": 71.12,
+        "argmax_val_acc": 30
+      },
+      "seresnet": {
+        "train_acc": 96.4444,
+        "val_acc": 70.82,
+        "gap": 25.62440000000001,
+        "max_val_acc": 70.88,
+        "argmax_val_acc": 28
+      }
+    },
+    "diabetes": {
+      "basic": {
+        "train_acc": 89.7002,
+        "val_acc": 89.0029,
+        "gap": 0.6972999999999985,
+        "max_val_acc": 91.2495,
+        "argmax_val_acc": 18
+      },
+      "vgg": {
+        "train_acc": 90.1697,
+        "val_acc": 89.523,
+        "gap": 0.6467000000000098,
+        "max_val_acc": 89.8766,
+        "argmax_val_acc": 2
+      },
+      "resnet": {
+        "train_acc": 89.8814,
+        "val_acc": 89.1901,
+        "gap": 0.6912999999999982,
+        "max_val_acc": 89.5715,
+        "argmax_val_acc": 8
+      },
+      "seresnet": {
+        "train_acc": 90.03,
+        "val_acc": 87.9559,
+        "gap": 2.0741000000000014,
+        "max_val_acc": 91.0692,
+        "argmax_val_acc": 10
+      }
+    }
+  },
+  "probe_class": "horse",
+  "probe_index": 13,
+  "noclip_diverged_epoch": 8
+}

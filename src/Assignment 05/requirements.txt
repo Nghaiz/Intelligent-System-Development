@@ -1,0 +1,15 @@
+# Assignment 05 — CNN nhìn như hợp của các hàm
+# Python 3.13 · Windows 11 · GPU NVIDIA (CUDA 12.6) cho hai tập ảnh, CPU cho Diabetes
+# Cài PyTorch bản CUDA:
+#   pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu126
+# rồi:
+#   pip install -r requirements.txt
+
+numpy==2.5.1
+pandas==3.0.5
+scikit-learn==1.9.0
+torch==2.13.0
+
+nbformat==5.11.1
+nbconvert==7.17.1
+ipykernel==7.3.0

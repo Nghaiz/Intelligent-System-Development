@@ -1,0 +1,19 @@
+% Chuỗi hợp hàm của CNN nhỏ ở notebook 00; shape đọc từ concepts.json.
+\begin{tikzpicture}[node distance=5mm]
+  \node[khoiX, minimum width=16mm] (x) {$x$\\[-1pt]{\scriptsize\SL{concepts/trace/0/1}}};
+  \node[khoi, right=of x, minimum width=16mm] (f1) {$f_1$: Conv\\[-1pt]{\scriptsize\SL{concepts/trace/1/1}}};
+  \node[khoi, right=of f1, minimum width=16mm] (f2) {$f_2$: ReLU\\[-1pt]{\scriptsize\SL{concepts/trace/2/1}}};
+  \node[khoi, right=of f2, minimum width=16mm] (f3) {$f_3$: MaxPool\\[-1pt]{\scriptsize\SL{concepts/trace/3/1}}};
+  \node[khoi, right=of f3, minimum width=16mm] (f4) {$f_4$: Flatten\\[-1pt]{\scriptsize\SL{concepts/trace/4/1}}};
+  \node[khoi, right=of f4, minimum width=16mm] (f5) {$f_5$: Dense\\[-1pt]{\scriptsize\SL{concepts/trace/5/1}}};
+  \node[khoiG, below=9mm of f5, minimum width=16mm] (sm) {softmax\\[-1pt]{\scriptsize $\hat{y}\in[0,1]^{10}$}};
+  \node[khoiC, left=12mm of sm, minimum width=22mm] (L) {$L = -\log \hat{y}_{y}$};
+  \foreach \a/\b in {x/f1,f1/f2,f2/f3,f3/f4,f4/f5} \draw[mui] (\a) -- (\b);
+  \draw[mui] (f5) -- (sm);
+  \draw[mui] (sm) -- (L);
+  \draw[decorate, decoration={brace, amplitude=5pt, raise=2pt}, thick, gray]
+    (f1.north west) -- (f4.north east)
+    node[midway, above=8pt, nhan] {trích đặc trưng: $\phi = f_4\circ f_3\circ f_2\circ f_1$};
+  \draw[-{Stealth}, dashed, accentRed, thick] (L.west) -| node[pos=0.25, below, font=\scriptsize, text=accentRed]
+    {gradient $\nabla_\theta L$ đi ngược chuỗi theo quy tắc chuỗi} (x.south);
+\end{tikzpicture}

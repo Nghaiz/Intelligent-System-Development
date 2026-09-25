@@ -1,0 +1,19 @@
+% Ma trận tương quan Pearson giữa 6 đặc trưng số/nhị phân và nhãn (notebook 02).
+\begin{tikzpicture}
+\begin{axis}[a05, grid=none, width=8.6cm, height=8.6cm, enlargelimits=false, axis equal image,
+  colormap={rb}{rgb255=(33,102,172) rgb255=(247,247,247) rgb255=(178,24,43)},
+  point meta min=-1, point meta max=1, colorbar, colorbar style={width=3mm},
+  xtick={0,...,6}, ytick={0,...,6},
+  xticklabels={\SL{data/diabetes/corr_names/0}, \SL{data/diabetes/corr_names/1}, \SL{data/diabetes/corr_names/2},
+               \SL{data/diabetes/corr_names/3}, \SL{data/diabetes/corr_names/4}, \SL{data/diabetes/corr_names/5},
+               \SL{data/diabetes/corr_names/6}},
+  yticklabels={\SL{data/diabetes/corr_names/6}, \SL{data/diabetes/corr_names/5}, \SL{data/diabetes/corr_names/4},
+               \SL{data/diabetes/corr_names/3}, \SL{data/diabetes/corr_names/2}, \SL{data/diabetes/corr_names/1},
+               \SL{data/diabetes/corr_names/0}},
+  x tick label style={rotate=40, anchor=north east, font=\scriptsize},
+  y tick label style={font=\scriptsize},
+  nodes near coords={\pgfmathprintnumber[fixed, precision=2, use comma]{\pgfplotspointmeta}},
+  every node near coord/.append style={font=\tiny, anchor=center}]
+  \addplot[matrix plot*, mesh/cols=7, point meta=explicit] table[meta=v]{figdata/diabetes_corr.dat};
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,288 @@
+% =====================================================================
+%  Chương 5 — Mục 5 của đề: so sánh và đánh giá
+%  Mã nguồn: a05/metrics.py · Notebook: 03, 04, 05 (số liệu), 06 (tổng hợp)
+% =====================================================================
+\chapter{So sánh và đánh giá}
+\label{ch:sosanh}
+
+\section{Tiêu chí đánh giá}
+
+Accuracy một mình không đủ để so sánh các mô hình: nó bỏ qua giá phải trả, và gần như vô nghĩa khi dữ liệu mất cân bằng
+như Diabetes. Chương này so sánh bốn mô hình theo năm nhóm tiêu chí:
+
+\begin{enumerate}
+  \item \textbf{Chất lượng} trên tập test: accuracy và macro-F1 với ảnh; thêm top-5 với CIFAR-100 (100 lớp, nhiều lớp
+        gần giống nhau); precision, recall, F1, ROC-AUC và PR-AUC với Diabetes.
+  \item \textbf{Chi phí}: số tham số, số phép nhân-cộng (MACs) cho một mẫu, thời gian một epoch, thời gian suy luận
+        một mẫu.
+  \item \textbf{Hội tụ}: đường loss và accuracy theo epoch, epoch có val loss nhỏ nhất.
+  \item \textbf{Lỗi}: ma trận nhầm lẫn của mô hình tốt nhất.
+  \item \textbf{Biểu diễn}: bộ lọc lớp đầu và feature map của cùng một ảnh qua bốn mô hình.
+\end{enumerate}
+
+Macro-F1 là trung bình F1 của từng lớp, nên một lớp bị bỏ quên sẽ kéo điểm này xuống dù accuracy vẫn cao. Top-$k$
+accuracy tính tỉ lệ mẫu có nhãn đúng nằm trong $k$ lớp có điểm cao nhất.
+
+\maNguon{metrics__topk_accuracy}{Top-$k$ accuracy}
+\maNguon{metrics__classification_report}{Ba chỉ số chất lượng cho ảnh}
+
+Số MACs chỉ tính các tầng tích chập và nối đầy đủ; BatchNorm, ReLU, pooling và phép cộng đường tắt nhỏ hơn vài bậc nên
+được bỏ qua. Thời gian suy luận được đo trên lô 256 ảnh, có đồng bộ GPU trước và sau khi đo, rồi chia cho số ảnh.
+
+\maNguon{metrics__count_macs}{Đếm MACs bằng forward hook}
+\maNguon{metrics__time_inference}{Đo thời gian suy luận có đồng bộ GPU}
+
+Vì mỗi mô hình chỉ chạy một hạt giống, chênh lệch nhỏ giữa hai mô hình có thể chỉ là nhiễu của lần chạy đó. Chương này
+quy ước: chênh lệch dưới 0,5 điểm phần trăm được ghi là \emph{nằm trong mức dao động của một lần chạy} và không dùng để
+kết luận mô hình nào tốt hơn.
+
+\section{CIFAR-10}
+
+\begin{table}[H]
+  \centering
+  \caption{Kết quả trên tập test CIFAR-10 (\SL{cifar10/n_test} ảnh). In đậm: accuracy cao nhất}
+  \label{tab:kqcifar10}
+  \small\input{generated/tab_cifar10}
+\end{table}
+
+\paragraph{Chất lượng.} Bước lớn nhất là từ M0 sang M1: accuracy tăng \SL{compare/delta/cifar10/basic_vgg} điểm, từ
+\SL{cifar10/models/basic/acc}\,\% lên \SL{cifar10/models/vgg/acc}\,\%. Hai bước sau không cho lợi ích nào: thêm đường tắt
+đổi \SL{compare/delta/cifar10/vgg_resnet} điểm, trong mức dao động. Thêm SE đổi \SL{compare/delta/cifar10/resnet_seresnet}
+điểm, nhỉnh hơn ngưỡng 0,5 một chút và theo chiều xấu đi. Tuy vậy không nên đọc đó là tác hại của SE: trên tập validation,
+thứ tự của ba mô hình ở epoch cuối lại ngược với trên tập test, và SE-ResNet đứng đầu (\SL{compare/final/cifar10/vgg/val_acc}, \SL{compare/final/cifar10/resnet/val_acc} và
+\SL{compare/final/cifar10/seresnet/val_acc}\,\% cho M1, M2, M3). Macro-F1 gần như trùng accuracy vì mười lớp cân bằng.
+
+\paragraph{Vì sao đường tắt không giúp gì ở đây.} ResNet giải quyết bài toán \emph{tối ưu mạng rất sâu}: khi chồng hàng
+chục tầng, gradient khó đi về các tầng đầu. M1 chỉ có 12 tầng tích chập, lại có BatchNorm, nên bài toán đó chưa xuất hiện.
+M1 đã đạt accuracy \SL{compare/final/cifar10/vgg/train_acc}\,\% trên tập train ở epoch cuối, tức là tối ưu không còn là
+chỗ nghẽn. Đường tắt vì vậy không có gì để sửa. Kết quả này không mâu thuẫn với bài báo ResNet; nó cho thấy lợi ích của
+một cơ chế phụ thuộc vào việc mô hình có đang gặp đúng vấn đề mà cơ chế đó giải quyết hay không.
+
+\paragraph{Hội tụ.} Hình~\ref{fig:hoccifar10} cho thấy M0 hội tụ chậm và dừng ở accuracy train
+\SL{compare/final/cifar10/basic/train_acc}\,\%, trong khi ba mô hình còn lại gần như thuộc lòng tập train. Khoảng cách
+train--val của M0 là \SL{compare/final/cifar10/basic/gap} điểm, của M1 là \SL{compare/final/cifar10/vgg/gap} điểm. M0 không
+thiếu dữ liệu mà thiếu sức chứa: nó chưa khớp hết tập train. Cả bốn mô hình đều có epoch tốt nhất ở cuối lịch huấn luyện,
+nhờ pha giảm tốc độ học của OneCycle.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_duong_hoc_cifar10}
+  \caption{Đường học trên CIFAR-10}
+  \label{fig:hoccifar10}
+\end{figure}
+
+\section{CIFAR-100}
+
+\begin{table}[H]
+  \centering
+  \caption{Kết quả trên tập test CIFAR-100 (\SL{cifar100/n_test} ảnh, 100 lớp)}
+  \label{tab:kqcifar100}
+  \small\input{generated/tab_cifar100}
+\end{table}
+
+\paragraph{Chất lượng.} Cùng bốn kiến trúc và cùng cấu hình, chỉ tăng số lớp lên mười lần, accuracy của mọi mô hình giảm
+mạnh so với CIFAR-10 (Bảng~\ref{tab:kqcifar10} và~\ref{tab:kqcifar100}). Bước M0$\to$M1 lớn hơn hẳn: \SL{compare/delta/cifar100/basic_vgg} điểm, từ
+\SL{cifar100/models/basic/acc}\,\% lên \SL{cifar100/models/vgg/acc}\,\%. Khác với CIFAR-10, đường tắt lần này có tác dụng
+đo được: M2 hơn M1 \SL{compare/delta/cifar100/vgg_resnet} điểm, vượt ngưỡng 0,5 điểm, và top-5 cũng tăng theo (từ
+\SL{cifar100/models/vgg/top5} lên \SL{cifar100/models/resnet/top5}\,\%). SE vẫn chỉ thêm
+\SL{compare/delta/cifar100/resnet_seresnet} điểm, trong mức dao động.
+
+Một cách đọc hợp lý là: bài toán 100 lớp khó hơn nên M1 không còn gần như thuộc lòng tập train như ở CIFAR-10
+(\SL{compare/final/cifar100/vgg/train_acc}\,\% so với \SL{compare/final/cifar10/vgg/train_acc}\,\%), và đường tắt giúp
+tối ưu tốt hơn một chút. Tuy vậy, với một lần chạy duy nhất, chênh lệch một điểm chỉ đủ để nói ``có dấu hiệu'', chưa đủ để
+kết luận chắc chắn.
+
+\paragraph{Top-5.} Top-5 của mô hình tốt nhất là \SL{cifar100/models/seresnet/top5}\,\%, cao hơn nhiều so với top-1.
+Phần lớn lỗi top-1 là nhầm sang một lớp gần giống, và lớp đúng vẫn nằm trong vài lựa chọn đầu. Mục~\ref{sec:loi} sẽ cho thấy
+các lớp gần giống này thường thuộc cùng một siêu lớp.
+
+\paragraph{Hội tụ.} Khoảng cách train--val trên CIFAR-100 rất lớn: \SL{compare/final/cifar100/vgg/gap} điểm với M1 và
+\SL{compare/final/cifar100/basic/gap} điểm với M0 (Hình~\ref{fig:hoccifar100}). Mỗi lớp chỉ có \SL{data/cifar100/per_class_max} ảnh gốc, nên các
+mô hình có BN nhớ được tập train nhưng khái quát kém hơn nhiều so với CIFAR-10. Đây là quá khớp thật, khác với trường hợp
+thiếu sức chứa của M0.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_duong_hoc_cifar100}
+  \caption{Đường học trên CIFAR-100}
+  \label{fig:hoccifar100}
+\end{figure}
+
+\section{Diabetes}
+
+\begin{table}[H]
+  \centering
+  \caption{Kết quả trên tập test Diabetes (\SL{diabetes/n_test} bệnh nhân). In đậm: giá trị cao nhất mỗi cột}
+  \label{tab:kqdiabetes}
+  \scriptsize\input{generated/tab_diabetes}
+\end{table}
+
+\paragraph{Mốc so sánh.} Đoán mọi bệnh nhân đều khoẻ đạt accuracy \SL{diabetes/majority_acc}\,\% nhưng recall bằng 0. Accuracy của bốn
+mô hình từ \SL{diabetes/models/basic/acc} đến \SL{diabetes/models/seresnet/acc}\,\%, chỉ hơn mốc này vài điểm. Vì vậy phần so sánh dưới đây dựa vào recall, F1 và
+hai diện tích dưới đường cong.
+
+\paragraph{Chất lượng.} Bốn mô hình gần như không phân biệt được. ROC-AUC chỉ dao động từ \SL{diabetes/models/vgg/roc_auc}
+đến \SL{diabetes/models/basic/roc_auc}, và PR-AUC từ \SL{diabetes/models/vgg/pr_auc} đến \SL{diabetes/models/seresnet/pr_auc}.
+Hai chỉ số này đo khả năng \emph{xếp hạng} bệnh nhân theo nguy cơ và không phụ thuộc ngưỡng, nên có thể nói bốn mô hình xếp
+hạng tốt như nhau. F1 của SE-ResNet cao hơn (\SL{diabetes/models/seresnet/f1}\,\% so với \SL{diabetes/models/basic/f1}\,\% của M0),
+nhưng Bảng~\ref{tab:kqdiabetes} cho thấy phần chênh này đến từ \emph{điểm cắt}: precision của nó cao nhất
+(\SL{diabetes/models/seresnet/precision}\,\%) còn recall thấp nhất (\SL{diabetes/models/seresnet/recall}\,\%). Nó không phải
+một mô hình tốt hơn, chỉ là một điểm khác trên cùng một đường ROC (Hình~\ref{fig:rocpr}).
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_roc_pr}
+  \caption{Đường ROC và Precision--Recall của bốn mô hình trên tập test Diabetes. Đường chấm trên hình PR là tỉ lệ dương, mốc của một bộ phân loại ngẫu nhiên}
+  \label{fig:rocpr}
+\end{figure}
+
+\paragraph{Vì sao kiến trúc không giúp gì ở đây.} Cả ba cơ chế đều được thiết kế cho dữ liệu có cấu trúc không gian: bộ lọc
+$3\times3$ khai thác quan hệ giữa các điểm ảnh kề nhau, và một đặc trưng dịch đi vài ô vẫn là cùng một đặc trưng. Một hàng
+dữ liệu Diabetes chỉ có \SL{data/diabetes/n_features_encoded} cột, và hai cột kề nhau (ví dụ \texttt{bmi} và
+\texttt{HbA1c\_level}) không có quan hệ lân cận nào. Chương~\ref{ch:dulieu} cũng cho thấy phần lớn ca dương tính đã được
+hai ngưỡng xét nghiệm tách ra. Phần khó còn lại nằm ở những bệnh nhân có chỉ số chồng lấn với người khoẻ, và thêm tầng hay
+thêm cơ chế không tạo ra thông tin mới để phân biệt họ.
+
+\paragraph{Hội tụ.} Các mô hình có BN đạt val loss nhỏ nhất rất sớm (epoch \SL{diabetes/models/vgg/best_epoch} với M1,
+\SL{diabetes/models/resnet/best_epoch} với M2) rồi bị dừng sớm; M0 cần đến epoch \SL{diabetes/models/basic/best_epoch}
+(Hình~\ref{fig:hocdiabetes}). Khoảng cách train--val ở epoch cuối nhỏ (\SL{compare/final/diabetes/basic/gap} điểm với M0): với \SL{data/diabetes/n_train} dòng
+train và nhiều nhất \SL{diabetes/models/seresnet/params} tham số, không mô hình nào quá khớp.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_duong_hoc_diabetes}
+  \caption{Đường học trên Diabetes; accuracy tính tại ngưỡng 0,5 của mô hình có \texttt{pos\_weight}}
+  \label{fig:hocdiabetes}
+\end{figure}
+
+\paragraph{Ma trận nhầm lẫn.} Tại ngưỡng chọn trên validation, SE-ResNet bỏ sót \SL{diabetes/models/seresnet/confusion/1/0}
+ca dương tính và báo nhầm \SL{diabetes/models/seresnet/confusion/0/1} người khoẻ; M0 bỏ sót
+\SL{diabetes/models/basic/confusion/1/0} ca và báo nhầm \SL{diabetes/models/basic/confusion/0/1} người. Nếu mô hình được dùng
+để sàng lọc, bỏ sót một ca bệnh đắt hơn nhiều so với một lần xét nghiệm thừa, và khi đó nên hạ ngưỡng để tăng recall thay vì
+chọn ngưỡng theo F1.
+
+\section{Chất lượng và chi phí}
+\label{sec:chiphi}
+
+Hình~\ref{fig:cot} đặt chất lượng cạnh thời gian huấn luyện. Bước M0$\to$M1 tăng số tham số từ
+\SL{cifar10/models/basic/paramsM} lên \SL{cifar10/models/vgg/paramsM} triệu và số MACs mỗi ảnh từ
+\SL{cifar10/models/basic/macsM} lên \SL{cifar10/models/vgg/macsM} triệu. Phần lớn MACs tăng thêm đến từ việc các tầng
+đầu của M1 chạy ở độ phân giải $32\times32$ với 64 kênh. Hai bước sau gần như miễn phí về tham số: đường tắt thêm
+\SL{compare/delta/cifar10/vgg_resnet_params} tham số (các conv $1\times1$ chiếu) và SE thêm
+\SL{compare/delta/cifar10/resnet_seresnet_params}. Tuy vậy thời gian mỗi epoch vẫn tăng, từ \SL{cifar10/models/vgg/epoch_s}
+lên \SL{cifar10/models/resnet/epoch_s} giây, vì phép cộng đường tắt và SE là các thao tác đọc ghi bộ nhớ, không được tính
+vào MACs. Trên Diabetes, M0 huấn luyện một epoch trong \SL{diabetes/models/basic/epoch_s} giây, còn SE-ResNet cần
+\SL{diabetes/models/seresnet/epoch_s} giây, cho cùng một chất lượng.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_cot}
+  \caption{Chất lượng (hàng trên) và thời gian mỗi epoch (hàng dưới) của M0--M3 trên ba tập}
+  \label{fig:cot}
+\end{figure}
+
+Hình~\ref{fig:scatter} vẽ accuracy theo chi phí. Ba mô hình M1--M3 nằm chồng lên nhau ở cùng mức chi phí. Trên cả hai tập ảnh,
+đường nối M0 với cụm này dốc lên rõ rệt: số tham số tăng từ \SL{cifar10/models/basic/paramsM} lên \SL{cifar10/models/vgg/paramsM} triệu đổi được \SL{compare/delta/cifar10/basic_vgg}
+điểm trên CIFAR-10 và \SL{compare/delta/cifar100/basic_vgg} điểm trên CIFAR-100.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_scatter}
+  \caption{Accuracy trên tập test theo số tham số (trái) và theo MACs mỗi ảnh, trục log (phải)}
+  \label{fig:scatter}
+\end{figure}
+
+\section{Phân tích lỗi}
+\label{sec:loi}
+
+Hình~\ref{fig:confc10} là ma trận nhầm lẫn của \SL{compare/confusion/cifar10/model}, mô hình tốt nhất trên CIFAR-10. Lớp
+khó nhất là \SL{compare/confusion/cifar10/worst} (recall \SL{compare/confusion/cifar10/diag_min}\,\%), lớp dễ nhất là
+\SL{compare/confusion/cifar10/best} (\SL{compare/confusion/cifar10/diag_max}\,\%). Cặp nhầm nhiều nhất là
+\SL{compare/confusion/cifar10/top_pair/0} bị đoán thành \SL{compare/confusion/cifar10/top_pair/1}
+(\SL{compare/confusion/cifar10/top_pair_pct}\,\% số ảnh \SL{compare/confusion/cifar10/top_pair/0}). Hai lớp này đều là thú bốn chân
+có lông, và ở độ phân giải $32\times32$ chúng khác nhau chủ yếu ở hình dạng tai và mõm. Lỗi của mô hình đi theo sự giống
+nhau về hình ảnh chứ không rải ngẫu nhiên.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_conf_cifar10}
+  \caption{Ma trận nhầm lẫn CIFAR-10 của mô hình tốt nhất, \% theo hàng}
+  \label{fig:confc10}
+\end{figure}
+
+Với CIFAR-100, ma trận $100\times100$ quá dày để đọc, nên lớp thật và lớp dự đoán được gộp về 20 siêu lớp
+(Hình~\ref{fig:confc100}). Mô hình tốt nhất là \SL{compare/confusion/cifar100/model}. Accuracy ở mức siêu lớp là
+\SL{compare/confusion/cifar100/coarse_acc}\,\%, cao hơn hẳn top-1 ở mức lớp mịn (\SL{cifar100/models/seresnet/acc}\,\%). Như vậy
+rất nhiều lỗi là nhầm giữa hai lớp mịn \emph{trong cùng một siêu lớp}: dự đoán sai lớp nhưng vẫn đúng nhóm. Cặp siêu lớp
+nhầm nhiều nhất là \SL{compare/confusion/cifar100/top_pair/0} sang \SL{compare/confusion/cifar100/top_pair/1}
+(\SL{compare/confusion/cifar100/top_pair_pct}\,\%). Siêu lớp khó nhất là \SL{compare/confusion/cifar100/worst}, dễ nhất là
+\SL{compare/confusion/cifar100/best}.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_conf_cifar100}
+  \caption{Ma trận nhầm lẫn CIFAR-100 gộp theo 20 siêu lớp, \% theo hàng}
+  \label{fig:confc100}
+\end{figure}
+
+\section{Biểu diễn: bộ lọc lớp đầu và feature map}
+
+Hình~\ref{fig:bieudien} đặt cạnh nhau 16 bộ lọc $3\times3\times3$ đầu tiên của tầng tích chập đầu và sáu feature map mà tầng đó
+tạo ra từ cùng một ảnh test (lớp \SL{compare/probe_class}, ảnh ở Hình~\ref{fig:fmapm0}), cho bốn mô hình CIFAR-10. Mỗi bộ lọc
+được kéo giãn min--max về $[0, 255]$ để hiển thị như một ảnh màu nhỏ.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_bieu_dien}
+  \caption{Bộ lọc lớp đầu và feature map của cùng một ảnh test qua bốn mô hình CIFAR-10}
+  \label{fig:bieudien}
+\end{figure}
+
+Ở tầng đầu, bốn mô hình học những thứ giống nhau: các bộ lọc là những mảng màu và những cặp sáng--tối theo một hướng, và
+feature map làm nổi đường viền con ngựa theo các hướng khác nhau. Một vài kênh của ResNet và SE-ResNet phản ứng với cả vùng
+thân ngựa thay vì chỉ với viền. Tầng đầu của bốn mô hình giống nhau như vậy cũng khớp với việc M1, M2, M3 cho accuracy gần như bằng
+nhau: khác biệt giữa chúng, nếu có, nằm ở các tầng sâu hơn.
+
+Có một khác biệt đo được: độ lệch chuẩn của trọng số bộ lọc lớp đầu ở M0 là \SL{compare/filters/basic/weight_std}, còn ở
+M1, M2, M3 chỉ từ \SL{compare/filters/seresnet/weight_std} đến \SL{compare/filters/vgg/weight_std}. Điều này có lý do: ở M1--M3,
+ngay sau mỗi tầng tích chập là BatchNorm, và BatchNorm chuẩn hoá lại đầu ra, nên nhân mọi trọng số của bộ lọc với một hằng số
+không làm đổi kết quả. Độ lớn của trọng số vì thế không còn ý nghĩa, và weight decay kéo nó nhỏ dần. M0 không có BatchNorm nên
+độ lớn trọng số quyết định trực tiếp độ lớn của feature map.
+
+\section{Tổng hợp: mỗi cơ chế mang lại bao nhiêu}
+
+Bảng~\ref{tab:delta} gom chênh lệch giữa hai mô hình liền kề trên cả ba tập, và Bảng~\ref{tab:tonghop} là toàn bộ 12 lượt
+chạy (3 tập $\times$ 4 mô hình).
+
+\begin{table}[H]
+  \centering
+  \caption{Chênh lệch chất lượng giữa hai mô hình liền kề}
+  \label{tab:delta}
+  \small\input{generated/tab_delta}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Tổng hợp 12 lượt chạy trên tập test}
+  \label{tab:tonghop}
+  \small\input{generated/tab_summary}
+\end{table}
+
+Ba điều rút ra từ hai bảng trên:
+
+\begin{enumerate}
+  \item \textbf{Bước M0$\to$M1 quyết định gần như toàn bộ chênh lệch trên ảnh}: \SL{compare/delta/cifar10/basic_vgg} điểm
+        trên CIFAR-10 và \SL{compare/delta/cifar100/basic_vgg} điểm trên CIFAR-100. Bước này gộp ba thay đổi (sâu hơn,
+        BatchNorm, GAP), và thí nghiệm không tách được phần đóng góp của từng thay đổi. Bằng chứng liên quan duy nhất
+        là M0, mô hình không có BatchNorm, đã phân kỳ ở tốc độ học đỉnh khi chưa cắt gradient (Hình~\ref{fig:clip}).
+  \item \textbf{Đường tắt chỉ có ích khi bài toán đủ khó}: không đổi gì trên CIFAR-10 (\SL{compare/delta/cifar10/vgg_resnet}
+        điểm), tăng \SL{compare/delta/cifar100/vgg_resnet} điểm trên CIFAR-100. Với mạng 12 tầng, lợi ích này nhỏ; nó được
+        thiết kế cho mạng sâu hàng chục đến hàng trăm tầng.
+  \item \textbf{SE không cho lợi ích nhất quán}: \SL{compare/delta/cifar10/resnet_seresnet} điểm trên CIFAR-10 (validation
+        lại xếp nó đứng đầu), \SL{compare/delta/cifar100/resnet_seresnet} điểm trên CIFAR-100. Trên Diabetes, F1 của nó cao hơn
+        \SL{compare/delta/diabetes/resnet_seresnet} điểm nhưng ROC-AUC không đổi, tức là khác biệt nằm ở ngưỡng chứ không ở
+        mô hình.
+\end{enumerate}
+
+Trên dữ liệu bảng, lựa chọn hợp lý là mô hình \emph{rẻ nhất}: M0 cho cùng khả năng xếp hạng với \SL{diabetes/models/basic/params}
+tham số, so với \SL{diabetes/models/seresnet/params} của M3. Trên ảnh, lựa chọn hợp lý là M1 hoặc M2: M2 tốt hơn một chút khi bài toán khó hơn, với chi phí tham số gần như bằng M1.

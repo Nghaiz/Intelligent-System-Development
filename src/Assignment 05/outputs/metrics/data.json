@@ -1,0 +1,175 @@
+{
+  "cifar10": {
+    "n_train": 45000,
+    "n_val": 5000,
+    "n_test": 10000,
+    "n_classes": 10,
+    "per_class_min": 5000,
+    "per_class_max": 5000,
+    "test_per_class": 1000,
+    "mean": [
+      0.4911373512433157,
+      0.48211118702965566,
+      0.4464489876221127
+    ],
+    "std": [
+      0.24686913619422035,
+      0.243430126129394,
+      0.2616033939238015
+    ],
+    "shape": "32×32×3",
+    "class_names": [
+      "airplane",
+      "automobile",
+      "bird",
+      "cat",
+      "deer",
+      "dog",
+      "frog",
+      "horse",
+      "ship",
+      "truck"
+    ]
+  },
+  "cifar100": {
+    "n_train": 45000,
+    "n_val": 5000,
+    "n_test": 10000,
+    "n_classes": 100,
+    "per_class_min": 500,
+    "per_class_max": 500,
+    "test_per_class": 100,
+    "mean": [
+      0.5070556501951134,
+      0.4864234557203145,
+      0.44058432591187857
+    ],
+    "std": [
+      0.2672420444535152,
+      0.2563343181419608,
+      0.276031295611197
+    ],
+    "shape": "32×32×3",
+    "coarse_names": [
+      "aquatic_mammals",
+      "fish",
+      "flowers",
+      "food_containers",
+      "fruit_and_vegetables",
+      "household_electrical_devices",
+      "household_furniture",
+      "insects",
+      "large_carnivores",
+      "large_man-made_outdoor_things",
+      "large_natural_outdoor_scenes",
+      "large_omnivores_and_herbivores",
+      "medium_mammals",
+      "non-insect_invertebrates",
+      "people",
+      "reptiles",
+      "small_mammals",
+      "trees",
+      "vehicles_1",
+      "vehicles_2"
+    ],
+    "sample_fine": [
+      "otter",
+      "aquarium_fish",
+      "sunflower",
+      "cup",
+      "apple",
+      "telephone",
+      "table",
+      "cockroach",
+      "wolf",
+      "castle",
+      "cloud",
+      "cattle",
+      "possum",
+      "lobster",
+      "boy",
+      "dinosaur",
+      "squirrel",
+      "willow_tree",
+      "train",
+      "streetcar"
+    ],
+    "fine_per_coarse": 5
+  },
+  "diabetes": {
+    "n_raw": 100000,
+    "n_dup": 3854,
+    "n_rows": 96146,
+    "n_features_raw": 8,
+    "n_features_encoded": 15,
+    "pos_rate": 0.08821999875189815,
+    "n_pos": 8482,
+    "no_info_rate": 0.3420527115012585,
+    "n_train": 67302,
+    "n_val": 14422,
+    "n_test": 14422,
+    "desc": {
+      "age": {
+        "mean": 41.79432571297818,
+        "std": 22.46294757741935,
+        "min": 0.08,
+        "max": 80.0
+      },
+      "bmi": {
+        "mean": 27.32146111122667,
+        "std": 6.767715560480338,
+        "min": 10.01,
+        "max": 95.69
+      },
+      "HbA1c_level": {
+        "mean": 5.532608740873256,
+        "std": 1.0732320256443277,
+        "min": 3.5,
+        "max": 9.0
+      },
+      "blood_glucose_level": {
+        "mean": 138.21823060761758,
+        "std": 40.909771362746795,
+        "min": 80.0,
+        "max": 300.0
+      }
+    },
+    "corr_target": {
+      "age": 0.26492692423607167,
+      "bmi": 0.21493169995887582,
+      "HbA1c_level": 0.40640837582949013,
+      "blood_glucose_level": 0.42433583557906795,
+      "hypertension": 0.19570970179625852,
+      "heart_disease": 0.17071089766632525
+    },
+    "corr_names": [
+      "age",
+      "bmi",
+      "HbA1c_level",
+      "blood_glucose_level",
+      "hypertension",
+      "heart_disease",
+      "diabetes"
+    ],
+    "pure_threshold": {
+      "HbA1c_level": 6.8,
+      "blood_glucose_level": 220.0
+    },
+    "pos_covered": 0.6685923131336949,
+    "categories": {
+      "gender": [
+        "Female",
+        "Male",
+        "Other"
+      ],
+      "smoking_history": [
+        "No Info",
+        "current",
+        "ever",
+        "former",
+        "never",
+        "not current"
+      ]
+    }
+  }
+}

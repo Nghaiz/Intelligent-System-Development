@@ -1,0 +1,14 @@
+% Ma trận nhầm lẫn CIFAR-100 gộp theo 20 siêu lớp, chuẩn hoá theo hàng (%), notebook 06.
+\begin{tikzpicture}
+\begin{axis}[a05, grid=none, width=12cm, height=12cm, enlargelimits=false, axis equal image,
+  colormap={xanh}{rgb255=(255,255,255) rgb255=(110,160,215)}, point meta min=0, point meta max=100,
+  colorbar, colorbar style={width=3mm, ylabel={\% của hàng}},
+  xtick={0,...,19}, ytick={0,...,19}, xlabel={siêu lớp dự đoán}, ylabel={siêu lớp thật},
+  xticklabel={\SL{data/cifar100/coarse_names/\ticknum}},
+  yticklabel={\pgfmathtruncatemacro{\r}{19-\ticknum}\SL{data/cifar100/coarse_names/\r}},
+  x tick label style={rotate=60, anchor=north east, font=\tiny}, y tick label style={font=\tiny},
+  nodes near coords={\pgfmathprintnumber[fixed, precision=0]{\pgfplotspointmeta}},
+  every node near coord/.append style={font=\fontsize{4.5}{5}\selectfont, anchor=center}]
+  \addplot[matrix plot*, mesh/cols=20, point meta=explicit] table[meta=v]{figdata/confusion_cifar100.dat};
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,18 @@
+% Đường ROC và Precision-Recall của 4 mô hình Conv1D trên tập test Diabetes (notebook 05).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=16mm}, a05, width=7cm, height=6cm,
+  xmin=0, xmax=1, ymin=0, ymax=1.02]
+  \nextgroupplot[title={ROC}, xlabel={tỉ lệ dương tính giả}, ylabel={tỉ lệ dương tính thật}, legend pos=south east]
+    \foreach \m/\s/\lab in {basic/m0/BasicCNN, vgg/m1/VGGNet, resnet/m2/ResNet, seresnet/m3/SE-ResNet} {
+      \edef\tmp{\noexpand\addplot[\s] table[x=fpr, y=tpr]{figdata/diabetes_\m_roc.dat};
+                \noexpand\addlegendentry{\lab\ (AUC \noexpand\SL{diabetes/models/\m/roc_auc})}}
+      \tmp}
+    \addplot[gray, dotted, domain=0:1] {x};
+  \nextgroupplot[title={Precision-Recall}, xlabel={recall}, ylabel={precision}, legend pos=south west]
+    \foreach \m/\s/\lab in {basic/m0/BasicCNN, vgg/m1/VGGNet, resnet/m2/ResNet, seresnet/m3/SE-ResNet} {
+      \edef\tmp{\noexpand\addplot[\s] table[x=recall, y=precision]{figdata/diabetes_\m_pr.dat};
+                \noexpand\addlegendentry{\lab\ (AP \noexpand\SL{diabetes/models/\m/pr_auc})}}
+      \tmp}
+    \addplot[gray, dotted, domain=0:1] {\SL{data/diabetes/pos_rateRaw}};
+\end{groupplot}
+\end{tikzpicture}

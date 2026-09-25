@@ -1,0 +1,57 @@
+% =====================================================================
+%  Lời mở đầu và bảng đối chiếu với đề bài
+% =====================================================================
+\chapter*{Lời mở đầu}
+\addcontentsline{toc}{chapter}{Lời mở đầu}
+\markboth{Lời mở đầu}{Lời mở đầu}
+
+Assignment 04 đã cài đặt phép tích chập bằng tay và so sánh ba khung phần mềm. Assignment 05 đặt một câu hỏi khác:
+từ năm 1998 đến nay các kiến trúc CNN đã thêm những gì, và mỗi thứ thêm vào thực sự đổi được bao nhiêu? Để trả lời,
+bài nhìn mạng nơ-ron tích chập như một hợp của các hàm, $f = f_L\circ\dots\circ f_1$. Với cách nhìn này, mỗi kiến
+trúc mới chỉ là một cách thay một hàm, hoặc thay cách nối các hàm với nhau. Ví dụ, ResNet không đổi hàm tích chập;
+nó thêm $x$ vào đầu ra của hai tầng tích chập.
+
+Báo cáo đi theo đúng năm mục của đề. Chương 1 viết từng khái niệm (neuron, hàm kích hoạt, tích chập, pooling,
+softmax, lan truyền ngược) thành một hàm NumPy và đối chiếu với PyTorch. Chương 2 đi qua chín kiến trúc từ LeNet đến ViT,
+mỗi kiến trúc một lớp PyTorch ngắn. Chương 3 mô tả ba tập dữ liệu: CIFAR-10, CIFAR-100 và Diabetes Prediction. Chương 4
+xây một CNN cơ bản và ba mô hình phát triển. Mỗi mô hình chỉ thêm đúng một cơ chế so với mô hình trước, rồi cả bốn được
+huấn luyện trên cả ba tập. Chương 5 so sánh chúng theo chất lượng, chi phí, tốc độ hội tụ, lỗi và biểu diễn.
+
+Kết quả không đi theo câu chuyện ``kiến trúc sau luôn tốt hơn kiến trúc trước''. Bước từ CNN cơ bản sang VGG tăng
+\SL{compare/delta/cifar10/basic_vgg} điểm accuracy trên CIFAR-10 và \SL{compare/delta/cifar100/basic_vgg} điểm trên CIFAR-100.
+Thêm đường tắt của ResNet không đổi gì trên CIFAR-10 và chỉ thêm \SL{compare/delta/cifar100/vgg_resnet} điểm trên CIFAR-100.
+Thêm khối chú ý SE không cho lợi ích nhất quán: accuracy đổi \SL{compare/delta/cifar10/resnet_seresnet} điểm trên CIFAR-10
+và \SL{compare/delta/cifar100/resnet_seresnet} điểm trên CIFAR-100. Trên dữ liệu bệnh tiểu đường, cả bốn mô hình có
+ROC-AUC gần như bằng nhau, và mô hình rẻ nhất là lựa chọn hợp lý. Chương 5 giải thích vì sao: mỗi cơ chế chỉ có ích khi mô hình
+gặp đúng vấn đề mà cơ chế đó được tạo ra để giải quyết.
+
+Mọi con số trong báo cáo được sinh tự động từ tệp kết quả của notebook, mọi đoạn mã được trích thẳng từ mã nguồn, và
+mọi hình được vẽ bằng TikZ từ dữ liệu, kể cả ảnh mẫu (vẽ lại từng điểm ảnh). Nếu chạy lại notebook, báo cáo sẽ đổi theo.
+Phụ lục~\ref{ch:phuluc} ghi các lệnh để tái lập.
+
+Em xin cảm ơn thầy \textbf{PGS.TS Trần Đình Quế} đã hướng dẫn học phần và ra đề bài này.
+
+\vspace{8mm}
+\begin{flushright}
+\emph{Hà Nội, tháng 9 năm 2026}\par
+\vspace{2mm}
+\textbf{Nguyễn Duy Nghĩa}
+\end{flushright}
+
+\section*{Đối chiếu với đề bài}
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{L{4.6cm}L{2.2cm}L{3.8cm}L{3.8cm}}
+    \toprule
+    Yêu cầu của đề & Chương & Notebook & Mã nguồn \\
+    \midrule
+    1. Khái niệm cơ bản của CNN qua hàm và hợp hàm, kèm code & \ref{ch:khainiem} & \texttt{00\_ham\_va\_hop\_ham} & \texttt{a05/concepts.py} \\
+    2. Các mô hình phát triển của CNN, hàm và code & \ref{ch:kientruc} & \texttt{01\_kien\_truc\_phat\_trien} & \texttt{a05/blocks.py} \\
+    3. Hai tập ảnh và một tập tiểu đường, có link và mô tả & \ref{ch:dulieu} & \texttt{02\_du\_lieu} & \texttt{a05/data.py} \\
+    4. Code một CNN cơ bản và ba mô hình phát triển & \ref{ch:mohinh} & \texttt{03\_cifar10}, \texttt{04\_cifar100}, \texttt{05\_diabetes} & \texttt{a05/models.py}, \texttt{a05/train.py} \\
+    5. So sánh và đánh giá & \ref{ch:sosanh} & \texttt{06\_so\_sanh} & \texttt{a05/metrics.py} \\
+    \bottomrule
+  \end{tabular}
+\end{table}

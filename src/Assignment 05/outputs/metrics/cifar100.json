@@ -1,0 +1,64 @@
+{
+  "models": {
+    "basic": {
+      "acc": 0.5748,
+      "top5": 0.8433,
+      "macro_f1": 0.5742558655121165,
+      "params": 643492,
+      "macs": 10871808,
+      "epoch_s": 2.659675966666691,
+      "infer_ms": 0.007528085937380524,
+      "best_epoch": 30,
+      "epochs_run": 30,
+      "best_val_acc": 0.5696
+    },
+    "vgg": {
+      "acc": 0.7071,
+      "top5": 0.919,
+      "macro_f1": 0.707860054878906,
+      "params": 2722084,
+      "macs": 379282432,
+      "epoch_s": 49.17882085333349,
+      "infer_ms": 0.09324060546873625,
+      "best_epoch": 29,
+      "epochs_run": 30,
+      "best_val_acc": 0.7002
+    },
+    "resnet": {
+      "acc": 0.7171,
+      "top5": 0.9226,
+      "macro_f1": 0.717087064629376,
+      "params": 2764132,
+      "macs": 383673344,
+      "epoch_s": 58.27575817666645,
+      "infer_ms": 0.10614064453129401,
+      "best_epoch": 29,
+      "epochs_run": 30,
+      "best_val_acc": 0.7112
+    },
+    "seresnet": {
+      "acc": 0.7186,
+      "top5": 0.9256,
+      "macro_f1": 0.7191748401774847,
+      "params": 2786588,
+      "macs": 383694848,
+      "epoch_s": 59.43447724000004,
+      "infer_ms": 0.11534953125007519,
+      "best_epoch": 29,
+      "epochs_run": 30,
+      "best_val_acc": 0.7088
+    }
+  },
+  "config": {
+    "epochs": 30,
+    "batch_size": 256,
+    "max_lr": 0.1,
+    "momentum": 0.9,
+    "weight_decay": 0.0005,
+    "grad_clip": 2.0
+  },
+  "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "n_train": 45000,
+  "n_val": 5000,
+  "n_test": 10000
+}

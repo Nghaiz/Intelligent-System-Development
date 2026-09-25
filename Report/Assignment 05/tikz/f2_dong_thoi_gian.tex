@@ -1,0 +1,22 @@
+% Dòng thời gian các kiến trúc CNN, mỗi mốc kèm cơ chế viết dưới dạng hàm.
+% Trục x tính theo số năm kể từ 1997 để toạ độ không vượt giới hạn kích thước của TeX.
+\begin{tikzpicture}[x=6.0mm, y=1cm]
+  \draw[thick, ptitblue, -{Stealth}] (0, 0) -- (24.3, 0);
+  \foreach \y in {1998, 2002, 2006, 2010, 2014, 2018}
+    \draw[ptitblue] (\y-1997, 0.1) -- (\y-1997, -0.1) node[below, font=\scriptsize] {\y};
+  \foreach \y/\ten/\cm/\h/\m/\a in {
+      1998/{LeNet-5}/{Conv $\to$ Pool $\to$ FC}/1.2/mZero/south,
+      2012/{AlexNet}/{ReLU, Dropout}/2.4/mZero/south,
+      2014/{VGG}/{chồng conv $3\times3$}/1.2/mOne/south,
+      2014.8/{Inception}/{nhánh song song, nối kênh}/3.5/mOne/south,
+      2015.7/{ResNet}/{$y = F(x) + x$}/-1.3/mTwo/north,
+      2017/{DenseNet}/{$x_l = H_l([x_0,\dots,x_{l-1}])$}/-2.6/mTwo/north,
+      2017.4/{MobileNet}/{depthwise + $1{\times}1$}/2.4/mOne/south,
+      2018.3/{SE-Net, CBAM}/{$x\odot\sigma(\mathrm{MLP}(\mathrm{GAP}\,x))$}/1.2/mThree/south,
+      2020.4/{ViT}/{ô ảnh + self-attention}/-1.3/mThree/north} {
+    \draw[\m, thick] (\y-1997, 0) -- (\y-1997, \h);
+    \fill[\m] (\y-1997, 0) circle (1.6pt);
+    \node[draw=\m, fill=white, rounded corners=2pt, font=\scriptsize, align=center, inner sep=2pt,
+          anchor=\a] at (\y-1997, \h) {\textbf{\ten}\\ \cm};
+  }
+\end{tikzpicture}

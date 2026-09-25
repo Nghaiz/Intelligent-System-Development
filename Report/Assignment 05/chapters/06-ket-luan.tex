@@ -1,0 +1,49 @@
+% =====================================================================
+%  Chương 6 — Kết luận
+% =====================================================================
+\chapter{Kết luận}
+\label{ch:ketluan}
+
+\section{Trả lời năm mục của đề}
+
+\begin{enumerate}
+  \item \textbf{Khái niệm cơ bản qua hàm và hợp hàm} (Chương~\ref{ch:khainiem}). Neuron, hàm kích hoạt, tích chập, pooling,
+        softmax và cross-entropy được viết thành các hàm NumPy trong \texttt{a05/concepts.py}. CNN là hợp của các hàm đó, và
+        lan truyền ngược là quy tắc đạo hàm của hàm hợp. \SL{concepts/checks_passed}/\SL{concepts/checks_total} phép kiểm chứng
+        khớp với PyTorch; gradient viết tay của tầng tích chập sai lệch so với sai phân hữu hạn chưa tới $10^{-6}$.
+  \item \textbf{Các mô hình phát triển} (Chương~\ref{ch:kientruc}). Chín mốc từ LeNet-5 đến ViT, mỗi mốc là một cơ chế viết
+        được dưới dạng hàm: chồng conv $3\times3$, nhánh song song, $F(x)+x$, nối mọi tầng, tách depthwise, nhân trọng số kênh,
+        self-attention. Mỗi cơ chế có một lớp PyTorch trong \texttt{a05/blocks.py}, đã kiểm tra shape và số tham số.
+  \item \textbf{Dữ liệu} (Chương~\ref{ch:dulieu}). CIFAR-10, CIFAR-100 (bài hiểu ``MNIST-100'' của đề là tập này) và Diabetes
+        Prediction, kèm đường dẫn đã kiểm tra, thống kê mô tả, cách chia tập và dạng tensor. Diabetes bị bỏ
+        \SL{data/diabetes/n_dup} dòng trùng trước khi chia, và mọi phép biến đổi chỉ học trên nhánh train.
+  \item \textbf{Một CNN cơ bản và ba mô hình phát triển} (Chương~\ref{ch:mohinh}). BasicCNN, VGGNet, ResNet, SE-ResNet, mỗi
+        bước thêm đúng một cơ chế, có bản 2D cho ảnh và bản 1D cho Diabetes từ cùng một định nghĩa. Mười hai lượt huấn luyện
+        (3 tập $\times$ 4 mô hình) dùng chung một cấu hình trong mỗi tập.
+  \item \textbf{So sánh và đánh giá} (Chương~\ref{ch:sosanh}). So theo chất lượng, chi phí, hội tụ, lỗi và biểu diễn. Kết quả
+        tốt nhất: \SL{cifar10/models/resnet/acc}\,\% trên CIFAR-10 (ResNet), \SL{cifar100/models/seresnet/acc}\,\% top-1 và
+        \SL{cifar100/models/seresnet/top5}\,\% top-5 trên CIFAR-100 (SE-ResNet), ROC-AUC \SL{diabetes/models/basic/roc_auc}
+        trên Diabetes (BasicCNN).
+\end{enumerate}
+
+\section{Điều rút ra}
+
+Kết quả quan trọng nhất của bài không phải mô hình nào đứng đầu, mà là \emph{một cơ chế chỉ có ích khi mô hình đang gặp
+đúng vấn đề mà cơ chế đó sinh ra để giải quyết}. BatchNorm được tạo ra để huấn luyện ổn định, và M0, mô hình duy nhất không có
+nó, là mô hình đã phân kỳ ở tốc độ học cao khi chưa cắt gradient. Đường tắt giải quyết bài toán tối ưu mạng sâu, nên nó không đổi gì khi M1 đã gần như
+thuộc lòng CIFAR-10, và chỉ thêm được \SL{compare/delta/cifar100/vgg_resnet} điểm trên CIFAR-100. Cả ba cơ chế đều khai thác cấu trúc không gian của ảnh,
+nên không giúp gì cho một hàng dữ liệu bảng không có cấu trúc đó. Đọc lịch sử CNN như một chuỗi ``kiến trúc sau luôn tốt hơn
+kiến trúc trước'' là đọc sai: mỗi kiến trúc tốt hơn \emph{trong điều kiện} mà nó được thiết kế.
+
+\section{Hạn chế}
+
+\begin{itemize}
+  \item \textbf{Một hạt giống.} Mỗi mô hình chạy một lần. Chênh lệch dưới 0,5 điểm không được dùng để kết luận, và ngay cả
+        chênh lệch \SL{compare/delta/cifar100/vgg_resnet} điểm của đường tắt trên CIFAR-100 cũng chỉ nên coi là dấu hiệu.
+  \item \textbf{Bước M0$\to$M1 gộp ba thay đổi.} Thí nghiệm không tách được phần đóng góp riêng của độ sâu, BatchNorm và GAP.
+  \item \textbf{Mạng nông.} Với 12 tầng tích chập, thí nghiệm không kiểm tra được lợi ích của đường tắt ở độ sâu mà nó được
+        thiết kế cho.
+  \item \textbf{Thời gian đo trên GPU laptop bị hạ xung vì nhiệt.} Số giây mỗi epoch chỉ so sánh được giữa các mô hình với nhau.
+  \item \textbf{``MNIST-100''} được hiểu là CIFAR-100. Nếu đề muốn một tập khác, Chương~\ref{ch:dulieu} và phần CIFAR-100 của
+        Chương~\ref{ch:sosanh} cần làm lại với tập đó; mã nguồn không phải đổi gì ngoài hàm nạp dữ liệu.
+\end{itemize}

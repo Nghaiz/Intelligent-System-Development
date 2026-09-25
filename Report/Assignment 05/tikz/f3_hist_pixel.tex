@@ -1,0 +1,16 @@
+% Phân bố cường độ điểm ảnh theo ba kênh trên nhánh train (notebook 02).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=14mm},
+  a05, width=7.2cm, height=5cm, xmin=0, xmax=256, ymin=0,
+  xlabel={cường độ điểm ảnh}, scaled y ticks=false,
+  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=3}]
+  \nextgroupplot[title={CIFAR-10}, ylabel={mật độ}, legend pos=north east]
+    \addplot[red!80!black, thick] table[x=bin, y=r]{figdata/cifar10_pixel_hist.dat}; \addlegendentry{R}
+    \addplot[green!55!black, thick] table[x=bin, y=g]{figdata/cifar10_pixel_hist.dat}; \addlegendentry{G}
+    \addplot[blue!80!black, thick] table[x=bin, y=b]{figdata/cifar10_pixel_hist.dat}; \addlegendentry{B}
+  \nextgroupplot[title={CIFAR-100}]
+    \addplot[red!80!black, thick] table[x=bin, y=r]{figdata/cifar100_pixel_hist.dat};
+    \addplot[green!55!black, thick] table[x=bin, y=g]{figdata/cifar100_pixel_hist.dat};
+    \addplot[blue!80!black, thick] table[x=bin, y=b]{figdata/cifar100_pixel_hist.dat};
+\end{groupplot}
+\end{tikzpicture}

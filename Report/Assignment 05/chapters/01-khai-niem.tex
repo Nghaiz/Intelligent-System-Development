@@ -1,0 +1,239 @@
+% =====================================================================
+%  Chương 1 — Mục 1 của đề: khái niệm cơ bản qua hàm và hợp hàm
+%  Mã nguồn: a05/concepts.py · Notebook: notebooks/00_ham_va_hop_ham.ipynb
+% =====================================================================
+\chapter{Khái niệm cơ bản của CNN qua hàm và hợp hàm}
+\label{ch:khainiem}
+
+Chương này trả lời mục 1 của đề. Cách nhìn xuyên suốt là: \emph{một mạng nơ-ron tích chập
+chỉ là một hàm có tham số}, và hàm đó được ghép từ nhiều hàm nhỏ,
+\[
+  f_\theta \;=\; f_L \circ f_{L-1} \circ \dots \circ f_2 \circ f_1 ,
+  \qquad f_\theta : \mathbb{R}^{C\times H\times W} \to \mathbb{R}^{K}.
+\]
+Mỗi khái niệm quen thuộc của CNN (tích chập, hàm kích hoạt, pooling, softmax) là một
+$f_l$ cụ thể. Huấn luyện là tìm $\theta$ làm hàm mất mát nhỏ nhất, và lan truyền ngược chỉ là
+quy tắc đạo hàm của hàm hợp. Mọi hàm trong chương được viết bằng NumPy thuần trong
+\texttt{a05/concepts.py}, rồi được so với PyTorch trong notebook 00. Kết quả:
+\SL{concepts/checks_passed}/\SL{concepts/checks_total} phép kiểm chứng đều khớp.
+
+\section{Neuron là một hàm affine}
+
+Đơn vị nhỏ nhất của mạng nhận vectơ $\mathbf{x}\in\mathbb{R}^n$ và trả về một số:
+\[
+  z = \mathbf{w}^{\top}\mathbf{x} + b = \sum_{i=1}^{n} w_i x_i + b .
+\]
+Ở đây $\mathbf{w}$ và $b$ là tham số. Gom $m$ neuron thành một tầng thì được hàm affine
+$\mathbf{x}\mapsto W\mathbf{x}+\mathbf{b}$ với $W\in\mathbb{R}^{m\times n}$. Mã nguồn~\ref{code:concepts__neuron}
+và~\ref{code:concepts__compose} viết đúng hai ý này: một neuron, và phép hợp hàm theo thứ tự áp dụng.
+
+\maNguon{concepts__neuron}{Neuron tuyến tính}
+\maNguon{concepts__compose}{Hợp hàm theo thứ tự áp dụng}
+
+\noindent\texttt{compose(f1, f2, f3)} trả về hàm $x\mapsto f_3(f_2(f_1(x)))$. Toàn bộ các mạng ở những
+chương sau đều có dạng này, chỉ khác nhau ở danh sách hàm được truyền vào.
+
+\subsection*{Vì sao cần hàm phi tuyến}
+
+Ghép hai tầng affine không cho gì mới:
+\[
+  W_2(W_1\mathbf{x}+\mathbf{b}_1)+\mathbf{b}_2 = (W_2W_1)\,\mathbf{x} + (W_2\mathbf{b}_1+\mathbf{b}_2).
+\]
+Vế phải lại là một tầng affine. Nếu giữa các tầng không có hàm phi tuyến, chồng bao nhiêu tầng thì
+mạng vẫn chỉ biểu diễn được hàm tuyến tính. Notebook 00 kiểm tra điều này bằng số: ghép hai tầng affine
+ngẫu nhiên cho đúng kết quả của một tầng gộp, còn khi chèn ReLU vào giữa thì không còn tầng gộp nào khớp.
+
+\maNguon{concepts__collapse_affine}{Hai tầng affine gộp thành một}
+
+\section{Hàm kích hoạt}
+
+Hàm kích hoạt $\sigma$ được áp dụng lên từng phần tử sau mỗi tầng affine hoặc tích chập. Ba hàm hay gặp là
+\[
+  \mathrm{ReLU}(z)=\max(0,z),\qquad
+  \mathrm{sigmoid}(z)=\frac{1}{1+e^{-z}},\qquad
+  \tanh(z)=\frac{e^{z}-e^{-z}}{e^{z}+e^{-z}} .
+\]
+Khi lan truyền ngược, gradient đi qua mỗi tầng bị nhân với $\sigma'(z)$. Hình~\ref{fig:kichhoat} cho thấy
+đạo hàm của sigmoid không vượt quá $0{,}25$ và của tanh tiến về 0 ở hai đầu, nên qua nhiều tầng gradient bị
+thu nhỏ rất nhanh. Đạo hàm của ReLU bằng đúng 1 ở mọi $z>0$, đó là lý do các CNN từ AlexNet trở đi dùng ReLU.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_kich_hoat}
+  \caption{Ba hàm kích hoạt (nét liền) và đạo hàm của chúng (nét đứt)}
+  \label{fig:kichhoat}
+\end{figure}
+
+\maNguon{concepts__relu}{ReLU}
+\maNguon{concepts__sigmoid_grad}{Đạo hàm sigmoid viết qua chính sigmoid}
+
+\section{Tích chập là một hàm}
+
+\subsection{Định nghĩa}
+
+Tầng tích chập nhận ảnh $X\in\mathbb{R}^{C\times H\times W}$ và $F$ bộ lọc $K\in\mathbb{R}^{F\times C\times k\times k}$.
+Kênh ra thứ $f$ tại vị trí $(i,j)$ là
+\[
+  Y_{f,i,j} \;=\; b_f + \sum_{c=1}^{C}\sum_{u=0}^{k-1}\sum_{v=0}^{k-1}
+      K_{f,c,u,v}\; X_{c,\; iS+u,\; jS+v},
+\]
+trong đó $S$ là bước trượt (stride). Công thức này thực ra là tương quan chéo (cross-correlation), không lật
+bộ lọc như định nghĩa tích chập trong toán học. \texttt{nn.Conv2d} của PyTorch cũng tính đúng như vậy.
+Vì bộ lọc được học từ dữ liệu, việc có lật hay không không ảnh hưởng gì.
+
+Hình~\ref{fig:tichchap} tính tay một ví dụ của notebook 00: ảnh $5\times5$, bộ lọc $3\times3$ phát hiện
+biên dọc (cột trái $+1$, cột phải $-1$).
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_tich_chap}
+  \caption{Tích chập tính tay: mỗi ô đầu ra là tổng tích của bộ lọc với một cửa sổ của ảnh}
+  \label{fig:tichchap}
+\end{figure}
+
+Mã nguồn~\ref{code:concepts__conv2d} viết công thức trên thành hai vòng lặp theo vị trí đầu ra. Tại mỗi
+vị trí, \texttt{np.tensordot} tính tổng tích giữa toàn bộ $F$ bộ lọc và cửa sổ tương ứng. Notebook 00 so
+hàm này với \texttt{F.conv2d} ở ba cấu hình (stride 1 không đệm, stride 1 đệm 1, stride 2 đệm 1), và cả
+ba đều khớp.
+
+\maNguon{concepts__conv2d}{Tích chập 2D bằng NumPy}
+
+\subsection{Padding và stride}
+
+Đệm (padding) $P$ thêm các ô 0 quanh biên để đầu ra không bị co lại. Bước (stride) $S$ là số ô cửa sổ nhảy
+mỗi lần. Kích thước đầu ra là
+\[
+  H_{\text{ra}} = \left\lfloor \frac{H + 2P - K}{S} \right\rfloor + 1 .
+\]
+Với $K=3$, chọn $P=1, S=1$ thì giữ nguyên kích thước; đây là cấu hình của mọi tầng tích chập trong
+Chương~\ref{ch:mohinh}.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_pad_stride}
+  \caption{Ba vị trí đầu tiên của cửa sổ $3\times3$ khi đệm $P=1$, bước $S=2$}
+  \label{fig:padstride}
+\end{figure}
+
+\maNguon{concepts__out_size}{Công thức kích thước đầu ra}
+
+\subsection{Chia sẻ trọng số: tích chập rẻ hơn tầng nối đầy đủ}
+
+Một bộ lọc được dùng lại ở mọi vị trí của ảnh, nên số tham số của tầng tích chập không phụ thuộc vào kích
+thước ảnh: nó chỉ là $C_{\text{vào}}\cdot C_{\text{ra}}\cdot k^2 + C_{\text{ra}}$. Với ảnh CIFAR $32\times32\times3$,
+nối đầy đủ tới 64 đơn vị cần \SL{concepts/params/dense} tham số, còn tầng Conv $3\times3$ ra 64 kênh chỉ cần
+\SL{concepts/params/conv}, ít hơn khoảng \SL{concepts/params/ratio} lần. Hai con số này được kiểm lại bằng
+\texttt{numel()} của lớp PyTorch tương ứng.
+
+\maNguon{concepts__count_params_conv}{Số tham số của tầng tích chập}
+
+\section{Pooling}
+
+Max pooling thay mỗi cửa sổ bằng giá trị lớn nhất của nó:
+$\;Y_{c,i,j} = \max_{0\le u,v<s} X_{c,\,iS+u,\,jS+v}$. Hàm này không có tham số. Nó giảm kích thước không gian
+và làm đặc trưng ít nhạy với dịch chuyển nhỏ: dù đặc trưng dịch đi một ô trong cửa sổ, giá trị lớn nhất vẫn giữ nguyên.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_pooling}
+  \caption{Max pooling $2\times2$ bước 2: mỗi vùng màu cho đúng một ô ở đầu ra}
+  \label{fig:pooling}
+\end{figure}
+
+\maNguon{concepts__maxpool2d}{Max pooling}
+
+\section{Đầu ra: softmax và cross-entropy}
+
+Sau các tầng trích đặc trưng, tensor được làm phẳng (\texttt{flatten}) rồi qua một tầng nối đầy đủ để
+cho ra $K$ \emph{logits} $\mathbf{z}\in\mathbb{R}^K$. Softmax biến logits thành phân phối xác suất, và hàm mất
+mát cross-entropy phạt xác suất thấp gán cho nhãn đúng $y$:
+\[
+  \hat{y}_k = \frac{e^{z_k}}{\sum_j e^{z_j}}, \qquad
+  L(\mathbf{z}, y) = -\log \hat{y}_y = \log\sum_j e^{z_j} - z_y .
+\]
+Viết thẳng công thức này thì $e^{1000}$ sẽ tràn số. Trừ đi $m=\max_j z_j$ ở cả tử và mẫu không làm đổi
+kết quả, nhưng đưa mọi số mũ về $\le 0$. Notebook 00 tính được
+$\mathrm{softmax}(1000, 1001, 1002)$ mà không tràn, và giá trị cross-entropy khớp \texttt{F.cross\_entropy}.
+
+\maNguon{concepts__softmax}{Softmax ổn định số}
+\maNguon{concepts__cross_entropy}{Cross-entropy dùng log-sum-exp}
+
+\section{Một CNN hoàn chỉnh là một hợp hàm}
+
+Ghép các hàm ở trên lại, ta được một CNN nhỏ:
+\[
+  f = \mathrm{dense}\circ\mathrm{flatten}\circ\mathrm{maxpool}\circ\mathrm{ReLU}\circ\mathrm{conv}.
+\]
+Hình~\ref{fig:hopham} vẽ hợp hàm này cùng shape tensor sau từng hàm. Bảng~\ref{tab:tinytrace} là bản in thật
+của notebook 00 khi chạy trên ảnh $3\times8\times8$ với bốn bộ lọc.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_hop_ham}
+  \caption{CNN nhỏ viết thành hợp hàm; bốn hàm đầu trích đặc trưng, gradient đi ngược chuỗi}
+  \label{fig:hopham}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Shape sau từng hàm của CNN nhỏ (notebook 00)}
+  \label{tab:tinytrace}
+  \input{generated/tab_tiny_trace}
+\end{table}
+
+\maNguon{concepts__tiny_cnn_forward}{CNN nhỏ viết thẳng thành hợp hàm}
+
+\noindent Hàm này nhận đúng một danh sách \texttt{(tên, hàm)} và áp dụng lần lượt, hay chính là
+\texttt{compose} có kèm theo việc ghi shape. Với cùng trọng số, logits của nó khớp với
+\texttt{nn.Sequential(Conv2d, ReLU, MaxPool2d, Flatten, Linear)}. Như vậy \texttt{nn.Sequential} cũng không
+làm gì hơn một phép hợp hàm.
+
+\section{Học là đạo hàm của hàm hợp}
+
+\subsection{Quy tắc chuỗi}
+
+Huấn luyện tìm $\theta$ làm nhỏ rủi ro thực nghiệm
+$\mathcal{L}(\theta) = \frac{1}{N}\sum_{n} L(f_\theta(\mathbf{x}_n), y_n)$ bằng gradient descent
+$\theta \leftarrow \theta - \eta\,\nabla_\theta\mathcal{L}$. Vì $f_\theta$ là hàm hợp, gradient theo tham số
+của tầng $l$ được tính bằng quy tắc chuỗi, đi ngược từ đầu ra:
+\[
+  \frac{\partial L}{\partial \theta_l}
+  = \frac{\partial L}{\partial \mathbf{a}_L}\,
+    \frac{\partial \mathbf{a}_L}{\partial \mathbf{a}_{L-1}}\cdots
+    \frac{\partial \mathbf{a}_{l+1}}{\partial \mathbf{a}_{l}}\,
+    \frac{\partial \mathbf{a}_{l}}{\partial \theta_l},
+  \qquad \mathbf{a}_l = f_l(\mathbf{a}_{l-1}).
+\]
+Mỗi tầng chỉ cần biết hai việc: nhận gradient $G = \partial L/\partial Y$ từ tầng sau, và trả về
+$\partial L/\partial X$ cho tầng trước, kèm gradient theo tham số của chính nó.
+
+\subsection{Gradient của tầng tích chập}
+
+Vì $Y_{f,i,j}$ tuyến tính theo cả $K$ lẫn $X$, đạo hàm của nó chỉ là cộng dồn:
+\[
+  \frac{\partial L}{\partial K_{f,c,u,v}} = \sum_{i,j} G_{f,i,j}\, X_{c,\,iS+u,\,jS+v},\qquad
+  \frac{\partial L}{\partial X_{c,p,q}} = \sum_{f}\sum_{\substack{i,j,u,v\\ iS+u=p,\; jS+v=q}} G_{f,i,j}\, K_{f,c,u,v},\qquad
+  \frac{\partial L}{\partial b_f} = \sum_{i,j} G_{f,i,j}.
+\]
+Mã nguồn~\ref{code:concepts__conv2d_backward} duyệt lại đúng các cửa sổ mà lượt thuận đã dùng và cộng
+dồn theo hai công thức đầu.
+
+\maNguon{concepts__conv2d_backward}{Lan truyền ngược qua tầng tích chập}
+
+\subsection{Kiểm chứng bằng sai phân hữu hạn}
+
+Một gradient viết tay chỉ đáng tin khi đã được đối chiếu với định nghĩa đạo hàm. Hàm \texttt{grad\_check}
+nhích từng phần tử $\pm\varepsilon$ và tính sai phân trung tâm $\bigl(L(\theta+\varepsilon)-L(\theta-\varepsilon)\bigr)/2\varepsilon$.
+Trên ảnh $3\times9\times9$, bốn bộ lọc, stride 2, đệm 1, sai số tương đối là \SL{concepts/grad_err/K} với $\partial L/\partial K$,
+\SL{concepts/grad_err/X} với $\partial L/\partial X$ và \SL{concepts/grad_err/b} với $\partial L/\partial b$, đều dưới
+ngưỡng $10^{-6}$. Một bước cập nhật $K\leftarrow K-\eta\,\partial L/\partial K$ với $\eta=\SL{concepts/gd_step/eta}$ làm
+$L$ giảm từ \SL{concepts/gd_step/before} xuống \SL{concepts/gd_step/after}, đúng hướng mà gradient chỉ ra.
+
+\maNguon{concepts__grad_check}{Kiểm tra gradient bằng sai phân trung tâm}
+
+\begin{phathien}{Tóm tắt Chương 1}
+Mỗi thành phần của CNN là một hàm: tích chập là hàm tuyến tính có chia sẻ trọng số, ReLU là hàm phi tuyến
+đặt giữa các tầng tuyến tính để chúng không gộp lại thành một tầng, pooling là hàm lấy cực đại cục bộ,
+softmax và cross-entropy biến logits thành mất mát. CNN là hợp của các hàm đó, và việc học là tính đạo hàm
+của hàm hợp bằng quy tắc chuỗi. Toàn bộ \SL{concepts/checks_total} hàm viết tay khớp với PyTorch.
+\end{phathien}

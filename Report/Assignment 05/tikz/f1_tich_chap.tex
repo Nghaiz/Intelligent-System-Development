@@ -1,0 +1,27 @@
+% Tích chập 5x5 * 3x3 -> 3x3, số đọc từ concepts.json (notebook 00).
+\begin{tikzpicture}[x=6.5mm, y=6.5mm]
+  % Ảnh vào X
+  \foreach \i in {0,...,4} \foreach \j in {0,...,4}
+    \node[o] at (\j, -\i) {\SL{concepts/conv_example/X/\i/\j}};
+  \begin{scope}[on background layer]
+    \fill[lightBlue] (-0.5, 0.5) rectangle (2.5, -2.5);
+  \end{scope}
+  \draw[ptitblue, very thick] (-0.5, 0.5) rectangle (2.5, -2.5);
+  \node[above] at (2, 0.6) {$X$ (5×5)};
+  \node at (5.4, -2) {\Large $\ast$};
+  % Bộ lọc K
+  \foreach \i in {0,...,2} \foreach \j in {0,...,2}
+    \node[o, fill=lightOrange] at (6.5+\j, -1-\i) {\SL{concepts/conv_example/K/\i/\j}};
+  \node[above] at (7.5, -0.4) {$K$ (3×3)};
+  \node at (10, -2) {\Large $=$};
+  % Đầu ra Y
+  \foreach \i in {0,...,2} \foreach \j in {0,...,2}
+    \node[o] at (11+\j, -1-\i) {\SL{concepts/conv_example/Y/\i/\j}};
+  \node[o, fill=lightBlue, draw=ptitblue, very thick] at (11, -1) {\SL{concepts/conv_example/Y/0/0}};
+  \node[above] at (12, -0.4) {$Y$ (3×3)};
+  \draw[-{Stealth}, ptitblue, thick] (2.5, 0) to[bend left=25] (10.7, -0.75);
+  \node[font=\footnotesize, align=left, anchor=north west] at (-0.5, -5) {%
+    $Y_{00} = \sum_{u=0}^{2}\sum_{v=0}^{2} X_{u,v}\,K_{u,v}$:
+    tổng tích của vùng tô xanh với bộ lọc. Trượt cửa sổ sang phải một ô được $Y_{01}$,
+    xuống một ô được $Y_{10}$.};
+\end{tikzpicture}

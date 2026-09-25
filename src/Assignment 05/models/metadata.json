@@ -1,0 +1,330 @@
+{
+  "cifar10_basic": {
+    "dataset": "cifar10",
+    "model": "basic",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.8562,
+    "top5": 0.9932,
+    "macro_f1": 0.8560409758489549,
+    "params": 620362,
+    "macs": 10848768,
+    "epoch_s": 1.997656969999965,
+    "infer_ms": 0.005072617187451556,
+    "best_epoch": 30,
+    "epochs_run": 30,
+    "best_val_acc": 0.8656
+  },
+  "diabetes_basic": {
+    "dataset": "diabetes",
+    "model": "basic",
+    "config": {
+      "epochs": 30,
+      "batch_size": 512,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "threads": 8
+    },
+    "device": "cpu",
+    "acc": 0.9674802385244765,
+    "precision": 0.8834765998089781,
+    "recall": 0.7272012578616353,
+    "f1": 0.7977576541612764,
+    "roc_auc": 0.9768108962861994,
+    "pr_auc": 0.8806275602785415,
+    "threshold": 0.8793501257896423,
+    "confusion": [
+      [
+        13028,
+        122
+      ],
+      [
+        347,
+        925
+      ]
+    ],
+    "params": 12065,
+    "macs": 34064,
+    "epoch_s": 0.5955477296296589,
+    "infer_ms": 0.0012752539062521606,
+    "best_epoch": 22,
+    "epochs_run": 27
+  },
+  "diabetes_vgg": {
+    "dataset": "diabetes",
+    "model": "vgg",
+    "config": {
+      "epochs": 30,
+      "batch_size": 512,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "threads": 8
+    },
+    "device": "cpu",
+    "acc": 0.9687283317154347,
+    "precision": 0.9109109109109109,
+    "recall": 0.7154088050314465,
+    "f1": 0.8014090708938794,
+    "roc_auc": 0.9751905026663797,
+    "pr_auc": 0.8778889928522865,
+    "threshold": 0.8976516723632812,
+    "confusion": [
+      [
+        13061,
+        89
+      ],
+      [
+        362,
+        910
+      ]
+    ],
+    "params": 57073,
+    "macs": 239632,
+    "epoch_s": 1.9398729181818701,
+    "infer_ms": 0.003557930908204554,
+    "best_epoch": 6,
+    "epochs_run": 11
+  },
+  "diabetes_resnet": {
+    "dataset": "diabetes",
+    "model": "resnet",
+    "config": {
+      "epochs": 30,
+      "batch_size": 512,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "threads": 8
+    },
+    "device": "cpu",
+    "acc": 0.9688670087366523,
+    "precision": 0.916076845298281,
+    "recall": 0.7122641509433962,
+    "f1": 0.8014153029632906,
+    "roc_auc": 0.976085055121123,
+    "pr_auc": 0.8798458217026721,
+    "threshold": 0.8692490458488464,
+    "confusion": [
+      [
+        13067,
+        83
+      ],
+      [
+        366,
+        906
+      ]
+    ],
+    "params": 59873,
+    "macs": 249600,
+    "epoch_s": 2.1486044444445724,
+    "infer_ms": 0.0038611181640613172,
+    "best_epoch": 4,
+    "epochs_run": 9
+  },
+  "diabetes_seresnet": {
+    "dataset": "diabetes",
+    "model": "seresnet",
+    "config": {
+      "epochs": 30,
+      "batch_size": 512,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "threads": 8
+    },
+    "device": "cpu",
+    "acc": 0.9712245180973512,
+    "precision": 0.9534391534391534,
+    "recall": 0.7083333333333334,
+    "f1": 0.8128101037437979,
+    "roc_auc": 0.976471441040725,
+    "pr_auc": 0.8815624951535062,
+    "threshold": 0.8719231486320496,
+    "confusion": [
+      [
+        13106,
+        44
+      ],
+      [
+        371,
+        901
+      ]
+    ],
+    "params": 61913,
+    "macs": 251392,
+    "epoch_s": 2.8367917615379645,
+    "infer_ms": 0.005495207519534695,
+    "best_epoch": 8,
+    "epochs_run": 13
+  },
+  "cifar10_vgg": {
+    "dataset": "cifar10",
+    "model": "vgg",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.9265,
+    "top5": 0.9979,
+    "macro_f1": 0.9264945809192925,
+    "params": 2698954,
+    "macs": 379259392,
+    "epoch_s": 50.077064249999964,
+    "infer_ms": 0.09886550781246228,
+    "best_epoch": 30,
+    "epochs_run": 30,
+    "best_val_acc": 0.927
+  },
+  "cifar10_resnet": {
+    "dataset": "cifar10",
+    "model": "resnet",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.9269,
+    "top5": 0.9982,
+    "macro_f1": 0.9268503600004884,
+    "params": 2741002,
+    "macs": 383650304,
+    "epoch_s": 62.39550526333338,
+    "infer_ms": 0.12167357421883906,
+    "best_epoch": 30,
+    "epochs_run": 30,
+    "best_val_acc": 0.929
+  },
+  "cifar10_seresnet": {
+    "dataset": "cifar10",
+    "model": "seresnet",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.9205,
+    "top5": 0.9983,
+    "macro_f1": 0.9203245658308091,
+    "params": 2763458,
+    "macs": 383671808,
+    "epoch_s": 63.42670337999995,
+    "infer_ms": 0.11534693359358528,
+    "best_epoch": 28,
+    "epochs_run": 30,
+    "best_val_acc": 0.931
+  },
+  "cifar100_basic": {
+    "dataset": "cifar100",
+    "model": "basic",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.5748,
+    "top5": 0.8433,
+    "macro_f1": 0.5742558655121165,
+    "params": 643492,
+    "macs": 10871808,
+    "epoch_s": 2.659675966666691,
+    "infer_ms": 0.007528085937380524,
+    "best_epoch": 30,
+    "epochs_run": 30,
+    "best_val_acc": 0.5696
+  },
+  "cifar100_vgg": {
+    "dataset": "cifar100",
+    "model": "vgg",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.7071,
+    "top5": 0.919,
+    "macro_f1": 0.707860054878906,
+    "params": 2722084,
+    "macs": 379282432,
+    "epoch_s": 49.17882085333349,
+    "infer_ms": 0.09324060546873625,
+    "best_epoch": 29,
+    "epochs_run": 30,
+    "best_val_acc": 0.7002
+  },
+  "cifar100_resnet": {
+    "dataset": "cifar100",
+    "model": "resnet",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.7171,
+    "top5": 0.9226,
+    "macro_f1": 0.717087064629376,
+    "params": 2764132,
+    "macs": 383673344,
+    "epoch_s": 58.27575817666645,
+    "infer_ms": 0.10614064453129401,
+    "best_epoch": 29,
+    "epochs_run": 30,
+    "best_val_acc": 0.7112
+  },
+  "cifar100_seresnet": {
+    "dataset": "cifar100",
+    "model": "seresnet",
+    "config": {
+      "epochs": 30,
+      "batch_size": 256,
+      "max_lr": 0.1,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "grad_clip": 2.0
+    },
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "acc": 0.7186,
+    "top5": 0.9256,
+    "macro_f1": 0.7191748401774847,
+    "params": 2786588,
+    "macs": 383694848,
+    "epoch_s": 59.43447724000004,
+    "infer_ms": 0.11534953125007519,
+    "best_epoch": 29,
+    "epochs_run": 30,
+    "best_val_acc": 0.7088
+  }
+}
