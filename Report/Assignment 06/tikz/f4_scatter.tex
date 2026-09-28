@@ -1,0 +1,22 @@
+% Chất lượng theo độ trễ suy luận (CPU, 1 luồng, lô 1) của 16 mô hình; màu theo framework (notebook 06).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=17mm}, a06, width=7.3cm, height=6cm,
+  xmode=log, xlabel={độ trễ (ms/mẫu, thang log)}, log ticks with fixed point,
+  nodes near coords, point meta=explicit symbolic,
+  every node near coord/.append style={font=\tiny, inner sep=1.5pt}]
+  \nextgroupplot[title={(a) AMZN}, ylabel={RMSE test (USD, càng thấp càng tốt)}, legend pos=north east]
+    \addplot[only marks, mark=*, fwTorch, every node near coord/.append style={anchor=west}]
+      table[x=lat, y=m, meta=label]{figdata/bench_amzn_torch.dat};
+    \addlegendentry{PyTorch}
+    \addplot[only marks, mark=square*, fwKeras, every node near coord/.append style={anchor=east}]
+      table[x=lat, y=m, meta=label]{figdata/bench_amzn_keras.dat};
+    \addlegendentry{Keras}
+    \addplot[accentRed, dashed, domain=0.15:5, samples=2, forget plot] {\SL{bench/naive/rmseRaw}};
+    \node[font=\scriptsize, accentRed, anchor=north east] at (axis cs:4.9,\SL{bench/naive/rmseRaw}) {mốc ngây thơ};
+  \nextgroupplot[title={(b) KKBox}, ylabel={F1 test (\%, càng cao càng tốt)}]
+    \addplot[only marks, mark=*, fwTorch, every node near coord/.append style={anchor=west}]
+      table[x=lat, y=m, meta=label]{figdata/bench_kkbox_torch.dat};
+    \addplot[only marks, mark=square*, fwKeras, every node near coord/.append style={anchor=east}]
+      table[x=lat, y=m, meta=label]{figdata/bench_kkbox_keras.dat};
+\end{groupplot}
+\end{tikzpicture}

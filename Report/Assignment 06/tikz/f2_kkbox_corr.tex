@@ -1,0 +1,14 @@
+% Tương quan Pearson giữa 8 đặc trưng (trung bình 31 ngày của mỗi người dùng, notebook 02).
+\begin{tikzpicture}
+\begin{axis}[a06, grid=none, width=6.8cm, height=6.8cm, enlargelimits=false, axis equal image,
+  colormap={rb}{rgb255=(33,102,172) rgb255=(247,247,247) rgb255=(178,24,43)},
+  point meta min=-1, point meta max=1, colorbar, colorbar style={width=3mm},
+  xtick={0,...,7}, ytick={0,...,7},
+  xticklabels={num\_25,num\_50,num\_75,num\_985,num\_100,num\_unq,total\_secs,active},
+  yticklabels={active,total\_secs,num\_unq,num\_100,num\_985,num\_75,num\_50,num\_25},
+  x tick label style={rotate=45, anchor=north east, font=\scriptsize}, y tick label style={font=\scriptsize},
+  nodes near coords={\pgfmathprintnumber[fixed, precision=2, use comma]{\pgfplotspointmeta}},
+  every node near coord/.append style={font=\tiny, anchor=center}]
+  \addplot[matrix plot*, mesh/cols=8, point meta=explicit] table[meta=v]{figdata/kkbox_corr.dat};
+\end{axis}
+\end{tikzpicture}

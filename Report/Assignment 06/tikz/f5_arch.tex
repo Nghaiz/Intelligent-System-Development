@@ -1,0 +1,29 @@
+% Kiến trúc Web App: trình duyệt gọi REST API của Flask; Flask nạp mô hình một lần và giữ trong bộ nhớ.
+\begin{tikzpicture}[font=\footnotesize, node distance=6mm and 10mm,
+  hop/.style={draw=ptitblue, rounded corners=3pt, fill=#1, align=center, inner sep=4pt, text width=36mm},
+  hop/.default=lightBlue]
+  % trình duyệt
+  \node[hop=lightGray, text width=38mm] (html) {\textbf{Trình duyệt}\\\texttt{index.html} (2 tab)};
+  \node[hop=lightGray, text width=38mm, below=of html] (js) {\texttt{app.js}: \texttt{fetch} API,\\vẽ bằng Chart.js};
+  \node[draw=gray, dashed, rounded corners, fit=(html)(js), inner sep=5pt, label={[nhan]above:máy người dùng}] (client) {};
+  % máy chủ Flask
+  \node[hop, right=20mm of html, yshift=6mm] (r1) {\texttt{GET /api/stock/history}};
+  \node[hop, below=3mm of r1] (r2) {\texttt{POST /api/stock/predict}};
+  \node[hop, below=3mm of r2] (r3) {\texttt{POST /api/churn/predict}};
+  \node[hop, below=3mm of r3] (r4) {\texttt{GET /api/meta}, \texttt{GET /}};
+  \node[draw=ptitblue, rounded corners, fit=(r1)(r4), inner sep=5pt, label={[nhan]above:\texttt{app.py} (Flask, cổng 8080)}] (flask) {};
+  % tài nguyên
+  \node[hop=lightOrange, right=13mm of r1, yshift=-2mm] (cache) {\texttt{load\_model}\\(\texttt{lru\_cache}, nạp 1 lần)};
+  \node[hop=lightGreen, below=5mm of cache, text width=17mm, xshift=-10mm] (pth) {8 tệp\\\texttt{.pth}};
+  \node[hop=lightGreen, right=2mm of pth, text width=17mm] (keras) {8 tệp\\\texttt{.keras}};
+  \node[hop=lightOrange, below=5mm of pth, xshift=10mm] (meta) {\texttt{metadata.json}: scaler,\\ngưỡng, mô hình tốt nhất,\\2 người dùng mẫu};
+  \node[hop=lightOrange, below=4mm of meta] (csv) {\texttt{AMZN.csv}\\(30 phiên mới nhất)};
+  % mũi tên
+  \draw[mui, <->] (client.east) -- node[above, nhan] {JSON} (flask.west);
+  \draw[mui] (r2.east) -- (cache.west);
+  \draw[mui] (r3.east) -- (cache.west);
+  \draw[mui] (cache) -- (pth);
+  \draw[mui] (cache) -- (keras);
+  \draw[mui] (flask.south) |- (meta.west);
+  \draw[mui] (flask.south) |- (csv.west);
+\end{tikzpicture}

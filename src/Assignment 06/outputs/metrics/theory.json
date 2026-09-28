@@ -1,0 +1,82 @@
+{
+  "shapes": {
+    "amzn": [
+      4764,
+      30,
+      8
+    ],
+    "kkbox": [
+      70000,
+      31,
+      8
+    ]
+  },
+  "params": {
+    "mlp": 15424,
+    "mlp_t60": 30784,
+    "conv1d": 1600,
+    "rnn": 4672
+  },
+  "cell_params": {
+    "rnn": 4736,
+    "lstm": 18944,
+    "gru": 14208,
+    "bilstm": 37888
+  },
+  "grad": {
+    "T": 60,
+    "forget_bias": 3.0,
+    "rnn_lag20": 4.328938538651806e-06,
+    "rnn_lag59": 4.0595867069168086e-17,
+    "lstm_lag20": 4.161906181417857e-06,
+    "lstm_lag59": 2.459837754465446e-14,
+    "lstm3_lag20": 0.01961793454434156,
+    "lstm3_lag59": 0.015113976038504687
+  },
+  "rho_end": {
+    "r09": 0.003935773747456614,
+    "r10": 0.2396471433233029,
+    "r11": 9.860228459866155,
+    "T": 40
+  },
+  "clip": {
+    "norm_before": 72.17723671199946,
+    "norm_after": 0.9999999861452166,
+    "g2": [
+      3.0,
+      4.0
+    ],
+    "g2_clipped": [
+      0.599999880000024,
+      0.799999840000032
+    ],
+    "g2_norm": 5.0
+  },
+  "bilstm": {
+    "out_shape": [
+      4,
+      30,
+      128
+    ],
+    "hn_shape": [
+      2,
+      4,
+      64
+    ]
+  },
+  "checks": {
+    "params_rnn": true,
+    "params_conv1d": true,
+    "params_mlp": true,
+    "rnn_forward": true,
+    "clip_grad_norm": true,
+    "lstm_cell": true,
+    "gru_cell": true,
+    "bilstm_concat": true,
+    "layer_norm": true
+  },
+  "n_checks": 9,
+  "mask_p": 0.3,
+  "mask_keep_std": 0.75,
+  "mask_keep_rec": 0.75
+}

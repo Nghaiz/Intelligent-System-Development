@@ -1,0 +1,19 @@
+% Phân bố nhãn của 100.000 người dùng trong mẫu và tỉ lệ churn ở ba tầng lọc dữ liệu.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=18mm}, a06, width=6.6cm, height=5.2cm]
+  \nextgroupplot[ybar, bar width=16mm, bar shift=0pt, ymin=0, ymax=108000, ylabel={số người dùng},
+    symbolic x coords={loyal,churn}, xtick={loyal,churn},
+    xticklabels={ở lại (0), churn (1)}, enlarge x limits=0.5, title={(a) Mẫu \SL{kkbox/labels/total} người},
+    nodes near coords, every node near coord/.append style={font=\scriptsize},
+    /pgf/number format/1000 sep={.}, scaled y ticks=false, ytick={0,25000,50000,75000,100000},
+    yticklabel style={/pgf/number format/fixed}]
+    \addplot[fill=loyalC!60, draw=loyalC] coordinates {(loyal,\SL{kkbox/labels/loyalRaw})};
+    \addplot[fill=churnC!60, draw=churnC] coordinates {(churn,\SL{kkbox/labels/churnRaw})};
+  \nextgroupplot[ybar, bar width=10mm, ymin=0, ymax=12, ylabel={tỉ lệ churn (\%)}, symbolic x coords={a,b,c},
+    xtick=data, xticklabels={có nhãn, có nhãn + log, mẫu}, enlarge x limits=0.3, title={(b) Tỉ lệ churn giữ nguyên},
+    nodes near coords={\pgfmathprintnumber[fixed, precision=2, use comma]{\pgfplotspointmeta}},
+    every node near coord/.append style={font=\scriptsize}]
+    \addplot[fill=churnC!45, draw=churnC, y filter/.expression={100*y}] coordinates {(a,\SL{kkbox/churn_rate_labeledRaw})
+      (b,\SL{kkbox/churn_rate_with_logRaw}) (c,\SL{kkbox/churn_rate_sampleRaw})};
+\end{groupplot}
+\end{tikzpicture}

@@ -1,0 +1,26 @@
+% BiLSTM: một LSTM đọc xuôi, một LSTM đọc ngược; vector tóm tắt là [h→_T ; h←_1].
+\begin{tikzpicture}[font=\footnotesize, node distance=8mm,
+  nf/.style={khoi, minimum width=10mm},
+  nb/.style={khoiC, minimum width=10mm},
+  nx/.style={khoiG, minimum width=10mm}]
+  \foreach \t/\lab in {1/1, 2/2, 3/3, 4/T} {
+    \node[nx] (x\t) at (2.1*\t, 0) {$x_{\lab}$};
+    \node[nb] (b\t) at (2.1*\t, 1.3) {$\overleftarrow{h}_{\lab}$};
+    \node[nf] (f\t) at (2.1*\t, 2.6) {$\overrightarrow{h}_{\lab}$};
+    \draw[mui, gray] (x\t) -- (b\t);
+    \draw[mui, gray] (x\t.north east) to[bend right=25] (f\t.south east);
+  }
+  \foreach \a/\b in {1/2, 2/3} {
+    \draw[mui] (f\a) -- (f\b);
+    \draw[mui, mTwo!80!black] (b\b) -- (b\a);
+  }
+  \draw[mui, dotted] (f3) -- node[above, nhan] {$\cdots$} (f4);
+  \draw[mui, dotted, mTwo!80!black] (b4) -- node[below, nhan] {$\cdots$} (b3);
+  \node[left=4mm of f1, nhan, align=right] {LSTM xuôi\\($t = 1 \to T$)};
+  \node[left=4mm of b1, nhan, align=right] {LSTM ngược\\($t = T \to 1$)};
+  \node[khoiX, minimum width=22mm] (cat) at (5.25, 4.2) {$[\,\overrightarrow{h}_T \,;\, \overleftarrow{h}_1\,] \in \mathbb{R}^{2H}$};
+  \draw[mui] (f4) |- (cat.east);
+  \draw[mui, mTwo!80!black] (b1.west) -- ++(-0.35,0) |- (cat.west);
+  \node[khoiC, right=8mm of cat] (head) {Linear$\to$ReLU$\to$Linear};
+  \draw[mui] (cat) -- (head);
+\end{tikzpicture}

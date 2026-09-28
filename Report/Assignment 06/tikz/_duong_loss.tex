@@ -1,0 +1,19 @@
+% Mã dùng chung: đường loss train (liền) và val (đứt) của 4 mô hình, 4 ô một hàng.
+% Trước khi \input cần \def\dsfw{<tập>_<framework>} và \def\ylab{<nhãn trục tung>}.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=4 by 1, horizontal sep=8mm, y descriptions at=edge left}, a06,
+  width=4.6cm, height=4.4cm, xlabel={epoch}, ylabel={\ylab}, xmin=1]
+  \nextgroupplot[title={Simple RNN}]
+    \addplot[m0, mark=*, mark size=0.8pt] table[x=epoch, y=train_loss]{figdata/hist_\dsfw_rnn.dat};
+    \addplot[m0, dashed, thick] table[x=epoch, y=val_loss]{figdata/hist_\dsfw_rnn.dat};
+  \nextgroupplot[title={LSTM}]
+    \addplot[m1, mark=*, mark size=0.8pt] table[x=epoch, y=train_loss]{figdata/hist_\dsfw_lstm.dat};
+    \addplot[m1, dashed, thick] table[x=epoch, y=val_loss]{figdata/hist_\dsfw_lstm.dat};
+  \nextgroupplot[title={GRU}]
+    \addplot[m2, mark=*, mark size=0.8pt] table[x=epoch, y=train_loss]{figdata/hist_\dsfw_gru.dat};
+    \addplot[m2, dashed, thick] table[x=epoch, y=val_loss]{figdata/hist_\dsfw_gru.dat};
+  \nextgroupplot[title={BiLSTM}]
+    \addplot[m3, mark=*, mark size=0.8pt] table[x=epoch, y=train_loss]{figdata/hist_\dsfw_bilstm.dat};
+    \addplot[m3, dashed, thick] table[x=epoch, y=val_loss]{figdata/hist_\dsfw_bilstm.dat};
+\end{groupplot}
+\end{tikzpicture}

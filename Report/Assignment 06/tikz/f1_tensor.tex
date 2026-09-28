@@ -1,0 +1,21 @@
+% Tensor dữ liệu chuỗi X ∈ R^{B×T×D}: một khối hộp, một lát là một mẫu, một cột là một bước thời gian.
+\begin{tikzpicture}[x=1cm, y=1cm]
+  % mặt trước (T × D) và chiều sâu B
+  \def\W{6}\def\H{2.4}\def\dx{1.6}\def\dy{1.1}
+  \fill[lightBlue] (0,0) rectangle (\W,\H);
+  \fill[lightBlue!70] (0,\H) -- (\dx,\H+\dy) -- (\W+\dx,\H+\dy) -- (\W,\H) -- cycle;
+  \fill[lightBlue!50] (\W,0) -- (\W+\dx,\dy) -- (\W+\dx,\H+\dy) -- (\W,\H) -- cycle;
+  \foreach \i in {1,...,11} \draw[gray!60] (\i*\W/12,0) -- (\i*\W/12,\H) -- ++(\dx,\dy);
+  \foreach \j in {1,...,3} \draw[gray!60] (0,\j*\H/4) -- (\W,\j*\H/4) -- ++(\dx,\dy);
+  \draw[ptitblue, thick] (0,0) rectangle (\W,\H) (0,\H) -- (\dx,\H+\dy) -- (\W+\dx,\H+\dy) -- (\W+\dx,\dy) -- (\W,0)
+        (\W,\H) -- (\W+\dx,\H+\dy);
+  % một bước thời gian x_t được tô đậm
+  \fill[mTwo!60, opacity=0.8] (7*\W/12,0) rectangle (8*\W/12,\H);
+  \node[font=\footnotesize, mTwo!70!black] at (7.5*\W/12,-0.35) {$x_t \in \mathbb{R}^{D}$};
+  % kích thước
+  \draw[|<->|, thin] (0,-0.9) -- node[below, font=\small] {$T$ bước thời gian (AMZN: 30 phiên, KKBox: 31 ngày)} (\W,-0.9);
+  \draw[|<->|, thin] (-0.4,0) -- node[left, font=\small, align=right] {$D = 8$\\đặc trưng} (-0.4,\H);
+  \draw[|<->|, thin] (\W+\dx+0.35,\dy) -- (\W+0.35,0);
+  \node[right, font=\small, align=left] at (\W+\dx+0.5,0.45*\dy) {$B$ mẫu\\(cửa sổ / người dùng)};
+  \node[font=\small, ptitblue] at (\W/2+\dx/2,\H+\dy+0.35) {$X \in \mathbb{R}^{B \times T \times D}$};
+\end{tikzpicture}

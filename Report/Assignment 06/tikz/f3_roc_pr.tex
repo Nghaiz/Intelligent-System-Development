@@ -1,0 +1,17 @@
+% ROC và Precision-Recall của 4 mô hình PyTorch trên test KKBox; vạch xám là mốc ngẫu nhiên.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=16mm}, a06, width=7cm, height=6cm,
+  xmin=0, xmax=1, ymin=0, ymax=1]
+  \nextgroupplot[title={(a) ROC}, xlabel={tỉ lệ dương giả (FPR)}, ylabel={tỉ lệ dương thật (TPR)}, legend pos=south east]
+    \foreach \c/\s/\lab in {rnn/m0/Simple RNN, lstm/m1/LSTM, gru/m2/GRU, bilstm/m3/BiLSTM} {
+      \edef\tmp{\noexpand\addplot[\s] table[x=fpr, y=tpr]{figdata/kkbox_torch_roc_\c.dat};
+                \noexpand\addlegendentry{\lab}}
+      \tmp}
+    \addplot[gray, dashed, domain=0:1] {x};
+  \nextgroupplot[title={(b) Precision--Recall}, xlabel={Recall}, ylabel={Precision}]
+    \foreach \c/\s in {rnn/m0, lstm/m1, gru/m2, bilstm/m3} {
+      \edef\tmp{\noexpand\addplot[\s] table[x=recall, y=precision]{figdata/kkbox_torch_pr_\c.dat};}
+      \tmp}
+    \addplot[gray, dashed, domain=0:1] {\SL{torch_kkbox/pos_rate_testRaw}};
+\end{groupplot}
+\end{tikzpicture}

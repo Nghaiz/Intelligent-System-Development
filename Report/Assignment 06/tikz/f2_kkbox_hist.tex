@@ -1,0 +1,12 @@
+% Phân phối tổng số giờ nghe trong tháng (thang log(1 + giờ)) của hai nhóm, chuẩn hoá thành mật độ.
+\begin{tikzpicture}
+\begin{axis}[a06, width=6.8cm, height=5.2cm, xlabel={$\log(1 + \text{giờ nghe trong tháng})$}, ylabel={mật độ},
+  legend pos=north west, ymin=0]
+  \addplot[const plot mark mid, loyalC, thick, fill=loyalC, fill opacity=0.25] table[x=x, y=loyal]{figdata/kkbox_hist_hours.dat}
+    \closedcycle;
+  \addlegendentry{ở lại}
+  \addplot[const plot mark mid, churnC, thick, fill=churnC, fill opacity=0.25] table[x=x, y=churn]{figdata/kkbox_hist_hours.dat}
+    \closedcycle;
+  \addlegendentry{churn}
+\end{axis}
+\end{tikzpicture}

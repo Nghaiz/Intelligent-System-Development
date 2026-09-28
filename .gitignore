@@ -80,3 +80,16 @@ Report/Assignment 05/_minted*/
 Report/Assignment 05/main.*
 !Report/Assignment 05/main.tex
 Report/Assignment 05/build.out
+
+# ===== Assignment 06 =====
+# Dữ liệu KKBox (Kaggle, cần đăng nhập, > 2 GB) và bản gom .npz: tải lại theo src/Assignment 06/README.md
+src/Assignment 06/data/kkbox/
+# Báo cáo 06: các thư mục build.py tự sinh lại từ src/Assignment 06/outputs, a06/ và app/
+Report/Assignment 06/figdata/
+Report/Assignment 06/code/
+Report/Assignment 06/generated/
+Report/Assignment 06/tikzcache/
+Report/Assignment 06/_minted*/
+Report/Assignment 06/main.*
+!Report/Assignment 06/main.tex
+Report/Assignment 06/build.out

@@ -17,6 +17,7 @@ Bài tập lớn học phần **Phát triển các Hệ thống Thông minh** �
 | **03** | Mạng Nơ-ron và Học Biểu diễn | Mạng nơ-ron sâu viết tay hoàn toàn bằng NumPy (không TensorFlow/PyTorch), mở rộng lên 3 hệ thống quy mô lớn kèm Web + Mobile | [`src/Assignment 03`](src/Assignment%2003) | [PDF](Report/Assignment%2003/A03_CT_nghiand.600.pdf) |
 | **04** | Mạng Nơ-ron Tích chập | Tích chập 1D và 2D hiện thực ba lần bằng NumPy thuần, PyTorch và TensorFlow trên 5 miền dữ liệu (văn bản, bảng, ảnh xám, ảnh màu), kèm đối kháng MLP với CNN và phân tích không gian ẩn PCA | [`src/Assignment 04`](src/Assignment%2004) | [PDF](Report/Assignment%2004/A04_CT_nghiand.600.pdf) |
 | **05** | CNN nhìn như hợp của các hàm | Khái niệm CNN viết thành hàm NumPy, 9 kiến trúc từ LeNet đến ViT, một CNN cơ bản và ba mô hình phát triển (VGG, ResNet, SE-ResNet) huấn luyện trên CIFAR-10, CIFAR-100 và Diabetes; báo cáo LaTeX với mọi hình vẽ bằng TikZ | [`src/Assignment 05`](src/Assignment%2005) | [PDF](Report/Assignment%2005/A05_CT_nghiand.600.pdf) |
+| **06** | Mạng nơ-ron hồi quy trên dữ liệu chuỗi | Simple RNN, LSTM, GRU, BiLSTM bằng PyTorch và Keras (16 mô hình) trên giá cổ phiếu AMZN 1997–2024 và log nghe nhạc của 100.000 người dùng KKBox; lý thuyết viết bằng NumPy, đối chuẩn hai framework, Web App Flask | [`src/Assignment 06`](src/Assignment%2006) | [PDF](Report/Assignment%2006/A06_CT_nghiand.600.pdf) |
 
 Mỗi bài có README riêng trong thư mục mã nguồn, hướng dẫn dựng lại từ đầu.
 
@@ -33,14 +34,16 @@ Intelligent-System-Development/
 │   │                             customer_comments/ knowledge_graph/
 │   ├── Assignment 04/            customer_comments/ diabetes/ house_price/
 │   │                             mnist/ cifar10/ mlp_vs_cnn/ analysis/
-│   └── Assignment 05/            a05/ (gói dùng chung) notebooks/ models/ outputs/
+│   ├── Assignment 05/            a05/ (gói dùng chung) notebooks/ models/ outputs/
+│   └── Assignment 06/            a06/ (gói dùng chung) app/ (Web App) notebooks/ models/ outputs/
 │
 ├── Report/                     Báo cáo từng bài (PDF + mã nguồn dựng báo cáo)
 │   ├── Assignment 01/            LaTeX: main.tex, chapters/, refs.bib, figures/
 │   ├── Assignment 02/            Python: build_report.py, chapters_*.py, figures/
 │   ├── Assignment 03/            Python: build_report.py, chapters_*.py, figures/
 │   ├── Assignment 04/            Python: build_report.py, chapters_*.py, figures/
-│   └── Assignment 05/            LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
+│   ├── Assignment 05/            LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
+│   └── Assignment 06/            LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
 │
 └── TAILIEU/                    Tài liệu môn học
     ├── 1. BASIC MACHINE LEARNING ... .pdf

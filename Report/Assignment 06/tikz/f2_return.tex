@@ -1,0 +1,25 @@
+% Bốn ô: log-return theo thời gian, histogram so với phân phối chuẩn, biến động 20 phiên, tương quan 8 đặc trưng.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 2, horizontal sep=17mm, vertical sep=17mm}, a06, width=7.2cm, height=5.2cm]
+  \nextgroupplot[title={(a) Log-return ngày (\%)}, xmin=1997.3, xmax=2024.9, xtick={2000,2008,...,2024},
+    x tick label style={/pgf/number format/1000 sep={}}]
+    \addplot[mOne, very thin] table[x=x, y=r]{figdata/amzn_return.dat};
+  \nextgroupplot[title={(b) Phân phối return so với Gauss}, xlabel={return (\%)}, ylabel={mật độ}, xmin=-15, xmax=15,
+    legend style={font=\scriptsize}]
+    \addplot[ybar interval, draw=mOne, fill=lightBlue] table[x=x, y=dens]{figdata/amzn_return_hist.dat};
+    \addlegendentry{AMZN}
+    \addplot[accentRed, thick, smooth] table[x=x, y=gauss]{figdata/amzn_return_hist.dat};
+    \addlegendentry{Gauss cùng $\mu, \sigma$}
+  \nextgroupplot[title={(c) Biến động 20 phiên (năm hoá)}, xmin=1997.3, xmax=2024.9, xtick={2000,2008,...,2024},
+    x tick label style={/pgf/number format/1000 sep={}}, ymin=0]
+    \addplot[mTwo, thin] table[x=x, y=volat]{figdata/amzn_price_weekly.dat};
+  \nextgroupplot[title={(d) Tương quan Pearson}, grid=none, enlargelimits=false, axis equal image,
+    colormap={rb}{rgb255=(33,102,172) rgb255=(247,247,247) rgb255=(178,24,43)}, point meta min=-1, point meta max=1,
+    xtick={0,...,7}, ytick={0,...,7},
+    xticklabels={Close,Open,High,Low,Volume,Return,MA20,RSI14},
+    yticklabels={RSI14,MA20,Return,Volume,Low,High,Open,Close},
+    x tick label style={rotate=45, anchor=north east, font=\tiny}, y tick label style={font=\tiny},
+    colorbar, colorbar style={width=2.5mm, ytick={-1,0,1}, tick label style={font=\tiny}}]
+    \addplot[matrix plot*, mesh/cols=8, point meta=explicit] table[meta=v]{figdata/amzn_corr.dat};
+\end{groupplot}
+\end{tikzpicture}

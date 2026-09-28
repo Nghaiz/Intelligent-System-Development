@@ -1,0 +1,18 @@
+% Quỹ đạo trung bình 31 ngày của nhóm ở lại và nhóm churn cho ba đặc trưng (notebook 02).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=3 by 1, horizontal sep=14mm}, a06, width=5.6cm, height=4.8cm,
+  xmin=1, xmax=31, xtick={1,10,20,31}, xlabel={ngày trong tháng 3/2017}]
+  \nextgroupplot[title={$\log(1+\text{giây nghe})$}, legend to name=legTraj, legend columns=2]
+    \addplot[loyalC, thick] table[x=day, y=loyal_secs]{figdata/kkbox_traj.dat};
+    \addlegendentry{ở lại}
+    \addplot[churnC, thick] table[x=day, y=churn_secs]{figdata/kkbox_traj.dat};
+    \addlegendentry{churn}
+  \nextgroupplot[title={$\log(1+\text{số bài khác nhau})$}]
+    \addplot[loyalC, thick] table[x=day, y=loyal_unq]{figdata/kkbox_traj.dat};
+    \addplot[churnC, thick] table[x=day, y=churn_unq]{figdata/kkbox_traj.dat};
+  \nextgroupplot[title={tỉ lệ người có nghe trong ngày}]
+    \addplot[loyalC, thick] table[x=day, y=loyal_act]{figdata/kkbox_traj.dat};
+    \addplot[churnC, thick] table[x=day, y=churn_act]{figdata/kkbox_traj.dat};
+\end{groupplot}
+\node[below=11mm] at (group c2r1.south) {\pgfplotslegendfromname{legTraj}};
+\end{tikzpicture}

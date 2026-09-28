@@ -1,0 +1,160 @@
+% =====================================================================
+%  Tài liệu tham khảo — Assignment 06 (biên dịch bằng biber, UTF-8)
+%  Hai nguồn dữ liệu có URL, cả hai đã kiểm tra trả HTTP 200 ngày 2026-09-28.
+% =====================================================================
+
+% ---------------------------------------------------------------- Dữ liệu
+@misc{yahooamzn,
+  author       = {{Yahoo Finance}},
+  title        = {Amazon.com, Inc. (AMZN) Stock Historical Prices \& Data},
+  year         = {2024},
+  url          = {https://finance.yahoo.com/quote/AMZN/history/},
+  note         = {Tải bằng thư viện yfinance, dữ liệu ngày 15/05/1997 -- 24/09/2024, truy cập 2026-09-28}
+}
+
+@misc{kkbox2017,
+  author       = {{KKBOX} and {WSDM 2018}},
+  title        = {WSDM -- KKBox's Churn Prediction Challenge},
+  year         = {2017},
+  howpublished = {Kaggle},
+  url          = {https://www.kaggle.com/competitions/kkbox-churn-prediction-challenge/data},
+  note         = {Tệp train\_v2.csv và user\_logs\_v2.csv, truy cập 2026-09-28}
+}
+
+% ---------------------------------------------------------------- Mạng hồi quy
+@article{elman1990,
+  author  = {Elman, Jeffrey L.},
+  title   = {Finding Structure in Time},
+  journal = {Cognitive Science},
+  volume  = {14}, number = {2}, pages = {179--211}, year = {1990}
+}
+
+@article{werbos1990,
+  author  = {Werbos, Paul J.},
+  title   = {Backpropagation Through Time: What It Does and How to Do It},
+  journal = {Proceedings of the IEEE},
+  volume  = {78}, number = {10}, pages = {1550--1560}, year = {1990}
+}
+
+@article{bengio1994,
+  author  = {Bengio, Yoshua and Simard, Patrice and Frasconi, Paolo},
+  title   = {Learning Long-Term Dependencies with Gradient Descent is Difficult},
+  journal = {IEEE Transactions on Neural Networks},
+  volume  = {5}, number = {2}, pages = {157--166}, year = {1994}
+}
+
+@inproceedings{pascanu2013,
+  author    = {Pascanu, Razvan and Mikolov, Tomas and Bengio, Yoshua},
+  title     = {On the Difficulty of Training Recurrent Neural Networks},
+  booktitle = {Proceedings of the 30th International Conference on Machine Learning},
+  pages     = {1310--1318}, year = {2013}
+}
+
+@article{hochreiter1997,
+  author  = {Hochreiter, Sepp and Schmidhuber, Jürgen},
+  title   = {Long Short-Term Memory},
+  journal = {Neural Computation},
+  volume  = {9}, number = {8}, pages = {1735--1780}, year = {1997}
+}
+
+@inproceedings{cho2014,
+  author    = {Cho, Kyunghyun and van Merriënboer, Bart and Gulcehre, Caglar and Bahdanau, Dzmitry and
+               Bougares, Fethi and Schwenk, Holger and Bengio, Yoshua},
+  title     = {Learning Phrase Representations using {RNN} Encoder--Decoder for Statistical Machine Translation},
+  booktitle = {Proceedings of EMNLP 2014},
+  pages     = {1724--1734}, year = {2014}
+}
+
+@article{schuster1997,
+  author  = {Schuster, Mike and Paliwal, Kuldip K.},
+  title   = {Bidirectional Recurrent Neural Networks},
+  journal = {IEEE Transactions on Signal Processing},
+  volume  = {45}, number = {11}, pages = {2673--2681}, year = {1997}
+}
+
+@inproceedings{jozefowicz2015,
+  author    = {Jozefowicz, Rafal and Zaremba, Wojciech and Sutskever, Ilya},
+  title     = {An Empirical Exploration of Recurrent Network Architectures},
+  booktitle = {Proceedings of the 32nd International Conference on Machine Learning},
+  pages     = {2342--2350}, year = {2015}
+}
+
+@inproceedings{gal2016,
+  author    = {Gal, Yarin and Ghahramani, Zoubin},
+  title     = {A Theoretically Grounded Application of Dropout in Recurrent Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems 29},
+  pages     = {1019--1027}, year = {2016}
+}
+
+@article{ba2016,
+  author  = {Ba, Jimmy Lei and Kiros, Jamie Ryan and Hinton, Geoffrey E.},
+  title   = {Layer Normalization},
+  journal = {arXiv preprint arXiv:1607.06450},
+  year    = {2016}
+}
+
+@book{goodfellow2016,
+  author    = {Goodfellow, Ian and Bengio, Yoshua and Courville, Aaron},
+  title     = {Deep Learning},
+  publisher = {MIT Press},
+  year      = {2016},
+  note      = {Chương 10: Sequence Modeling: Recurrent and Recursive Nets}
+}
+
+% ---------------------------------------------------------------- Tối ưu và phần mềm
+@inproceedings{loshchilov2019,
+  author    = {Loshchilov, Ilya and Hutter, Frank},
+  title     = {Decoupled Weight Decay Regularization},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2019}
+}
+
+@inproceedings{paszke2019,
+  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and others},
+  title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning Library},
+  booktitle = {Advances in Neural Information Processing Systems 32},
+  pages     = {8024--8035}, year = {2019}
+}
+
+@misc{chollet2015,
+  author       = {Chollet, François and others},
+  title        = {Keras},
+  year         = {2015},
+  howpublished = {\url{https://keras.io}}
+}
+
+@inproceedings{abadi2016,
+  author    = {Abadi, Martín and Barham, Paul and Chen, Jianmin and others},
+  title     = {{TensorFlow}: A System for Large-Scale Machine Learning},
+  booktitle = {12th USENIX Symposium on Operating Systems Design and Implementation},
+  pages     = {265--283}, year = {2016}
+}
+
+% ---------------------------------------------------------------- Chuỗi thời gian tài chính
+@article{dickey1979,
+  author  = {Dickey, David A. and Fuller, Wayne A.},
+  title   = {Distribution of the Estimators for Autoregressive Time Series with a Unit Root},
+  journal = {Journal of the American Statistical Association},
+  volume  = {74}, number = {366}, pages = {427--431}, year = {1979}
+}
+
+@book{wilder1978,
+  author    = {Wilder, J. Welles},
+  title     = {New Concepts in Technical Trading Systems},
+  publisher = {Trend Research},
+  year      = {1978}
+}
+
+@article{fama1970,
+  author  = {Fama, Eugene F.},
+  title   = {Efficient Capital Markets: A Review of Theory and Empirical Work},
+  journal = {The Journal of Finance},
+  volume  = {25}, number = {2}, pages = {383--417}, year = {1970}
+}
+
+@article{welch1947,
+  author  = {Welch, Bernard L.},
+  title   = {The Generalization of ``Student's'' Problem when Several Different Population Variances are Involved},
+  journal = {Biometrika},
+  volume  = {34}, number = {1/2}, pages = {28--35}, year = {1947}
+}

@@ -1,0 +1,25 @@
+% Cửa sổ trượt 30 phiên -> nhãn return phiên kế tiếp; chia theo thời gian 70/15/15, không xáo trộn.
+\begin{tikzpicture}[font=\footnotesize, x=0.95cm, y=1cm]
+  % trục thời gian và ba phần
+  \fill[lightBlue] (0,0) rectangle (9.8,0.6);
+  \fill[lightOrange] (9.8,0) rectangle (11.9,0.6);
+  \fill[lightGreen] (11.9,0) rectangle (14,0.6);
+  \draw[ptitblue] (0,0) rectangle (14,0.6);
+  \node at (4.9,0.3) {train: \SL{amzn/split/train/n} cửa sổ};
+  \node at (10.85,0.3) {val: \SL{amzn/split/val/n}};
+  \node at (12.95,0.3) {test: \SL{amzn/split/test/n}};
+  \node[nhan, below, align=center] at (0,0) {\SL{amzn/split/train/start}};
+  \node[nhan, below, align=center] at (9.8,0) {\SL{amzn/split/val/start}};
+  \node[nhan, below, align=center] at (11.9,0) {\SL{amzn/split/test/start}};
+  \node[nhan, below, align=center] at (14,0) {\SL{amzn/split/test/end}};
+  \draw[-{Stealth}, gray] (0,-0.6) -- (14.3,-0.6) node[right] {thời gian};
+  % minh hoạ cửa sổ trượt
+  \foreach \k/\s in {0/0, 1/0.35, 2/0.7} {
+    \pgfmathsetmacro\y{1.3+0.75*\k}
+    \foreach \i in {0,...,9} \draw[fill=lightBlue, draw=ptitblue] (\s+0.3*\i,\y) rectangle ++(0.3,0.45);
+    \draw[fill=accentRed!70, draw=accentRed] (\s+3.0,\y) rectangle ++(0.3,0.45);
+    \node[anchor=west, nhan] at (\s+3.45,\y+0.22) {$\to\ r_{t+1}$};
+  }
+  \draw[decorate, decoration={brace, amplitude=4pt}] (0,3.4) -- node[above=3pt] {$T = \SL{amzn/window}$ phiên $\times$ 8 đặc trưng} (3.0,3.4);
+  \node[anchor=west, align=left] at (5.3,2.35) {mỗi bước trượt thêm 1 phiên;\\scaler và chuẩn hoá nhãn chỉ fit trên phần train;\\giá trong cửa sổ chia cho Close ngày cuối cửa sổ};
+\end{tikzpicture}

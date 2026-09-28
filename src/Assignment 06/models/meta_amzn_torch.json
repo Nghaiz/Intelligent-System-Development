@@ -1,0 +1,42 @@
+{
+  "amzn_torch_rnn": {
+    "file": "amzn_torch_rnn.pth",
+    "params": 6849,
+    "device": "cuda",
+    "best_epoch": 7,
+    "epochs_run": 15,
+    "epoch_s": 0.2506463399993663,
+    "train_s": 3.759695099990495,
+    "best_val_loss": 0.22126092419904822
+  },
+  "amzn_torch_lstm": {
+    "file": "amzn_torch_lstm.pth",
+    "params": 21057,
+    "device": "cuda",
+    "best_epoch": 5,
+    "epochs_run": 13,
+    "epoch_s": 0.2148834923077979,
+    "train_s": 2.793485400001373,
+    "best_val_loss": 0.22056575639575135
+  },
+  "amzn_torch_gru": {
+    "file": "amzn_torch_gru.pth",
+    "params": 16321,
+    "device": "cuda",
+    "best_epoch": 7,
+    "epochs_run": 15,
+    "epoch_s": 0.16937664000021566,
+    "train_s": 2.540649600003235,
+    "best_val_loss": 0.21986482400520174
+  },
+  "amzn_torch_bilstm": {
+    "file": "amzn_torch_bilstm.pth",
+    "params": 42049,
+    "device": "cuda",
+    "best_epoch": 1,
+    "epochs_run": 9,
+    "epoch_s": 0.27139253333371016,
+    "train_s": 2.4425328000033915,
+    "best_val_loss": 0.22261263307403115
+  }
+}

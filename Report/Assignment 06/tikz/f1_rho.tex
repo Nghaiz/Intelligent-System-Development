@@ -1,0 +1,12 @@
+% ‖(W_hh^T)^t v‖ với W_hh có bán kính phổ ρ = 0,9 / 1,0 / 1,1 (notebook 00).
+\begin{tikzpicture}
+\begin{axis}[a06, width=8.2cm, height=5.6cm, ymode=log, xmin=0, xmax=39,
+  xlabel={số bước $t$}, ylabel={$\lVert (W_{hh}^\top)^t v \rVert$}, legend pos=south west]
+  \addplot[m3, very thick] table[x=t, y=r11]{figdata/theory_rho.dat};
+  \addlegendentry{$\rho = 1{,}1$: bùng nổ}
+  \addplot[m0, very thick, dashed] table[x=t, y=r10]{figdata/theory_rho.dat};
+  \addlegendentry{$\rho = 1{,}0$}
+  \addplot[accentRed, very thick] table[x=t, y=r09]{figdata/theory_rho.dat};
+  \addlegendentry{$\rho = 0{,}9$: triệt tiêu}
+\end{axis}
+\end{tikzpicture}

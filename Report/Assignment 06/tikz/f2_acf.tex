@@ -1,0 +1,18 @@
+% ACF và PACF 40 trễ của giá đóng cửa và của log-return; dải xám là khoảng tin cậy 95 % (±1,96/√n).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 2, horizontal sep=14mm, vertical sep=21mm}, a06, width=7.2cm, height=4.6cm,
+  xmin=0, xmax=41, xlabel={trễ}]
+  \nextgroupplot[title={(a) ACF của giá}, ymin=-0.1, ymax=1.05]
+    \fill[gray!25] (axis cs:0,-\SL{amzn/acf_bandRaw}) rectangle (axis cs:41,\SL{amzn/acf_bandRaw});
+    \addplot[ycomb, mOne, thick] table[x=lag, y=acf_c]{figdata/amzn_acf.dat};
+  \nextgroupplot[title={(b) PACF của giá}, ymin=-0.1, ymax=1.05]
+    \fill[gray!25] (axis cs:0,-\SL{amzn/acf_bandRaw}) rectangle (axis cs:41,\SL{amzn/acf_bandRaw});
+    \addplot[ycomb, mOne, thick] table[x=lag, y=pacf_c]{figdata/amzn_acf.dat};
+  \nextgroupplot[title={(c) ACF của return}, ymin=-0.1, ymax=0.1, ytick={-0.1,-0.05,0,0.05,0.1}, scaled y ticks=false, yticklabel style={/pgf/number format/fixed}]
+    \fill[gray!25] (axis cs:0,-\SL{amzn/acf_bandRaw}) rectangle (axis cs:41,\SL{amzn/acf_bandRaw});
+    \addplot[ycomb, mTwo, thick] table[x=lag, y=acf_r]{figdata/amzn_acf.dat};
+  \nextgroupplot[title={(d) PACF của return}, ymin=-0.1, ymax=0.1, ytick={-0.1,-0.05,0,0.05,0.1}, scaled y ticks=false, yticklabel style={/pgf/number format/fixed}]
+    \fill[gray!25] (axis cs:0,-\SL{amzn/acf_bandRaw}) rectangle (axis cs:41,\SL{amzn/acf_bandRaw});
+    \addplot[ycomb, mTwo, thick] table[x=lag, y=pacf_r]{figdata/amzn_acf.dat};
+\end{groupplot}
+\end{tikzpicture}

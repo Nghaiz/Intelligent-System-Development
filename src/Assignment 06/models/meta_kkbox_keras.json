@@ -1,0 +1,42 @@
+{
+  "kkbox_keras_rnn": {
+    "file": "kkbox_keras_rnn.keras",
+    "params": 6785,
+    "device": "cpu",
+    "best_epoch": 5,
+    "epochs_run": 9,
+    "epoch_s": 2.7434251666660807,
+    "train_s": 24.690826499994728,
+    "best_val_loss": 1.1576212644577026
+  },
+  "kkbox_keras_lstm": {
+    "file": "kkbox_keras_lstm.keras",
+    "params": 20801,
+    "device": "cpu",
+    "best_epoch": 7,
+    "epochs_run": 11,
+    "epoch_s": 16.871882427271473,
+    "train_s": 185.59070669998619,
+    "best_val_loss": 1.1309945583343506
+  },
+  "kkbox_keras_gru": {
+    "file": "kkbox_keras_gru.keras",
+    "params": 16321,
+    "device": "cpu",
+    "best_epoch": 15,
+    "epochs_run": 19,
+    "epoch_s": 19.345520710526262,
+    "train_s": 367.564893499999,
+    "best_val_loss": 1.1294959783554077
+  },
+  "kkbox_keras_bilstm": {
+    "file": "kkbox_keras_bilstm.keras",
+    "params": 41537,
+    "device": "cpu",
+    "best_epoch": 8,
+    "epochs_run": 12,
+    "epoch_s": 53.420274841666775,
+    "train_s": 641.0432981000013,
+    "best_val_loss": 1.132210373878479
+  }
+}

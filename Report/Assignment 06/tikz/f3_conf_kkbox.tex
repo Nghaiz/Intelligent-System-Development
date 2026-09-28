@@ -1,0 +1,29 @@
+% Ma trận nhầm lẫn của 4 mô hình PyTorch trên test KKBox, tại ngưỡng chọn trên validation.
+% Ô đậm màu theo tỉ lệ trong hàng (recall của từng lớp); số trong ô là số người thật.
+\begin{tikzpicture}[font=\footnotesize, x=1.35cm, y=0.95cm]
+  \foreach \c/\lab [count=\k from 0] in {rnn/Simple RNN, lstm/LSTM, gru/GRU, bilstm/BiLSTM} {
+    \begin{scope}[xshift=\k*3.55cm]
+      \pgfmathsetmacro\tn{\SL{torch_kkbox/models/\c/confusion/0/0Raw}}
+      \pgfmathsetmacro\fp{\SL{torch_kkbox/models/\c/confusion/0/1Raw}}
+      \pgfmathsetmacro\fn{\SL{torch_kkbox/models/\c/confusion/1/0Raw}}
+      \pgfmathsetmacro\tp{\SL{torch_kkbox/models/\c/confusion/1/1Raw}}
+      % chia trước rồi mới nhân: 60*12887 vượt giới hạn 16383 của pgfmath
+      \pgfmathsetmacro\ra{60*(\tn/(\tn+\fp))}\pgfmathsetmacro\rb{60*(\fp/(\tn+\fp))}
+      \pgfmathsetmacro\rc{60*(\fn/(\fn+\tp))}\pgfmathsetmacro\rd{60*(\tp/(\fn+\tp))}
+      \fill[ptitblue!\ra] (0,1) rectangle (1,2);  \fill[ptitblue!\rb] (1,1) rectangle (2,2);
+      \fill[ptitblue!\rc] (0,0) rectangle (1,1);  \fill[ptitblue!\rd] (1,0) rectangle (2,1);
+      \draw[gray] (0,0) grid[step=1] (2,2);   % step không đơn vị = 1 ô theo hệ x, y của hình
+      \node at (0.5,1.5) {\SL{torch_kkbox/models/\c/confusion/0/0}};
+      \node at (1.5,1.5) {\SL{torch_kkbox/models/\c/confusion/0/1}};
+      \node at (0.5,0.5) {\SL{torch_kkbox/models/\c/confusion/1/0}};
+      \node at (1.5,0.5) {\SL{torch_kkbox/models/\c/confusion/1/1}};
+      \node[font=\small\bfseries] at (1,2.4) {\lab};
+      \node[nhan] at (0.5,-0.25) {ở lại};  \node[nhan] at (1.5,-0.25) {churn};
+      \ifnum\k=0
+        \node[nhan, rotate=90] at (-0.25,1.5) {ở lại};  \node[nhan, rotate=90] at (-0.25,0.5) {churn};
+        \node[nhan, rotate=90] at (-0.6,1) {thật};
+      \fi
+    \end{scope}
+  }
+  \node[nhan] at (6.2,-0.6) {dự báo};
+\end{tikzpicture}

@@ -1,0 +1,163 @@
+% =====================================================================
+%  Chương 3 — Hạng mục 3: hiện thực và huấn luyện bằng PyTorch
+%  Mã nguồn: a06/models_torch.py, a06/train_torch.py, a06/bench.py
+%  Notebook: 03_pytorch_amzn.ipynb, 04_pytorch_kkbox.ipynb
+% =====================================================================
+\chapter{Hiện thực và huấn luyện bằng PyTorch}
+\label{ch:pytorch}
+
+Chương này dựng bốn mô hình Simple RNN, LSTM, GRU và BiLSTM bằng PyTorch~\cite{paszke2019}, huấn luyện trên cả hai
+tập của Chương~\ref{ch:dulieu} và đánh giá trên tập test. Bốn mô hình chỉ khác nhau ở tầng hồi quy; phần còn lại
+(đầu dự báo, tối ưu, dữ liệu) giống hệt, để chênh lệch kết quả chỉ đến từ loại tế bào.
+
+\section{Một lớp cho bốn mô hình}
+
+Mô hình nhận tensor $(B, T, 8)$, cho qua tầng hồi quy 64 đơn vị, lấy vector tóm tắt $h_T$ (hoặc
+$[\overrightarrow{h}_T; \overleftarrow{h}_1]$ với BiLSTM) rồi đưa qua đầu dự báo
+$\mathrm{Linear}(\cdot, 32) \to \mathrm{ReLU} \to \mathrm{Linear}(32, 1)$. Đầu ra là một số: return đã chuẩn hoá với
+AMZN, logit churn với KKBox. Cả bốn mô hình dùng chung một lớp; tham số \texttt{cell} chọn tầng hồi quy.
+
+\maNguon{models_torch__PyTorchRNN}{Lớp chung cho Simple RNN, LSTM, GRU và BiLSTM}
+
+\texttt{nn.LSTM} và \texttt{nn.GRU} gọi thẳng nhân cuDNN khi chạy trên GPU, nên vòng lặp theo thời gian không nằm
+trong Python. Với BiLSTM, PyTorch trả về đầu ra hai chiều nối nhau ở mỗi bước; lớp trên cắt đúng
+$\overrightarrow{h}_T$ ở bước cuối và $\overleftarrow{h}_1$ ở bước đầu, đúng như cách nối đã kiểm chứng ở
+Chương~\ref{ch:lythuyet}.
+
+\section{Vòng lặp huấn luyện}
+
+Cấu hình giống nhau cho mọi mô hình: AdamW~\cite{loshchilov2019} với tốc độ học $10^{-3}$ và weight decay $10^{-4}$, cắt chuẩn gradient về 1 (Chương~\ref{ch:lythuyet}), dừng sớm khi val loss không
+giảm sau một số epoch, và giữ lại trọng số của epoch có val loss nhỏ nhất. Bảng~\ref{tab:cfg} ghi phần khác nhau giữa hai
+tập.
+
+\begin{table}[H]
+  \centering\small
+  \caption{Cấu hình huấn luyện}
+  \label{tab:cfg}
+  \begin{tabular}{lll}
+    \toprule
+    & AMZN (hồi quy) & KKBox (phân loại) \\
+    \midrule
+    Hàm mất mát & MSE trên return chuẩn hoá & BCE trên logit, \texttt{pos\_weight} = số âm / số dương \\
+    Lô, số epoch tối đa & 64, 60 & 512, 20 \\
+    Dừng sớm & 8 epoch không cải thiện & 4 epoch không cải thiện \\
+    Thiết bị & chọn bằng đo (Mục~\ref{sec:thietbi}) & GPU \\
+    Seed & 42 & 42 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Toàn bộ dữ liệu được chuyển lên thiết bị một lần dưới dạng tensor; mỗi epoch chỉ xáo chỉ số rồi cắt lô, không dùng
+\texttt{DataLoader}. Với tập KKBox khoảng 100 MB, cách này bỏ được chi phí chép dữ liệu từ RAM sang GPU ở mỗi lô.
+
+\maNguon{train_torch__fit}{Vòng lặp huấn luyện chung: AdamW, clip gradient, dừng sớm theo val loss}
+
+Với KKBox, nhãn dương chỉ chiếm khoảng 9\,\%. Không cân bằng lại thì mô hình đạt loss thấp bằng cách đoán ``ở lại'' cho
+tất cả. \texttt{pos\_weight} nhân mất mát của mẫu dương lên khoảng 10 lần, tương đương cân bằng hai lớp trong hàm mất mát.
+
+\maNguon{train_torch__make_loss}{Hàm mất mát cho hai loại bài toán}
+
+\subsection{Chọn thiết bị bằng đo}
+\label{sec:thietbi}
+
+Các bài trước cho thấy GPU không phải lúc nào cũng nhanh hơn với mô hình nhỏ và tập nhỏ. Vì vậy notebook 03 đo một
+epoch LSTM trên cả hai thiết bị (sau một lượt khởi động) rồi chọn bên nhanh hơn. Kết quả: CPU
+\SL{torch_amzn/probe/cpu} s/epoch, GPU \SL{torch_amzn/probe/cuda} s/epoch, nên AMZN cũng huấn luyện trên GPU. Nhân cuDNN
+cho LSTM chạy cả 30 bước trong một lần gọi, còn CPU phải lặp từng bước.
+
+\maNguon{train_torch__pick_device}{Chọn CPU hay GPU bằng cách đo một epoch}
+
+\section{Kết quả trên AMZN}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_loss_amzn}
+  \caption{Đường loss của bốn mô hình PyTorch trên AMZN (liền: train, đứt: val)}
+  \label{fig:loss-amzn}
+\end{figure}
+
+Hình~\ref{fig:loss-amzn} cho thấy train loss giảm chậm nhưng đều, còn val loss gần như không đổi ngay từ những epoch
+đầu. Val loss thấp hơn train loss nhiều vì nhãn được chuẩn hoá theo độ lệch chuẩn của train, trong khi return giai đoạn
+val biến động ít hơn hẳn (Chương~\ref{ch:dulieu}); so hai đường với nhau thì không có ý nghĩa, chỉ xu hướng của từng
+đường là có. BiLSTM có val loss nhỏ nhất ở epoch \SL{torch_amzn/models/bilstm/best_epoch}, tức là mọi epoch sau đó chỉ
+làm mô hình khớp thêm nhiễu của tập train. Các mô hình còn lại đạt val loss nhỏ nhất ở epoch
+\SL{torch_amzn/models/lstm/best_epoch} đến \SL{torch_amzn/models/rnn/best_epoch}.
+
+\begin{table}[H]
+  \centering\footnotesize
+  \caption{Bốn mô hình PyTorch trên tập test AMZN (\SL{torch_amzn/test_start} đến \SL{torch_amzn/test_end})}
+  \label{tab:torch-amzn}
+  \input{generated/tab_torch_amzn}
+\end{table}
+
+Bảng~\ref{tab:torch-amzn} là kết quả trung thực nhất của bài, và nó không đẹp. RMSE của bốn mô hình nằm trong khoảng
+\SL{torch_amzn/models/bilstm/rmse} đến \SL{torch_amzn/models/gru/rmse} USD, trong khi mốc ngây thơ ``giá ngày mai bằng
+giá hôm nay'' đạt \SL{torch_amzn/naive/rmse} USD. Không mô hình nào thắng mốc ngây thơ. Cột $R^2$ trên giá cho
+\SL{torch_amzn/models/lstm/r2} với mọi mô hình và với cả mốc ngây thơ, nên con số rất cao này không nói gì: giá hôm
+nay đã giải thích gần hết phương sai của giá ngày mai. Cột $R^2$ trên return mới đo khả năng dự báo thật, và nó âm với
+cả bốn mô hình. Tỉ lệ dự báo đúng chiều tăng hay giảm dao động quanh 50\,\%, từ
+\SL{torch_amzn/models/rnn/dir_acc}\,\% đến \SL{torch_amzn/models/lstm/dir_acc}\,\%.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_pred_amzn}
+  \caption{Giá thật, mốc ngây thơ và dự báo của bốn mô hình trên các phiên cuối của tập test}
+  \label{fig:pred-amzn}
+\end{figure}
+
+Hình~\ref{fig:pred-amzn} cho thấy nhìn bằng mắt thì dự báo ``bám'' giá thật rất sát. Phóng to 30 phiên cuối (ô b) thì
+thấy rõ lý do: đường dự báo gần như trùng mốc ngây thơ, tức là đường giá thật dịch sang phải một phiên. Mô hình học được
+rằng return ngày mai có trung bình gần 0, và dự báo gần 0 là lựa chọn có sai số bình phương nhỏ nhất khi return không có
+tự tương quan (Chương~\ref{ch:dulieu}). Chương~\ref{ch:keras} bàn tiếp giới hạn này.
+
+\section{Kết quả trên KKBox}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_loss_kkbox}
+  \caption{Đường loss của bốn mô hình PyTorch trên KKBox (liền: train, đứt: val)}
+  \label{fig:loss-kkbox}
+\end{figure}
+
+KKBox là bài toán khác hẳn. Train loss và val loss giảm cùng nhau trong nhiều epoch (Hình~\ref{fig:loss-kkbox}); LSTM
+đạt val loss tốt nhất ở epoch \SL{torch_kkbox/models/lstm/best_epoch}/\SL{torch_kkbox/models/lstm/epochs_run}. Mô hình
+học được tín hiệu thật từ chuỗi hành vi.
+
+Ngưỡng phân loại không cố định ở 0,5. Với mỗi mô hình, notebook chọn ngưỡng làm F1 lớn nhất trên \emph{validation},
+rồi áp nguyên ngưỡng đó cho test. Chọn ngưỡng trên test sẽ làm kết quả test đẹp hơn thực tế.
+
+\maNguon{bench__best_threshold}{Chọn ngưỡng theo F1 trên validation}
+
+\begin{table}[H]
+  \centering\footnotesize
+  \caption{Bốn mô hình PyTorch trên tập test KKBox (\SL{kkbox/n_test} người dùng)}
+  \label{tab:torch-kkbox}
+  \input{generated/tab_torch_kkbox}
+\end{table}
+
+Ba mô hình có cổng (LSTM, GRU, BiLSTM) đạt ROC-AUC từ \SL{torch_kkbox/models/gru/roc_auc} đến
+\SL{torch_kkbox/models/lstm/roc_auc}, cao hơn Simple RNN (\SL{torch_kkbox/models/rnn/roc_auc}). Khoảng cách không lớn
+vì chuỗi chỉ dài 31 bước, chưa đủ dài để gradient của Simple RNN triệt tiêu hoàn toàn. LSTM có F1 cao nhất,
+\SL{torch_kkbox/models/lstm/f1}\,\%, với Precision \SL{torch_kkbox/models/lstm/precision}\,\% và Recall
+\SL{torch_kkbox/models/lstm/recall}\,\%: cứ ba người bị báo churn thì khoảng một người churn thật, và mô hình tìm ra
+khoảng một phần ba số người churn.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_conf_kkbox}
+  \caption{Ma trận nhầm lẫn trên test KKBox; màu ô theo tỉ lệ trong hàng}
+  \label{fig:conf-kkbox}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f3_roc_pr}
+  \caption{Đường ROC và Precision--Recall trên test KKBox; vạch đứt là mô hình đoán ngẫu nhiên}
+  \label{fig:roc-pr}
+\end{figure}
+
+Các con số này thấp so với bảng xếp hạng của cuộc thi, và có lý do. Các đội mạnh nhất dùng thêm lịch sử giao dịch (phương
+thức thanh toán, tự động gia hạn, ngày hết hạn), là những đặc trưng dự báo churn trực tiếp. Bài này chỉ dùng log nghe
+nhạc, vì trọng tâm của bài là mô hình hồi quy trên dữ liệu chuỗi. Hình~\ref{fig:roc-pr} cho thấy phần tín hiệu mà chuỗi hành vi
+mang lại là có thật: đường PR nằm cao hơn nhiều so với mốc ngẫu nhiên \SL{torch_kkbox/pos_rate_test}\,\%, nhưng
+ROC-AUC dừng ở khoảng 0,68. Phần tín hiệu còn lại không nằm trong việc người dùng nghe nhạc thế nào.

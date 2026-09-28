@@ -1,0 +1,161 @@
+% =====================================================================
+%  Chương 4 — Hạng mục 4: hiện thực Keras và đối chuẩn PyTorch với Keras
+%  Mã nguồn: a06/models_keras.py, a06/bench.py · Notebook: 05_keras.ipynb, 06_doi_chuan.ipynb
+% =====================================================================
+\chapter{Keras và đối chuẩn hai framework}
+\label{ch:keras}
+
+Chương này viết lại bốn mô hình bằng Keras~\cite{chollet2015} (backend TensorFlow~\cite{abadi2016}), huấn luyện trên
+cùng dữ liệu, rồi so 16 mô hình theo chất lượng, kích thước và tốc độ. Mọi chỉ số của cả hai framework được tính lại bằng
+cùng một hàm trong \texttt{a06/bench.py}, từ dự báo đã lưu, để phép so không lệch vì cách tính.
+
+\section{Bốn mô hình bằng Keras}
+
+Kiến trúc giữ đúng như bản PyTorch: đầu vào \texttt{Input(T, 8)}, một tầng hồi quy 64 đơn vị (một trong
+\texttt{SimpleRNN}, \texttt{LSTM}, \texttt{GRU} và \texttt{Bidirectional(LSTM)}), rồi hai tầng \texttt{Dense(32, relu)}
+và \texttt{Dense(1)}. Tối ưu cũng giống:
+AdamW với tốc độ học $10^{-3}$, weight decay $10^{-4}$, \texttt{clipnorm=1.0}.
+
+\maNguon{models_keras__build_keras}{Bốn mô hình Keras dựng từ một hàm}
+
+Có một khác biệt nhỏ về clipping. \texttt{clipnorm} của Keras cắt chuẩn của \emph{từng} tensor gradient, còn
+\texttt{clip\_grad\_norm\_} của PyTorch cắt theo chuẩn gộp của mọi gradient. Với ngưỡng 1 và mô hình nhỏ như ở đây, cả hai
+hiếm khi được kích hoạt sau vài epoch đầu, nên bài giữ mặc định của mỗi framework.
+
+Keras không có tham số \texttt{pos\_weight}. Cách tương đương là trọng số mẫu: mẫu dương nhận trọng số bằng số âm chia số
+dương, mẫu âm nhận 1. Trọng số được truyền cho cả tập train lẫn tập validation, để val loss mà \texttt{EarlyStopping}
+theo dõi đo đúng đại lượng như val loss của PyTorch.
+
+\maNguon{models_keras__sample_weights}{Trọng số mẫu thay cho \texttt{pos\_weight}}
+
+\maNguon{models_keras__fit_keras}{Huấn luyện một mô hình Keras với cùng lô và cùng dừng sớm}
+
+\subsection{Chênh lệch số tham số}
+
+Cùng kiến trúc nhưng số tham số không bằng nhau (Hình~\ref{fig:size}a). PyTorch lưu hai vector bias cho mỗi khối cổng
+($b_{ih}$ và $b_{hh}$), Keras chỉ lưu một. Vì vậy Keras ít hơn đúng $H = 64$ tham số với Simple RNN
+(\SL{bench/cmp/amzn_rnn/param_diff}), $4H$ với LSTM (\SL{bench/cmp/amzn_lstm/param_diff}) và $8H$ với BiLSTM
+(\SL{bench/cmp/amzn_bilstm/param_diff}). GRU là ngoại lệ: Keras mặc định \texttt{reset\_after=True}, áp cổng reset sau
+phép nhân ma trận giống PyTorch, nên cần hai vector bias và số tham số bằng nhau
+(\SL{bench/models/amzn_torch_gru/params}). Bài giữ nguyên chênh lệch này thay vì ép bằng, vì nó không đổi khả năng biểu
+diễn: tổng hai bias chỉ là một bias.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f4_size}
+  \caption{Số tham số và kích thước tệp mô hình của hai framework}
+  \label{fig:size}
+\end{figure}
+
+Kích thước tệp chênh nhiều hơn số tham số. Tệp \texttt{.pth} chỉ chứa \texttt{state\_dict}, còn tệp \texttt{.keras}
+mặc định lưu thêm cấu hình mô hình và trạng thái của optimizer (hai moment của AdamW cho mỗi trọng số), nên nặng gấp
+khoảng ba lần: \SL{bench/models/amzn_keras_lstm/size_kb} KB so với \SL{bench/models/amzn_torch_lstm/size_kb} KB với LSTM.
+Nhờ vậy tệp Keras huấn luyện tiếp được ngay, nhưng khi chỉ cần phục vụ thì phần optimizer là thừa.
+
+\section{Huấn luyện song song trên hai thiết bị}
+
+TensorFlow từ bản 2.11 không còn hỗ trợ GPU trên Windows, nên Keras chạy trên CPU (16 luồng) trong một tiến trình riêng,
+\emph{cùng lúc} với notebook PyTorch dùng GPU. Hai bên không phải chờ nhau, và CPU 32 luồng của máy được chia đôi cho hai
+tiến trình. Hình~\ref{fig:loss-keras-amzn} và~\ref{fig:loss-keras-kkbox} là đường loss của bốn mô hình Keras; hình dạng
+giống bản PyTorch ở Chương~\ref{ch:pytorch}: trên AMZN val loss đứng yên ngay từ đầu, trên KKBox cả hai đường cùng giảm.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f4_loss_keras_amzn}
+  \caption{Đường loss của bốn mô hình Keras trên AMZN (liền: train, đứt: val)}
+  \label{fig:loss-keras-amzn}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f4_loss_keras_kkbox}
+  \caption{Đường loss của bốn mô hình Keras trên KKBox (liền: train, đứt: val)}
+  \label{fig:loss-keras-kkbox}
+\end{figure}
+
+Thời gian huấn luyện phản ánh chủ yếu thiết bị, không phản ánh framework. Trên KKBox, một epoch BiLSTM mất
+\SL{bench/models/kkbox_keras_bilstm/epoch_s} giây với Keras trên CPU và \SL{bench/models/kkbox_torch_bilstm/epoch_s} giây
+với PyTorch trên GPU. Vì vậy phần so tốc độ bên dưới đo suy luận trên cùng một thiết bị.
+
+\section{Đo độ trễ suy luận}
+
+Để so công bằng, độ trễ của cả 16 mô hình được đo trên CPU với đúng một luồng. Mỗi mô hình chạy khởi động 20 lần, rồi đo
+200 lần với lô một mẫu và lấy trung vị (độ trễ), và đo 30 lần với lô 256 mẫu (thông lượng). Mô hình Keras chạy qua
+\texttt{tf.function}, tức đồ thị đã biên dịch, là cách dùng khi phục vụ thật; gọi \texttt{model(x)} ở chế độ eager chậm
+hơn khoảng một trăm lần vì vòng lặp theo thời gian chạy từng phép tính một.
+
+\maNguon{bench___median_time}{Đo thời gian: khởi động rồi lấy trung vị}
+\maNguon{bench__latency}{Độ trễ với lô 1 và thông lượng với lô 256}
+
+Khi viết notebook này, lần đo đầu tiên cho PyTorch chậm bất thường, 1,5 đến 5 ms mỗi mẫu. Nguyên nhân là mô hình PyTorch và
+Keras được đo xen kẽ nhau: sau mỗi lần gọi, các luồng của TensorFlow tiếp tục quay chờ việc một lúc và giành mất lõi CPU
+duy nhất của PyTorch. Đo hết PyTorch rồi mới đo Keras thì kết quả ổn định. Đây là một ví dụ nhỏ cho thấy đối chuẩn hiệu
+năng dễ sai như thế nào nếu không kiểm soát môi trường.
+
+\section{Bảng đối chuẩn 16 mô hình}
+
+\begin{table}[H]
+  \centering\scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \caption{Đối chuẩn trên AMZN: 8 mô hình và mốc ngây thơ}
+  \label{tab:bench-amzn}
+  \input{generated/tab_bench_amzn}
+\end{table}
+
+\begin{table}[H]
+  \centering\scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \caption{Đối chuẩn trên KKBox: 8 mô hình}
+  \label{tab:bench-kkbox}
+  \input{generated/tab_bench_kkbox}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f4_scatter}
+  \caption{Chất lượng theo độ trễ suy luận của 16 mô hình}
+  \label{fig:scatter}
+\end{figure}
+
+Bảng~\ref{tab:bench-amzn}, Bảng~\ref{tab:bench-kkbox} và Hình~\ref{fig:scatter} cho bốn kết luận.
+
+\textbf{Chất lượng gần như không phụ thuộc framework.} Trên KKBox, F1 của cùng một kiến trúc ở hai framework chênh nhau
+từ \SL{bench/cmp/kkbox_bilstm/diffPct} đến \SL{bench/cmp/kkbox_gru/diffPct} điểm phần trăm. Trên AMZN, RMSE chênh không
+quá \SL{bench/cmp/amzn_bilstm/diff} USD, trừ Simple RNN của Keras kém hơn \SL{bench/cmp/amzn_rnn/diff} USD vì dừng ở
+epoch \SL{bench/models/amzn_keras_rnn/best_epoch}. Mỗi mô hình chỉ chạy một seed, nên những chênh lệch cỡ này nằm trong mức
+dao động của khởi tạo ngẫu nhiên, không đủ để nói framework nào học tốt hơn.
+
+\textbf{PyTorch nhanh hơn với từng mẫu một.} Độ trễ trung vị của 8 mô hình PyTorch là \SL{bench/lat_median/torch} ms,
+của Keras là \SL{bench/lat_median/keras} ms. Với lô một mẫu, chi phí gọi hàm của framework chiếm phần lớn thời gian, và
+lời gọi eager của PyTorch nhẹ hơn lời gọi \texttt{tf.function}. BiLSTM chênh nhiều nhất: Keras chậm hơn
+\SL{bench/cmp/amzn_bilstm/lat_ratio} lần.
+
+\textbf{Với lô lớn, khoảng cách hẹp lại và có chỗ đảo chiều.} Ở lô 256, Keras Simple RNN xử lý
+\SL{bench/models/kkbox_keras_rnn/throughput} mẫu/giây, nhiều hơn PyTorch (\SL{bench/models/kkbox_torch_rnn/throughput}).
+Với LSTM và BiLSTM, PyTorch vẫn nhanh hơn khoảng hai lần. Chọn framework theo tốc độ cần biết trước ứng dụng phục vụ từng
+yêu cầu một hay theo lô.
+
+\textbf{Mô hình ``tốt nhất'' khác nhau tuỳ tiêu chí.} Theo val loss (tiêu chí dùng để chọn mô hình cho Web App), mô hình
+tốt nhất trên AMZN là \SL{bench/best/amzn_torchLabel} (PyTorch) và \SL{bench/best/amzn_kerasLabel} (Keras), trên
+KKBox là \SL{bench/best/kkbox_torchLabel} (PyTorch) và \SL{bench/best/kkbox_kerasLabel} (Keras). Chỉ số test tốt nhất
+lại thuộc về \SL{bench/best_test/amznLabel} trên AMZN và \SL{bench/best_test/kkboxLabel} trên KKBox. Khi các mô hình gần bằng nhau như vậy, thứ hạng trên test gần
+như là ngẫu nhiên, và mô hình rẻ nhất đủ tốt là lựa chọn hợp lý.
+
+\section{Giới hạn của mô hình dự báo giá}
+
+Trên AMZN, không mô hình nào trong 16 mô hình thắng mốc ngây thơ (dòng cuối Bảng~\ref{tab:bench-amzn}). Đây không phải
+lỗi cài đặt. Nó đến từ ba điều đã thấy trong dữ liệu:
+
+\begin{itemize}
+  \item \textbf{Return gần như không có tự tương quan} (Chương~\ref{ch:dulieu}): quá khứ 30 phiên chứa rất ít thông tin
+        về return ngày mai. Dự báo tốt nhất theo sai số bình phương khi đó là một hằng số gần 0, đúng là điều mô hình
+        học được (val loss đứng yên từ epoch đầu).
+  \item \textbf{Trễ pha tại điểm đảo chiều}: vì $\hat r \approx 0$, dự báo $\hat P_{t+1} \approx P_t$ luôn đi sau giá thật
+        một phiên (Hình~\ref{fig:pred-amzn}b). Khi giá đổi chiều, mô hình chỉ ``thấy'' sau khi việc đã xảy ra.
+  \item \textbf{Phân phối đổi theo thời gian}: độ lệch chuẩn của return là \SL{amzn/ret_std/train} trên train nhưng chỉ
+        \SL{amzn/ret_std/test} trên test (Chương~\ref{ch:dulieu}), và những phiên lớn nhất đến từ sự kiện ngoài dữ liệu (báo cáo tài chính, tin vĩ mô) mà
+        tám đặc trưng kỹ thuật không chứa.
+\end{itemize}
+
+Chỉ số $R^2$ trên giá (khoảng 0,99) và biểu đồ ``đường dự báo bám sát đường thật'' là hai cách trình bày dễ làm kết quả
+trông tốt hơn thực tế. Với chuỗi giá, cần so với mốc ngây thơ và đo trên return.

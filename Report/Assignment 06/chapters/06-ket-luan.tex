@@ -1,0 +1,44 @@
+% =====================================================================
+%  Chương 6 — Kết luận
+% =====================================================================
+\chapter{Kết luận}
+\label{ch:ketluan}
+
+\section{Trả lời sáu hạng mục}
+
+\begin{enumerate}
+  \item \textbf{Cơ sở lý thuyết.} Mỗi khái niệm của mạng hồi quy (tensor chuỗi, Simple RNN, BPTT, clipping, tế bào LSTM và
+        GRU, BiLSTM, recurrent dropout, LayerNorm) được viết thành một hàm NumPy và khớp với PyTorch ở cả
+        \SL{theory/n_checks} phép đối chiếu. Phép đo gradient bằng autograd cho một kết quả đáng nhớ: LSTM chỉ giữ được
+        gradient khi cổng quên mở. Với bias cổng quên bằng 0, gradient ở trễ 20 gần như bằng của Simple RNN.
+  \item \textbf{Hai tập dữ liệu thực tế.} AMZN có \SL{amzn/n_raw} phiên, chia theo thời gian, dự báo return thay vì mức
+        giá vì giá không dừng (ADF $p = \SL{amzn/adf/close/p}$). KKBox có \SL{kkbox/n_sample} người dùng thật lấy từ
+        \SL{kkbox/log_rows} dòng log, đọc theo khối không cần nạp trọn vào RAM. Trên cả hai tập, mọi thống kê chuẩn hoá
+        chỉ tính trên train.
+  \item \textbf{PyTorch.} Bốn mô hình dùng chung một lớp và một vòng lặp huấn luyện, huấn luyện trên GPU sau khi đo được
+        GPU nhanh hơn CPU. Trên KKBox, LSTM tốt nhất với F1 \SL{torch_kkbox/models/lstm/f1}\,\% và ROC-AUC
+        \SL{torch_kkbox/models/lstm/roc_auc}; ba mô hình có cổng đều hơn Simple RNN.
+  \item \textbf{Keras và đối chuẩn.} Cùng kiến trúc cho chất lượng gần như bằng nhau ở hai framework. PyTorch nhanh hơn
+        với từng mẫu một (trung vị \SL{bench/lat_median/torch} so với \SL{bench/lat_median/keras} ms trên một luồng CPU),
+        còn với lô lớn thì khoảng cách hẹp lại và Keras thắng ở Simple RNN. Tệp \texttt{.keras} nặng hơn vì chứa cả trạng thái
+        optimizer.
+  \item \textbf{Web App.} Flask phục vụ cả 16 mô hình qua REST API, giao diện hai tab; toàn bộ tham số tiền xử lý đọc từ
+        \texttt{metadata.json} nên ứng dụng chạy được mà không cần dữ liệu gốc. Kịch bản kiểm chứng qua
+        \SL{app/n_calls} lượt gọi.
+  \item \textbf{Kết luận về mô hình.} Mạng hồi quy học được tín hiệu thật khi tín hiệu nằm trong chuỗi (xu hướng nghe nhạc
+        giảm dần của người sắp rời bỏ). Nó không tạo ra được tín hiệu khi chuỗi không chứa (return cổ phiếu ngày mai):
+        không mô hình nào trong 16 mô hình thắng mốc ``giá ngày mai bằng giá hôm nay''.
+\end{enumerate}
+
+\section{Hạn chế}
+
+\begin{itemize}
+  \item Mỗi mô hình chỉ chạy một seed. Chênh lệch giữa các mô hình trên KKBox (dưới hai điểm F1) và giữa hai framework
+        đều nhỏ hơn mức dao động thường gặp giữa các lần khởi tạo, nên bài không xếp hạng chúng.
+  \item KKBox chỉ dùng mẫu 100.000 người và 31 ngày log. Bỏ qua lịch sử giao dịch và thông tin thành viên nên ROC-AUC dừng
+        ở khoảng 0,68, thấp hơn các lời giải đầy đủ của cuộc thi.
+  \item AMZN chỉ dùng đặc trưng kỹ thuật tính từ chính chuỗi giá. Các sự kiện gây biến động lớn nhất (báo cáo quý, tin vĩ
+        mô) không có trong dữ liệu.
+  \item Keras chạy trên CPU vì TensorFlow không hỗ trợ GPU trên Windows, nên thời gian huấn luyện của hai framework không
+        so trực tiếp được; bài chỉ so tốc độ suy luận trên cùng CPU.
+\end{itemize}

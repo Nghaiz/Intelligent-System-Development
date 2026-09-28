@@ -1,0 +1,70 @@
+{
+  "history": {
+    "n": 100,
+    "first": "2024-05-02",
+    "last": "2024-09-24",
+    "close_last": 193.96
+  },
+  "stock": {
+    "torch": {
+      "change_pct": 0.157,
+      "framework": "torch",
+      "last_close": 193.96,
+      "last_date": "2024-09-24",
+      "latency_ms": 1.107,
+      "model": "gru",
+      "model_label": "GRU",
+      "pred_close": 194.27
+    },
+    "keras": {
+      "change_pct": 0.29,
+      "framework": "keras",
+      "last_close": 193.96,
+      "last_date": "2024-09-24",
+      "latency_ms": 2.469,
+      "model": "lstm",
+      "model_label": "LSTM",
+      "pred_close": 194.52
+    }
+  },
+  "churn": {
+    "churn_torch": {
+      "framework": "torch",
+      "latency_ms": 0.335,
+      "model": "lstm",
+      "model_label": "LSTM",
+      "prob": 0.9805,
+      "risk": "cao",
+      "threshold": 0.657
+    },
+    "churn_keras": {
+      "framework": "keras",
+      "latency_ms": 2.011,
+      "model": "gru",
+      "model_label": "GRU",
+      "prob": 0.9871,
+      "risk": "cao",
+      "threshold": 0.694
+    },
+    "loyal_torch": {
+      "framework": "torch",
+      "latency_ms": 0.729,
+      "model": "lstm",
+      "model_label": "LSTM",
+      "prob": 0.2348,
+      "risk": "thấp",
+      "threshold": 0.657
+    },
+    "loyal_keras": {
+      "framework": "keras",
+      "latency_ms": 1.664,
+      "model": "gru",
+      "model_label": "GRU",
+      "prob": 0.1832,
+      "risk": "thấp",
+      "threshold": 0.694
+    }
+  },
+  "bad_shape_status": 400,
+  "n_calls": 7
+}

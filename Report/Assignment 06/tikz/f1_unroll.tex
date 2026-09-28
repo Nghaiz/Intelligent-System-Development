@@ -1,0 +1,35 @@
+% RNN dạng cuộn (trái) và mở theo thời gian (phải): cùng W_xh, W_hh, b ở mọi bước.
+\begin{tikzpicture}[node distance=9mm, font=\footnotesize,
+  nh/.style={khoi, minimum width=10mm, minimum height=8mm},
+  nx/.style={khoiG, minimum width=10mm},
+  ny/.style={khoiC, minimum width=10mm}]
+  % dạng cuộn
+  \node[nh] (hc) {$h$};
+  \node[nx, below=of hc] (xc) {$x_t$};
+  \node[ny, above=of hc] (yc) {$\hat y$};
+  \draw[mui] (xc) -- node[right, nhan] {$W_{xh}$} (hc);
+  \draw[mui] (hc) -- node[right, nhan] {$W_{hy}$} (yc);
+  \draw[mui] (hc.east) .. controls +(1.1,0.6) and +(1.1,-0.6) .. node[right, nhan] {$W_{hh}$} (hc.east);
+  \node[font=\Large] at (2.75,0) {$=$};
+  % dạng mở
+  \begin{scope}[xshift=3.6cm]
+    \node[khoiX, minimum width=8mm] (h0) {$h_0$};
+    \foreach \t/\p in {1/h0, 2/h1, 3/h2} {
+      \node[nh, right=11mm of \p] (h\t) {$h_{\t}$};
+      \node[nx, below=of h\t] (x\t) {$x_{\t}$};
+      \draw[mui] (x\t) -- node[right, nhan] {$W_{xh}$} (h\t);
+      \draw[mui] (\p) -- node[above, nhan] {$W_{hh}$} (h\t);
+    }
+    \node[right=6mm of h3] (dots) {$\cdots$};
+    \node[nh, right=6mm of dots] (hT) {$h_T$};
+    \node[nx, below=of hT] (xT) {$x_T$};
+    \draw[mui] (xT) -- node[right, nhan] {$W_{xh}$} (hT);
+    \draw[mui] (h3) -- (dots);
+    \draw[mui] (dots) -- node[above, nhan] {$W_{hh}$} (hT);
+    \node[ny, above=of hT] (yT) {$\hat y$};
+    \draw[mui] (hT) -- node[right, nhan] {đầu ra} (yT);
+    \node[nhan, above=2mm of h2, align=center] {mọi bước dùng chung\\$W_{xh}, W_{hh}, b$};
+  \end{scope}
+  \node[below=4mm of xc, nhan] {dạng cuộn};
+  \node[below=4mm of x2, nhan] {mở theo thời gian: $h_t = \tanh(W_{xh}x_t + W_{hh}h_{t-1} + b)$};
+\end{tikzpicture}

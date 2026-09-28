@@ -1,0 +1,12 @@
+% Mặt nạ dropout (p = 0,3) trên 8 đơn vị ẩn × 12 bước: dropout thường đổi mặt nạ ở mỗi bước,
+% recurrent dropout giữ một mặt nạ cho cả chuỗi (notebook 00, recurrent_dropout_masks).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=12mm}, a06, grid=none, width=7cm, height=5cm,
+  enlargelimits=false, colormap={bw}{rgb255=(214,39,40) rgb255=(220,232,245)}, point meta min=0, point meta max=1,
+  xtick={0,5,10}, xticklabels={1,6,11}, ytick={0,7}, yticklabels={$h_8$,$h_1$}, xlabel={bước $t$}]
+  \nextgroupplot[title={Dropout thường: mặt nạ mới mỗi bước}]
+    \addplot[matrix plot*, mesh/cols=12, point meta=explicit] table[meta=v]{figdata/theory_mask_std.dat};
+  \nextgroupplot[title={Recurrent dropout: một mặt nạ cho cả chuỗi}]
+    \addplot[matrix plot*, mesh/cols=12, point meta=explicit] table[meta=v]{figdata/theory_mask_rec.dat};
+\end{groupplot}
+\end{tikzpicture}

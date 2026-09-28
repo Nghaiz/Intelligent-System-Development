@@ -1,0 +1,261 @@
+% =====================================================================
+%  Chương 1 — Hạng mục 1: cơ sở lý thuyết mạng nơ-ron hồi quy
+%  Mã nguồn: a06/theory.py · Notebook: 00_ly_thuyet_rnn.ipynb
+% =====================================================================
+\chapter{Cơ sở lý thuyết mạng nơ-ron hồi quy}
+\label{ch:lythuyet}
+
+Chương này dựng lại các khái niệm của mạng hồi quy từ công thức. Mỗi khái niệm là một hàm NumPy trong
+\texttt{a06/theory.py}; notebook 00 chạy hàm đó và so với lớp PyTorch tương ứng bằng \texttt{np.allclose}. Cả
+\SL{theory/n_checks} phép đối chiếu đều cho kết quả khớp, nên các công thức dưới đây chính là những gì thư viện
+đang tính.
+
+\section{Dữ liệu chuỗi và tensor ba chiều}
+
+Một mẫu dữ liệu chuỗi là một dãy vector $x_1, x_2, \dots, x_T$ với $x_t \in \mathbb{R}^D$. Gom $B$ mẫu lại được
+tensor $X \in \mathbb{R}^{B \times T \times D}$ (Hình~\ref{fig:tensor}). Cả hai tập của bài đều có dạng này. AMZN
+cho $X_{\text{train}}$ có shape $(\SL{theory/shapes/amzn/0}, \SL{theory/shapes/amzn/1}, \SL{theory/shapes/amzn/2})$:
+mỗi mẫu là một cửa sổ 30 phiên giao dịch, mỗi phiên 8 đặc trưng. KKBox cho
+$(\SL{theory/shapes/kkbox/0}, \SL{theory/shapes/kkbox/1}, \SL{theory/shapes/kkbox/2})$: mỗi mẫu là một người dùng,
+31 ngày của tháng 3/2017, mỗi ngày 8 đặc trưng nghe nhạc.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_tensor}
+  \caption{Tensor dữ liệu chuỗi; lát tô cam là một bước thời gian $x_t$}
+  \label{fig:tensor}
+\end{figure}
+
+Điều làm dữ liệu chuỗi khác dữ liệu bảng là thứ tự. Giá hôm nay phụ thuộc giá hôm qua; một người sắp bỏ dịch vụ
+thường nghe ít dần trong những ngày cuối. Giả định các mẫu độc lập và cùng phân phối (i.i.d.) vẫn đúng giữa các
+mẫu, nhưng sai hoàn toàn giữa các bước trong cùng một mẫu. Mô hình cho chuỗi phải khai thác được sự phụ thuộc đó.
+
+\section{Vì sao MLP và Conv1D chưa đủ}
+
+Có hai cách dùng lại công cụ của các bài trước. Cách thứ nhất là làm phẳng chuỗi thành vector $T \cdot D$ chiều rồi
+đưa vào MLP. Cách thứ hai là trượt một kernel Conv1D theo trục thời gian. Bảng~\ref{tab:mlp-rnn} đếm tham số của tầng
+đầu tiên với $T = 30$, $D = 8$ và $H = 64$ đơn vị ẩn.
+
+\begin{table}[H]
+  \centering\small
+  \caption{Tầng đầu của ba loại mô hình cho chuỗi $T = 30$, $D = 8$, $H = 64$}
+  \label{tab:mlp-rnn}
+  \begin{tabular}{lL{3.3cm}rL{3.2cm}L{3.2cm}}
+    \toprule
+    Mô hình & Số tham số & Giá trị & Độ dài chuỗi thay đổi & Nhớ quá khứ xa \\
+    \midrule
+    MLP (làm phẳng) & $(T \cdot D) H + H$ & \SL{theory/params/mlp} & không, $T$ cố định & mọi bước, nhưng không chia sẻ trọng số \\
+    Conv1D, $K = 3$ & $K D H + H$ & \SL{theory/params/conv1d} & được & chỉ $K$ bước mỗi tầng \\
+    Simple RNN & $H(D + H + 1)$ & \SL{theory/params/rnn} & được & qua trạng thái $h_t$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+MLP học một trọng số riêng cho từng cặp (bước, đặc trưng). Nhân đôi độ dài chuỗi thì số tham số tầng đầu tăng từ
+\SL{theory/params/mlp} lên \SL{theory/params/mlp_t60}, và điều học được ở bước 5 không dùng lại được ở bước 25.
+Conv1D chia sẻ trọng số theo thời gian nhưng mỗi tầng chỉ nhìn $K$ bước, muốn thấy 30 bước phải chồng nhiều tầng.
+RNN giải quyết cả hai: một bộ trọng số dùng cho mọi bước, và một trạng thái $h_t$ mang thông tin từ đầu chuỗi đến
+hiện tại. Ba hàm đếm tham số nằm trong \texttt{theory.py}; notebook so từng công thức với \texttt{numel()} của
+\texttt{nn.Linear}, \texttt{nn.Conv1d} và \texttt{nn.RNN}.
+
+\maNguon{theory__count_params_rnn}{Số tham số của Simple RNN không phụ thuộc độ dài chuỗi}
+
+\section{Simple RNN}
+
+Elman~\cite{elman1990} đưa ra dạng đơn giản nhất: ở mỗi bước, trạng thái mới là hàm của đầu vào hiện tại và trạng
+thái cũ,
+\begin{equation}
+  h_t = \tanh\left(W_{xh}\, x_t + W_{hh}\, h_{t-1} + b\right), \qquad h_0 = 0 .
+  \label{eq:rnn}
+\end{equation}
+Mở vòng lặp theo thời gian thì RNN trở thành một mạng sâu $T$ tầng, nhưng mọi tầng dùng chung $W_{xh}$, $W_{hh}$ và
+$b$ (Hình~\ref{fig:unroll}). Trạng thái cuối $h_T$ là bản tóm tắt cả chuỗi, và cả bốn mô hình của bài đều đưa
+$h_T$ vào một đầu dự báo nhỏ.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_unroll}
+  \caption{RNN ở dạng cuộn và dạng mở theo thời gian}
+  \label{fig:unroll}
+\end{figure}
+
+\maNguon{theory__rnn_forward}{Lan truyền xuôi của Simple RNN theo công thức~\eqref{eq:rnn}}
+
+Hàm trên khớp \texttt{nn.RNN} của PyTorch (kiểm tra \texttt{rnn\_forward}: \SL{theory/checks/rnn_forward}). PyTorch lưu
+hai vector bias $b_{ih}$ và $b_{hh}$ nên tầng \texttt{nn.RNN(8, 64)} có \SL{theory/cell_params/rnn} tham số, nhiều hơn
+công thức ở Bảng~\ref{tab:mlp-rnn} đúng $H = 64$. Khi so khớp, notebook cộng hai bias lại thành $b$.
+
+\section{Lan truyền ngược theo thời gian và hai vấn đề của gradient}
+
+Huấn luyện RNN dùng lan truyền ngược theo thời gian (BPTT)~\cite{werbos1990}: mở mạng ra $T$ bước rồi lan truyền
+ngược như một mạng thường, cộng gradient của $W_{hh}$ từ mọi bước. Gọi $L$ là hàm mất mát tính từ $h_T$. Theo quy tắc
+chuỗi,
+\begin{equation}
+  \frac{\partial L}{\partial h_t}
+  = \frac{\partial L}{\partial h_T} \prod_{k=t+1}^{T} \frac{\partial h_k}{\partial h_{k-1}}
+  = \frac{\partial L}{\partial h_T} \prod_{k=t+1}^{T} W_{hh}^\top\, \mathrm{diag}\!\left(1 - h_k^2\right).
+  \label{eq:bptt}
+\end{equation}
+Gradient đi từ $h_T$ về $h_t$ bị nhân với $T - t$ ma trận Jacobi. Nếu chuẩn của các ma trận này nhỏ hơn 1, tích co lại
+theo hàm mũ và gradient \emph{triệt tiêu}; nếu lớn hơn 1, tích \emph{bùng nổ}~\cite{bengio1994,pascanu2013}. Bỏ qua
+đạo hàm của $\tanh$ (luôn không vượt 1) để thấy riêng vai trò của $W_{hh}$: với vector $v$ bất kỳ,
+$\lVert (W_{hh}^\top)^t v \rVert$ tăng hay giảm theo bán kính phổ $\rho$ của $W_{hh}$.
+
+\maNguon{theory__jacobian_product_norm}{Chuẩn của tích Jacobi với bán kính phổ $\rho$ cho trước}
+
+Hình~\ref{fig:rho} chạy hàm này với ba giá trị $\rho$. Sau \SL{theory/rho_end/T} bước, $\rho = 0{,}9$ còn lại
+\SL{theory/rho_end/r09}, còn $\rho = 1{,}1$ đã lên \SL{theory/rho_end/r11}. Chênh lệch chỉ $0{,}1$ ở bán kính phổ
+thành chênh lệch hơn ba bậc độ lớn ở gradient.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_rho}
+  \caption{Tích Jacobi co hoặc giãn theo hàm mũ tuỳ bán kính phổ của $W_{hh}$}
+  \label{fig:rho}
+\end{figure}
+
+Thực tế có thêm $\tanh$ và trọng số khởi tạo ngẫu nhiên, nên notebook đo trực tiếp: dựng chuỗi ngẫu nhiên dài
+\SL{theory/grad/T} bước, lấy $L = \sum h_T$, rồi dùng autograd đọc $\lVert\partial L/\partial h_t\rVert$ ở từng bước.
+Để giữ được gradient của từng $h_t$, hàm mở vòng lặp bằng \texttt{RNNCell}/\texttt{LSTMCell} thay cho lớp RNN gộp.
+
+\maNguon{theory__grad_norms_through_time}{Đo chuẩn gradient theo từng bước bằng autograd}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_gradnorm}
+  \caption{Gradient của mất mát theo $h_t$, chuẩn hoá theo bước cuối (trục tung thang log)}
+  \label{fig:gradnorm}
+\end{figure}
+
+Hình~\ref{fig:gradnorm} cho một kết quả đáng chú ý. Với Simple RNN, lùi 20 bước thì gradient chỉ còn
+\SL{theory/grad/rnn_lag20} lần giá trị ở bước cuối; lùi 59 bước còn \SL{theory/grad/rnn_lag59}. LSTM với khởi tạo
+mặc định của PyTorch cũng suy giảm gần như vậy: \SL{theory/grad/lstm_lag20} ở trễ 20. Lý do là bias cổng quên bằng 0
+nên $f_t \approx 0{,}5$, và cell state bị nhân với khoảng $0{,}5$ ở mỗi bước. Khi đặt bias cổng quên bằng
+\SL{theory/grad/forget_bias} như Jozefowicz và cộng sự đề xuất~\cite{jozefowicz2015}, $f_t$ tiến về gần 1 và gradient ở trễ
+59 còn \SL{theory/grad/lstm3_lag59}, lớn hơn RNN hàng chục bậc. Vậy LSTM không tự động nhớ xa. Nó có một con đường để
+gradient đi qua, và mô hình phải học mở con đường đó.
+
+\section{Gradient clipping}
+
+Triệt tiêu làm mô hình không học được phụ thuộc xa; bùng nổ thì nguy hiểm hơn, vì một bước cập nhật quá lớn có thể phá
+hỏng trọng số đã học. Cách chữa thông dụng là cắt theo chuẩn~\cite{pascanu2013}: gộp mọi gradient thành một vector
+$g$, nếu $\lVert g\rVert > c$ thì thay bằng $g \cdot c / \lVert g\rVert$. Độ dài bị chặn, còn hướng giữ nguyên
+(Hình~\ref{fig:clip}). Cả 16 mô hình của bài dùng $c = 1$.
+
+\maNguon{theory__clip_grad_norm}{Cắt gradient theo chuẩn, giữ hướng}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_clip}
+  \caption{Gradient clipping chỉ đổi độ dài của $g$, không đổi hướng}
+  \label{fig:clip}
+\end{figure}
+
+Trên hai ma trận gradient ngẫu nhiên có tổng chuẩn \SL{theory/clip/norm_before}, hàm trả về chuẩn
+\SL{theory/clip/norm_after} và khớp \texttt{nn.utils.clip\_grad\_norm\_} (\SL{theory/checks/clip_grad_norm}).
+
+\section{LSTM}
+
+LSTM~\cite{hochreiter1997} thêm một trạng thái thứ hai là cell state $c_t$ và ba cổng điều khiển nó. Với
+$z_t = [h_{t-1}; x_t]$,
+\begin{align}
+  f_t &= \sigma(W_f z_t + b_f), & i_t &= \sigma(W_i z_t + b_i), & o_t &= \sigma(W_o z_t + b_o), \nonumber\\
+  \tilde c_t &= \tanh(W_c z_t + b_c), & c_t &= f_t \odot c_{t-1} + i_t \odot \tilde c_t, & h_t &= o_t \odot \tanh(c_t).
+  \label{eq:lstm}
+\end{align}
+Cổng quên $f_t$ quyết định giữ bao nhiêu của $c_{t-1}$, cổng vào $i_t$ quyết định ghi bao nhiêu thông tin mới
+$\tilde c_t$, cổng ra $o_t$ quyết định để lộ bao nhiêu ra $h_t$. Điểm mấu chốt là phép cộng ở dòng $c_t$
+(Hình~\ref{fig:lstm}): $\partial c_t / \partial c_{t-1} = f_t$, không có ma trận trọng số và không có $\tanh$ trên
+đường đi. Khi $f_t$ gần 1, gradient đi qua nhiều bước gần như nguyên vẹn.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_lstm}
+  \caption{Tế bào LSTM: đường cộng của cell state ở trên, bốn phép biến đổi có cổng ở dưới}
+  \label{fig:lstm}
+\end{figure}
+
+\maNguon{theory__lstm_cell}{Một bước LSTM theo~\eqref{eq:lstm}, thứ tự khối cổng như PyTorch}
+
+\section{GRU}
+
+GRU~\cite{cho2014} gộp cell state vào $h_t$ và chỉ dùng hai cổng: cổng reset $r_t$ quyết định dùng bao nhiêu trạng thái
+cũ khi tạo ứng viên $n_t$, cổng cập nhật $z_t$ hoà trộn trạng thái cũ với ứng viên,
+\begin{align}
+  r_t &= \sigma(W_r z_t + b_r), \qquad z_t = \sigma(W_z z_t + b_z), \nonumber\\
+  n_t &= \tanh\!\left(W_{in} x_t + r_t \odot (W_{hn} h_{t-1})\right), \qquad
+  h_t = (1 - z_t) \odot n_t + z_t \odot h_{t-1}.
+  \label{eq:gru}
+\end{align}
+Dòng cuối là một tổ hợp lồi: khi $z_t \to 1$ thì $h_t \approx h_{t-1}$, gradient đi thẳng qua giống đường cộng của
+LSTM (Hình~\ref{fig:gru}).
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_gru}
+  \caption{Tế bào GRU với hai cổng}
+  \label{fig:gru}
+\end{figure}
+
+\maNguon{theory__gru_cell}{Một bước GRU theo~\eqref{eq:gru}}
+
+Bảng~\ref{tab:lstm-gru} so hai tế bào với cùng $D = 8$, $H = 64$. Số tham số đọc từ PyTorch.
+
+\begin{table}[H]
+  \centering\small
+  \caption{So sánh Simple RNN, LSTM, GRU và BiLSTM ($D = 8$, $H = 64$, tham số của riêng tầng hồi quy trong PyTorch)}
+  \label{tab:lstm-gru}
+  \begin{tabular}{lcccr}
+    \toprule
+    Tế bào & Số khối trọng số & Trạng thái & Cổng & Tham số \\
+    \midrule
+    Simple RNN & 1 & $h_t$ & không & \SL{theory/cell_params/rnn} \\
+    LSTM & 4 & $h_t$, $c_t$ & $f, i, o$ & \SL{theory/cell_params/lstm} \\
+    GRU & 3 & $h_t$ & $r, z$ & \SL{theory/cell_params/gru} \\
+    BiLSTM & $2 \times 4$ & $\overrightarrow{h}_t, \overleftarrow{h}_t$ & $f, i, o$ mỗi chiều & \SL{theory/cell_params/bilstm} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{LSTM hai chiều}
+
+BiLSTM~\cite{schuster1997} chạy hai LSTM độc lập, một đọc từ $t = 1$ đến $T$, một đọc từ $T$ về 1, rồi nối hai trạng
+thái cuối: $[\overrightarrow{h}_T; \overleftarrow{h}_1] \in \mathbb{R}^{2H}$ (Hình~\ref{fig:bilstm}). Notebook kiểm tra
+cách nối này trên \texttt{nn.LSTM(bidirectional=True)}: đầu ra có shape
+$(\SL{theory/bilstm/out_shape/0}, \SL{theory/bilstm/out_shape/1}, \SL{theory/bilstm/out_shape/2})$, nửa đầu ở bước cuối
+trùng $\overrightarrow{h}_T$ và nửa sau ở bước đầu trùng $\overleftarrow{h}_1$ (\SL{theory/checks/bilstm_concat}).
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_bilstm}
+  \caption{BiLSTM: vector tóm tắt là trạng thái cuối của hai chiều đọc}
+  \label{fig:bilstm}
+\end{figure}
+
+Với bài dự báo giá, chiều ngược không làm lộ tương lai. Nó chỉ đọc lại 30 phiên của cửa sổ theo thứ tự ngược, mọi phiên
+đều trước ngày cần dự báo. Chiều ngược thêm một góc nhìn khác lên cùng quá khứ, không thêm thông tin mới.
+
+\section{Điều chuẩn cho mạng hồi quy}
+
+Dropout thường đổi mặt nạ ở mỗi bước. Áp lên trạng thái $h_t$, nó xoá một phần trí nhớ khác nhau ở mỗi bước, và
+thông tin khó đi xa. Gal và Ghahramani~\cite{gal2016} đề xuất dùng \emph{một} mặt nạ cho cả chuỗi (recurrent dropout):
+đơn vị bị tắt thì tắt suốt chuỗi, đơn vị còn lại mang thông tin liền mạch (Hình~\ref{fig:dropout}, $p =
+\SL{theory/mask_p}\,\%$).
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_dropout}
+  \caption{Mặt nạ dropout thường và recurrent dropout; ô đỏ là đơn vị bị tắt}
+  \label{fig:dropout}
+\end{figure}
+
+\maNguon{theory__recurrent_dropout_masks}{Hai kiểu mặt nạ dropout cho chuỗi}
+
+BatchNorm của các bài trước lấy thống kê theo lô và theo từng bước, không hợp với chuỗi có độ dài thay đổi.
+LayerNorm~\cite{ba2016} chuẩn hoá theo chiều đặc trưng của \emph{từng mẫu}, nên dùng được ở mọi bước và mọi kích thước lô.
+Hàm dưới khớp \texttt{nn.LayerNorm} (\SL{theory/checks/layer_norm}).
+
+\maNguon{theory__layer_norm}{Layer Normalization theo từng mẫu}
+
+Các mô hình ở Chương~\ref{ch:pytorch} chỉ có một tầng hồi quy 64 đơn vị và dừng sớm theo validation, nên bài không
+dùng dropout hay LayerNorm. Hai kỹ thuật được trình bày ở đây vì chúng là công cụ chuẩn khi mô hình sâu hơn.

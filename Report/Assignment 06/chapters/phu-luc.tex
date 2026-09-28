@@ -1,0 +1,42 @@
+% =====================================================================
+%  Phụ lục — Tái lập kết quả
+% =====================================================================
+\chapter{Tái lập kết quả}
+\label{ch:phuluc}
+
+\section{Môi trường}
+
+Windows 11, Python 3.13, GPU NVIDIA GeForce RTX 4060 Laptop cho PyTorch (CUDA 12.6), CPU cho TensorFlow. PyTorch
+\SL{bench/torch_version}, Keras \SL{bench/keras_version} với TensorFlow 2.21. Mọi thư viện cài trong môi trường ảo riêng
+của bài, liệt kê trong \texttt{requirements.txt}.
+
+\section{Các bước}
+
+\begin{enumerate}
+  \item Tạo môi trường và cài thư viện:
+\begin{verbatim}
+cd "src/Assignment 06"
+python -m venv .venv
+.venv\Scripts\activate
+pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu126
+pip install -r requirements.txt
+python -m ipykernel install --user --name a06
+\end{verbatim}
+  \item Tải \texttt{train\_v2.csv.7z} và \texttt{user\_logs\_v2.csv.7z} của cuộc thi KKBox trên Kaggle (cần đăng nhập và
+        chấp nhận luật cuộc thi) vào \texttt{data/kkbox/}, giải nén. \texttt{AMZN.csv} đã có sẵn trong kho.
+  \item Chạy các notebook theo thứ tự số. Notebook 03, 04 (GPU) và 05 (CPU) chạy song song được. Trước khi chạy, đặt
+        biến môi trường \texttt{OPENBLAS\_NUM\_THREADS} bằng 8: trên máy 32 luồng, OpenBLAS mặc định cấp bộ đệm cho 32
+        luồng và có lúc làm kernel chết vì không cấp phát được bộ nhớ.
+\begin{verbatim}
+cd notebooks
+jupyter nbconvert --to notebook --execute --inplace ^
+    --ExecutePreprocessor.kernel_name=a06 --ExecutePreprocessor.timeout=-1 00_*.ipynb
+\end{verbatim}
+  \item Kiểm chứng Web App: \texttt{python app/smoke\_test.py}; chạy thật: \texttt{python app/app.py}.
+  \item Dựng báo cáo: \texttt{python "Report/Assignment 06/build.py"} (cần LuaLaTeX, \texttt{latexmk}, \texttt{biber}
+        và gói \texttt{minted}).
+\end{enumerate}
+
+Lần chạy đầu của notebook 02 gom log KKBox thành tệp \texttt{kkbox\_seq.npz}; các lần sau đọc thẳng tệp này.
+
+\maNguon{data_churn__build_cache}{Gom dữ liệu KKBox một lần và lưu lại}

@@ -1,0 +1,200 @@
+% =====================================================================
+%  Chương 2 — Hạng mục 2: hai tập dữ liệu chuỗi thực tế
+%  Mã nguồn: a06/data_stock.py, a06/data_churn.py · Notebook: 01_du_lieu_amzn, 02_du_lieu_kkbox
+% =====================================================================
+\chapter{Hai tập dữ liệu chuỗi thực tế}
+\label{ch:dulieu}
+
+Bài dùng hai tập dữ liệu thật, đủ lớn và thuộc hai loại bài toán khác nhau. AMZN là chuỗi giá cổ phiếu, một bài hồi
+quy: dự báo giá đóng cửa của phiên kế tiếp. KKBox Churn là log nghe nhạc theo ngày của người dùng một dịch vụ trả phí,
+một bài phân loại: người dùng này có bỏ dịch vụ hay không. Cả hai đều đưa về tensor $B \times T \times 8$ như
+Chương~\ref{ch:lythuyet}, nên cùng một lớp mô hình chạy được trên cả hai.
+
+\section{Giá cổ phiếu AMZN}
+
+\subsection{Nguồn và quy mô}
+
+Dữ liệu ngày của Amazon.com, Inc. (NASDAQ: AMZN) được tải từ Yahoo Finance~\cite{yahooamzn} bằng thư viện
+\texttt{yfinance}, gồm \SL{amzn/n_raw} phiên từ \SL{amzn/start} (phiên đầu sau IPO) đến \SL{amzn/end}. Mỗi phiên có
+giá mở cửa, cao nhất, thấp nhất, đóng cửa và khối lượng. Giá đã điều chỉnh theo các lần chia tách cổ phiếu, gần nhất là
+lần chia 20:1 năm 2022. Tệp CSV được lưu trong kho mã nguồn để lần chạy sau dùng đúng dữ liệu này, không phụ thuộc
+việc Yahoo cập nhật lại.
+
+\maNguon{data_stock__add_features}{Thêm đặc trưng tài chính từ giá và khối lượng}
+
+Tám đặc trưng đưa vào mô hình là Close, Open, High, Low, Volume, Return (log-return
+$r_t = \ln(P_t/P_{t-1})$), MA20 (trung bình 20 phiên) và RSI14 (chỉ số sức mạnh tương đối của Wilder~\cite{wilder1978}).
+MA50 và Volatility20 chỉ dùng để phân tích. Bỏ \SL{amzn/n_raw} $-$ \SL{amzn/n_feat} phiên đầu chưa đủ 50 phiên để tính
+MA50, còn lại \SL{amzn/n_feat} phiên. Bảng~\ref{tab:amzn-desc} cho thống kê mô tả.
+
+\begin{table}[H]
+  \centering\small
+  \caption{Thống kê mô tả của AMZN, \SL{amzn/n_feat} phiên}
+  \label{tab:amzn-desc}
+  \input{generated/tab_amzn_desc}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_price}
+  \caption{Giá đóng cửa AMZN (thang log) với MA20, MA50 và khối lượng; vạch đứt là ranh giới train, val, test}
+  \label{fig:price}
+\end{figure}
+
+Hình~\ref{fig:price} vẽ giá trên thang log. Trong 27 năm giá tăng hơn một nghìn lần, với hai lần sụt mạnh: bong bóng
+dot-com 2000--2001 và đợt điều chỉnh 2022. Thang tuyến tính sẽ ép toàn bộ giai đoạn trước 2010 thành một đường nằm sát
+trục hoành.
+
+\subsection{Return, phân phối và biến động}
+
+Hình~\ref{fig:return} xem xét log-return. Return trung bình \SL{amzn/ret/mean} mỗi phiên, độ lệch chuẩn
+\SL{amzn/ret/std}. Phiên giảm mạnh nhất là \SL{amzn/ret/min_date} ($r = \SL{amzn/ret/min}$), tăng mạnh nhất là
+\SL{amzn/ret/max_date} ($r = \SL{amzn/ret/max}$), đều trong giai đoạn dot-com. Phân phối có đuôi dày: độ nhọn dư
+(excess kurtosis) là \SL{amzn/ret/kurt}, trong khi phân phối chuẩn có độ nhọn dư bằng 0. Tỉ lệ phiên lệch quá 4 độ lệch
+chuẩn là \SL{amzn/ret/tail4}\,\%, nếu phân phối chuẩn thì chỉ \SL{amzn/ret/tail4_gauss}\,\%. Biến động
+(ô c) tụ thành cụm: những giai đoạn dao động mạnh kéo dài nhiều tháng. Ô d cho thấy năm cột giá gần như trùng nhau
+(tương quan gần 1). Chúng mang thông tin về mức giá, còn Return và RSI14 mang thông tin về thay đổi.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_return}
+  \caption{Log-return, phân phối return so với phân phối chuẩn, biến động 20 phiên và tương quan giữa 8 đặc trưng}
+  \label{fig:return}
+\end{figure}
+
+\subsection{Tính dừng: kiểm định ADF và tự tương quan}
+
+Kiểm định Augmented Dickey--Fuller~\cite{dickey1979} có giả thuyết không là chuỗi có nghiệm đơn vị (không dừng).
+Với giá đóng cửa, thống kê ADF là \SL{amzn/adf/close/stat}, $p = \SL{amzn/adf/close/p}$, không bác bỏ được giả thuyết:
+giá không dừng. Với return, thống kê là \SL{amzn/adf/return/statSgn}, $p = \SL{amzn/adf/return/p}$: return dừng.
+Hình~\ref{fig:acf} cho cùng kết luận. ACF của giá giảm rất chậm, ở trễ 40 vẫn còn \SL{amzn/acf_c40}. ACF của return
+gần như nằm trong dải tin cậy $\pm\SL{amzn/acf_band}$; chỉ \SL{amzn/acf_r_out} trong 40 trễ vượt ra ngoài và đều rất
+nhỏ.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_acf}
+  \caption{ACF và PACF 40 trễ của giá và của return; dải xám là khoảng tin cậy 95\,\%}
+  \label{fig:acf}
+\end{figure}
+
+Hai kết quả này quyết định cách đặt bài toán. Giá không dừng, nên mô hình học trên giá 1997--2016 sẽ gặp mức giá hoàn
+toàn mới ở tập test: giá lớn nhất của test gấp \SL{amzn/p_max_ratio} lần giá lớn nhất của train. Một mô hình dự báo
+thẳng mức giá đã chuẩn hoá Min-Max theo train sẽ phải ngoại suy ra ngoài khoảng $[0, 1]$ mà nó từng thấy. Return thì
+dừng, nhưng gần như không có tự tương quan, tức là rất khó dự báo từ quá khứ của chính nó. Đó là điều giả thuyết thị
+trường hiệu quả~\cite{fama1970} dự đoán, và Chương~\ref{ch:keras} sẽ thấy các mô hình va vào đúng giới hạn này.
+
+\subsection{Cửa sổ trượt và chống rò rỉ}
+
+Bài dự báo log-return phiên kế tiếp $r_{t+1}$ từ cửa sổ \SL{amzn/window} phiên, rồi quy đổi ra giá
+$\hat P_{t+1} = P_t\, e^{\hat r_{t+1}}$ để báo sai số bằng USD. Trong mỗi cửa sổ, năm cột giá chia cho Close của ngày
+cuối cửa sổ, nên mô hình chỉ thấy giá tương đối (ví dụ ``MA20 cao hơn giá hiện tại 3\,\%''), không thấy mức giá tuyệt đối.
+Volume lấy log.
+
+\maNguon{data_stock__make_windows}{Cửa sổ trượt với nhãn là return phiên kế tiếp}
+
+Tổng cộng \SL{amzn/n_windows} cửa sổ, chia theo thời gian 70/15/15 và không xáo trộn (Hình~\ref{fig:window}). Tập
+test là bốn năm cuối, từ \SL{amzn/split/test/start} đến \SL{amzn/split/test/end}. Mọi thống kê chuẩn hoá (trung bình, độ
+lệch chuẩn của từng đặc trưng và của nhãn) chỉ tính trên phần train. Notebook 01 kiểm tra bằng \texttt{assert} rằng ngày
+cuối của train đứng trước ngày đầu của val, và ngày cuối của val đứng trước ngày đầu của test.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_window}
+  \caption{Cửa sổ trượt và cách chia theo thời gian của AMZN}
+  \label{fig:window}
+\end{figure}
+
+\maNguon{data_stock__WindowScaler}{Chuẩn hoá đặc trưng và nhãn, fit chỉ trên train}
+
+Độ lệch chuẩn của return ở ba phần cũng khác nhau: \SL{amzn/ret_std/train} ở train (có cả giai đoạn dot-com),
+\SL{amzn/ret_std/val} ở val và \SL{amzn/ret_std/test} ở test. Mô hình học trên một thị trường biến động mạnh hơn nhiều so
+với thị trường nó được đánh giá.
+
+\section{KKBox Churn}
+
+\subsection{Nguồn và định nghĩa nhãn}
+
+KKBox là dịch vụ nghe nhạc trực tuyến lớn ở Đài Loan. Năm 2017, KKBox và hội nghị WSDM 2018 mở một cuộc thi trên
+Kaggle~\cite{kkbox2017} với dữ liệu thật của người dùng đã ẩn danh. Bài dùng hai tệp:
+\begin{itemize}
+  \item \texttt{train\_v2.csv}: \SL{kkbox/n_labeled} người dùng, nhãn \texttt{is\_churn} bằng 1 nếu người dùng
+        \emph{không} gia hạn gói thuê bao trong 30 ngày sau khi gói hết hạn vào tháng 3/2017;
+  \item \texttt{user\_logs\_v2.csv} (1,4 GB, \SL{kkbox/log_rows} dòng): mỗi dòng là một ngày nghe của một người dùng
+        trong tháng 3/2017, gồm số bài nghe dưới 25\,\%, 25--50\,\%, 50--75\,\%, 75--98,5\,\% và trên 98,5\,\% độ dài
+        bài (\texttt{num\_25} đến \texttt{num\_100}), số bài khác nhau (\texttt{num\_unq}) và tổng số giây nghe
+        (\texttt{total\_secs}).
+\end{itemize}
+
+\subsection{Lấy mẫu và dựng chuỗi}
+
+Chỉ \SL{kkbox/n_with_log} người có cả nhãn lẫn ít nhất một ngày log. Từ đó bài lấy mẫu phân tầng
+\SL{kkbox/n_sample} người (seed 42). Tệp log không được đọc trọn vào RAM: \texttt{pyarrow} đọc theo khối 64 MB, lượt
+thứ nhất lấy tập người có log, lượt thứ hai giữ lại \SL{kkbox/log_rows_kept} dòng của người trong mẫu. Cả quá trình mất
+khoảng một phút.
+
+\maNguon{data_churn__sample_users}{Lấy mẫu phân tầng những người vừa có nhãn vừa có log}
+
+Mỗi người dùng thành một ma trận $31 \times 8$: bảy cột log lấy $\log(1+x)$ vì phân phối đuôi rất dài, cột thứ tám là
+cờ \texttt{active} (ngày đó có nghe hay không). Ngày không có log để 0. Một ngày có thể có nhiều dòng (nhiều thiết bị)
+nên được cộng dồn. \SL{kkbox/secs_clipped} dòng có \texttt{total\_secs} âm hoặc vượt 86.400 giây (dài hơn một ngày) là
+lỗi ghi log và được kẹp về $[0, 86.400]$.
+
+\maNguon{data_churn__build_sequences}{Gom log theo ngày thành tensor $(N, 31, 8)$}
+
+Chia 70/15/15 phân tầng theo nhãn: \SL{kkbox/n_train} người train, \SL{kkbox/n_val} val và \SL{kkbox/n_test} test.
+Chuẩn hoá z-score từng đặc trưng, thống kê tính trên mọi ngày của mọi người trong train.
+
+\subsection{Phân tích dữ liệu}
+
+Nhãn lệch mạnh: \SL{kkbox/labels/churn} người churn trên \SL{kkbox/labels/total}, tức \SL{kkbox/churn_rate_sample}\,\%
+(Hình~\ref{fig:kklabels}). Tỉ lệ này gần như giữ nguyên qua hai bước lọc (\SL{kkbox/churn_rate_labeled}\,\% trên toàn bộ
+người có nhãn), nên mẫu đại diện được tập gốc. Một mô hình luôn đoán ``ở lại'' đã đạt accuracy
+$100 - \SL{kkbox/churn_rate_sample} \,\%$, vì vậy accuracy không phải thước đo phù hợp; bài dùng F1, Recall, ROC-AUC và
+PR-AUC.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_kkbox_labels}
+  \caption{Phân bố nhãn trong mẫu và tỉ lệ churn qua các bước lọc}
+  \label{fig:kklabels}
+\end{figure}
+
+Hình~\ref{fig:kktraj} là kết quả thú vị nhất của phần phân tích. Đầu tháng 3, nhóm sẽ churn nghe \emph{nhiều hơn} nhóm ở
+lại ở cả ba đặc trưng. Trong tuần thứ hai (giữa ngày 6 và ngày 11) hai đường cắt nhau, rồi nhóm churn giảm đều đến cuối
+tháng, còn nhóm ở lại gần như đi ngang. Tính trung bình cả
+tháng, người churn có \SL{kkbox/active_days/churn} ngày nghe, người ở lại có \SL{kkbox/active_days/loyal} ngày. Tín hiệu
+nằm ở \emph{xu hướng} theo thời gian chứ không nằm ở mức trung bình, và đó là loại tín hiệu mô hình hồi quy có thể đọc
+được mà mô hình trên đặc trưng tổng hợp sẽ bỏ lỡ.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_kkbox_traj}
+  \caption{Quỹ đạo trung bình 31 ngày của nhóm ở lại và nhóm churn}
+  \label{fig:kktraj}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{0.47\textwidth}\centering\hinh{f2_kkbox_hist}\end{minipage}\hfill
+  \begin{minipage}{0.5\textwidth}\centering\hinh{f2_kkbox_corr}\end{minipage}
+  \caption{Trái: phân phối tổng giờ nghe trong tháng. Phải: tương quan giữa 8 đặc trưng}
+  \label{fig:kkhist}
+\end{figure}
+
+Hình~\ref{fig:kkhist} (trái) cho thấy phân phối tổng giờ nghe của hai nhóm chồng lên nhau gần hết; trung vị là
+\SL{kkbox/hours_med/churn} giờ với nhóm churn và \SL{kkbox/hours_med/loyal} giờ với nhóm ở lại. Các đặc trưng tương quan
+mạnh với nhau (phải): \texttt{num\_100} và \texttt{total\_secs} có hệ số \SL{kkbox/corr_100_secs}. Bảng~\ref{tab:ttest}
+so hai nhóm bằng kiểm định $t$ của Welch~\cite{welch1947}. Mọi khác biệt đều có ý nghĩa thống kê vì mẫu lớn, nhưng
+độ chênh của trung bình nhỏ so với độ phân tán trong từng nhóm. Hành vi nghe chỉ phân biệt được một phần người churn;
+phần còn lại phụ thuộc thông tin không có trong log, như phương thức thanh toán hay gói cước. Chương~\ref{ch:pytorch}
+sẽ đo mức trần này.
+
+\begin{table}[H]
+  \centering\small
+  \caption{Kiểm định $t$ Welch giữa nhóm ở lại và nhóm churn, trung bình 31 ngày của từng người}
+  \label{tab:ttest}
+  \input{generated/tab_ttest}
+\end{table}
+
+\maNguon{data_churn__stratified_split}{Chia train/val/test phân tầng theo nhãn}

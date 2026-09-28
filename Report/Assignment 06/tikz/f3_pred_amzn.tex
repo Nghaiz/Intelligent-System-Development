@@ -1,0 +1,22 @@
+% Giá thật, mốc ngây thơ và dự báo của 4 mô hình PyTorch trên các phiên cuối của test (amzn_torch_pred.dat).
+% Ô phải phóng to 30 phiên cuối để thấy dự báo đi trễ một nhịp so với giá thật.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=14mm}, a06, height=6cm, ylabel={giá (USD)},
+  xlabel={phiên (tính từ \SL{torch_amzn/plot_start})}]
+  \nextgroupplot[width=9.2cm, title={(a) \SL{torch_amzn/plot_n} phiên cuối của test}, legend to name=legPred, legend columns=6]
+    \addplot[black, very thick] table[x=i, y=true]{figdata/amzn_torch_pred.dat};
+    \addlegendentry{giá thật}
+    \addplot[accentRed, densely dotted, thick] table[x=i, y=naive]{figdata/amzn_torch_pred.dat};
+    \addlegendentry{mốc ngây thơ}
+    \foreach \c/\s/\lab in {rnn/m0/Simple RNN, lstm/m1/LSTM, gru/m2/GRU, bilstm/m3/BiLSTM} {
+      \edef\tmp{\noexpand\addplot[\s] table[x=i, y=\c]{figdata/amzn_torch_pred.dat};
+                \noexpand\addlegendentry{\lab}}
+      \tmp}
+  \nextgroupplot[width=6.4cm, title={(b) Phóng to 30 phiên cuối}, xmin=119.5, xmax=149.5]
+    \addplot[black, very thick, mark=*, mark size=1pt] table[x=i, y=true]{figdata/amzn_torch_pred.dat};
+    \addplot[accentRed, densely dotted, thick] table[x=i, y=naive]{figdata/amzn_torch_pred.dat};
+    \addplot[m1, thick] table[x=i, y=lstm]{figdata/amzn_torch_pred.dat};
+    \addplot[m3, thick] table[x=i, y=bilstm]{figdata/amzn_torch_pred.dat};
+\end{groupplot}
+\node[below=12mm] at ($(group c1r1.south)!0.5!(group c2r1.south)$) {\pgfplotslegendfromname{legPred}};
+\end{tikzpicture}

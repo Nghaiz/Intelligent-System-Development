@@ -1,0 +1,21 @@
+% Tab "Churn KKBox" của Web App với người dùng mẫu đã churn, vẽ lại bằng TikZ từ phản hồi của API (app_churn.dat, app.json).
+\begin{tikzpicture}[x=1cm, y=1cm]
+  \def\tabActive{2}\def\tabA{Giá cổ phiếu AMZN}\def\tabB{Churn KKBox}
+  \def\labA{Người dùng mẫu (tập test)}\def\valA{Người dùng thật đã churn}
+  \def\labB{Framework · Mô hình}\def\valB{PyTorch · \SL{app/churn/churn_torch/model_label}}
+  \def\nutBam{Dự báo churn}
+  \input{tikz/_khung_app}
+  \node[anchor=north west, font=\scriptsize, align=left, text width=3.6cm] at (0.7,3.5)
+    {Xác suất churn:\\{\large\bfseries\color{ptitblue}\SL{app/churn/churn_torch/probPct}\,\%}\\[2pt]
+     Mức rủi ro: {\bfseries\color{churnC}\SL{app/churn/churn_torch/risk}}\\
+     (ngưỡng từ val: \SL{app/churn/churn_torch/thresholdPct}\,\%)\\[2pt]
+     \SL{app/churn/churn_torch/model_label} · PyTorch · \SL{app/churn/churn_torch/latency_ms} ms};
+  \begin{axis}[at={(4.9cm,0.75cm)}, a06, width=10.2cm, height=6.2cm, xmin=1, xmax=31, xtick={1,10,20,31},
+    title={Hành vi 31 ngày tháng 3/2017}, xlabel={ngày}, legend style={at={(0.98,0.98)}, anchor=north east},
+    tick label style={font=\tiny}, ymin=0]
+    \addplot[mOne, thick, mark=*, mark size=0.8pt] table[x=day, y=churn_secs]{figdata/app_churn.dat};
+    \addlegendentry{$\log(1 + \text{giây nghe})$}
+    \addplot[mThree, thick, mark=*, mark size=0.8pt] table[x=day, y=churn_unq]{figdata/app_churn.dat};
+    \addlegendentry{$\log(1 + \text{số bài khác nhau})$}
+  \end{axis}
+\end{tikzpicture}

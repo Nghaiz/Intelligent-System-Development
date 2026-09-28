@@ -1,0 +1,17 @@
+% Số tham số và kích thước tệp mô hình của hai framework (mô hình AMZN; mô hình KKBox cùng kích thước).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=16mm}, a06, width=7.2cm, height=5.4cm,
+  ybar, /pgf/bar width=4.5mm, ymin=0, xtick={0,1,2,3}, xticklabels={Simple RNN, LSTM, GRU, BiLSTM},
+  x tick label style={font=\scriptsize}, enlarge x limits=0.18,
+  nodes near coords, every node near coord/.append style={font=\tiny, rotate=90, anchor=west},
+  nodes near coords style={/pgf/number format/fixed, /pgf/number format/precision=1}]
+  \nextgroupplot[title={(a) Số tham số (nghìn)}, ymax=55, legend pos=north west]
+    \addplot[fill=fwTorch!70, draw=fwTorch] table[x=i, y=torch_params]{figdata/bench_size.dat};
+    \addlegendentry{PyTorch}
+    \addplot[fill=fwKeras!70, draw=fwKeras] table[x=i, y=keras_params]{figdata/bench_size.dat};
+    \addlegendentry{Keras}
+  \nextgroupplot[title={(b) Kích thước tệp (KB)}, ymax=680]
+    \addplot[fill=fwTorch!70, draw=fwTorch] table[x=i, y=torch_kb]{figdata/bench_size.dat};
+    \addplot[fill=fwKeras!70, draw=fwKeras] table[x=i, y=keras_kb]{figdata/bench_size.dat};
+\end{groupplot}
+\end{tikzpicture}

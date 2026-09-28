@@ -1,0 +1,22 @@
+% Giá đóng cửa AMZN + MA20/MA50 (thang log, 1 điểm/tuần) và khối lượng; vạch đứt là ranh giới train/val/test.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=4mm, x descriptions at=edge bottom},
+  a06, width=14cm, xmin=1997.3, xmax=2024.9, xtick={2000,2004,...,2024},
+  x tick label style={/pgf/number format/1000 sep={}}]
+  \nextgroupplot[height=6.2cm, ymode=log, ylabel={giá (USD, thang log)}, legend pos=north west,
+    log ticks with fixed point]
+    \addplot[mOne, thick] table[x=x, y=close]{figdata/amzn_price_weekly.dat};
+    \addlegendentry{Close}
+    \addplot[mTwo, thin] table[x=x, y=ma20]{figdata/amzn_price_weekly.dat};
+    \addlegendentry{MA20}
+    \addplot[mThree, thin] table[x=x, y=ma50]{figdata/amzn_price_weekly.dat};
+    \addlegendentry{MA50}
+    \draw[dashed, accentRed] (axis cs:\SL{amzn/bounds/valRaw},0.05) -- (axis cs:\SL{amzn/bounds/valRaw},400);
+    \draw[dashed, accentRed] (axis cs:\SL{amzn/bounds/testRaw},0.05) -- (axis cs:\SL{amzn/bounds/testRaw},400);
+    \node[font=\scriptsize, accentRed, anchor=south] at (axis cs:2007,0.08) {train};
+    \node[font=\scriptsize, accentRed, anchor=south] at (axis cs:2018.6,0.08) {val};
+    \node[font=\scriptsize, accentRed, anchor=south] at (axis cs:2022.7,0.08) {test};
+  \nextgroupplot[height=3.4cm, ylabel={Volume (triệu cp)}, ymin=0]
+    \addplot[ybar, bar width=0.4pt, draw=gray, fill=gray] table[x=x, y=vol]{figdata/amzn_price_weekly.dat};
+\end{groupplot}
+\end{tikzpicture}

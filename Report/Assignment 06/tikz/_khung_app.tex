@@ -1,0 +1,25 @@
+% Mã dùng chung: khung giao diện Web App (thanh tiêu đề, hai tab, khung nội dung).
+% Cần \def\tabA{...}\def\tabB{...} và \def\tabActive{1 hoặc 2}.
+\fill[white] (0,0) rectangle (15,8.6);
+\draw[gray!70, rounded corners=3pt] (0,0) rectangle (15,8.6);
+\fill[ptitblue, rounded corners=3pt] (0,7.5) rectangle (15,8.6);
+\fill[ptitblue] (0,7.5) rectangle (15,7.8);
+\node[anchor=west, text=white, font=\small\bfseries] at (0.3,8.2) {Mạng nơ-ron hồi quy: dự báo giá AMZN và churn KKBox};
+\node[anchor=west, text=white!85!ptitblue, font=\tiny] at (0.3,7.75) {Assignment 06 · 16 mô hình (RNN, LSTM, GRU, BiLSTM × PyTorch, Keras)};
+\ifnum\tabActive=1
+  \fill[white] (0.3,6.8) rectangle (3.5,7.3); \fill[gray!20] (3.6,6.8) rectangle (6.4,7.3);
+\else
+  \fill[gray!20] (0.3,6.8) rectangle (3.5,7.3); \fill[white] (3.6,6.8) rectangle (6.4,7.3);
+\fi
+\draw[gray!60] (0.3,6.8) rectangle (3.5,7.3) (3.6,6.8) rectangle (6.4,7.3);
+\node[font=\scriptsize] at (1.9,7.05) {\tabA};
+\node[font=\scriptsize] at (5.0,7.05) {\tabB};
+\draw[gray!60] (0.3,0.3) rectangle (14.7,6.8);
+% cột điều khiển bên trái
+\node[anchor=west, font=\tiny, text=gray] at (0.6,6.35) {\labA};
+\draw[gray!60, rounded corners=1pt] (0.6,5.7) rectangle (4.4,6.15); \node[anchor=west, font=\scriptsize] at (0.7,5.93) {\valA};
+\node[anchor=west, font=\tiny, text=gray] at (0.6,5.4) {\labB};
+\draw[gray!60, rounded corners=1pt] (0.6,4.75) rectangle (4.4,5.2); \node[anchor=west, font=\scriptsize] at (0.7,4.98) {\valB};
+\fill[ptitblue, rounded corners=2pt] (0.6,3.9) rectangle (4.4,4.45);
+\node[text=white, font=\scriptsize] at (2.5,4.18) {\nutBam};
+\fill[softgray, rounded corners=2pt] (0.6,0.6) rectangle (4.4,3.6);

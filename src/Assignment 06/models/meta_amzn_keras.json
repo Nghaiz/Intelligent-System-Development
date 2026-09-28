@@ -1,0 +1,42 @@
+{
+  "amzn_keras_rnn": {
+    "file": "amzn_keras_rnn.keras",
+    "params": 6785,
+    "device": "cpu",
+    "best_epoch": 2,
+    "epochs_run": 10,
+    "epoch_s": 0.9260105899993505,
+    "train_s": 9.260105899993505,
+    "best_val_loss": 0.2345510870218277
+  },
+  "amzn_keras_lstm": {
+    "file": "amzn_keras_lstm.keras",
+    "params": 20801,
+    "device": "cpu",
+    "best_epoch": 1,
+    "epochs_run": 9,
+    "epoch_s": 1.447869088888385,
+    "train_s": 13.030821799995465,
+    "best_val_loss": 0.22330747544765472
+  },
+  "amzn_keras_gru": {
+    "file": "amzn_keras_gru.keras",
+    "params": 16321,
+    "device": "cpu",
+    "best_epoch": 2,
+    "epochs_run": 10,
+    "epoch_s": 1.4503442599994743,
+    "train_s": 14.503442599994742,
+    "best_val_loss": 0.22391961514949799
+  },
+  "amzn_keras_bilstm": {
+    "file": "amzn_keras_bilstm.keras",
+    "params": 41537,
+    "device": "cpu",
+    "best_epoch": 1,
+    "epochs_run": 9,
+    "epoch_s": 2.0690032333336097,
+    "train_s": 18.621029100002488,
+    "best_val_loss": 0.23042859137058258
+  }
+}

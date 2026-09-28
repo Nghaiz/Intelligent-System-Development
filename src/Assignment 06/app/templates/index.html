@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assignment 06 · RNN Web App</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root { --xanh: #123A75; --nen: #F2F4F7; --vien: #D0D5DD; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--nen); color: #1d2939; }
+    header { background: var(--xanh); color: #fff; padding: 14px 24px; }
+    header h1 { margin: 0; font-size: 20px; }
+    header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+    nav { display: flex; gap: 4px; padding: 12px 24px 0; }
+    nav button { border: 1px solid var(--vien); border-bottom: none; background: #e4e7ec; padding: 8px 18px;
+                 border-radius: 6px 6px 0 0; cursor: pointer; font-size: 14px; }
+    nav button.active { background: #fff; font-weight: 600; color: var(--xanh); }
+    main { background: #fff; margin: 0 24px 24px; border: 1px solid var(--vien); border-radius: 0 6px 6px 6px; padding: 20px; }
+    .tab { display: none; } .tab.active { display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
+    label { display: block; font-size: 13px; margin: 10px 0 4px; color: #475467; }
+    select, button.chay { width: 100%; padding: 8px; font-size: 14px; border: 1px solid var(--vien); border-radius: 6px; }
+    button.chay { background: var(--xanh); color: #fff; border: none; margin-top: 16px; cursor: pointer; }
+    .ketqua { margin-top: 18px; padding: 12px; background: var(--nen); border-radius: 6px; font-size: 14px; line-height: 1.7; }
+    .so { font-size: 24px; font-weight: 700; color: var(--xanh); }
+    .cao { color: #C0392B; } .thap { color: #009E73; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Mạng nơ-ron hồi quy: dự báo giá AMZN và churn KKBox</h1>
+  <p>Assignment 06 · Nguyễn Duy Nghĩa · B23DCCN600 · 16 mô hình (RNN, LSTM, GRU, BiLSTM × PyTorch, Keras)</p>
+</header>
+<nav>
+  <button class="active" data-tab="stock">Giá cổ phiếu AMZN</button>
+  <button data-tab="churn">Churn KKBox</button>
+</nav>
+<main>
+  <section id="stock" class="tab active">
+    <div>
+      <label>Framework</label>
+      <select id="s-fw"><option value="torch">PyTorch</option><option value="keras">Keras</option></select>
+      <label>Mô hình</label>
+      <select id="s-model"></select>
+      <button class="chay" id="s-run">Dự báo phiên kế tiếp</button>
+      <div class="ketqua" id="s-out">Chọn mô hình rồi bấm dự báo.</div>
+    </div>
+    <div><canvas id="s-chart" height="130"></canvas></div>
+  </section>
+  <section id="churn" class="tab">
+    <div>
+      <label>Người dùng mẫu (tập test)</label>
+      <select id="c-preset"></select>
+      <label>Framework</label>
+      <select id="c-fw"><option value="torch">PyTorch</option><option value="keras">Keras</option></select>
+      <label>Mô hình</label>
+      <select id="c-model"></select>
+      <button class="chay" id="c-run">Dự báo churn</button>
+      <div class="ketqua" id="c-out">Chọn người dùng mẫu rồi bấm dự báo.</div>
+    </div>
+    <div><canvas id="c-chart" height="130"></canvas></div>
+  </section>
+</main>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

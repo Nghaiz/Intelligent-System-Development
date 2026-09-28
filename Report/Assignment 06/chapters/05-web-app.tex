@@ -1,0 +1,121 @@
+% =====================================================================
+%  Chương 5 — Hạng mục 5: đóng gói triển khai Web App
+%  Mã nguồn: app/app.py, app/static/app.js, app/smoke_test.py
+% =====================================================================
+\chapter{Triển khai Web App}
+\label{ch:webapp}
+
+Chương này đóng gói các mô hình thành một Web App chạy cục bộ. Ứng dụng có hai phân hệ ứng với hai tập dữ liệu: dự báo
+giá đóng cửa AMZN của phiên kế tiếp, và dự báo xác suất churn của một người dùng KKBox từ chuỗi 31 ngày nghe nhạc. Người
+dùng chọn framework (PyTorch hoặc Keras) và một trong bốn mô hình; mặc định là mô hình có val loss nhỏ nhất
+(Chương~\ref{ch:keras}).
+
+\section{Kiến trúc}
+
+Máy chủ là Flask, trả JSON qua bốn nhóm endpoint; giao diện là một trang HTML với hai tab, gọi API bằng \texttt{fetch}
+và vẽ biểu đồ bằng Chart.js (Hình~\ref{fig:arch}). Ứng dụng không cần dữ liệu gốc của KKBox để chạy. Mọi thứ nó cần
+nằm trong thư mục \texttt{models/}: 16 tệp mô hình và \texttt{metadata.json} do notebook 06 ghi, gồm thống kê chuẩn hoá
+của hai tập, ngưỡng phân loại chọn trên validation, tên mô hình tốt nhất và chuỗi hành vi của hai người dùng mẫu.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_arch}
+  \caption{Kiến trúc Web App}
+  \label{fig:arch}
+\end{figure}
+
+Bảng~\ref{tab:api} liệt kê các endpoint.
+
+\begin{table}[H]
+  \centering\small
+  \caption{REST API của Web App}
+  \label{tab:api}
+  \begin{tabular}{llL{7.2cm}}
+    \toprule
+    Phương thức & Đường dẫn & Vào $\to$ ra \\
+    \midrule
+    GET & \texttt{/api/stock/history} & $\to$ 100 phiên gần nhất: ngày, Close, MA20 \\
+    POST & \texttt{/api/stock/predict} & \texttt{\{framework, model\}} $\to$ giá dự báo, \% thay đổi, độ trễ \\
+    POST & \texttt{/api/churn/predict} & \texttt{\{preset\}} hoặc \texttt{\{sequence\}} ($31\times8$), \texttt{framework},
+                                        \texttt{model} $\to$ xác suất, mức rủi ro, ngưỡng, độ trễ \\
+    GET & \texttt{/api/meta} & $\to$ danh sách mô hình, mô hình tốt nhất, người dùng mẫu \\
+    GET & \texttt{/} & $\to$ trang giao diện \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Nạp mô hình}
+
+Mỗi mô hình chỉ được nạp một lần, ở lần gọi đầu tiên, rồi giữ trong bộ nhớ nhờ \texttt{lru\_cache}. Hàm nạp trả về một
+hàm dự báo cùng giao diện cho cả hai framework, nên phần xử lý yêu cầu không cần biết mô hình đến từ đâu. Mô hình Keras
+chạy qua \texttt{tf.function} như lúc đo độ trễ ở Chương~\ref{ch:keras}, và mỗi mô hình được chạy thử một lần ngay khi
+nạp để độ trễ trả về cho người dùng là độ trễ lúc ổn định. TensorFlow chỉ được import khi có yêu cầu dùng mô hình Keras.
+
+\maNguon{app__load_model}{Nạp mô hình một lần, cùng giao diện cho PyTorch và Keras}
+
+\section{Hai phân hệ dự báo}
+
+Phân hệ giá lấy 30 phiên mới nhất trong \texttt{AMZN.csv}, áp đúng phép biến đổi của Chương~\ref{ch:dulieu} (giá tương
+đối, log Volume, z-score bằng thống kê của train), đưa qua mô hình rồi quy đổi return dự báo ra giá USD. Hàm
+\texttt{latest\_window} dùng chung hai hàm biến đổi với \texttt{make\_windows} của lúc huấn luyện, nên dữ liệu phục vụ
+không thể lệch khỏi dữ liệu huấn luyện.
+
+\maNguon{app__stock_predict}{Endpoint dự báo giá phiên kế tiếp}
+
+Phân hệ churn nhận hoặc tên một người dùng mẫu, hoặc một ma trận $31 \times 8$ bất kỳ. Đầu vào sai shape bị từ chối với mã
+400 và thông báo lỗi rõ ràng, không đưa vào mô hình. Xác suất được so với ngưỡng của đúng mô hình đó để xếp mức rủi ro:
+cao khi vượt ngưỡng, trung bình khi vượt nửa ngưỡng, còn lại là thấp.
+
+\maNguon{app__churn_predict}{Endpoint dự báo churn}
+
+\section{Giao diện}
+
+Mỗi tab có một cột điều khiển và một biểu đồ. Khi đổi framework, danh sách mô hình được dựng lại và mô hình tốt nhất
+trên validation của framework đó được chọn sẵn.
+
+\maNguonJS{initChurn}{Tab churn: gọi API và vẽ chuỗi hành vi bằng Chart.js}
+
+Hình~\ref{fig:ui-stock} và~\ref{fig:ui-churn} vẽ lại hai tab bằng TikZ thay cho ảnh chụp màn hình. Mọi con số và đường
+cong trong hai hình là phản hồi thật của API, do \texttt{smoke\_test.py} ghi lại: biểu đồ giá đọc 100 phiên mà
+\texttt{/api/stock/history} trả về, còn biểu đồ churn đọc đúng chuỗi mà \texttt{/api/churn/predict} trả về cho người dùng
+mẫu.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_ui_stock}
+  \caption{Tab dự báo giá AMZN với mô hình PyTorch tốt nhất trên validation}
+  \label{fig:ui-stock}
+\end{figure}
+
+Với dữ liệu kết thúc ngày \SL{app/stock/torch/last_date}, mô hình \SL{app/stock/torch/model_label} của PyTorch dự báo
+phiên kế tiếp đóng cửa ở \SL{app/stock/torch/pred_close} USD, mô hình \SL{app/stock/keras/model_label} của Keras dự báo
+\SL{app/stock/keras/pred_close} USD, so với giá hiện tại \SL{app/stock/torch/last_close} USD. Cả hai chỉ lệch vài phần
+nghìn so với giá hiện tại, đúng với điều Chương~\ref{ch:keras} đã phân tích: mô hình dự báo return gần 0.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f5_ui_churn}
+  \caption{Tab dự báo churn với một người dùng thật đã churn trong tập test}
+  \label{fig:ui-churn}
+\end{figure}
+
+Hai người dùng mẫu là người thật trong tập test: một người đã churn mà mô hình tin chắc nhất, và một người ở lại mà mô hình
+cho xác suất churn thấp nhất. Người churn trong Hình~\ref{fig:ui-churn} nghe gần như mỗi ngày trong 9 ngày đầu tháng rồi
+ngừng hẳn từ ngày 10, dạng cực đoan của quỹ đạo nhóm churn ở Chương~\ref{ch:dulieu}. LSTM của PyTorch cho xác suất
+\SL{app/churn/churn_torch/probPct}\,\% với người này và \SL{app/churn/loyal_torch/probPct}\,\% với người ở lại; GRU của
+Keras cho lần lượt \SL{app/churn/churn_keras/probPct}\,\% và \SL{app/churn/loyal_keras/probPct}\,\%.
+
+\section{Kiểm chứng}
+
+\texttt{smoke\_test.py} dùng test client của Flask, không cần mở cổng mạng. Nó gọi lịch sử giá, dự báo giá với cả hai
+framework và dự báo churn cho hai người dùng mẫu với cả hai framework, tổng cộng \SL{app/n_calls} lượt. Mỗi phản hồi phải
+có mã 200 và đủ các khoá cần thiết; một chuỗi sai shape phải bị từ chối với mã \SL{app/bad_shape_status}. Kịch bản dừng
+ngay khi có một điều kiện không thoả, và lượt chạy cuối qua hết.
+
+\maNguon{smoke_test__main}{Kiểm chứng ba endpoint và ghi phản hồi thật cho báo cáo}
+
+Chạy ứng dụng bằng \texttt{python app/app.py} rồi mở \texttt{http://localhost:8080}. Độ trễ API trả về là thời gian của riêng lời gọi mô hình:
+\SL{app/churn/churn_torch/latency_ms} ms với LSTM của PyTorch và \SL{app/churn/churn_keras/latency_ms} ms với GRU của
+Keras, cùng cỡ với số đo ở Bảng~\ref{tab:bench-kkbox}. Trong ứng dụng, PyTorch chạy 1 luồng còn TensorFlow dùng số luồng
+mặc định, và mỗi con số chỉ là một lần gọi, nên chúng để tham khảo chứ không thay cho phép đo có kiểm soát của
+Chương~\ref{ch:keras}.
