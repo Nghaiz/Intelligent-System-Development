@@ -2,7 +2,8 @@
 
 Chạy:  python app/app.py   rồi mở http://localhost:8080
 Hai phân hệ: dự báo giá AMZN phiên kế tiếp và dự báo churn KKBox từ chuỗi 31 ngày nghe nhạc.
-Mọi mô hình, scaler, ngưỡng và hai người dùng mẫu đọc từ models/ (do notebook 06 ghi), không cần dữ liệu gốc.
+Mọi mô hình, scaler, ngưỡng và hai người dùng mẫu đọc từ models/ (do notebook 06 ghi), chỉ số test của thẻ mô hình
+đọc từ outputs/metrics/; không cần dữ liệu gốc của KKBox.
 """
 import json
 import sys
@@ -77,11 +78,23 @@ STOCK_DF = load_amzn()
 S_SCALER = META["scalers"]["amzn"]
 
 
+HISTORY_SIZES = (60, 100, 250)
+
+
 @app.get("/api/stock/history")
 def stock_history():
-    tail = STOCK_DF.tail(100)
+    """n phiên gần nhất (60, 100 hoặc 250): Close, MA20, RSI-14 và thông tin phiên cuối cho thẻ thống kê."""
+    n = request.args.get("n", 100, type=int)
+    if n not in HISTORY_SIZES:
+        return jsonify({"error": f"n phải là một trong {HISTORY_SIZES}"}), 400
+    tail = STOCK_DF.tail(n)
+    last, prev = STOCK_DF.iloc[-1], STOCK_DF.iloc[-2]
     return jsonify({"dates": [d.strftime("%Y-%m-%d") for d in tail.index],
-                    "close": tail.Close.round(2).tolist(), "ma20": tail.MA20.round(2).tolist()})
+                    "close": tail.Close.round(2).tolist(), "ma20": tail.MA20.round(2).tolist(),
+                    "rsi14": tail.RSI14.round(2).tolist(),
+                    "last": {"open": round(float(last.Open), 2), "high": round(float(last.High), 2),
+                             "low": round(float(last.Low), 2), "close": round(float(last.Close), 2),
+                             "volume": int(last.Volume), "change_pct": round(100 * (last.Close / prev.Close - 1), 3)}})
 
 
 @app.post("/api/stock/predict")
@@ -156,11 +169,35 @@ def listening_trend(seq):
     return round(float(secs[-7:].mean() - secs[:7].mean()), 4)
 
 
+# Chỉ số test của 16 mô hình và thống kê hai tập, do notebook 03-06 ghi; giao diện hiện chúng trên thẻ mô hình.
+METRICS = ROOT / "outputs" / "metrics"
+BENCH = json.loads((METRICS / "bench.json").read_text(encoding="utf-8"))
+DATA_STATS = {name: json.loads((METRICS / f"{name}.json").read_text(encoding="utf-8")) for name in ("amzn", "kkbox")}
+CARD_KEYS = {"amzn": ("rmse", "mae", "dir_acc"), "kkbox": ("f1", "roc_auc", "pr_auc")}
+
+
+def model_card(key):
+    dataset = key.split("_")[0]
+    b = BENCH["models"][key]
+    card = {k: round(b[k], 4) for k in CARD_KEYS[dataset]}
+    card.update(params=b["params"], latency_ms=round(b["latency_ms"], 3), size_kb=round(b["size_kb"], 1),
+                best_epoch=b["best_epoch"], val_loss=round(b["best_val_loss"], 4))
+    return card
+
+
 @app.get("/api/meta")
 def meta():
-    return jsonify({"models": {c: CELL_LABELS[c] for c in CELLS}, "frameworks": FRAMEWORKS,
-                    "best": META["best"], "presets": {k: v["label"] for k, v in META["presets"].items()},
-                    "features": META["kkbox_features"]})
+    amzn, kkbox = DATA_STATS["amzn"], DATA_STATS["kkbox"]
+    # jsonify sắp khoá theo chữ cái, nên thứ tự hiển thị RNN -> LSTM -> GRU -> BiLSTM đi riêng trong "cells"
+    return jsonify({"models": {c: CELL_LABELS[c] for c in CELLS}, "cells": list(CELLS), "frameworks": FRAMEWORKS,
+                    "best": META["best"], "cards": {k: model_card(k) for k in BENCH["models"]},
+                    "naive_rmse": round(BENCH["naive"]["rmse"], 4),
+                    "presets": {k: {"label": v["label"], "sequence": v["sequence"]} for k, v in META["presets"].items()},
+                    "features": META["kkbox_features"], "seq_len": META["seq_len"],
+                    "stats": {"amzn": {"n": amzn["n_feat"], "start": amzn["start"], "end": amzn["end"],
+                                       "window": amzn["window"], "n_features": amzn["n_features"]},
+                              "kkbox": {"n_sample": kkbox["n_sample"], "n_test": kkbox["n_test"],
+                                        "churn_rate": round(kkbox["churn_rate_sample"], 4), "T": kkbox["T"]}}})
 
 
 @app.get("/")

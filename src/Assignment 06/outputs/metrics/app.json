@@ -11,7 +11,7 @@
       "framework": "torch",
       "last_close": 193.96,
       "last_date": "2024-09-24",
-      "latency_ms": 1.023,
+      "latency_ms": 1.086,
       "model": "gru",
       "model_label": "GRU",
       "note": "Mô hình không thắng được mốc 'giá ngày mai bằng giá hôm nay' trên tập test; dự báo chỉ để minh hoạ, không dùng làm khuyến nghị đầu tư.",
@@ -24,7 +24,7 @@
       "framework": "keras",
       "last_close": 193.96,
       "last_date": "2024-09-24",
-      "latency_ms": 3.206,
+      "latency_ms": 2.357,
       "model": "lstm",
       "model_label": "LSTM",
       "note": "Mô hình không thắng được mốc 'giá ngày mai bằng giá hôm nay' trên tập test; dự báo chỉ để minh hoạ, không dùng làm khuyến nghị đầu tư.",
@@ -37,7 +37,7 @@
     "churn_torch": {
       "advice": "Liên hệ trước ngày hết hạn gói, tặng ưu đãi gia hạn và gợi ý danh sách phát theo lịch sử nghe.",
       "framework": "torch",
-      "latency_ms": 0.449,
+      "latency_ms": 0.3,
       "model": "lstm",
       "model_label": "LSTM",
       "prob": 0.9805,
@@ -48,7 +48,7 @@
     "churn_keras": {
       "advice": "Liên hệ trước ngày hết hạn gói, tặng ưu đãi gia hạn và gợi ý danh sách phát theo lịch sử nghe.",
       "framework": "keras",
-      "latency_ms": 2.512,
+      "latency_ms": 2.452,
       "model": "gru",
       "model_label": "GRU",
       "prob": 0.9871,
@@ -59,7 +59,7 @@
     "loyal_torch": {
       "advice": "Không cần can thiệp; giữ chăm sóc thông thường.",
       "framework": "torch",
-      "latency_ms": 0.664,
+      "latency_ms": 0.786,
       "model": "lstm",
       "model_label": "LSTM",
       "prob": 0.2348,
@@ -70,7 +70,7 @@
     "loyal_keras": {
       "advice": "Không cần can thiệp; giữ chăm sóc thông thường.",
       "framework": "keras",
-      "latency_ms": 2.658,
+      "latency_ms": 2.084,
       "model": "gru",
       "model_label": "GRU",
       "prob": 0.1832,
@@ -80,5 +80,6 @@
     }
   },
   "bad_shape_status": 400,
-  "n_calls": 7
+  "bad_n_status": 400,
+  "n_calls": 10
 }

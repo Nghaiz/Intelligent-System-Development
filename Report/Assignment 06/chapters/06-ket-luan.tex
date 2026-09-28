@@ -22,8 +22,9 @@
         với từng mẫu một (trung vị \SL{bench/lat_median/torch} so với \SL{bench/lat_median/keras} ms trên một luồng CPU),
         còn với lô lớn thì khoảng cách hẹp lại và Keras thắng ở Simple RNN. Tệp \texttt{.keras} nặng hơn vì chứa cả trạng thái
         optimizer.
-  \item \textbf{Web App.} Flask phục vụ cả 16 mô hình qua REST API, giao diện hai tab; toàn bộ tham số tiền xử lý đọc từ
-        \texttt{metadata.json} nên ứng dụng chạy được mà không cần dữ liệu gốc. Kịch bản kiểm chứng qua
+  \item \textbf{Web App.} Flask phục vụ cả 16 mô hình qua REST API; giao diện hai phân hệ nền tối/sáng có biểu đồ tương
+        tác, thẻ mô hình kèm chỉ số test, bảng so sánh bốn kiến trúc và trình mô phỏng hành vi nghe nhạc. Toàn bộ tham số
+        tiền xử lý đọc từ \texttt{metadata.json} nên ứng dụng chạy được mà không cần dữ liệu gốc. Kịch bản kiểm chứng qua
         \SL{app/n_calls} lượt gọi.
   \item \textbf{Kết luận về mô hình.} Mạng hồi quy học được tín hiệu thật khi tín hiệu nằm trong chuỗi (xu hướng nghe nhạc
         giảm dần của người sắp rời bỏ). Nó không tạo ra được tín hiệu khi chuỗi không chứa (return cổ phiếu ngày mai):

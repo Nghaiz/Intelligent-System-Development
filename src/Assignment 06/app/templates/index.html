@@ -1,66 +1,143 @@
 <!doctype html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Assignment 06 · RNN Web App</title>
+  <title>Dự báo chuỗi thời gian · Assignment 06</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <style>
-    :root { --xanh: #123A75; --nen: #F2F4F7; --vien: #D0D5DD; }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--nen); color: #1d2939; }
-    header { background: var(--xanh); color: #fff; padding: 14px 24px; }
-    header h1 { margin: 0; font-size: 20px; }
-    header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
-    nav { display: flex; gap: 4px; padding: 12px 24px 0; }
-    nav button { border: 1px solid var(--vien); border-bottom: none; background: #e4e7ec; padding: 8px 18px;
-                 border-radius: 6px 6px 0 0; cursor: pointer; font-size: 14px; }
-    nav button.active { background: #fff; font-weight: 600; color: var(--xanh); }
-    main { background: #fff; margin: 0 24px 24px; border: 1px solid var(--vien); border-radius: 0 6px 6px 6px; padding: 20px; }
-    .tab { display: none; } .tab.active { display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
-    label { display: block; font-size: 13px; margin: 10px 0 4px; color: #475467; }
-    select, button.chay { width: 100%; padding: 8px; font-size: 14px; border: 1px solid var(--vien); border-radius: 6px; }
-    button.chay { background: var(--xanh); color: #fff; border: none; margin-top: 16px; cursor: pointer; }
-    .ketqua { margin-top: 18px; padding: 12px; background: var(--nen); border-radius: 6px; font-size: 14px; line-height: 1.7; }
-    .so { font-size: 24px; font-weight: 700; color: var(--xanh); }
-    .cao { color: #C0392B; } .thap { color: #009E73; }
-  </style>
 </head>
 <body>
-<header>
-  <h1>Mạng nơ-ron hồi quy: dự báo giá AMZN và churn KKBox</h1>
-  <p>Assignment 06 · Nguyễn Duy Nghĩa · B23DCCN600 · 16 mô hình (RNN, LSTM, GRU, BiLSTM × PyTorch, Keras)</p>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<header class="hero">
+  <button class="theme-toggle" id="theme-toggle" aria-label="Đổi nền sáng / tối" title="Đổi nền sáng / tối">
+    <svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M1.5 12H4M20 12h2.5M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+  </button>
+  <span class="badge-top"><span class="dot"></span>Mạng nơ-ron hồi quy · RNN · LSTM · GRU · BiLSTM</span>
+  <h1>Dự Báo Chuỗi Thời Gian &amp; Nguy Cơ Rời Bỏ</h1>
+  <p class="lead">Hai bài toán thật, 16 mô hình hồi quy huấn luyện bằng PyTorch và Keras: dự báo giá đóng cửa cổ phiếu
+    Amazon phiên kế tiếp và ước lượng xác suất một người dùng KKBox không gia hạn gói nghe nhạc.</p>
+  <div class="kpis" id="kpis">
+    <div class="kpi"><span class="kpi-v" data-kpi="models">16</span><span class="kpi-l">mô hình đã huấn luyện</span></div>
+    <div class="kpi"><span class="kpi-v" data-kpi="amzn">–</span><span class="kpi-l">phiên giao dịch AMZN</span></div>
+    <div class="kpi"><span class="kpi-v" data-kpi="kkbox">–</span><span class="kpi-l">người dùng KKBox</span></div>
+    <div class="kpi"><span class="kpi-v" data-kpi="lat">–</span><span class="kpi-l">độ trễ trung vị PyTorch</span></div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" data-tab="stock">
+      <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Phân hệ 1 · Dự báo giá AMZN</button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="churn">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 11l4 4m0-4-4 4"/></svg>Phân hệ 2 · Nguy cơ rời bỏ KKBox</button>
+  </nav>
 </header>
-<nav>
-  <button class="active" data-tab="stock">Giá cổ phiếu AMZN</button>
-  <button data-tab="churn">Churn KKBox</button>
-</nav>
+
 <main>
-  <section id="stock" class="tab active">
-    <div>
-      <label>Framework</label>
-      <select id="s-fw"><option value="torch">PyTorch</option><option value="keras">Keras</option></select>
-      <label>Mô hình</label>
-      <select id="s-model"></select>
-      <button class="chay" id="s-run">Dự báo phiên kế tiếp</button>
-      <div class="ketqua" id="s-out">Chọn mô hình rồi bấm dự báo.</div>
+  <!-- ======================================================= PHÂN HỆ 1 -->
+  <section class="panel active" id="stock" role="tabpanel">
+    <div class="grid">
+      <div class="col">
+        <article class="card chart-card">
+          <div class="card-head">
+            <h2><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l3-3 3 3 5-6"/></svg>Diễn biến giá đóng cửa</h2>
+            <div class="seg" id="s-range" role="group" aria-label="Số phiên hiển thị">
+              <button data-n="60">60 phiên</button><button data-n="100" class="on">100 phiên</button><button data-n="250">250 phiên</button>
+            </div>
+          </div>
+          <div class="chart-box tall"><canvas id="s-chart"></canvas></div>
+          <div class="sub-head"><span>RSI-14</span><span class="muted small">vùng 70 quá mua · 30 quá bán</span></div>
+          <div class="chart-box short"><canvas id="s-rsi"></canvas></div>
+          <div class="stats" id="s-stats"></div>
+        </article>
+        <article class="card compare">
+          <div class="card-head">
+            <h2><svg viewBox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7H2"/></svg>So sánh bốn kiến trúc</h2>
+            <button class="btn-ghost" id="s-compare"><span class="spinner"></span>Chạy cả 4 mô hình</button>
+          </div>
+          <div id="s-compare-out" class="compare-out"><p class="muted">Dự báo cùng một cửa sổ 30 phiên bằng cả bốn kiến trúc
+            của framework đang chọn, kèm sai số RMSE trên tập test so với mốc ngây thơ.</p></div>
+        </article>
+      </div>
+
+      <aside class="card side">
+        <h3 class="side-title">Cấu hình dự báo</h3>
+        <label class="lbl">Framework</label>
+        <div class="seg full" id="s-fw"><button data-fw="torch" class="on">PyTorch</button><button data-fw="keras">Keras</button></div>
+        <label class="lbl">Kiến trúc mô hình <span class="muted">(chỉ số trên tập test)</span></label>
+        <div class="model-list" id="s-models"></div>
+        <button class="btn-primary" id="s-run"><span class="spinner"></span>
+          <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Dự báo phiên kế tiếp</button>
+        <div class="result" id="s-out">
+          <div class="placeholder">Chọn mô hình rồi bấm dự báo. Kết quả hiện ở đây kèm độ trễ suy luận.</div>
+        </div>
+        <div class="note warn">
+          <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4m0 3v.5"/></svg>
+          <p><b>Lưu ý:</b> trên tập test không mô hình nào thắng mốc “giá ngày mai bằng giá hôm nay”. Dự báo để minh hoạ,
+            không phải khuyến nghị đầu tư.</p>
+        </div>
+      </aside>
     </div>
-    <div><canvas id="s-chart" height="130"></canvas></div>
+
   </section>
-  <section id="churn" class="tab">
-    <div>
-      <label>Người dùng mẫu (tập test)</label>
-      <select id="c-preset"></select>
-      <label>Framework</label>
-      <select id="c-fw"><option value="torch">PyTorch</option><option value="keras">Keras</option></select>
-      <label>Mô hình</label>
-      <select id="c-model"></select>
-      <button class="chay" id="c-run">Dự báo churn</button>
-      <div class="ketqua" id="c-out">Chọn người dùng mẫu rồi bấm dự báo.</div>
+
+  <!-- ======================================================= PHÂN HỆ 2 -->
+  <section class="panel" id="churn" role="tabpanel">
+    <div class="grid">
+      <div class="col">
+        <article class="card chart-card">
+          <div class="card-head">
+            <h2><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Hành vi nghe 31 ngày (tháng 3/2017)</h2>
+            <span class="muted small" id="c-source">Người dùng thật trong tập test</span>
+          </div>
+          <div class="chips" id="c-presets" role="group" aria-label="Chọn chuỗi hành vi"></div>
+          <div class="chart-box tall"><canvas id="c-chart"></canvas></div>
+          <div class="sim" id="c-sim" hidden>
+            <div class="sim-head"><b>Trình mô phỏng hành vi</b><span class="muted small">kéo thanh trượt, dự báo tự chạy lại</span></div>
+            <div class="sliders">
+              <label>Phút nghe mỗi ngày <output id="o-min">90</output>
+                <input type="range" id="r-min" min="0" max="300" step="5" value="90"></label>
+              <label>Số bài khác nhau mỗi ngày <output id="o-song">25</output>
+                <input type="range" id="r-song" min="1" max="80" step="1" value="25"></label>
+              <label>Số ngày nghe mỗi tuần <output id="o-week">5</output>
+                <input type="range" id="r-week" min="1" max="7" step="1" value="5"></label>
+              <label>Ngừng nghe từ ngày <output id="o-stop">không ngừng</output>
+                <input type="range" id="r-stop" min="2" max="32" step="1" value="32"></label>
+            </div>
+          </div>
+          <div class="stats" id="c-stats"></div>
+        </article>
+        <article class="card compare">
+          <div class="card-head">
+            <h2><svg viewBox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7H2"/></svg>Bốn kiến trúc nhìn cùng một người dùng</h2>
+            <button class="btn-ghost" id="c-compare"><span class="spinner"></span>Chạy cả 4 mô hình</button>
+          </div>
+          <div id="c-compare-out" class="compare-out"><p class="muted">Xác suất rời bỏ của cả bốn kiến trúc cho chuỗi đang
+            chọn; vạch trắng là ngưỡng quyết định mỗi mô hình chọn trên tập validation.</p></div>
+        </article>
+      </div>
+
+      <aside class="card side">
+        <h3 class="side-title">Đánh giá nguy cơ rời bỏ</h3>
+        <label class="lbl">Framework</label>
+        <div class="seg full" id="c-fw"><button data-fw="torch" class="on">PyTorch</button><button data-fw="keras">Keras</button></div>
+        <label class="lbl">Kiến trúc mô hình <span class="muted">(chỉ số trên tập test)</span></label>
+        <div class="model-list" id="c-models"></div>
+        <button class="btn-primary green" id="c-run"><span class="spinner"></span>
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Phân tích nguy cơ</button>
+        <div class="result" id="c-out">
+          <div class="placeholder">Chọn một chuỗi hành vi rồi bấm phân tích.</div>
+        </div>
+      </aside>
     </div>
-    <div><canvas id="c-chart" height="130"></canvas></div>
+
   </section>
 </main>
+
+<footer>Assignment 06 · Nguyễn Duy Nghĩa · B23DCCN600 · Flask + Chart.js</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

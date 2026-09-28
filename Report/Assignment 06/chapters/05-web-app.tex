@@ -1,6 +1,6 @@
 % =====================================================================
 %  Chương 5 — Hạng mục 5: đóng gói triển khai Web App
-%  Mã nguồn: app/app.py, app/static/app.js, app/smoke_test.py
+%  Mã nguồn: app/app.py, app/static/app.js, app/static/style.css, app/smoke_test.py, app/screenshots.py
 % =====================================================================
 \chapter{Triển khai Web App}
 \label{ch:webapp}
@@ -12,10 +12,13 @@ dùng chọn framework (PyTorch hoặc Keras) và một trong bốn mô hình; m
 
 \section{Kiến trúc}
 
-Máy chủ là Flask, trả JSON qua bốn nhóm endpoint; giao diện là một trang HTML với hai tab, gọi API bằng \texttt{fetch}
-và vẽ biểu đồ bằng Chart.js (Hình~\ref{fig:arch}). Ứng dụng không cần dữ liệu gốc của KKBox để chạy. Mọi thứ nó cần
-nằm trong thư mục \texttt{models/}: 16 tệp mô hình và \texttt{metadata.json} do notebook 06 ghi, gồm thống kê chuẩn hoá
-của hai tập, ngưỡng phân loại chọn trên validation, tên mô hình tốt nhất và chuỗi hành vi của hai người dùng mẫu.
+Máy chủ là Flask, trả JSON qua bốn nhóm endpoint; giao diện là một trang HTML với hai phân hệ, gọi API bằng
+\texttt{fetch} và vẽ biểu đồ bằng Chart.js (Hình~\ref{fig:arch}). Ứng dụng không cần dữ liệu gốc của KKBox để chạy. Mô
+hình và tham số tiền xử lý nằm trong thư mục \texttt{models/}: 16 tệp mô hình và \texttt{metadata.json} do notebook 06
+ghi, gồm thống kê chuẩn hoá của hai tập, ngưỡng phân loại chọn trên validation, tên mô hình tốt nhất và chuỗi hành vi của
+hai người dùng mẫu. Chỉ số test của 16 mô hình mà giao diện hiện trên thẻ mô hình được đọc từ \texttt{outputs/metrics/},
+đúng các tệp mà Chương~\ref{ch:pytorch} và~\ref{ch:keras} dùng để lập bảng, nên con số trên giao diện và trong báo cáo
+là một.
 
 \begin{figure}[H]
   \centering
@@ -34,13 +37,15 @@ Bảng~\ref{tab:api} liệt kê các endpoint.
     \toprule
     Phương thức & Đường dẫn & Vào $\to$ ra \\
     \midrule
-    GET & \texttt{/api/stock/history} & $\to$ 100 phiên gần nhất: ngày, Close, MA20 \\
+    GET & \texttt{/api/stock/history?n=} & $n \in \{60, 100, 250\}$ $\to$ $n$ phiên gần nhất: ngày, Close, MA20,
+                                          RSI-14 và giá mở/cao/thấp/khối lượng của phiên cuối \\
     POST & \texttt{/api/stock/predict} & \texttt{\{framework, model\}} $\to$ giá dự báo, \% thay đổi, RSI-14 và vùng
                                         RSI, ghi chú rủi ro, độ trễ \\
     POST & \texttt{/api/churn/predict} & \texttt{\{preset\}} hoặc \texttt{\{sequence\}} ($31\times8$), \texttt{framework},
                                         \texttt{model} $\to$ xác suất, mức rủi ro, ngưỡng, xu hướng nghe, khuyến nghị,
                                         độ trễ \\
-    GET & \texttt{/api/meta} & $\to$ danh sách mô hình, mô hình tốt nhất, người dùng mẫu \\
+    GET & \texttt{/api/meta} & $\to$ danh sách mô hình, mô hình tốt nhất, thẻ chỉ số test của 16 mô hình, thống kê
+                               hai tập, chuỗi của hai người dùng mẫu \\
     GET & \texttt{/} & $\to$ trang giao diện \\
     \bottomrule
   \end{tabular}
@@ -83,51 +88,154 @@ thường.
 
 \maNguon{app__listening_trend}{Xu hướng nghe trả về cùng xác suất churn}
 
-\section{Giao diện}
+\section{Thiết kế giao diện}
 
-Mỗi tab có một cột điều khiển và một biểu đồ. Khi đổi framework, danh sách mô hình được dựng lại và mô hình tốt nhất
-trên validation của framework đó được chọn sẵn.
+Giao diện nhắm tới hai kiểu người dùng: người phân tích muốn xem mô hình nói gì và đáng tin tới đâu, và nhân viên chăm
+sóc khách hàng cần một con số cùng một việc nên làm. Vì vậy mỗi kết quả luôn đi kèm ngữ cảnh để đọc nó: ngưỡng quyết
+định, chỉ số trên tập test, độ trễ và một lời nhắc khi con số không nên được tin quá mức. Trang gồm ba phần.
 
-\maNguonJS{initChurn}{Tab churn: gọi API và vẽ chuỗi hành vi bằng Chart.js}
-
-Hình~\ref{fig:ui-stock} và~\ref{fig:ui-churn} vẽ lại hai tab bằng TikZ thay cho ảnh chụp màn hình. Mọi con số và đường
-cong trong hai hình là phản hồi thật của API, do \texttt{smoke\_test.py} ghi lại: biểu đồ giá đọc 100 phiên mà
-\texttt{/api/stock/history} trả về, còn biểu đồ churn đọc đúng chuỗi mà \texttt{/api/churn/predict} trả về cho người dùng
-mẫu.
+\begin{itemize}
+  \item \textbf{Phần đầu trang} (Hình~\ref{fig:ui-hero}): nhãn chủ đề, tiêu đề chữ chuyển màu, một dòng mô tả hai bài
+        toán và bốn ô số liệu đọc từ \texttt{/api/meta}: số mô hình, số phiên AMZN, số người dùng KKBox và độ trễ trung
+        vị của các mô hình PyTorch. Hai nút lớn chuyển giữa hai phân hệ, mỗi phân hệ một màu nhấn (chàm cho giá cổ phiếu,
+        xanh lục cho churn) để người dùng luôn biết mình đang ở đâu.
+  \item \textbf{Cột trái}: biểu đồ tương tác (di chuột để xem giá trị từng ngày), dải thống kê nhanh và bảng so sánh bốn
+        kiến trúc.
+  \item \textbf{Cột phải} (cố định khi cuộn): chọn framework bằng công tắc hai nấc, chọn kiến trúc bằng bốn thẻ mô hình,
+        nút chạy và khung kết quả.
+\end{itemize}
 
 \begin{figure}[H]
   \centering
-  \hinh{f5_ui_stock}
-  \caption{Tab dự báo giá AMZN với mô hình PyTorch tốt nhất trên validation}
+  \includegraphics[width=\linewidth]{assets/ui/hero.png}
+  \caption{Phần đầu trang: bốn ô số liệu và hai nút chuyển phân hệ}
+  \label{fig:ui-hero}
+\end{figure}
+
+Mỗi thẻ mô hình hiện số tham số, hai chỉ số chính trên tập test (RMSE và tỉ lệ đúng hướng cho giá, F1 và ROC-AUC cho
+churn) và độ trễ đo ở Chương~\ref{ch:keras}; mô hình có val loss nhỏ nhất mang nhãn ``tốt nhất val'' và được chọn sẵn
+mỗi khi đổi framework. Người dùng nhờ đó chọn mô hình với đủ thông tin thay vì chọn theo tên. Thẻ lấy số liệu từ hàm
+\texttt{model\_card} của máy chủ:
+
+\maNguon{app__model_card}{Thẻ mô hình: chỉ số test, số tham số, độ trễ và kích thước tệp}
+
+Các chi tiết nhỏ làm giao diện dễ dùng hơn: nút chạy hiện vòng quay và khoá lại trong lúc chờ API, con số kết quả chạy
+từ 0 lên giá trị thật, thanh xác suất và kim RSI trượt tới vị trí mới, lỗi từ API hiện thành thông báo nổi ở cuối trang
+thay vì im lặng. Trang có nền tối mặc định và một nút đổi sang nền sáng ở góc phải (Hình~\ref{fig:ui-light}); lựa chọn
+được nhớ trong trình duyệt và biểu đồ vẽ lại theo bảng màu mới. Dưới 980 px hai cột xếp chồng, dưới 640 px các ô số liệu
+chia hai cột và nút phân hệ trải hết chiều ngang, nên trang dùng được trên điện thoại.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.86\linewidth]{assets/ui/stock_light.png}
+  \caption{Phân hệ 1 ở nền sáng}
+  \label{fig:ui-light}
+\end{figure}
+
+\section{Giao diện phân hệ 1: dự báo giá cổ phiếu AMZN}
+
+Phân hệ 1 (Hình~\ref{fig:ui-stock}) phục vụ bài toán dự báo chuỗi thời gian tài chính.
+
+\begin{itemize}
+  \item \textbf{Biểu đồ giá tương tác.} Đường giá đóng cửa có vùng tô chuyển màu và đường MA-20 nét đứt để thấy xu hướng
+        ngắn hạn. Công tắc phía trên đổi khung nhìn 60, 100 hoặc 250 phiên. Sau khi dự báo, một điểm đỏ nối từ phiên cuối
+        sang ``phiên kế tiếp'' đặt dự báo ngay trong bối cảnh diễn biến giá.
+  \item \textbf{Biểu đồ RSI-14} bên dưới, có hai vạch 70 và 30, cho thấy cổ phiếu đang gần vùng quá mua hay quá bán.
+  \item \textbf{Dải thống kê phiên cuối}: ngày, giá đóng cửa và \% thay đổi (xanh khi tăng, đỏ khi giảm), giá cao/thấp,
+        khối lượng giao dịch.
+  \item \textbf{Khung kết quả}: giá dự báo cỡ lớn, nhãn TĂNG hoặc GIẢM, biến động theo USD và theo \%, giá phiên gần nhất,
+        độ trễ suy luận, và một thanh RSI nhiều màu với kim chỉ vị trí hiện tại.
+  \item \textbf{Cảnh báo} viền vàng nhắc rằng trên tập test không mô hình nào thắng mốc ``giá ngày mai bằng giá hôm nay''.
+  \item \textbf{So sánh bốn kiến trúc}: một nút chạy lần lượt cả bốn mô hình trên cùng cửa sổ 30 phiên, rồi xếp giá dự báo,
+        \% thay đổi, độ trễ và RMSE test của từng mô hình thành bảng; thanh RMSE có vạch đánh dấu RMSE của mốc ngây thơ
+        nên thấy ngay không thanh nào ngắn hơn vạch.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{assets/ui/stock.png}
+  \caption{Phân hệ 1: dự báo giá AMZN phiên kế tiếp bằng mô hình PyTorch tốt nhất trên validation, kèm bảng so sánh bốn
+           kiến trúc}
   \label{fig:ui-stock}
 \end{figure}
 
 Với dữ liệu kết thúc ngày \SL{app/stock/torch/last_date}, mô hình \SL{app/stock/torch/model_label} của PyTorch dự báo
 phiên kế tiếp đóng cửa ở \SL{app/stock/torch/pred_close} USD, mô hình \SL{app/stock/keras/model_label} của Keras dự báo
 \SL{app/stock/keras/pred_close} USD, so với giá hiện tại \SL{app/stock/torch/last_close} USD. Cả hai chỉ lệch vài phần
-nghìn so với giá hiện tại, đúng với điều Chương~\ref{ch:keras} đã phân tích: mô hình dự báo return gần 0.
+nghìn so với giá hiện tại, và bảng so sánh cho thấy bốn kiến trúc cùng dự báo một mức tăng rất nhỏ, đúng với điều
+Chương~\ref{ch:keras} đã phân tích: mô hình dự báo return gần 0.
+
+\section{Giao diện phân hệ 2: đánh giá nguy cơ rời bỏ KKBox}
+
+Phân hệ 2 (Hình~\ref{fig:ui-churn}) giúp bộ phận chăm sóc khách hàng quyết định có cần can thiệp để giữ một người dùng
+hay không.
+
+\begin{itemize}
+  \item \textbf{Chọn chuỗi hành vi bằng một chạm}: ``Người dùng thật đã churn'', ``Người dùng thật ở lại'' hoặc ``Tự mô
+        phỏng hành vi''.
+  \item \textbf{Biểu đồ hai trục} cho 31 ngày tháng 3/2017: cột xanh là số phút nghe mỗi ngày (trục trái), đường nét đứt
+        là số bài khác nhau (trục phải). Hai đại lượng được đổi ngược từ dạng $\log(1+x)$ mà mô hình dùng về đơn vị thật,
+        vì người đọc hiểu ``90 phút'' dễ hơn ``8,6''.
+  \item \textbf{Dải thống kê}: số ngày có nghe, tổng giờ nghe, ngày nghe cuối và xu hướng nghe (7 ngày cuối trừ 7 ngày
+        đầu), để người dùng tự kiểm tra điều mô hình vừa kết luận.
+  \item \textbf{Khung kết quả}: xác suất rời bỏ cỡ lớn đổi màu theo mức rủi ro (đỏ, vàng, xanh), nhãn mức rủi ro, một thanh
+        xác suất có vạch trắng đánh dấu ngưỡng quyết định của đúng mô hình đó, khuyến nghị can thiệp theo mức rủi ro, xu
+        hướng nghe và độ trễ.
+  \item \textbf{Bốn kiến trúc nhìn cùng một người dùng}: xác suất của cả bốn mô hình trên cùng thang, mỗi thanh có vạch
+        ngưỡng riêng, kèm mức rủi ro, F1 test và độ trễ. Bảng tự xoá khi đổi chuỗi hay framework để không bao giờ hiện
+        kết quả của một đầu vào khác.
+\end{itemize}
 
 \begin{figure}[H]
   \centering
-  \hinh{f5_ui_churn}
-  \caption{Tab dự báo churn với một người dùng thật đã churn trong tập test}
+  \includegraphics[width=\linewidth]{assets/ui/churn.png}
+  \caption{Phân hệ 2: đánh giá nguy cơ rời bỏ của một người dùng thật đã churn trong tập test}
   \label{fig:ui-churn}
 \end{figure}
 
 Hai người dùng mẫu là người thật trong tập test: một người đã churn mà mô hình tin chắc nhất, và một người ở lại mà mô hình
 cho xác suất churn thấp nhất. Người churn trong Hình~\ref{fig:ui-churn} nghe gần như mỗi ngày trong 9 ngày đầu tháng rồi
-ngừng hẳn từ ngày 10, dạng cực đoan của quỹ đạo nhóm churn ở Chương~\ref{ch:dulieu}. LSTM của PyTorch cho xác suất
+ngừng hẳn, dạng cực đoan của quỹ đạo nhóm churn ở Chương~\ref{ch:dulieu}. LSTM của PyTorch cho xác suất
 \SL{app/churn/churn_torch/probPct}\,\% với người này và \SL{app/churn/loyal_torch/probPct}\,\% với người ở lại; GRU của
 Keras cho lần lượt \SL{app/churn/churn_keras/probPct}\,\% và \SL{app/churn/loyal_keras/probPct}\,\%.
 
+\subsection{Trình mô phỏng hành vi}
+
+Hai người dùng mẫu chỉ cho biết mô hình phản ứng thế nào với hai trường hợp đã có. Trình mô phỏng cho người dùng tự dựng
+một tháng nghe nhạc bằng bốn thanh trượt: số phút nghe mỗi ngày, số bài khác nhau mỗi ngày, số ngày nghe mỗi tuần và ngày
+bắt đầu ngừng nghe. Trình duyệt dựng ma trận $31 \times 8$ cùng dạng với dữ liệu huấn luyện (các đếm lấy $\log(1+x)$,
+ngày không nghe để 0 và cờ \texttt{active} bằng 0), vẽ lại biểu đồ ngay và gửi chuỗi tới \texttt{/api/churn/predict}
+khi người dùng dừng kéo 0,3 giây. Tỉ lệ giữa các mức nghe (hết bài, bỏ ở 25\,\%, 50\,\%\ldots) là giả định, và mỗi ngày
+có một hệ số dao động cố định để chuỗi trông giống hành vi thật hơn một đường thẳng.
+
+\maNguonJS{simulatedSequence}{Dựng chuỗi 31 ngày giả định từ bốn thanh trượt}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{assets/ui/churn_sim.png}
+  \caption{Trình mô phỏng: nghe 90 phút, 25 bài mỗi ngày, 5 ngày một tuần, ngừng nghe từ ngày 12}
+  \label{fig:ui-sim}
+\end{figure}
+
+Trình mô phỏng cho thấy mô hình nhạy với \emph{thời điểm} ngừng nghe hơn với lượng nghe. Cùng một người nghe 90 phút mỗi
+ngày, 5 ngày một tuần, nếu nghe đều tới cuối tháng thì LSTM của PyTorch cho xác suất dưới ngưỡng; nếu dừng từ giữa tháng
+thì xác suất vượt ngưỡng xa và cả bốn kiến trúc đều xếp mức rủi ro cao (Hình~\ref{fig:ui-sim}). Điều này khớp với
+Chương~\ref{ch:dulieu}: tín hiệu mạnh nhất là hoạt động giảm dần về cuối tháng, và mạng hồi quy đọc được tín hiệu đó vì
+nó xử lý chuỗi theo thứ tự ngày.
+
 \section{Kiểm chứng}
 
-\texttt{smoke\_test.py} dùng test client của Flask, không cần mở cổng mạng. Nó gọi lịch sử giá, dự báo giá với cả hai
-framework và dự báo churn cho hai người dùng mẫu với cả hai framework, tổng cộng \SL{app/n_calls} lượt. Mỗi phản hồi phải
-có mã 200 và đủ các khoá cần thiết; một chuỗi sai shape phải bị từ chối với mã \SL{app/bad_shape_status}. Kịch bản dừng
+\texttt{smoke\_test.py} dùng test client của Flask, không cần mở cổng mạng. Nó gọi \texttt{/api/meta} (phải đủ 16 thẻ mô hình),
+lịch sử giá với ba khung 60, 100 và 250 phiên (phải trả đúng số phiên), dự báo giá với cả hai framework và dự báo churn
+cho hai người dùng mẫu với cả hai framework, tổng cộng \SL{app/n_calls} lượt. Mỗi phản hồi phải có mã 200 và đủ các khoá
+cần thiết. Hai đầu vào sai phải bị từ chối: một chuỗi sai shape nhận mã \SL{app/bad_shape_status}, một khung lịch sử
+ngoài ba giá trị cho phép nhận mã \SL{app/bad_n_status}. Kịch bản dừng
 ngay khi có một điều kiện không thoả, và lượt chạy cuối qua hết.
 
-\maNguon{smoke_test__main}{Kiểm chứng ba endpoint và ghi phản hồi thật cho báo cáo}
+\maNguon{smoke_test__main}{Kiểm chứng bốn endpoint và ghi phản hồi thật cho báo cáo}
+
+Ngoài kiểm chứng API, kịch bản \texttt{screenshots.py} trong thư mục \texttt{app/} mở trang thật bằng Playwright, bấm
+qua cả hai phân hệ, trình mô phỏng và nền sáng, chụp các hình trong chương này và dừng nếu trang có lỗi JavaScript.
 
 Chạy ứng dụng bằng \texttt{python app/app.py} rồi mở \texttt{http://localhost:8080}. Độ trễ API trả về là thời gian của riêng lời gọi mô hình:
 \SL{app/churn/churn_torch/latency_ms} ms với LSTM của PyTorch và \SL{app/churn/churn_keras/latency_ms} ms với GRU của

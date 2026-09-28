@@ -54,7 +54,7 @@ src/Assignment 06/
 │   ├── models_keras.py    Ch.4: build_keras, fit_keras (TensorFlow chỉ import ở tệp này)
 │   ├── bench.py           Ch.4: chỉ số, ngưỡng từ val, độ trễ suy luận, lưu kết quả
 │   └── export.py          nơi duy nhất ghi .dat (pgfplots) và .json (số liệu)
-├── app/                 Ch.5: app.py (Flask), templates/, static/app.js, smoke_test.py
+├── app/                 Ch.5: app.py (Flask), templates/, static/ (app.js, style.css), smoke_test.py, screenshots.py
 ├── notebooks/           00 → 06, đã chạy, có output
 ├── data/amzn/AMZN.csv   dữ liệu giá (có trong kho để tái lập)
 ├── data/kkbox/          dữ liệu KKBox (không commit, tải theo hướng dẫn dưới)
@@ -66,8 +66,8 @@ src/Assignment 06/
 ```
 
 Báo cáo không có con số nào gõ tay: `Report/Assignment 06/build.py` biến `outputs/metrics/*.json` thành macro LaTeX và
-trích mã nguồn thẳng từ `a06/`, `app/` theo tên hàm. Mọi hình vẽ bằng TikZ/pgfplots, kể cả hai khung giao diện của Web App
-(vẽ lại từ phản hồi thật của API).
+trích mã nguồn thẳng từ `a06/`, `app/` theo tên hàm. Mọi hình vẽ bằng TikZ/pgfplots, trừ các ảnh chụp giao diện Web App
+(`Report/Assignment 06/assets/ui/`, do `app/screenshots.py` chụp từ trang thật).
 
 ---
 
@@ -106,8 +106,9 @@ for %n in (00 01 02 03 04 05 06) do python -m jupyter nbconvert --to notebook --
 Web App:
 
 ```bash
-python app/smoke_test.py      # kiểm chứng 3 endpoint bằng test client
+python app/smoke_test.py      # kiểm chứng 4 endpoint bằng test client
 python app/app.py             # rồi mở http://localhost:8080
+python app/screenshots.py     # (app đang chạy) chụp ảnh giao diện cho báo cáo, cần playwright + chromium
 ```
 
 Báo cáo (cần MiKTeX hoặc TeX Live có LuaLaTeX, `latexmk`, `biber`, gói `minted`):
