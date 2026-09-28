@@ -17,7 +17,7 @@
         chỉ tính trên train.
   \item \textbf{PyTorch.} Bốn mô hình dùng chung một lớp và một vòng lặp huấn luyện, huấn luyện trên GPU sau khi đo được
         GPU nhanh hơn CPU. Trên KKBox, LSTM tốt nhất với F1 \SL{torch_kkbox/models/lstm/f1}\,\% và ROC-AUC
-        \SL{torch_kkbox/models/lstm/roc_auc}; ba mô hình có cổng đều hơn Simple RNN.
+        \SL{torch_kkbox/models/lstm/roc_auc}; về ROC-AUC, ba mô hình có cổng đều hơn Simple RNN.
   \item \textbf{Keras và đối chuẩn.} Cùng kiến trúc cho chất lượng gần như bằng nhau ở hai framework. PyTorch nhanh hơn
         với từng mẫu một (trung vị \SL{bench/lat_median/torch} so với \SL{bench/lat_median/keras} ms trên một luồng CPU),
         còn với lô lớn thì khoảng cách hẹp lại và Keras thắng ở Simple RNN. Tệp \texttt{.keras} nặng hơn vì chứa cả trạng thái
@@ -41,4 +41,21 @@
         mô) không có trong dữ liệu.
   \item Keras chạy trên CPU vì TensorFlow không hỗ trợ GPU trên Windows, nên thời gian huấn luyện của hai framework không
         so trực tiếp được; bài chỉ so tốc độ suy luận trên cùng CPU.
+\end{itemize}
+
+\section{Hướng phát triển}
+
+\begin{itemize}
+  \item \textbf{Thêm dữ liệu cho bài churn.} Kết quả của Chương~\ref{ch:dulieu} cho thấy tín hiệu nằm ở xu hướng hành vi,
+        và phần còn thiếu nằm ngoài log nghe nhạc. Bước có lợi nhất là ghép chuỗi giao dịch (\texttt{transactions\_v2})
+        và thông tin thành viên của cùng cuộc thi vào mô hình, dưới dạng đặc trưng tĩnh nối vào $h_T$.
+  \item \textbf{Chú ý theo thời gian.} Cơ chế attention~\cite{vaswani2017} gán trọng số cho từng bước thay vì chỉ dựa vào
+        $h_T$, và cho biết ngày nào quyết định dự báo, điều hữu ích cho bộ phận chăm sóc khách hàng.
+  \item \textbf{Mô hình chuỗi thời gian hiện đại.} Temporal Fusion Transformer~\cite{lim2021}, PatchTST~\cite{nie2023}
+        và các mô hình không gian trạng thái như Mamba~\cite{gu2023} xử lý chuỗi dài hơn nhiều so với LSTM.
+  \item \textbf{Đổi mục tiêu cho bài giá.} Với return gần như không dự báo được, câu hỏi hữu ích hơn là dự báo
+        \emph{biến động} (vốn có tự tương quan mạnh, xem hiệu ứng ARCH ở Chương~\ref{ch:dulieu}) hoặc dự báo xác suất
+        tăng/giảm, rồi so với mốc ngây thơ tương ứng.
+  \item \textbf{Đánh giá chắc chắn hơn.} Chạy nhiều seed và kiểm định thống kê để phân biệt được chênh lệch nhỏ giữa các
+        mô hình; với bài giá, dùng kiểm định trượt nhiều giai đoạn (walk-forward) thay cho một lần chia duy nhất.
 \end{itemize}

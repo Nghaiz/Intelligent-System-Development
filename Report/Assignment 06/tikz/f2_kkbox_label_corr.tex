@@ -1,0 +1,15 @@
+% Tương quan của từng đặc trưng với nhãn churn theo ba cách tóm tắt chuỗi 31 ngày (notebook 02).
+\begin{tikzpicture}
+\begin{axis}[a06, width=14cm, height=5.6cm, ybar, /pgf/bar width=3.2mm, ymax=0.01, ymin=-0.19,
+  xtick={0,...,7}, xticklabels={num\_25,num\_50,num\_75,num\_985,num\_100,num\_unq,total\_secs,active},
+  x tick label style={font=\scriptsize}, ylabel={tương quan với nhãn churn}, enlarge x limits=0.07,
+  legend style={at={(0.5,1.03)}, anchor=south}, legend columns=3,
+  y tick label style={/pgf/number format/fixed, /pgf/number format/precision=2}]
+  \addplot[fill=gray!40, draw=gray] table[x=i, y=mean]{figdata/kkbox_label_corr.dat};
+  \addlegendentry{trung bình 31 ngày}
+  \addplot[fill=mOne!55, draw=mOne] table[x=i, y=last7]{figdata/kkbox_label_corr.dat};
+  \addlegendentry{trung bình 7 ngày cuối}
+  \addplot[fill=churnC!70, draw=churnC] table[x=i, y=trend]{figdata/kkbox_label_corr.dat};
+  \addlegendentry{xu hướng (7 ngày cuối $-$ 7 ngày đầu)}
+\end{axis}
+\end{tikzpicture}

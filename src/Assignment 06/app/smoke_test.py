@@ -11,8 +11,8 @@ from a06.export import save_metrics, write_dat  # noqa: E402
 from app import app  # noqa: E402
 
 KEYS = {"history": {"dates", "close", "ma20"},
-        "stock": {"pred_close", "last_close", "change_pct", "latency_ms", "model"},
-        "churn": {"prob", "risk", "threshold", "latency_ms", "sequence"}}
+        "stock": {"pred_close", "last_close", "change_pct", "latency_ms", "model", "rsi14", "rsi_zone", "note"},
+        "churn": {"prob", "risk", "threshold", "latency_ms", "sequence", "advice", "trend"}}
 
 
 def call(client, method, path, body=None):

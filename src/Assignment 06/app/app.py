@@ -96,10 +96,22 @@ def stock_predict():
     z, ms = timed(load_model("amzn", framework, cell), X)
     r_hat = float(z[0]) * S_SCALER["y_std"] + S_SCALER["y_mean"]     # return đã chuẩn hoá -> log-return
     pred = close * float(np.exp(r_hat))
+    rsi = float(STOCK_DF.RSI14.iloc[-1])
     return jsonify({"framework": framework, "model": cell, "model_label": CELL_LABELS[cell],
                     "last_date": last.strftime("%Y-%m-%d"), "last_close": round(close, 2),
                     "pred_close": round(pred, 2), "change_pct": round(100 * (pred / close - 1), 3),
+                    "rsi14": round(rsi, 2), "rsi_zone": rsi_zone(rsi), "note": STOCK_NOTE,
                     "latency_ms": round(ms, 3)})
+
+
+# Ghi chú đi kèm mọi dự báo giá: Chương 4 cho thấy không mô hình nào thắng mốc "giá ngày mai = giá hôm nay".
+STOCK_NOTE = ("Mô hình không thắng được mốc 'giá ngày mai bằng giá hôm nay' trên tập test; "
+              "dự báo chỉ để minh hoạ, không dùng làm khuyến nghị đầu tư.")
+
+
+def rsi_zone(rsi):
+    """Ngưỡng 70/30 quy ước của Wilder."""
+    return "quá mua" if rsi >= 70 else "quá bán" if rsi <= 30 else "trung tính"
 
 
 # ---------------------------------------------------------------- phân hệ 2: churn KKBox
@@ -128,7 +140,20 @@ def churn_predict():
     risk = "cao" if prob >= thr else "trung bình" if prob >= thr / 2 else "thấp"
     return jsonify({"framework": framework, "model": cell, "model_label": CELL_LABELS[cell],
                     "prob": round(prob, 4), "threshold": round(thr, 4), "risk": risk,
+                    "advice": ADVICE[risk], "trend": listening_trend(seq),
                     "latency_ms": round(ms, 3), "sequence": seq.round(4).tolist()})
+
+
+# Khuyến nghị theo mức rủi ro cho bộ phận chăm sóc khách hàng.
+ADVICE = {"cao": "Liên hệ trước ngày hết hạn gói, tặng ưu đãi gia hạn và gợi ý danh sách phát theo lịch sử nghe.",
+          "trung bình": "Gửi nhắc gia hạn và gợi ý nội dung mới; theo dõi hành vi nghe trong tuần tới.",
+          "thấp": "Không cần can thiệp; giữ chăm sóc thông thường."}
+
+
+def listening_trend(seq):
+    """Xu hướng nghe: log(1+giây) trung bình 7 ngày cuối trừ 7 ngày đầu (Chương 2: đây là tín hiệu mạnh nhất)."""
+    secs = seq[:, META["kkbox_features"].index("total_secs")]
+    return round(float(secs[-7:].mean() - secs[:7].mean()), 4)
 
 
 @app.get("/api/meta")

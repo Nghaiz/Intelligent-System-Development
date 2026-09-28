@@ -5,8 +5,8 @@
     "device": "cpu",
     "best_epoch": 2,
     "epochs_run": 10,
-    "epoch_s": 0.9260105899993505,
-    "train_s": 9.260105899993505,
+    "epoch_s": 0.8198455500009004,
+    "train_s": 8.198455500009004,
     "best_val_loss": 0.2345510870218277
   },
   "amzn_keras_lstm": {
@@ -15,8 +15,8 @@
     "device": "cpu",
     "best_epoch": 1,
     "epochs_run": 9,
-    "epoch_s": 1.447869088888385,
-    "train_s": 13.030821799995465,
+    "epoch_s": 1.158549377777187,
+    "train_s": 10.426944399994682,
     "best_val_loss": 0.22330747544765472
   },
   "amzn_keras_gru": {
@@ -25,8 +25,8 @@
     "device": "cpu",
     "best_epoch": 2,
     "epochs_run": 10,
-    "epoch_s": 1.4503442599994743,
-    "train_s": 14.503442599994742,
+    "epoch_s": 1.288646940000035,
+    "train_s": 12.886469400000351,
     "best_val_loss": 0.22391961514949799
   },
   "amzn_keras_bilstm": {
@@ -35,8 +35,8 @@
     "device": "cpu",
     "best_epoch": 1,
     "epochs_run": 9,
-    "epoch_s": 2.0690032333336097,
-    "train_s": 18.621029100002488,
+    "epoch_s": 2.078992322223106,
+    "train_s": 18.710930900007952,
     "best_val_loss": 0.23042859137058258
   }
 }

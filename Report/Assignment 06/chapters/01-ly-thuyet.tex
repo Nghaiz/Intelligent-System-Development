@@ -30,6 +30,32 @@ $(\SL{theory/shapes/kkbox/0}, \SL{theory/shapes/kkbox/1}, \SL{theory/shapes/kkbo
 thường nghe ít dần trong những ngày cuối. Giả định các mẫu độc lập và cùng phân phối (i.i.d.) vẫn đúng giữa các
 mẫu, nhưng sai hoàn toàn giữa các bước trong cùng một mẫu. Mô hình cho chuỗi phải khai thác được sự phụ thuộc đó.
 
+Cùng một tensor có hai cách xếp trục. Thư viện cuDNN của NVIDIA và mặc định của \texttt{nn.LSTM} dùng bố cục
+\emph{time-first} $(T, B, D)$: mỗi bước thời gian là một khối liền trong bộ nhớ, thuận cho vòng lặp theo $t$. Keras và
+phần lớn mã PyTorch dùng \emph{batch-first} $(B, T, D)$ với \texttt{batch\_first=True}, cùng bố cục với các tầng
+\texttt{Dense} và tích chập. Đây chỉ là hoán vị trục: notebook 00 nạp cùng trọng số vào hai lớp LSTM, đưa vào tensor
+$(\SL{theory/layout/bf_in/0}, \SL{theory/layout/bf_in/1}, \SL{theory/layout/bf_in/2})$ và bản hoán vị
+$(\SL{theory/layout/tf_in/0}, \SL{theory/layout/tf_in/1}, \SL{theory/layout/tf_in/2})$, và nhận cùng đầu ra
+(\SL{theory/checks/batch_first_equiv}). Cả bài dùng batch-first.
+
+\section{Các dạng bài toán chuỗi}
+
+Theo quan hệ giữa chuỗi vào và chuỗi ra, bài toán chuỗi chia thành năm dạng (Hình~\ref{fig:taxonomy}). One-to-one là
+mạng thường của các bài trước: một đầu vào cố định, một đầu ra. One-to-many sinh một chuỗi từ một đầu vào, như viết
+chú thích cho ảnh. Many-to-one đọc cả chuỗi rồi cho một kết quả. Many-to-many đồng bộ cho một đầu ra ở mỗi bước, như gán
+nhãn từ loại. Seq2seq (bộ mã hoá--giải mã) đọc hết chuỗi vào rồi sinh chuỗi ra có độ dài khác, như dịch máy.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f1_taxonomy}
+  \caption{Năm dạng bài toán chuỗi; ô xanh lá là đầu vào, xanh dương là trạng thái ẩn, cam là đầu ra}
+  \label{fig:taxonomy}
+\end{figure}
+
+Cả hai bài của báo cáo đều là \textbf{many-to-one}. AMZN đọc 30 phiên và cho một số là return của phiên kế tiếp. KKBox
+đọc 31 ngày và cho một xác suất rời bỏ. Vì vậy mọi mô hình ở các chương sau chỉ dùng trạng thái cuối $h_T$ và bỏ qua
+$h_1, \dots, h_{T-1}$.
+
 \section{Vì sao MLP và Conv1D chưa đủ}
 
 Có hai cách dùng lại công cụ của các bài trước. Cách thứ nhất là làm phẳng chuỗi thành vector $T \cdot D$ chiều rồi
@@ -51,11 +77,57 @@ Có hai cách dùng lại công cụ của các bài trước. Cách thứ nhấ
   \end{tabular}
 \end{table}
 
-MLP học một trọng số riêng cho từng cặp (bước, đặc trưng). Nhân đôi độ dài chuỗi thì số tham số tầng đầu tăng từ
-\SL{theory/params/mlp} lên \SL{theory/params/mlp_t60}, và điều học được ở bước 5 không dùng lại được ở bước 25.
-Conv1D chia sẻ trọng số theo thời gian nhưng mỗi tầng chỉ nhìn $K$ bước, muốn thấy 30 bước phải chồng nhiều tầng.
-RNN giải quyết cả hai: một bộ trọng số dùng cho mọi bước, và một trạng thái $h_t$ mang thông tin từ đầu chuỗi đến
-hiện tại. Ba hàm đếm tham số nằm trong \texttt{theory.py}; notebook so từng công thức với \texttt{numel()} của
+\textbf{MLP} học một trọng số riêng cho từng cặp (bước, đặc trưng). Nhân đôi độ dài chuỗi thì số tham số tầng đầu tăng
+từ \SL{theory/params/mlp} lên \SL{theory/params/mlp_t60}. Điều học được ở bước 5 cũng không dùng lại được ở bước 25:
+một mẫu hình giá xuất hiện ở hai vị trí khác nhau phải được học hai lần, vì không có chia sẻ trọng số theo thời gian.
+
+\textbf{Conv1D} chia sẻ trọng số theo thời gian và tính song song được trên mọi vị trí, nên là lựa chọn mạnh cho nhiều
+bài chuỗi (WaveNet, TCN). Nhưng nó có ba giới hạn so với RNN:
+
+\begin{enumerate}
+  \item \emph{Trường thụ cảm hữu hạn.} Mỗi tầng kernel $K$ chỉ nới tầm nhìn thêm $K-1$ bước:
+        \begin{equation}
+          RF_{\text{thường}} = 1 + L(K-1), \qquad RF_{\text{giãn nở}} = 1 + (K-1)(2^L - 1).
+          \label{eq:rf}
+        \end{equation}
+        Với $K = 3$, muốn nhìn đủ $T = 30$ bước phải chồng \SL{theory/rf/L_for_T30} tầng; tích chập giãn nở của TCN
+        rút xuống \SL{theory/rf/L_for_T30_dilated} tầng. Dù cách nào, tầm nhìn vẫn là hằng số chốt lúc thiết kế,
+        còn $h_t$ của RNN về nguyên lý mang thông tin từ bước đầu tiên.
+  \item \emph{Tính nhân quả phải tự đảm bảo.} Conv1D với \texttt{padding='same'} đặt kernel đối xứng quanh $t$, nên
+        đầu ra ở bước $t$ dùng cả $x_{t+1}, \dots, x_{t+K/2}$: mô hình nhìn thấy tương lai. Notebook 00 đo trực tiếp
+        bằng autograd: chuẩn gradient của đầu ra bước $t$ theo các đầu vào \emph{sau} $t$ là \SL{theory/leak/same}
+        với \texttt{padding='same'}, bằng \SL{theory/leak/causal} với tích chập nhân quả (đệm $K-1$ giá trị bên trái)
+        và bằng \SL{theory/leak/rnn} với RNN. RNN nhân quả sẵn, không cần cấu hình gì.
+  \item \emph{Không có trạng thái.} Khi một điểm dữ liệu mới $x_{T+1}$ đến, RNN chỉ cần một bước
+        $h_{T+1} = f(h_T, x_{T+1})$, chi phí $O(1)$. Conv1D phải tính lại trên cả cửa sổ.
+\end{enumerate}
+
+\maNguon{theory__receptive_field}{Trường thụ cảm của Conv1D thường và giãn nở}
+\maNguon{theory__CausalConv1d}{Tích chập nhân quả: đệm lệch trái để không nhìn thấy tương lai}
+
+Đổi lại, RNN phải tính tuần tự theo $t$, nên huấn luyện khó song song hoá hơn Conv1D. Bảng~\ref{tab:mlp-rnn-full} tổng
+hợp các tiêu chí.
+
+\begin{table}[H]
+  \centering\small
+  \caption{So sánh ba loại mô hình trên dữ liệu chuỗi}
+  \label{tab:mlp-rnn-full}
+  \begin{tabular}{L{3.4cm}L{3.5cm}L{3.5cm}L{3.8cm}}
+    \toprule
+    Tiêu chí & MLP (làm phẳng) & Conv1D & RNN, LSTM, GRU \\
+    \midrule
+    Chia sẻ trọng số & không & cục bộ qua kernel & toàn cục qua mọi bước \\
+    Tầm nhìn quá khứ & cả cửa sổ, $T$ cố định & $1 + L(K-1)$ bước & không giới hạn về nguyên lý \\
+    Độ dài chuỗi thay đổi & không & được, qua pooling & được, tự nhiên \\
+    Tính nhân quả & phụ thuộc cách làm phẳng & cần tích chập nhân quả & sẵn có \\
+    Trạng thái nhớ & không & không & $h_t$ (và $c_t$ với LSTM) \\
+    Thêm một điểm mới & tính lại cả cửa sổ & tính lại cả cửa sổ & một bước, $O(1)$ \\
+    Song song hoá & hoàn toàn & hoàn toàn & tuần tự theo $t$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Ba hàm đếm tham số nằm trong \texttt{theory.py}; notebook so từng công thức với \texttt{numel()} của
 \texttt{nn.Linear}, \texttt{nn.Conv1d} và \texttt{nn.RNN}.
 
 \maNguon{theory__count_params_rnn}{Số tham số của Simple RNN không phụ thuộc độ dài chuỗi}
@@ -65,9 +137,12 @@ hiện tại. Ba hàm đếm tham số nằm trong \texttt{theory.py}; notebook 
 Elman~\cite{elman1990} đưa ra dạng đơn giản nhất: ở mỗi bước, trạng thái mới là hàm của đầu vào hiện tại và trạng
 thái cũ,
 \begin{equation}
-  h_t = \tanh\left(W_{xh}\, x_t + W_{hh}\, h_{t-1} + b\right), \qquad h_0 = 0 .
+  h_t = \tanh\left(W_{xh}\, x_t + W_{hh}\, h_{t-1} + b\right), \qquad h_0 = 0, \qquad
+  \hat y = g\left(W_{hy}\, h_T + b_y\right).
   \label{eq:rnn}
 \end{equation}
+Ở đây $W_{xh} \in \mathbb{R}^{H \times D}$, $W_{hh} \in \mathbb{R}^{H \times H}$, còn $g$ là hàm đồng nhất với bài hồi
+quy và sigmoid với bài phân loại nhị phân. Vì bài là many-to-one, đầu ra chỉ tính từ $h_T$.
 Mở vòng lặp theo thời gian thì RNN trở thành một mạng sâu $T$ tầng, nhưng mọi tầng dùng chung $W_{xh}$, $W_{hh}$ và
 $b$ (Hình~\ref{fig:unroll}). Trạng thái cuối $h_T$ là bản tóm tắt cả chuỗi, và cả bốn mô hình của bài đều đưa
 $h_T$ vào một đầu dự báo nhỏ.
@@ -217,6 +292,14 @@ Bảng~\ref{tab:lstm-gru} so hai tế bào với cùng $D = 8$, $H = 64$. Số t
   \end{tabular}
 \end{table}
 
+\textbf{LSTM hay GRU?} GRU có ba khối trọng số thay vì bốn, nên ít hơn đúng một phần tư tham số: tỉ lệ đo được là
+\SL{theory/gru_lstm_ratio}. Về lý thuyết GRU cũng ít phép tính hơn mỗi bước. Trên thực tế tốc độ còn phụ thuộc cách
+thư viện cài đặt: ở phép đo của Chương~\ref{ch:keras} trên CPU một luồng, GRU của PyTorch mất
+\SL{bench/models/kkbox_torch_gru/latency_ms} ms mỗi mẫu, trong khi LSTM chỉ mất
+\SL{bench/models/kkbox_torch_lstm/latency_ms} ms. Về chất lượng, hai tế bào gần như ngang nhau trên cả hai tập
+(Chương~\ref{ch:pytorch}), đúng với quan sát chung của Jozefowicz và cộng sự~\cite{jozefowicz2015}. LSTM có cell state
+riêng nên tách được ``nhớ'' với ``xuất ra''; GRU gộp hai việc đó vào $h_t$.
+
 \section{LSTM hai chiều}
 
 BiLSTM~\cite{schuster1997} chạy hai LSTM độc lập, một đọc từ $t = 1$ đến $T$, một đọc từ $T$ về 1, rồi nối hai trạng
@@ -240,7 +323,12 @@ Với bài dự báo giá, chiều ngược không làm lộ tương lai. Nó ch
 Dropout thường đổi mặt nạ ở mỗi bước. Áp lên trạng thái $h_t$, nó xoá một phần trí nhớ khác nhau ở mỗi bước, và
 thông tin khó đi xa. Gal và Ghahramani~\cite{gal2016} đề xuất dùng \emph{một} mặt nạ cho cả chuỗi (recurrent dropout):
 đơn vị bị tắt thì tắt suốt chuỗi, đơn vị còn lại mang thông tin liền mạch (Hình~\ref{fig:dropout}, $p =
-\SL{theory/mask_p}\,\%$).
+\SL{theory/mask_p}\,\%$):
+\begin{equation}
+  m \sim \mathrm{Bernoulli}(1-p)^H \text{ (lấy một lần cho cả chuỗi)}, \qquad
+  h_t = \tanh\left(W_{xh} x_t + W_{hh} (m \odot h_{t-1}) + b\right).
+  \label{eq:recdrop}
+\end{equation}
 
 \begin{figure}[H]
   \centering
@@ -252,7 +340,13 @@ thông tin khó đi xa. Gal và Ghahramani~\cite{gal2016} đề xuất dùng \em
 \maNguon{theory__recurrent_dropout_masks}{Hai kiểu mặt nạ dropout cho chuỗi}
 
 BatchNorm của các bài trước lấy thống kê theo lô và theo từng bước, không hợp với chuỗi có độ dài thay đổi.
-LayerNorm~\cite{ba2016} chuẩn hoá theo chiều đặc trưng của \emph{từng mẫu}, nên dùng được ở mọi bước và mọi kích thước lô.
+LayerNorm~\cite{ba2016} chuẩn hoá theo chiều đặc trưng của \emph{từng mẫu}, nên dùng được ở mọi bước và mọi kích thước lô:
+\begin{equation}
+  \mu_t = \frac{1}{H}\sum_{i=1}^{H} a_{t,i}, \qquad
+  \sigma_t^2 = \frac{1}{H}\sum_{i=1}^{H} (a_{t,i} - \mu_t)^2, \qquad
+  \mathrm{LN}(a_t) = \gamma \odot \frac{a_t - \mu_t}{\sqrt{\sigma_t^2 + \epsilon}} + \beta .
+  \label{eq:ln}
+\end{equation}
 Hàm dưới khớp \texttt{nn.LayerNorm} (\SL{theory/checks/layer_norm}).
 
 \maNguon{theory__layer_norm}{Layer Normalization theo từng mẫu}

@@ -3,20 +3,20 @@
     "file": "kkbox_torch_rnn.pth",
     "params": 6849,
     "device": "cuda",
-    "best_epoch": 15,
-    "epochs_run": 19,
-    "epoch_s": 0.591285747368889,
-    "train_s": 11.23442920000889,
-    "best_val_loss": 1.1388661688486734
+    "best_epoch": 9,
+    "epochs_run": 13,
+    "epoch_s": 0.46174575384569694,
+    "train_s": 6.00269479999406,
+    "best_val_loss": 1.1376399087905884
   },
   "kkbox_torch_lstm": {
     "file": "kkbox_torch_lstm.pth",
     "params": 21057,
     "device": "cuda",
     "best_epoch": 17,
-    "epochs_run": 20,
-    "epoch_s": 0.597183479999876,
-    "train_s": 11.94366959999752,
+    "epochs_run": 21,
+    "epoch_s": 0.5685094142851691,
+    "train_s": 11.938697699988552,
     "best_val_loss": 1.1256912843704223
   },
   "kkbox_torch_gru": {
@@ -25,8 +25,8 @@
     "device": "cuda",
     "best_epoch": 10,
     "epochs_run": 14,
-    "epoch_s": 0.7516609142858215,
-    "train_s": 10.5232528000015,
+    "epoch_s": 0.6196118071436233,
+    "train_s": 8.674565300010727,
     "best_val_loss": 1.1261073795318604
   },
   "kkbox_torch_bilstm": {
@@ -35,8 +35,8 @@
     "device": "cuda",
     "best_epoch": 9,
     "epochs_run": 13,
-    "epoch_s": 2.3099009538454993,
-    "train_s": 30.02871239999149,
+    "epoch_s": 1.106433869229267,
+    "train_s": 14.38364029998047,
     "best_val_loss": 1.1269926953951517
   }
 }

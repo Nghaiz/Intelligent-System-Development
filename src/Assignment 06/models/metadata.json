@@ -6,8 +6,8 @@
       "device": "cpu",
       "best_epoch": 2,
       "epochs_run": 10,
-      "epoch_s": 0.9260105899993505,
-      "train_s": 9.260105899993505,
+      "epoch_s": 0.8198455500009004,
+      "train_s": 8.198455500009004,
       "best_val_loss": 0.2345510870218277
     },
     "amzn_keras_lstm": {
@@ -16,8 +16,8 @@
       "device": "cpu",
       "best_epoch": 1,
       "epochs_run": 9,
-      "epoch_s": 1.447869088888385,
-      "train_s": 13.030821799995465,
+      "epoch_s": 1.158549377777187,
+      "train_s": 10.426944399994682,
       "best_val_loss": 0.22330747544765472
     },
     "amzn_keras_gru": {
@@ -26,8 +26,8 @@
       "device": "cpu",
       "best_epoch": 2,
       "epochs_run": 10,
-      "epoch_s": 1.4503442599994743,
-      "train_s": 14.503442599994742,
+      "epoch_s": 1.288646940000035,
+      "train_s": 12.886469400000351,
       "best_val_loss": 0.22391961514949799
     },
     "amzn_keras_bilstm": {
@@ -36,8 +36,8 @@
       "device": "cpu",
       "best_epoch": 1,
       "epochs_run": 9,
-      "epoch_s": 2.0690032333336097,
-      "train_s": 18.621029100002488,
+      "epoch_s": 2.078992322223106,
+      "train_s": 18.710930900007952,
       "best_val_loss": 0.23042859137058258
     },
     "amzn_torch_rnn": {
@@ -86,8 +86,8 @@
       "device": "cpu",
       "best_epoch": 5,
       "epochs_run": 9,
-      "epoch_s": 2.7434251666660807,
-      "train_s": 24.690826499994728,
+      "epoch_s": 2.5954907222217622,
+      "train_s": 23.35941649999586,
       "best_val_loss": 1.1576212644577026
     },
     "kkbox_keras_lstm": {
@@ -96,8 +96,8 @@
       "device": "cpu",
       "best_epoch": 7,
       "epochs_run": 11,
-      "epoch_s": 16.871882427271473,
-      "train_s": 185.59070669998619,
+      "epoch_s": 9.86734442727307,
+      "train_s": 108.54078870000376,
       "best_val_loss": 1.1309945583343506
     },
     "kkbox_keras_gru": {
@@ -106,8 +106,8 @@
       "device": "cpu",
       "best_epoch": 15,
       "epochs_run": 19,
-      "epoch_s": 19.345520710526262,
-      "train_s": 367.564893499999,
+      "epoch_s": 8.261555821052369,
+      "train_s": 156.96956059999502,
       "best_val_loss": 1.1294959783554077
     },
     "kkbox_keras_bilstm": {
@@ -116,28 +116,28 @@
       "device": "cpu",
       "best_epoch": 8,
       "epochs_run": 12,
-      "epoch_s": 53.420274841666775,
-      "train_s": 641.0432981000013,
+      "epoch_s": 17.545292908333675,
+      "train_s": 210.54351490000408,
       "best_val_loss": 1.132210373878479
     },
     "kkbox_torch_rnn": {
       "file": "kkbox_torch_rnn.pth",
       "params": 6849,
       "device": "cuda",
-      "best_epoch": 15,
-      "epochs_run": 19,
-      "epoch_s": 0.591285747368889,
-      "train_s": 11.23442920000889,
-      "best_val_loss": 1.1388661688486734
+      "best_epoch": 9,
+      "epochs_run": 13,
+      "epoch_s": 0.46174575384569694,
+      "train_s": 6.00269479999406,
+      "best_val_loss": 1.1376399087905884
     },
     "kkbox_torch_lstm": {
       "file": "kkbox_torch_lstm.pth",
       "params": 21057,
       "device": "cuda",
       "best_epoch": 17,
-      "epochs_run": 20,
-      "epoch_s": 0.597183479999876,
-      "train_s": 11.94366959999752,
+      "epochs_run": 21,
+      "epoch_s": 0.5685094142851691,
+      "train_s": 11.938697699988552,
       "best_val_loss": 1.1256912843704223
     },
     "kkbox_torch_gru": {
@@ -146,8 +146,8 @@
       "device": "cuda",
       "best_epoch": 10,
       "epochs_run": 14,
-      "epoch_s": 0.7516609142858215,
-      "train_s": 10.5232528000015,
+      "epoch_s": 0.6196118071436233,
+      "train_s": 8.674565300010727,
       "best_val_loss": 1.1261073795318604
     },
     "kkbox_torch_bilstm": {
@@ -156,8 +156,8 @@
       "device": "cuda",
       "best_epoch": 9,
       "epochs_run": 13,
-      "epoch_s": 2.3099009538454993,
-      "train_s": 30.02871239999149,
+      "epoch_s": 1.106433869229267,
+      "train_s": 14.38364029998047,
       "best_val_loss": 1.1269926953951517
     }
   },
@@ -168,7 +168,7 @@
     "kkbox_keras": "gru"
   },
   "thresholds": {
-    "kkbox_torch_rnn": 0.6238847999377839,
+    "kkbox_torch_rnn": 0.6954958336699381,
     "kkbox_torch_lstm": 0.6569825992679269,
     "kkbox_torch_gru": 0.7611507958782856,
     "kkbox_torch_bilstm": 0.6836734536841655,
@@ -885,7 +885,7 @@
       },
       "kkbox": {
         "task": "clf",
-        "epochs": 20,
+        "epochs": 60,
         "batch": 512,
         "patience": 4
       }

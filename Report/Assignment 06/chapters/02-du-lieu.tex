@@ -28,8 +28,9 @@ MA50 và Volatility20 chỉ dùng để phân tích. Bỏ \SL{amzn/n_raw} $-$ \S
 MA50, còn lại \SL{amzn/n_feat} phiên. Bảng~\ref{tab:amzn-desc} cho thống kê mô tả.
 
 \begin{table}[H]
-  \centering\small
-  \caption{Thống kê mô tả của AMZN, \SL{amzn/n_feat} phiên}
+  \centering\footnotesize
+  \setlength{\tabcolsep}{4.5pt}
+  \caption{Thống kê mô tả 10 đặc trưng của AMZN, \SL{amzn/n_feat} phiên}
   \label{tab:amzn-desc}
   \input{generated/tab_amzn_desc}
 \end{table}
@@ -52,7 +53,13 @@ Hình~\ref{fig:return} xem xét log-return. Return trung bình \SL{amzn/ret/mean
 \SL{amzn/ret/max_date} ($r = \SL{amzn/ret/max}$), đều trong giai đoạn dot-com. Phân phối có đuôi dày: độ nhọn dư
 (excess kurtosis) là \SL{amzn/ret/kurt}, trong khi phân phối chuẩn có độ nhọn dư bằng 0. Tỉ lệ phiên lệch quá 4 độ lệch
 chuẩn là \SL{amzn/ret/tail4}\,\%, nếu phân phối chuẩn thì chỉ \SL{amzn/ret/tail4_gauss}\,\%. Biến động
-(ô c) tụ thành cụm: những giai đoạn dao động mạnh kéo dài nhiều tháng. Ô d cho thấy năm cột giá gần như trùng nhau
+(ô c) tụ thành cụm: những giai đoạn dao động mạnh kéo dài nhiều tháng (hiệu ứng ARCH). Biến động 20 phiên năm hoá đạt
+đỉnh \SL{amzn/crisis/dotcom/max} vào \SL{amzn/crisis/dotcom/date} khi bong bóng dot-com vỡ,
+\SL{amzn/crisis/gfc/max} vào \SL{amzn/crisis/gfc/date} trong khủng hoảng tài chính 2008, và
+\SL{amzn/crisis/covid/max} vào \SL{amzn/crisis/covid/date} khi COVID-19 bùng phát, trong khi trung vị của giai đoạn
+yên ả 2012--2019 chỉ là \SL{amzn/calm_volat}. Khối lượng giao dịch tương quan dương với biến động
+($r = \SL{amzn/lev/vol_volat}$), còn mức giá tương quan âm với biến động ($r = \SL{amzn/lev/close_volat}$): giai
+đoạn giá thấp đầu những năm 2000 cũng là giai đoạn dao động mạnh nhất. Ô d cho thấy năm cột giá gần như trùng nhau
 (tương quan gần 1). Chúng mang thông tin về mức giá, còn Return và RSI14 mang thông tin về thay đổi.
 
 \begin{figure}[H]
@@ -196,5 +203,21 @@ sẽ đo mức trần này.
   \label{tab:ttest}
   \input{generated/tab_ttest}
 \end{table}
+
+Để kiểm chứng nhận định ``tín hiệu nằm ở xu hướng'', notebook 02 tính tương quan của từng đặc trưng với nhãn churn
+theo ba cách tóm tắt chuỗi: trung bình cả tháng, trung bình 7 ngày cuối, và xu hướng (7 ngày cuối trừ 7 ngày đầu).
+Hình~\ref{fig:labelcorr} cho thấy cột xu hướng mạnh hơn hẳn ở cả tám đặc trưng. Với \texttt{active}, độ lớn tương quan tăng từ
+\SL{kkbox/label_corr/active/mean} (trung bình) lên \SL{kkbox/label_corr/active/last7} (7 ngày cuối) và
+\SL{kkbox/label_corr/active/trend} (xu hướng); với \texttt{total\_secs} là \SL{kkbox/label_corr/total_secs/mean},
+\SL{kkbox/label_corr/total_secs/last7} và \SL{kkbox/label_corr/total_secs/trend}. Mọi tương quan đều âm: nghe ít đi
+thì dễ rời bỏ hơn. Một mô hình chỉ nhìn giá trị trung bình sẽ bỏ lỡ phần lớn tín hiệu; mô hình hồi quy đọc cả chuỗi
+nên thấy được sự thay đổi này.
+
+\begin{figure}[H]
+  \centering
+  \hinh{f2_kkbox_label_corr}
+  \caption{Tương quan từng đặc trưng với nhãn churn theo ba cách tóm tắt chuỗi 31 ngày}
+  \label{fig:labelcorr}
+\end{figure}
 
 \maNguon{data_churn__stratified_split}{Chia train/val/test phân tầng theo nhãn}

@@ -1,0 +1,25 @@
+% Năm dạng bài toán chuỗi theo quan hệ giữa đầu vào và đầu ra; hai bài của báo cáo đều là many-to-one.
+\begin{tikzpicture}[font=\scriptsize, x=1cm, y=1cm,
+  vin/.style={khoiG, minimum width=4.5mm, minimum height=4.5mm, inner sep=0pt},
+  hid/.style={khoi, minimum width=4.5mm, minimum height=4.5mm, inner sep=0pt},
+  vout/.style={khoiC, minimum width=4.5mm, minimum height=4.5mm, inner sep=0pt},
+  ar/.style={-{Stealth[length=1.2mm]}, ptitblue}]
+  % \panel{x}{tên}{mẫu ví dụ}{số ô}{danh sách ô có đầu vào}{danh sách ô có đầu ra}
+  \newcommand{\panel}[6]{%
+    \begin{scope}[xshift=#1cm]
+      \foreach \i in {1,...,#4} {
+        \node[hid] (h\i) at (0.62*\i, 1) {};
+        \ifnum\i>1 \pgfmathtruncatemacro\p{\i-1}\draw[ar] (h\p) -- (h\i);\fi
+      }
+      \foreach \i in {#5} { \node[vin] (x\i) at (0.62*\i, 0) {}; \draw[ar] (x\i) -- (h\i); }
+      \foreach \i in {#6} { \node[vout] (y\i) at (0.62*\i, 2) {}; \draw[ar] (h\i) -- (y\i); }
+      \node[font=\scriptsize\bfseries, anchor=south] at (0.31*#4+0.31, 2.35) {#2};
+      \node[nhan, anchor=north, align=center, text width=24mm] at (0.31*#4+0.31, -0.35) {#3};
+    \end{scope}}
+  \panel{0}{One-to-one}{MLP, CNN\\(ảnh $\to$ nhãn)}{1}{1}{1}
+  \panel{1.9}{One-to-many}{chú thích ảnh}{3}{1}{1,2,3}
+  \panel{4.8}{Many-to-one}{\textbf{AMZN, KKBox}\\(chuỗi $\to$ một giá trị)}{3}{1,2,3}{3}
+  \panel{7.7}{Many-to-many (đồng bộ)}{gán nhãn từng bước}{3}{1,2,3}{1,2,3}
+  \panel{10.6}{Seq2seq}{dịch máy}{4}{1,2}{3,4}
+  \draw[accentRed, thick, rounded corners] (4.75,-1.3) rectangle (7.45,2.8);
+\end{tikzpicture}

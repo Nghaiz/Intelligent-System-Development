@@ -8,8 +8,10 @@
     {Giá đóng cửa \SL{app/stock/torch/last_date}: \textbf{\SL{app/stock/torch/last_close}} USD\\[2pt]
      Dự báo phiên kế tiếp:\\{\large\bfseries\color{ptitblue}\SL{app/stock/torch/pred_close}} USD
      {\color{loyalC}(\SL{app/stock/torch/change_pctSgn}\,\%)}\\[2pt]
-     \SL{app/stock/torch/model_label} · PyTorch · \SL{app/stock/torch/latency_ms} ms};
-  \begin{axis}[at={(4.9cm,0.75cm)}, a06, width=10.2cm, height=6.2cm, xmin=0, xmax=101, title={100 phiên gần nhất},
+     \SL{app/stock/torch/model_label} · PyTorch · \SL{app/stock/torch/latency_ms} ms\\[2pt]
+     RSI-14: \textbf{\SL{app/stock/torch/rsi14}} (\SL{app/stock/torch/rsi_zone})\\[1pt]
+     {\tiny\itshape\SL{app/stock/torch/note}}};
+  \begin{axis}[at={(5.5cm,0.75cm)}, a06, width=9.6cm, height=6.2cm, xmin=0, xmax=101, title={100 phiên gần nhất},
     xtick={0,99}, xticklabels={\SL{app/history/first}, \SL{app/history/last}},
     legend style={at={(0.02,0.98)}, anchor=north west}, tick label style={font=\tiny}]
     \addplot[mOne, thick] table[x=i, y=close]{figdata/app_stock.dat};

@@ -5,8 +5,8 @@
     "device": "cpu",
     "best_epoch": 5,
     "epochs_run": 9,
-    "epoch_s": 2.7434251666660807,
-    "train_s": 24.690826499994728,
+    "epoch_s": 2.5954907222217622,
+    "train_s": 23.35941649999586,
     "best_val_loss": 1.1576212644577026
   },
   "kkbox_keras_lstm": {
@@ -15,8 +15,8 @@
     "device": "cpu",
     "best_epoch": 7,
     "epochs_run": 11,
-    "epoch_s": 16.871882427271473,
-    "train_s": 185.59070669998619,
+    "epoch_s": 9.86734442727307,
+    "train_s": 108.54078870000376,
     "best_val_loss": 1.1309945583343506
   },
   "kkbox_keras_gru": {
@@ -25,8 +25,8 @@
     "device": "cpu",
     "best_epoch": 15,
     "epochs_run": 19,
-    "epoch_s": 19.345520710526262,
-    "train_s": 367.564893499999,
+    "epoch_s": 8.261555821052369,
+    "train_s": 156.96956059999502,
     "best_val_loss": 1.1294959783554077
   },
   "kkbox_keras_bilstm": {
@@ -35,8 +35,8 @@
     "device": "cpu",
     "best_epoch": 8,
     "epochs_run": 12,
-    "epoch_s": 53.420274841666775,
-    "train_s": 641.0432981000013,
+    "epoch_s": 17.545292908333675,
+    "train_s": 210.54351490000408,
     "best_val_loss": 1.132210373878479
   }
 }

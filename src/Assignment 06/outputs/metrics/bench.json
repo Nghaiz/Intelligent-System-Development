@@ -14,8 +14,8 @@
       "device": "cuda",
       "best_val_loss": 0.22126092419904822,
       "file": "amzn_torch_rnn.pth",
-      "latency_ms": 0.3541000005498063,
-      "throughput": 71729.78046675169,
+      "latency_ms": 0.3132499987259507,
+      "throughput": 83344.18543777132,
       "size_kb": 29.849609375
     },
     "amzn_torch_lstm": {
@@ -32,8 +32,8 @@
       "device": "cuda",
       "best_val_loss": 0.22056575639575135,
       "file": "amzn_torch_lstm.pth",
-      "latency_ms": 0.26979999893228523,
-      "throughput": 45762.90880013163,
+      "latency_ms": 0.2319999985047616,
+      "throughput": 53313.89596202953,
       "size_kb": 85.3603515625
     },
     "amzn_torch_gru": {
@@ -50,8 +50,8 @@
       "device": "cuda",
       "best_val_loss": 0.21986482400520174,
       "file": "amzn_torch_gru.pth",
-      "latency_ms": 0.7869500004744623,
-      "throughput": 34919.72555446559,
+      "latency_ms": 0.780550002673408,
+      "throughput": 37275.12975563541,
       "size_kb": 66.849609375
     },
     "amzn_torch_bilstm": {
@@ -68,8 +68,8 @@
       "device": "cuda",
       "best_val_loss": 0.22261263307403115,
       "file": "amzn_torch_bilstm.pth",
-      "latency_ms": 0.438150000263704,
-      "throughput": 24150.487724058927,
+      "latency_ms": 0.37149999843677506,
+      "throughput": 26222.65698472324,
       "size_kb": 167.7568359375
     },
     "amzn_keras_rnn": {
@@ -81,13 +81,13 @@
       "params": 6785,
       "best_epoch": 2,
       "epochs_run": 10,
-      "epoch_s": 0.9260105899993505,
-      "train_s": 9.260105899993505,
+      "epoch_s": 0.8198455500009004,
+      "train_s": 8.198455500009004,
       "device": "cpu",
       "best_val_loss": 0.2345510870218277,
       "file": "amzn_keras_rnn.keras",
-      "latency_ms": 0.921900002140319,
-      "throughput": 103080.33023889092,
+      "latency_ms": 0.8337500003108289,
+      "throughput": 81669.11259133574,
       "size_kb": 108.1376953125
     },
     "amzn_keras_lstm": {
@@ -99,13 +99,13 @@
       "params": 20801,
       "best_epoch": 1,
       "epochs_run": 9,
-      "epoch_s": 1.447869088888385,
-      "train_s": 13.030821799995465,
+      "epoch_s": 1.158549377777187,
+      "train_s": 10.426944399994682,
       "device": "cpu",
       "best_val_loss": 0.22330747544765472,
       "file": "amzn_keras_lstm.keras",
-      "latency_ms": 1.2477000018407125,
-      "throughput": 24318.419306102656,
+      "latency_ms": 1.0357499995734543,
+      "throughput": 28993.221702453928,
       "size_kb": 272.45703125
     },
     "amzn_keras_gru": {
@@ -117,13 +117,13 @@
       "params": 16321,
       "best_epoch": 2,
       "epochs_run": 10,
-      "epoch_s": 1.4503442599994743,
-      "train_s": 14.503442599994742,
+      "epoch_s": 1.288646940000035,
+      "train_s": 12.886469400000351,
       "device": "cpu",
       "best_val_loss": 0.22391961514949799,
       "file": "amzn_keras_gru.keras",
-      "latency_ms": 1.39129999843135,
-      "throughput": 30396.941301106344,
+      "latency_ms": 1.2520999989646953,
+      "throughput": 35357.8950958888,
       "size_kb": 219.94921875
     },
     "amzn_keras_bilstm": {
@@ -135,43 +135,43 @@
       "params": 41537,
       "best_epoch": 1,
       "epochs_run": 9,
-      "epoch_s": 2.0690032333336097,
-      "train_s": 18.621029100002488,
+      "epoch_s": 2.078992322223106,
+      "train_s": 18.710930900007952,
       "device": "cpu",
       "best_val_loss": 0.23042859137058258,
       "file": "amzn_keras_bilstm.keras",
-      "latency_ms": 2.756150001005153,
-      "throughput": 11394.464337232568,
+      "latency_ms": 1.7157500005851034,
+      "throughput": 14713.954404199127,
       "size_kb": 525.8447265625
     },
     "kkbox_torch_rnn": {
-      "acc": 0.8865333333333333,
-      "precision": 0.3483050847457627,
-      "recall": 0.30580357142857145,
-      "f1": 0.32567353407290023,
-      "roc_auc": 0.670255214435657,
-      "pr_auc": 0.28352188203517714,
-      "threshold": 0.6238847999377839,
+      "acc": 0.9003333333333333,
+      "precision": 0.4180238870792617,
+      "recall": 0.2864583333333333,
+      "f1": 0.33995584988962474,
+      "roc_auc": 0.6720161162370631,
+      "pr_auc": 0.2923357060932062,
+      "threshold": 0.6954958336699381,
       "confusion": [
         [
-          12887,
-          769
+          13120,
+          536
         ],
         [
-          933,
-          411
+          959,
+          385
         ]
       ],
       "params": 6849,
-      "best_epoch": 15,
-      "epochs_run": 19,
-      "epoch_s": 0.591285747368889,
-      "train_s": 11.23442920000889,
+      "best_epoch": 9,
+      "epochs_run": 13,
+      "epoch_s": 0.46174575384569694,
+      "train_s": 6.00269479999406,
       "device": "cuda",
-      "best_val_loss": 1.1388661688486734,
+      "best_val_loss": 1.1376399087905884,
       "file": "kkbox_torch_rnn.pth",
-      "latency_ms": 0.37620000148308463,
-      "throughput": 72650.90673226531,
+      "latency_ms": 0.3356000015628524,
+      "throughput": 48697.90180571534,
       "size_kb": 29.8603515625
     },
     "kkbox_torch_lstm": {
@@ -194,14 +194,14 @@
       ],
       "params": 21057,
       "best_epoch": 17,
-      "epochs_run": 20,
-      "epoch_s": 0.597183479999876,
-      "train_s": 11.94366959999752,
+      "epochs_run": 21,
+      "epoch_s": 0.5685094142851691,
+      "train_s": 11.938697699988552,
       "device": "cuda",
       "best_val_loss": 1.1256912843704223,
       "file": "kkbox_torch_lstm.pth",
-      "latency_ms": 0.2644000014697667,
-      "throughput": 46941.469864475745,
+      "latency_ms": 0.39449999894713983,
+      "throughput": 48670.58949373576,
       "size_kb": 85.37109375
     },
     "kkbox_torch_gru": {
@@ -225,13 +225,13 @@
       "params": 16321,
       "best_epoch": 10,
       "epochs_run": 14,
-      "epoch_s": 0.7516609142858215,
-      "train_s": 10.5232528000015,
+      "epoch_s": 0.6196118071436233,
+      "train_s": 8.674565300010727,
       "device": "cuda",
       "best_val_loss": 1.1261073795318604,
       "file": "kkbox_torch_gru.pth",
-      "latency_ms": 0.8926999998948304,
-      "throughput": 30302.13357586755,
+      "latency_ms": 1.482949999626726,
+      "throughput": 22344.515766903678,
       "size_kb": 66.8603515625
     },
     "kkbox_torch_bilstm": {
@@ -255,13 +255,13 @@
       "params": 42049,
       "best_epoch": 9,
       "epochs_run": 13,
-      "epoch_s": 2.3099009538454993,
-      "train_s": 30.02871239999149,
+      "epoch_s": 1.106433869229267,
+      "train_s": 14.38364029998047,
       "device": "cuda",
       "best_val_loss": 1.1269926953951517,
       "file": "kkbox_torch_bilstm.pth",
-      "latency_ms": 0.3954999992856756,
-      "throughput": 25556.42629088127,
+      "latency_ms": 0.42219999886583537,
+      "throughput": 24379.907527520274,
       "size_kb": 167.767578125
     },
     "kkbox_keras_rnn": {
@@ -285,13 +285,13 @@
       "params": 6785,
       "best_epoch": 5,
       "epochs_run": 9,
-      "epoch_s": 2.7434251666660807,
-      "train_s": 24.690826499994728,
+      "epoch_s": 2.5954907222217622,
+      "train_s": 23.35941649999586,
       "device": "cpu",
       "best_val_loss": 1.1576212644577026,
       "file": "kkbox_keras_rnn.keras",
-      "latency_ms": 0.922549999813782,
-      "throughput": 99238.26877811497,
+      "latency_ms": 0.8471500004816335,
+      "throughput": 113623.75451023309,
       "size_kb": 108.2041015625
     },
     "kkbox_keras_lstm": {
@@ -315,13 +315,13 @@
       "params": 20801,
       "best_epoch": 7,
       "epochs_run": 11,
-      "epoch_s": 16.871882427271473,
-      "train_s": 185.59070669998619,
+      "epoch_s": 9.86734442727307,
+      "train_s": 108.54078870000376,
       "device": "cpu",
       "best_val_loss": 1.1309945583343506,
       "file": "kkbox_keras_lstm.keras",
-      "latency_ms": 1.142999999501626,
-      "throughput": 24985.48206988088,
+      "latency_ms": 1.6339499998139217,
+      "throughput": 17626.05902469655,
       "size_kb": 272.51953125
     },
     "kkbox_keras_gru": {
@@ -345,13 +345,13 @@
       "params": 16321,
       "best_epoch": 15,
       "epochs_run": 19,
-      "epoch_s": 19.345520710526262,
-      "train_s": 367.564893499999,
+      "epoch_s": 8.261555821052369,
+      "train_s": 156.96956059999502,
       "device": "cpu",
       "best_val_loss": 1.1294959783554077,
       "file": "kkbox_keras_gru.keras",
-      "latency_ms": 1.5623499984940281,
-      "throughput": 32313.64431123918,
+      "latency_ms": 1.7853999997896608,
+      "throughput": 35229.92342861727,
       "size_kb": 220.01171875
     },
     "kkbox_keras_bilstm": {
@@ -375,13 +375,13 @@
       "params": 41537,
       "best_epoch": 8,
       "epochs_run": 12,
-      "epoch_s": 53.420274841666775,
-      "train_s": 641.0432981000013,
+      "epoch_s": 17.545292908333675,
+      "train_s": 210.54351490000408,
       "device": "cpu",
       "best_val_loss": 1.132210373878479,
       "file": "kkbox_keras_bilstm.keras",
-      "latency_ms": 2.079050000247662,
-      "throughput": 10988.657216302832,
+      "latency_ms": 1.8696500010264572,
+      "throughput": 14363.704710986069,
       "size_kb": 525.9072265625
     }
   },
@@ -394,56 +394,56 @@
   "cmp": {
     "amzn_rnn": {
       "diff": 0.08034639442332336,
-      "lat_ratio": 2.6035018376416192,
-      "thr_ratio": 0.6958629284609038,
+      "lat_ratio": 2.6616121427034445,
+      "thr_ratio": 1.0205104817878636,
       "param_diff": -64
     },
     "amzn_lstm": {
       "diff": 0.0011519541671898281,
-      "lat_ratio": 4.624536718971084,
-      "thr_ratio": 1.8818208627831137,
+      "lat_ratio": 4.4644396821071375,
+      "thr_ratio": 1.8388400057492453,
       "param_diff": -256
     },
     "amzn_gru": {
       "diff": -0.008817817820018892,
-      "lat_ratio": 1.7679649248268854,
-      "thr_ratio": 1.148790768405196,
+      "lat_ratio": 1.6041252894448963,
+      "thr_ratio": 1.0542236650272072,
       "param_diff": 0
     },
     "amzn_bilstm": {
       "diff": 0.011291027870295345,
-      "lat_ratio": 6.290425651823218,
-      "thr_ratio": 2.1194930283071542,
+      "lat_ratio": 4.618438782785362,
+      "thr_ratio": 1.782162446910921,
       "param_diff": -512
     },
     "kkbox_rnn": {
-      "diff": -0.0015663912157573567,
-      "lat_ratio": 2.4522860079129036,
-      "thr_ratio": 0.732085591846671,
+      "diff": -0.015848707032481868,
+      "lat_ratio": 2.5242848526118857,
+      "thr_ratio": 0.4285890922688138,
       "param_diff": -64
     },
     "kkbox_lstm": {
       "diff": -0.004948333521908377,
-      "lat_ratio": 4.3229954355061695,
-      "thr_ratio": 1.8787498169211647,
+      "lat_ratio": 4.141825105639251,
+      "thr_ratio": 2.7612859701389585,
       "param_diff": -256
     },
     "kkbox_gru": {
       "diff": 0.0034673076242215384,
-      "lat_ratio": 1.7501400231635371,
-      "thr_ratio": 0.9377504215867105,
+      "lat_ratio": 1.2039515831545666,
+      "thr_ratio": 0.6342482069873937,
       "param_diff": 0
     },
     "kkbox_bilstm": {
       "diff": -0.0007786129417956533,
-      "lat_ratio": 5.256763600512507,
-      "thr_ratio": 2.3257096647773867,
+      "lat_ratio": 4.428351506510983,
+      "thr_ratio": 1.6973272577006766,
       "param_diff": -512
     }
   },
   "lat_median": {
-    "torch": 0.3858500003843801,
-    "keras": 1.3195000001360313
+    "torch": 0.38299999869195744,
+    "keras": 1.4430249993893085
   },
   "best": {
     "amzn_torch": "gru",

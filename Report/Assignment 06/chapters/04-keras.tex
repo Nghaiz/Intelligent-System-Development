@@ -120,7 +120,7 @@ năng dễ sai như thế nào nếu không kiểm soát môi trường.
 Bảng~\ref{tab:bench-amzn}, Bảng~\ref{tab:bench-kkbox} và Hình~\ref{fig:scatter} cho bốn kết luận.
 
 \textbf{Chất lượng gần như không phụ thuộc framework.} Trên KKBox, F1 của cùng một kiến trúc ở hai framework chênh nhau
-từ \SL{bench/cmp/kkbox_bilstm/diffPct} đến \SL{bench/cmp/kkbox_gru/diffPct} điểm phần trăm. Trên AMZN, RMSE chênh không
+từ \SL{bench/cmp/kkbox_rnn/diffPct} (Simple RNN) đến \SL{bench/cmp/kkbox_gru/diffPct} (GRU) điểm phần trăm. Trên AMZN, RMSE chênh không
 quá \SL{bench/cmp/amzn_bilstm/diff} USD, trừ Simple RNN của Keras kém hơn \SL{bench/cmp/amzn_rnn/diff} USD vì dừng ở
 epoch \SL{bench/models/amzn_keras_rnn/best_epoch}. Mỗi mô hình chỉ chạy một seed, nên những chênh lệch cỡ này nằm trong mức
 dao động của khởi tạo ngẫu nhiên, không đủ để nói framework nào học tốt hơn.
@@ -131,8 +131,10 @@ lời gọi eager của PyTorch nhẹ hơn lời gọi \texttt{tf.function}. BiL
 \SL{bench/cmp/amzn_bilstm/lat_ratio} lần.
 
 \textbf{Với lô lớn, khoảng cách hẹp lại và có chỗ đảo chiều.} Ở lô 256, Keras Simple RNN xử lý
-\SL{bench/models/kkbox_keras_rnn/throughput} mẫu/giây, nhiều hơn PyTorch (\SL{bench/models/kkbox_torch_rnn/throughput}).
-Với LSTM và BiLSTM, PyTorch vẫn nhanh hơn khoảng hai lần. Chọn framework theo tốc độ cần biết trước ứng dụng phục vụ từng
+\SL{bench/models/kkbox_keras_rnn/throughput} mẫu/giây trên KKBox, nhiều hơn PyTorch
+(\SL{bench/models/kkbox_torch_rnn/throughput}); Keras GRU trên KKBox cũng nhanh hơn
+(\SL{bench/models/kkbox_keras_gru/throughput} so với \SL{bench/models/kkbox_torch_gru/throughput}). Với LSTM và BiLSTM,
+PyTorch vẫn nhanh hơn, từ \SL{bench/cmp/kkbox_bilstm/thr_ratio} đến \SL{bench/cmp/kkbox_lstm/thr_ratio} lần. Chọn framework theo tốc độ cần biết trước ứng dụng phục vụ từng
 yêu cầu một hay theo lô.
 
 \textbf{Mô hình ``tốt nhất'' khác nhau tuỳ tiêu chí.} Theo val loss (tiêu chí dùng để chọn mô hình cho Web App), mô hình

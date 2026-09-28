@@ -35,9 +35,11 @@ Bảng~\ref{tab:api} liệt kê các endpoint.
     Phương thức & Đường dẫn & Vào $\to$ ra \\
     \midrule
     GET & \texttt{/api/stock/history} & $\to$ 100 phiên gần nhất: ngày, Close, MA20 \\
-    POST & \texttt{/api/stock/predict} & \texttt{\{framework, model\}} $\to$ giá dự báo, \% thay đổi, độ trễ \\
+    POST & \texttt{/api/stock/predict} & \texttt{\{framework, model\}} $\to$ giá dự báo, \% thay đổi, RSI-14 và vùng
+                                        RSI, ghi chú rủi ro, độ trễ \\
     POST & \texttt{/api/churn/predict} & \texttt{\{preset\}} hoặc \texttt{\{sequence\}} ($31\times8$), \texttt{framework},
-                                        \texttt{model} $\to$ xác suất, mức rủi ro, ngưỡng, độ trễ \\
+                                        \texttt{model} $\to$ xác suất, mức rủi ro, ngưỡng, xu hướng nghe, khuyến nghị,
+                                        độ trễ \\
     GET & \texttt{/api/meta} & $\to$ danh sách mô hình, mô hình tốt nhất, người dùng mẫu \\
     GET & \texttt{/} & $\to$ trang giao diện \\
     \bottomrule
@@ -62,11 +64,24 @@ không thể lệch khỏi dữ liệu huấn luyện.
 
 \maNguon{app__stock_predict}{Endpoint dự báo giá phiên kế tiếp}
 
+Kèm theo giá dự báo, phân hệ trả về RSI-14 của phiên mới nhất và vùng của nó theo ngưỡng 70/30 của
+Wilder~\cite{wilder1978} (quá mua, trung tính, quá bán). Mỗi dự báo cũng mang một ghi chú cố định: mô hình không thắng
+được mốc ngây thơ trên tập test (Chương~\ref{ch:keras}), nên con số chỉ để minh hoạ, không phải khuyến nghị đầu tư. Giao
+diện hiện ghi chú này ngay dưới kết quả, để người dùng không đọc dự báo nhiều hơn những gì nó nói được.
+
 Phân hệ churn nhận hoặc tên một người dùng mẫu, hoặc một ma trận $31 \times 8$ bất kỳ. Đầu vào sai shape bị từ chối với mã
 400 và thông báo lỗi rõ ràng, không đưa vào mô hình. Xác suất được so với ngưỡng của đúng mô hình đó để xếp mức rủi ro:
 cao khi vượt ngưỡng, trung bình khi vượt nửa ngưỡng, còn lại là thấp.
 
 \maNguon{app__churn_predict}{Endpoint dự báo churn}
+
+Để kết quả dùng được cho bộ phận chăm sóc khách hàng, phân hệ trả thêm hai thông tin. Thứ nhất là \emph{xu hướng nghe}:
+$\log(1+\text{giây nghe})$ trung bình 7 ngày cuối trừ 7 ngày đầu, chính là tóm tắt có tương quan mạnh nhất với nhãn churn ở
+Chương~\ref{ch:dulieu}. Thứ hai là một \emph{khuyến nghị can thiệp} theo mức rủi ro: rủi ro cao thì liên hệ trước ngày hết
+hạn gói và tặng ưu đãi gia hạn, rủi ro trung bình thì gửi nhắc gia hạn và theo dõi thêm, rủi ro thấp thì chăm sóc bình
+thường.
+
+\maNguon{app__listening_trend}{Xu hướng nghe trả về cùng xác suất churn}
 
 \section{Giao diện}
 

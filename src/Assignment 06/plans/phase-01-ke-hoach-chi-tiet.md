@@ -3,7 +3,7 @@
 **Đề tài:** Mạng nơ-ron hồi quy (RNN, LSTM, GRU, BiLSTM) trên hai tập dữ liệu chuỗi thực tế, hiện thực bằng PyTorch và Keras, triển khai Web App
 **Sinh viên:** Nguyễn Duy Nghĩa · B23DCCN600 · D23CTPM01 · GVHD PGS.TS Trần Đình Quế
 **Sản phẩm cuối:** `Report/Assignment 06/A06_CT_nghiand.600.pdf` và mã nguồn trong `src/Assignment 06/`
-**Trạng thái:** hoàn thành (2026-09-28). 7 notebook đã chạy, 16 mô hình, Web App qua smoke test, báo cáo 44 trang `A06_CT_nghiand.600.pdf` (bìa theo mẫu A04). Khác kế hoạch: AMZN cũng huấn luyện trên GPU (đo được nhanh hơn CPU khoảng 3 lần); độ trễ Keras đo qua `tf.function`; Chương 1 thêm đường LSTM có bias cổng quên b_f = 3 vì LSTM khởi tạo mặc định suy giảm gradient gần như RNN
+**Trạng thái:** hoàn thành (2026-09-28). 7 notebook đã chạy, 16 mô hình, Web App qua smoke test, báo cáo 44 trang `A06_CT_nghiand.600.pdf` (bìa theo mẫu A04). Khác kế hoạch: AMZN cũng huấn luyện trên GPU (đo được nhanh hơn CPU khoảng 3 lần); độ trễ Keras đo qua `tf.function`; Chương 1 thêm đường LSTM có bias cổng quên b_f = 3 vì LSTM khởi tạo mặc định suy giảm gradient gần như RNN. Rà soát lại theo báo cáo mẫu (2026-09-28): nâng trần KKBox 20 → 60 epoch (LSTM từng chạm trần), thêm 5 dạng bài toán chuỗi, batch-first, trường thụ cảm/nhân quả Conv1D, bảng thống kê 10 đặc trưng, tương quan với nhãn theo xu hướng, khuyến nghị/RSI trên Web App, mục Hướng phát triển; báo cáo 49 trang
 
 **Nguồn yêu cầu:** trong repo không có đề gốc bài 06 (`TAILIEU/` dừng ở `slide-assign_04`). Yêu cầu được suy ra từ báo cáo mẫu `tmp/A06_CT_tupv.879.pdf` (49 trang, 6 chương). Bảng ở Mục 1 liệt kê 6 hạng mục rút ra từ báo cáo đó; nếu sau này có đề gốc thì đối chiếu lại bảng này trước tiên.
 

@@ -24,6 +24,38 @@ def count_params_rnn(D, H):
     return H * (D + H + 1)
 
 
+def receptive_field(L, K, dilated=False):
+    """Số bước quá khứ một nơ-ron ở tầng L của Conv1D nhìn thấy.
+
+    Thường: 1 + L(K-1), tăng tuyến tính theo số tầng. Giãn nở 2^l (TCN): 1 + (K-1)(2^L - 1).
+    Dù loại nào cũng là một hằng số chốt lúc thiết kế; RNN không có giới hạn này.
+    """
+    return 1 + (K - 1) * (2 ** L - 1) if dilated else 1 + L * (K - 1)
+
+
+def future_dependence(conv, T=10, t=4):
+    """Đầu ra ở bước t có phụ thuộc đầu vào ở các bước SAU t không? Trả về chuẩn gradient theo x_{t+1..T}.
+
+    Khác 0 nghĩa là lớp tích chập nhìn thấy tương lai (rò rỉ khi dự báo chuỗi thời gian).
+    """
+    x = torch.randn(1, conv.in_channels, T, requires_grad=True)
+    conv(x)[0, :, t].sum().backward()
+    return x.grad[0, :, t + 1:].norm().item()
+
+
+class CausalConv1d(nn.Module):
+    """Tích chập nhân quả: đệm K-1 giá trị bên TRÁI, không đệm bên phải, nên y_t chỉ dùng x_{t-K+1..t}."""
+
+    def __init__(self, c_in, c_out, K):
+        super().__init__()
+        self.pad = K - 1
+        self.in_channels = c_in
+        self.conv = nn.Conv1d(c_in, c_out, K)
+
+    def forward(self, x):
+        return self.conv(nn.functional.pad(x, (self.pad, 0)))
+
+
 # ---------------------------------------------------------------- Simple RNN
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))

@@ -16,7 +16,8 @@ from .models_torch import CELLS, build_torch, count_params
 SEED = 42
 CFG = {
     "amzn": {"task": "reg", "epochs": 60, "batch": 64, "patience": 8},
-    "kkbox": {"task": "clf", "epochs": 20, "batch": 512, "patience": 4},
+    # Trần 60 epoch: với trần 20, LSTM còn cải thiện ở epoch 17 và bị cắt ở epoch 20 (chưa hội tụ).
+    "kkbox": {"task": "clf", "epochs": 60, "batch": 512, "patience": 4},
 }
 OPT = {"lr": 1e-3, "weight_decay": 1e-4, "clip": 1.0}
 

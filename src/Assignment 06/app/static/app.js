@@ -33,7 +33,8 @@ async function initStock(meta) {
       `Giá đóng cửa ${r.last_date}: <b>${r.last_close}</b> USD<br>` +
       `Dự báo phiên kế tiếp: <span class="so">${r.pred_close}</span> USD ` +
       `<span class="${up ? "thap" : "cao"}">(${up ? "+" : ""}${r.change_pct} %)</span><br>` +
-      `${r.model_label} · ${fw.value === "torch" ? "PyTorch" : "Keras"} · ${r.latency_ms} ms`;
+      `${r.model_label} · ${fw.value === "torch" ? "PyTorch" : "Keras"} · ${r.latency_ms} ms<br>` +
+      `RSI-14: <b>${r.rsi14}</b> (${r.rsi_zone})<br><small><i>${r.note}</i></small>`;
     const ds = stockChart.data;
     ds.labels = [...ds.labels.slice(0, 100), "phiên kế tiếp"];
     ds.datasets[2] = {label: "Dự báo", data: [...Array(99).fill(null), r.last_close, r.pred_close],
@@ -55,7 +56,9 @@ async function initChurn(meta) {
     document.getElementById("c-out").innerHTML =
       `Xác suất churn: <span class="so">${(100 * r.prob).toFixed(1)} %</span><br>` +
       `Mức rủi ro: <b class="${cls}">${r.risk}</b> (ngưỡng từ val: ${(100 * r.threshold).toFixed(1)} %)<br>` +
-      `${r.model_label} · ${fw.value === "torch" ? "PyTorch" : "Keras"} · ${r.latency_ms} ms`;
+      `${r.model_label} · ${fw.value === "torch" ? "PyTorch" : "Keras"} · ${r.latency_ms} ms<br>` +
+      `Xu hướng nghe (7 ngày cuối − 7 ngày đầu): <b>${r.trend}</b><br>` +
+      `<b>Khuyến nghị:</b> ${r.advice}`;
     const days = r.sequence.map((_, i) => i + 1);
     const data = {labels: days, datasets: [
       {label: "log(1 + giây nghe)", data: r.sequence.map(d => d[secs]), borderColor: "#0072B2", yAxisID: "y"},

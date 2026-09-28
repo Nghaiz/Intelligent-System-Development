@@ -68,6 +68,8 @@
     "params_rnn": true,
     "params_conv1d": true,
     "params_mlp": true,
+    "causal_conv_no_leak": true,
+    "batch_first_equiv": true,
     "rnn_forward": true,
     "clip_grad_norm": true,
     "lstm_cell": true,
@@ -75,8 +77,32 @@
     "bilstm_concat": true,
     "layer_norm": true
   },
-  "n_checks": 9,
+  "n_checks": 11,
   "mask_p": 0.3,
   "mask_keep_std": 0.75,
-  "mask_keep_rec": 0.75
+  "mask_keep_rec": 0.75,
+  "rf": {
+    "L_for_T30": 15,
+    "L_for_T30_dilated": 4,
+    "rf_L4": 9,
+    "rf_L4_dilated": 31
+  },
+  "leak": {
+    "same": 2.004368782043457,
+    "causal": 0.0,
+    "rnn": 0.0
+  },
+  "layout": {
+    "bf_in": [
+      4,
+      30,
+      8
+    ],
+    "tf_in": [
+      30,
+      4,
+      8
+    ]
+  },
+  "gru_lstm_ratio": 0.75
 }

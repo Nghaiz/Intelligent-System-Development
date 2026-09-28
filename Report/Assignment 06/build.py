@@ -112,7 +112,7 @@ def gen_macros(metrics):
                 lines.append(f"\\defSL{{{key}Raw}}{{{v:.6g}}}")     # dạng số thô cho toạ độ pgfplots
                 if leaf in ("roc_auc", "pr_auc", "prob", "threshold", "r2_ret", "diff", "prob_best"):
                     lines.append(f"\\defSL{{{key}Pct}}{{{num(100 * v, 2, sign=leaf in ('r2_ret', 'diff'))}}}")
-                if leaf in ("stat", "t", "diff", "change_pct"):
+                if leaf in ("stat", "t", "diff", "change_pct", "trend"):
                     lines.append(f"\\defSL{{{key}Sgn}}{{{num(v, 2 if abs(v) >= 1 else 4, sign=True)}}}")
     return "\n".join(lines) + "\n"
 
@@ -135,11 +135,14 @@ def bold_best(values, formatted, higher=True):
 
 def tab_amzn_desc(m):
     d = m["amzn"]["desc"]
-    names = {"Close": "Close (USD)", "Volume": "Volume (cp)", "Return": "Return (log)",
+    names = {"Close": "Close (USD)", "Open": "Open (USD)", "High": "High (USD)", "Low": "Low (USD)",
+             "Volume": "Volume (triệu cp)", "Return": "Return (\\%)", "MA20": "MA20 (USD)", "MA50": "MA50 (USD)",
              "Volatility20": "Volatility20 (năm)", "RSI14": "RSI14"}
-    rows = [[n, *(num(d[c][k], 0 if c == "Volume" else 4 if c == "Return" else 2)
-                  for k in ("mean", "std", "min", "max"))] for c, n in names.items()]
-    return table("lrrrr", ["Đặc trưng", "Trung bình", "Độ lệch chuẩn", "Nhỏ nhất", "Lớn nhất"], rows)
+    scale = {"Volume": 1e-6, "Return": 100}
+    keys = ("mean", "std", "min", "q25", "median", "q75", "max")
+    rows = [[n, *(num(d[c][k] * scale.get(c, 1), 2) for k in keys), num(d[c]["kurt"], 2)] for c, n in names.items()]
+    return table("l" + "r" * 8, ["Đặc trưng", "TB", "ĐLC", "Min", "Q25", "Trung vị", "Q75", "Max", "Kurtosis"], rows,
+                 "TB: trung bình; ĐLC: độ lệch chuẩn; kurtosis là độ nhọn dư (phân phối chuẩn bằng 0).")
 
 
 def tab_ttest(m):
@@ -147,8 +150,9 @@ def tab_ttest(m):
     rows = []
     for f, r in t.items():
         p = sci(r["p"]) if r["p"] < 1e-3 else num(r["p"], 4)
-        rows.append([f"\\texttt{{{tex_escape(f)}}}", num(r["loyal"], 3), num(r["churn"], 3), num(r["t"], 2, sign=True), p])
-    return table("lrrrr", ["Đặc trưng (TB 31 ngày)", "Loyal", "Churn", "$t$ Welch", "$p$"], rows,
+        rows.append([f"\\texttt{{{tex_escape(f)}}}", num(r["loyal"], 3), num(r["churn"], 3),
+                     num(r["diff_pct"], 1, sign=True), num(r["t"], 2, sign=True), p])
+    return table("lrrrrr", ["Đặc trưng (TB 31 ngày)", "Loyal", "Churn", "Chênh (\\%)", "$t$ Welch", "$p$"], rows,
                  "Đặc trưng đếm và số giây đã lấy $\\log(1+x)$; \\texttt{active} là tỉ lệ ngày có nghe.")
 
 
