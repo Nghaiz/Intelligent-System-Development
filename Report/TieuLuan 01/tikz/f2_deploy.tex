@@ -1,25 +1,32 @@
-% Kiến trúc ba tầng của Web App: trình duyệt - máy chủ Flask - tầng suy luận nạp sẵn mô hình.
-\begin{tikzpicture}[font=\footnotesize, node distance=6mm,
-  tang/.style={draw=ptitblue, rounded corners=4pt, fill=lightBlue!45, inner sep=6pt},
-  ep/.style={khoi, minimum width=27mm, font=\scriptsize}]
-  % tầng 1
-  \node[khoiG, minimum width=34mm, minimum height=26mm, align=center] (ui) at (0,0)
-    {\textbf{Trình duyệt}\\HTML5 / CSS3\\JavaScript \texttt{fetch}\\biểu đồ SVG};
-  % tầng 2
-  \foreach \e/\y in {diabetes/1.5, house/0.9, sentiment/0.3, vision/-0.3, stock/-0.9, churn/-1.5}
-    \node[ep] (\e) at (5.2,\y) {\texttt{POST /api/\e}};
-  \node[tang, fit=(diabetes)(churn), label={[font=\footnotesize\bfseries, text=ptitblue]above:Máy chủ Flask}] (srv) {};
-  % tầng 3
-  \node[khoiC, minimum width=46mm, align=left, anchor=west] (inf) at (8.2,0) {%
-    \textbf{Tầng suy luận (nạp sẵn lên RAM, CPU)}\\[2pt]
-    MLP PyTorch \texttt{.pt}, Random Forest \texttt{.joblib}\\
-    TF-IDF + Logistic Regression \texttt{.joblib}\\
-    ResNet-18, MobileNetV2 \texttt{.pt} + CAM\\
-    Simple RNN / LSTM / GRU / BiLSTM \texttt{.pt}\\
-    bộ tiền xử lý dựng lại từ \texttt{load\_*()}};
-  \draw[mui, <->] (ui.east) -- node[above, nhan] {JSON} (srv.west);
-  \draw[mui, <->] (srv.east) -- node[above, nhan] {tensor} (inf.west);
-  \node[nhan, below=3mm of ui] {Tầng giao diện};
-  \node[nhan, below=3mm of srv] {Tầng ứng dụng};
-  \node[nhan, below=3mm of inf] {Tầng mô hình};
+% Kiến trúc ba tầng của Web App: trình duyệt (màn hình), máy chủ Flask (khối 3D), tầng mô hình (chồng đĩa).
+\begin{tikzpicture}[font=\small]
+  % tầng 1: màn hình trình duyệt
+  \fill[cSlate!80, rounded corners=4pt] (-0.3,-1.9) rectangle (3.5,1.9);
+  \fill[top color=cSky!30, bottom color=white] (-0.1,-1.5) rectangle (3.3,1.7);
+  \fill[cSlate!60] (1.2,-2.4) rectangle (2.0,-1.9);
+  \fill[cSlate!80, rounded corners=2pt] (0.6,-2.6) rectangle (2.6,-2.35);
+  \foreach \y/\c in {1.25/cBlue, 0.55/cGreen, -0.15/cOrange, -0.85/cPurple}
+    \fill[\c!60, rounded corners=2pt] (0.15,\y-0.2) rectangle (3.05,\y+0.2);
+  \node[font=\footnotesize\bfseries, text=white] at (1.6,1.25) {HTML5 / CSS3};
+  \node[font=\footnotesize\bfseries, text=white] at (1.6,0.55) {JavaScript fetch};
+  \node[font=\footnotesize\bfseries, text=white] at (1.6,-0.15) {biểu đồ SVG};
+  \node[font=\footnotesize\bfseries, text=white] at (1.6,-0.85) {6 thẻ phân hệ};
+  \node[tieude] at (1.6,2.4) {Tầng giao diện};
+  % tầng 2: máy chủ
+  \khoibaD{5.4}{-2.2}{2.6}{4.2}{1.6}{cBlue}
+  \foreach \e/\y in {diabetes/1.4, house/0.75, sentiment/0.1, vision/-0.55, stock/-1.2, churn/-1.85}
+    \node[fill=white, rounded corners=2pt, font=\scriptsize\ttfamily, inner sep=2pt] at (6.7,\y) {/api/\e};
+  \node[tieude] at (7.2,2.85) {Máy chủ Flask};
+  % tầng 3: mô hình (chồng đĩa)
+  \foreach \k/\c/\t in {0/cRed/{RNN: LSTM, GRU…}, 1/cOrange/{CNN: ResNet, MobileNet}, 2/cGreen/{TF-IDF + Logistic}, 3/cPurple/{MLP, Random Forest}} {
+    \pgfmathsetmacro{\yy}{-1.9+1.05*\k}
+    \fill[\c!70!black] (10.4,\yy) rectangle (14.6,\yy+0.5);
+    \fill[\c!70!black] (12.5,\yy) ellipse (2.1 and 0.32);
+    \fill[top color=\c!35, bottom color=\c!70] (10.4,\yy+0.5) rectangle (14.6,\yy+0.5);
+    \fill[\c!45] (12.5,\yy+0.5) ellipse (2.1 and 0.32);
+    \node[font=\footnotesize\bfseries] at (12.5,\yy+0.5) {\t};
+  }
+  \node[tieude] at (12.5,2.9) {Tầng mô hình (RAM, CPU)};
+  \draw[muiM=cNavy, {Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, line width=2pt] (3.6,0) -- node[above, font=\small] {JSON} (5.35,0);
+  \draw[muiM=cNavy, {Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, line width=2pt] (8.9,0) -- node[above, font=\small] {tensor} (10.3,0);
 \end{tikzpicture}

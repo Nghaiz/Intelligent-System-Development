@@ -1,46 +1,47 @@
-% Dòng thời gian 1943-2026: 16 mốc, xen kẽ trên/dưới trục; dải màu là các kỷ nguyên.
-\begin{tikzpicture}[x=0.162cm, y=1cm, font=\scriptsize,
-  moc/.style={draw=ptitblue, fill=white, rounded corners=1.5pt, align=center, inner sep=2pt, text width=21mm}]
-  % các kỷ nguyên
-  \foreach \a/\b/\c/\t in {1943/1974/lightBlue/{Logic biểu tượng},
-                          1974/1980/lightGray/{Đông I},
-                          1980/1987/lightOrange/{Hệ chuyên gia},
-                          1987/1993/lightGray/{Đông II},
-                          1993/2012/lightGreen/{Học máy thống kê},
-                          2012/2020/lightBlue/{Học sâu},
-                          2020/2026/lightOrange/{GenAI}} {
-    \fill[\c] (\a-1940,-0.22) rectangle (\b-1940,0.22);
-    \pgfmathparse{\b-\a>=8 ? 1 : 0}
-    \ifnum\pgfmathresult=1 \node[font=\tiny\bfseries, text=ptitblue] at ({(\a+\b)/2-1940},0) {\t};\fi
-  }
-  \draw[ptitblue, thick] (3,-0.22) rectangle (86,0.22);
-  \foreach \y in {1950,1960,...,2020} \node[nhan] at (\y-1940,-0.42) {\y};
-  % mốc phía trên trục: năm / độ cao / nội dung
-  \foreach \y/\h/\t in {
-      1943/2.7/{McCulloch–Pitts:\\nơ-ron hình thức},
-      1950/0.75/{Turing: phép thử\\“máy có tư duy?”},
-      1969/2.7/{Minsky \& Papert:\\giới hạn XOR},
-      1980/0.75/{XCON, Neocognitron},
-      1995/2.7/{SVM\\(Cortes \& Vapnik)},
-      1998/0.75/{LeNet-5 (LeCun)},
-      2012/2.7/{AlexNet thắng\\ImageNet},
-      2017/0.75/{Transformer:\\“Attention is all\\you need”}} {
-    \draw[ptitblue!60] (\y-1940,0.22) -- (\y-1940,\h);
-    \fill[ptitred] (\y-1940,0) circle (0.9pt);
-    \node[moc, anchor=south] at (\y-1940,\h) {\textbf{\y}\\\t};
+% Dòng thời gian 1943-2026: 16 mốc, thẻ tô màu theo kỷ nguyên, xen kẽ trên/dưới trục.
+\begin{tikzpicture}[x=0.172cm, y=1cm, font=\scriptsize,
+  moc/.style={rounded corners=3pt, draw=#1!70!black, thick, top color=white, bottom color=#1!22, align=center,
+              inner sep=3pt, text width=23mm, blur shadow={shadow blur steps=5, shadow opacity=30}},
+  diem/.style={circle, ball color=#1, minimum size=3.2mm, inner sep=0pt}]
+  % trục kỷ nguyên dạng mũi tên dày nhiều màu
+  \foreach \a/\b/\c in {1940/1974/cBlue, 1974/1980/cSlate, 1980/1987/cOrange, 1987/1993/cSlate,
+                        1993/2012/cGreen, 2012/2020/cPurple, 2020/2027/cRed}
+    \shade[left color=\c!70, right color=\c!40] (\a-1940,-0.3) rectangle (\b-1940,0.3);
+  \fill[cRed!40] (87,-0.42) -- (89.5,0) -- (87,0.42) -- cycle;
+  \foreach \y in {1950,1960,...,2020} {
+    \draw[white, thick] (\y-1940,-0.3) -- (\y-1940,-0.12);
+    \node[font=\scriptsize\bfseries, text=cNavy] at (\y-1940,-0.55) {\y};}
+  % chú giải kỷ nguyên ở hàng dưới cùng
+  \foreach \i/\c/\t in {0/cBlue/{Logic biểu tượng}, 1/cSlate/{Mùa đông AI}, 2/cOrange/{Hệ chuyên gia},
+                        3/cGreen/{Học máy thống kê}, 4/cPurple/{Học sâu}, 5/cRed/{AI tạo sinh}} {
+    \fill[\c!60, rounded corners=1pt] (2+15*\i,-5.15) rectangle ++(3,0.32);
+    \node[anchor=west, font=\scriptsize] at (5.4+15*\i,-4.99) {\t};}
+  % mốc phía trên trục
+  \foreach \y/\h/\c/\t in {
+      1943/2.85/cBlue/{McCulloch–Pitts:\\nơ-ron hình thức},
+      1950/0.85/cBlue/{Turing: “máy có\\tư duy không?”},
+      1969/2.85/cBlue/{Minsky \& Papert:\\giới hạn XOR},
+      1980/0.85/cOrange/{XCON,\\Neocognitron},
+      1995/2.85/cGreen/{SVM\\(Cortes \& Vapnik)},
+      1998/0.85/cGreen/{LeNet-5\\(LeCun)},
+      2012/2.85/cPurple/{AlexNet thắng\\ImageNet},
+      2017/0.85/cPurple/{Transformer\\“Attention…”}} {
+    \draw[\c!70!black, thick] (\y-1940,0.3) -- (\y-1940,\h);
+    \node[diem=\c] at (\y-1940,0) {};
+    \node[moc=\c, anchor=south] at (\y-1940,\h) {\textbf{\color{\c!70!black}\y}\\\t};
   }
   % mốc phía dưới trục
-  \foreach \y/\h/\t in {
-      1956/-0.75/{Hội thảo Dartmouth:\\khai sinh “AI”},
-      1958/-2.6/{Rosenblatt:\\Perceptron},
-      1973/-0.75/{Báo cáo Lighthill},
-      1986/-2.6/{Lan truyền ngược\\(Rumelhart, Hinton)},
-      1997/-0.75/{LSTM; Deep Blue},
-      2001/-2.6/{Random Forest\\(Breiman)},
-      2015/-0.75/{ResNet vượt\\mắt người},
-      2022/-2.6/{ChatGPT; LLM,\\RAG, đa tác tử}} {
-    \draw[ptitblue!60] (\y-1940,-0.22) -- (\y-1940,\h);
-    \fill[ptitred] (\y-1940,0) circle (0.9pt);
-    \node[moc, anchor=north] at (\y-1940,\h) {\textbf{\y}\\\t};
+  \foreach \y/\h/\c/\t in {
+      1956/-0.85/cBlue/{Hội thảo Dartmouth:\\khai sinh “AI”},
+      1958/-2.85/cBlue/{Rosenblatt:\\Perceptron},
+      1973/-0.85/cSlate/{Báo cáo Lighthill:\\mùa đông I},
+      1986/-2.85/cOrange/{Lan truyền ngược\\(Rumelhart, Hinton)},
+      1997/-0.85/cGreen/{LSTM;\\Deep Blue},
+      2001/-2.85/cGreen/{Random Forest\\(Breiman)},
+      2015/-0.85/cPurple/{ResNet vượt\\mắt người},
+      2022/-2.85/cRed/{ChatGPT, LLM,\\RAG, đa tác tử}} {
+    \draw[\c!70!black, thick] (\y-1940,-0.3) -- (\y-1940,\h);
+    \node[diem=\c] at (\y-1940,0) {};
+    \node[moc=\c, anchor=north] at (\y-1940,\h) {\textbf{\color{\c!70!black}\y}\\\t};
   }
 \end{tikzpicture}

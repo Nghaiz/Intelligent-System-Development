@@ -1,6 +1,6 @@
 # Tiểu luận 01 — Học máy cơ bản, CNN và RNN trong hệ thống thông minh
 
-Mã nguồn của báo cáo [`Report/TieuLuan 01/tieuluan01_CT_nghiand.600.pdf`](../../Report/TieuLuan%2001/tieuluan01_CT_nghiand.600.pdf).
+Mã nguồn của báo cáo [`Report/TieuLuan 01/tieuluan01_CT_07_nghiand.600.pdf`](../../Report/TieuLuan%2001/tieuluan01_CT_07_nghiand.600.pdf).
 
 | Chương | Mô hình | Dữ liệu |
 |---|---|---|

@@ -1,22 +1,21 @@
-% Cửa sổ trượt 30 phiên -> lợi suất phiên kế tiếp; chia theo thời gian 80/20, không xáo trộn.
-\begin{tikzpicture}[font=\footnotesize, x=0.95cm, y=1cm]
-  \fill[lightBlue] (0,0) rectangle (10.08,0.6);
-  \fill[lightOrange] (10.08,0) rectangle (11.2,0.6);
-  \fill[lightGreen] (11.2,0) rectangle (14,0.6);
-  \draw[ptitblue] (0,0) rectangle (14,0.6);
-  \node at (5.0,0.3) {huấn luyện: \SL{eda/stock/n_train} cửa sổ (90 \% đầu)};
-  \node at (10.64,0.3) {kiểm định};
-  \node at (12.6,0.3) {kiểm thử: \SL{eda/stock/n_test}};
-  \node[nhan, below] at (0,0) {\SL{eda/stock/start}};
-  \node[nhan, below] at (11.2,0) {\SL{eda/stock/test_start}};
-  \node[nhan, below] at (14,0) {\SL{eda/stock/end}};
-  \draw[-{Stealth}, gray] (0,-0.65) -- (14.3,-0.65) node[right] {thời gian};
-  \foreach \k/\s in {0/0, 1/0.35, 2/0.7} {
-    \pgfmathsetmacro\y{1.3+0.75*\k}
-    \foreach \i in {0,...,9} \draw[fill=lightBlue, draw=ptitblue] (\s+0.3*\i,\y) rectangle ++(0.3,0.45);
-    \draw[fill=accentRed!70, draw=accentRed] (\s+3.0,\y) rectangle ++(0.3,0.45);
-    \node[anchor=west, nhan] at (\s+3.45,\y+0.22) {$\to\ r_{t+1}$};
+% Cửa sổ trượt 30 phiên -> lợi suất phiên kế tiếp; chia theo thời gian 80/20 (10 % cuối phần huấn luyện làm kiểm định).
+\begin{tikzpicture}[font=\small, x=0.95cm, y=1cm]
+  \shade[left color=cBlue!55, right color=cBlue!35, rounded corners=3pt] (0,0) rectangle (10.08,0.8);
+  \shade[left color=cOrange!60, right color=cOrange!45] (10.08,0) rectangle (11.2,0.8);
+  \shade[left color=cGreen!55, right color=cGreen!40, rounded corners=3pt] (11.2,0) rectangle (14,0.8);
+  \node[font=\small\bfseries, text=white] at (5.0,0.4) {huấn luyện: \SL{eda/stock/n_train} cửa sổ};
+  \node[font=\small\bfseries, text=white, rotate=0] at (10.64,0.4) {k.định};
+  \node[font=\small\bfseries, text=white] at (12.6,0.4) {kiểm thử: \SL{eda/stock/n_test}};
+  \node[nhan, below] at (0,-0.05) {\SL{eda/stock/start}};
+  \node[nhan, below] at (11.2,-0.05) {\SL{eda/stock/test_start}};
+  \node[nhan, below] at (14,-0.05) {\SL{eda/stock/end}};
+  \draw[-{Stealth}, very thick, gray] (0,-0.75) -- (14.4,-0.75) node[right] {thời gian};
+  \foreach \k/\s/\c in {0/0/cBlue, 1/0.35/cTeal, 2/0.7/cPurple} {
+    \pgfmathsetmacro\y{1.5+0.85*\k}
+    \foreach \i in {0,...,9} \fill[\c!45, draw=\c!70!black] (\s+0.3*\i,\y) rectangle ++(0.3,0.5);
+    \fill[cRed!75, draw=cRed!70!black] (\s+3.0,\y) rectangle ++(0.3,0.5);
+    \node[anchor=west, font=\small, text=cRed!70!black] at (\s+3.4,\y+0.25) {$\to\ r_{t+1}$};
   }
-  \draw[decorate, decoration={brace, amplitude=4pt}] (0,3.4) -- node[above=3pt] {$T = 30$ phiên $\times$ 9 đặc trưng} (3.0,3.4);
-  \node[anchor=west, align=left] at (5.3,2.35) {mỗi bước trượt thêm 1 phiên; giá trong cửa sổ chia cho\\giá đóng cửa ngày cuối cửa sổ; thống kê khối lượng chỉ\\tính trên phần huấn luyện; nhãn $r_{t+1}$ là lợi suất (\%)};
+  \draw[decorate, decoration={brace, amplitude=5pt}, very thick, cNavy] (0,3.9) -- node[above=4pt] {$T = 30$ phiên $\times$ 9 đặc trưng} (3.0,3.9);
+  \node[hop=cSlate, anchor=west, align=left, font=\small] at (5.6,2.65) {mỗi bước trượt thêm 1 phiên;\\giá trong cửa sổ chia cho giá đóng cửa ngày cuối;\\thống kê khối lượng chỉ tính trên phần huấn luyện;\\nhãn $r_{t+1}$ là lợi suất phiên kế tiếp (\%)};
 \end{tikzpicture}

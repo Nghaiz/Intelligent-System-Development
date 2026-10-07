@@ -1,29 +1,28 @@
-% Tích chập 5x5 * 3x3 (bộ lọc cạnh dọc) -> 3x3, số đã kiểm bằng NumPy.
-\begin{tikzpicture}[x=6.5mm, y=6.5mm]
+% Tích chập 5x5 * 3x3 (bộ lọc cạnh dọc) -> 3x3; ô tô màu theo giá trị, số đã kiểm bằng NumPy.
+\begin{tikzpicture}[x=8.5mm, y=8.5mm, font=\small,
+  cell/.style={draw=white, very thick, minimum size=8.5mm, inner sep=0pt, font=\small\bfseries}]
   \def\X{{{1,0,2,1,0},{0,1,3,1,1},{2,1,0,0,2},{1,0,1,2,1},{0,2,1,0,1}}}
   \def\Y{{{-2,0,2},{-1,-1,0},{1,1,-2}}}
   \foreach \i in {0,...,4} \foreach \j in {0,...,4} {
     \pgfmathtruncatemacro{\v}{\X[\i][\j]}
-    \node[o] at (\j, -\i) {\v};}
-  \begin{scope}[on background layer]
-    \fill[lightBlue] (0.5, 0.5) rectangle (3.5, -2.5);
-  \end{scope}
-  \draw[ptitblue, very thick] (0.5, 0.5) rectangle (3.5, -2.5);
-  \node[above] at (2, 0.6) {$X$ (5×5)};
-  \node at (5.4, -2) {\Large $\ast$};
-  \foreach \i in {0,...,2} \foreach \j/\k in {0/1, 1/0, 2/-1}
-    \node[o, fill=lightOrange] at (6.5+\j, -1-\i) {\k};
-  \node[above] at (7.5, -0.4) {$K$ (3×3)};
-  \node at (10, -2) {\Large $=$};
+    \pgfmathtruncatemacro{\p}{12+28*\v}
+    \node[cell, fill=cBlue!\p] at (\j, -\i) {\v};}
+  \draw[cOrange, line width=2.4pt, rounded corners=2pt] (0.5, 0.5) rectangle (3.5, -2.5);
+  \node[tieude] at (2, 1.1) {Ảnh vào $X$ (5×5)};
+  \node at (5.4, -2) {\huge $\ast$};
+  \foreach \i in {0,...,2} \foreach \j/\k/\c in {0/1/cGreen!55, 1/0/gray!15, 2/-1/cRed!45}
+    \node[cell, fill=\c] at (6.6+\j, -1-\i) {\k};
+  \node[tieude] at (7.6, -0.2) {Bộ lọc $K$ (3×3)};
+  \node at (10.1, -2) {\huge $=$};
   \foreach \i in {0,...,2} \foreach \j in {0,...,2} {
     \pgfmathtruncatemacro{\v}{\Y[\i][\j]}
-    \node[o] at (11+\j, -1-\i) {\v};}
-  \node[o, fill=lightBlue, draw=ptitblue, very thick] at (12, -1) {0};
-  \node[above] at (12, -0.4) {$Y$ (3×3)};
-  \draw[-{Stealth}, ptitblue, thick] (3.5, 0) to[bend left=25] (11.7, -0.75);
-  \node[font=\footnotesize, align=left, anchor=north west, text width=88mm] at (-0.5, -5) {%
-    $Y_{0,1} = \sum_{u=0}^{2}\sum_{v=0}^{2} X_{u,\,1+v}\,K_{u,v}
-      = (0 - 1) + (1 - 1) + (1 - 0) = 0$: tổng tích của vùng tô xanh với bộ lọc.
-    Bộ lọc này cho giá trị lớn khi cột trái sáng hơn cột phải, tức là phát hiện \emph{cạnh dọc};
-    trượt cửa sổ (bước $s = 1$, không đệm) qua mọi vị trí được bản đồ đặc trưng $3{\times}3$.};
+    \ifnum\v<0 \pgfmathtruncatemacro{\p}{-25*\v}\def\c{cRed}\else\pgfmathtruncatemacro{\p}{10+25*\v}\def\c{cGreen}\fi
+    \node[cell, fill=\c!\p] at (11.3+\j, -1-\i) {\v};}
+  \draw[cOrange, line width=2.4pt, rounded corners=2pt] (11.8, -0.5) rectangle (12.8, -1.5);
+  \node[tieude] at (12.3, -0.2) {Đầu ra $Y$ (3×3)};
+  \draw[muiM=cOrange, line width=2pt] (3.5, 0.2) to[bend left=22] (12.0, -0.45);
+  \node[hop=cOrange, font=\small, text width=125mm, anchor=north] at (6.3, -4.9) {%
+    $Y_{0,1} = \sum_{u=0}^{2}\sum_{v=0}^{2} X_{u,\,1+v}\,K_{u,v} = (0 - 1) + (1 - 1) + (1 - 0) = 0$:
+    tổng tích của vùng viền cam với bộ lọc. Bộ lọc cho giá trị dương khi cột trái sáng hơn cột phải (phát hiện
+    \emph{cạnh dọc}); trượt bước $s = 1$, không đệm, được bản đồ đặc trưng $3{\times}3$.};
 \end{tikzpicture}

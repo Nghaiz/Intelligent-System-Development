@@ -1,0 +1,29 @@
+% Class Activation Map: các bản đồ đặc trưng cuối f_k nhân với trọng số FC của lớp c rồi cộng lại.
+\begin{tikzpicture}[font=\small]
+  \foreach \k/\c/\w in {0/cBlue/w_1^c, 1/cGreen/w_2^c, 2/cPurple/w_3^c, 3/cOrange/w_K^c} {
+    \pgfmathsetmacro{\yy}{2.4-1.25*\k}
+    \begin{scope}[shift={(0,\yy)}]
+      \foreach \i in {0,...,3} \foreach \j in {0,...,3} {
+        \pgfmathsetmacro{\p}{mod(7*\i+5*\j+3*\k,9)*9+10}
+        \fill[\c!\p, draw=white] (0.25*\j,0.25*\i) rectangle ++(0.25,0.25);}
+      \node[anchor=west, font=\small] at (1.15,0.5) {$\times\ \w$};
+    \end{scope}
+  }
+  \node[tieude, align=center] at (0.5,4.0) {Bản đồ đặc trưng\\cuối $f_k(x,y)$};
+  \draw[decorate, decoration={brace, amplitude=6pt}, very thick, cNavy] (2.4,3.5) -- (2.4,-1.5);
+  \node[cau=cOrange, minimum size=12mm, font=\LARGE] (s) at (3.6,1.0) {$\Sigma$};
+  \draw[mui] (s) -- (5.2,1.0);
+  % bản đồ CAM nhiệt
+  \begin{scope}[shift={(5.4,-0.4)}]
+    \foreach \i in {0,...,7} \foreach \j in {0,...,7} {
+      \pgfmathsetmacro{\d}{sqrt((\i-4.5)^2+(\j-3.5)^2)}
+      \pgfmathtruncatemacro{\p}{max(0,100-24*\d)}
+      \ifnum\p>50 \pgfmathtruncatemacro{\q}{2*\p-100}\def\mau{cRed!\q!cYellow}%
+      \else \pgfmathtruncatemacro{\q}{2*\p}\def\mau{cYellow!\q!cBlue}\fi
+      \fill[\mau, draw=none] (0.35*\j,0.35*\i) rectangle ++(0.35,0.35);}
+    \draw[cNavy, thick] (0,0) rectangle (2.8,2.8);
+    \node[tieude, align=center] at (1.4,3.5) {CAM lớp $c$\\$M_c = \sum_k w_k^c f_k$};
+  \end{scope}
+  \draw[mui] (8.4,1.0) -- (9.2,1.0);
+  \node[hop=cRed, text width=48mm, anchor=west] at (9.4,1.0) {phóng về kích thước ảnh, phủ lên ảnh gốc: vùng đỏ là bằng chứng mô hình dùng để chọn lớp $c$};
+\end{tikzpicture}

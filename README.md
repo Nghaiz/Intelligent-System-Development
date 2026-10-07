@@ -23,7 +23,7 @@ Bài tập lớn học phần **Phát triển các Hệ thống Thông minh** �
 
 | # | Chủ đề | Nội dung chính | Mã nguồn | Báo cáo |
 |---|---|---|---|---|
-| **TL01** | Học máy cơ bản, CNN và RNN trong hệ thống thông minh | Lịch sử AI; Linear/Logistic/SVM/Random Forest và MLP (NumPy, Keras, PyTorch) trên tiểu đường, giá nhà Việt Nam, nhận xét khách hàng; Custom CNN, VGG-11, MobileNetV2, ResNet-18 trên SVHN và EuroSAT; RNN/LSTM/GRU/BiLSTM trên cổ phiếu VN30 và KKBox; Web App Flask sáu phân hệ | [`src/TieuLuan 01`](src/TieuLuan%2001) | [PDF](Report/TieuLuan%2001/tieuluan01_CT_nghiand.600.pdf) |
+| **TL01** | Học máy cơ bản, CNN và RNN trong hệ thống thông minh | Lịch sử AI; Linear/Logistic/SVM/Random Forest và MLP (NumPy, Keras, PyTorch) trên tiểu đường, giá nhà Việt Nam, nhận xét khách hàng; Custom CNN, VGG-11, MobileNetV2, ResNet-18 trên SVHN và EuroSAT; RNN/LSTM/GRU/BiLSTM trên cổ phiếu VN30 và KKBox; Web App Flask sáu phân hệ | [`src/TieuLuan 01`](src/TieuLuan%2001) | [PDF](Report/TieuLuan%2001/tieuluan01_CT_07_nghiand.600.pdf) |
 
 Mỗi bài có README riêng trong thư mục mã nguồn, hướng dẫn dựng lại từ đầu.
 

@@ -18,6 +18,16 @@ EUROSAT_CLASSES_VI = {
 }
 
 
+SHORT = {"Cây hằng năm": "Cây h.năm", "Rừng": "Rừng", "Thảm cỏ": "Thảm cỏ", "Đường cao tốc": "Cao tốc",
+         "Khu công nghiệp": "C.nghiệp", "Đồng cỏ chăn thả": "Đồng cỏ", "Cây lâu năm": "Cây l.năm",
+         "Khu dân cư": "Dân cư", "Sông": "Sông", "Biển/hồ": "Biển/hồ"}
+
+
+def short(name):
+    """Tên lớp ngắn cho nhãn dưới ảnh nhỏ trong hình lưới."""
+    return SHORT.get(name, name)
+
+
 def download_svhn():
     from torchvision.datasets import SVHN
     raw = VISION / "raw"

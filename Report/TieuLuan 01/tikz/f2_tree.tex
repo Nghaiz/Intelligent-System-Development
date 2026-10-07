@@ -1,0 +1,20 @@
+% Cây quyết định độ sâu 2 huấn luyện thật trên 80.000 hồ sơ tiểu đường (make_extra.py): ngưỡng, Gini, số mẫu, tỉ lệ mắc.
+\begin{tikzpicture}[font=\small, level distance=27mm,
+  level 1/.style={sibling distance=80mm}, level 2/.style={sibling distance=46mm},
+  q/.style={hop=cBlue, text width=36mm},
+  la/.style={hop=#1, text width=32mm},
+  edge from parent/.style={draw=cNavy, very thick, -{Stealth[length=2.4mm]}},
+  every child node/.style={anchor=north},
+  co/.style={font=\small\bfseries, text=cGreen!55!black, fill=white, inner sep=1pt},
+  khong/.style={font=\small\bfseries, text=cRed!70!black, fill=white, inner sep=1pt}]
+  \node[q] {\textbf{HbA1c $\le$ 6,7 \%?}\\Gini = \SL{extra/ch2/tree/nodes/0/gini}\\$N$ = \SL{extra/ch2/tree/nodes/0/n}\\mắc: \SL{extra/ch2/tree/nodes/0/p1Pct} \%}
+    child { node[q] {\textbf{Đường huyết $\le$ 210?}\\Gini = \SL{extra/ch2/tree/nodes/1/gini}\\$N$ = \SL{extra/ch2/tree/nodes/1/n}}
+      child { node[la=cGreen] {\textbf{Dự đoán: không mắc}\\$N$ = \SL{extra/ch2/tree/nodes/2/n}\\mắc: \SL{extra/ch2/tree/nodes/2/p1Pct} \%}
+              edge from parent node[co, left] {có} }
+      child { node[la=cRed] {\textbf{Dự đoán: mắc}\\$N$ = \SL{extra/ch2/tree/nodes/3/n}\\mắc: \SL{extra/ch2/tree/nodes/3/p1Pct} \%}
+              edge from parent node[khong, right] {không} }
+      edge from parent node[co, left] {có} }
+    child { node[la=cRed] {\textbf{Dự đoán: mắc}\\Gini = \SL{extra/ch2/tree/nodes/4/gini} (thuần)\\$N$ = \SL{extra/ch2/tree/nodes/4/n}\\mắc: \SL{extra/ch2/tree/nodes/4/p1Pct} \%}
+      edge from parent node[khong, right] {không} };
+  \node[hop=cPurple, anchor=north, text width=50mm] at (4.9,-5.4) {Hai câu hỏi đạt Accuracy \SL{extra/ch2/tree/accPct} \% và F1 \SL{extra/ch2/tree/f1} trên tập kiểm thử};
+\end{tikzpicture}

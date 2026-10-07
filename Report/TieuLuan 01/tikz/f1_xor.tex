@@ -1,0 +1,23 @@
+% Bài toán XOR: (a) không đường thẳng nào tách được; (b) một tầng ẩn hai nơ-ron tạo dải phân tách.
+\begin{tikzpicture}[font=\small]
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=18mm}, a06, width=7.2cm, height=7.2cm,
+  xmin=-0.4, xmax=1.4, ymin=-0.4, ymax=1.5, xtick={0,1}, ytick={0,1}, xlabel={$x_1$}, ylabel={$x_2$}]
+  \nextgroupplot[title={(a) Perceptron một tầng: thất bại}]
+  \addplot[cRed!70, dashed, very thick, domain=-0.4:1.4] {0.5};
+  \addplot[cRed!70, dashed, very thick, domain=-0.4:1.4] {1.2 - x};
+  \addplot[cRed!70, dashed, very thick] coordinates {(0.55,-0.4) (0.55,1.5)};
+  \addplot[only marks, mark=*, mark size=6pt, cBlue, mark options={draw=cNavy, thick}] coordinates {(0,0) (1,1)};
+  \addplot[only marks, mark=square*, mark size=6pt, cOrange, mark options={draw=cBrown, thick}] coordinates {(0,1) (1,0)};
+  \node[font=\small, fill=white, rounded corners=2pt, align=center] at (axis cs:0.5,1.33) {đường nào cũng sai\\ít nhất một điểm};
+  \nextgroupplot[title={(b) MLP 2 nơ-ron ẩn: thành công}]
+  \addplot[name path=l1, draw=cGreen!70!black, very thick, domain=-0.4:1.4] {1.5 - x};
+  \addplot[name path=l2, draw=cGreen!70!black, very thick, domain=-0.4:1.4] {0.5 - x};
+  \addplot[cGreen!25] fill between[of=l1 and l2];
+  \addplot[only marks, mark=*, mark size=6pt, cBlue, mark options={draw=cNavy, thick}] coordinates {(0,0) (1,1)};
+  \addplot[only marks, mark=square*, mark size=6pt, cOrange, mark options={draw=cBrown, thick}] coordinates {(0,1) (1,0)};
+  \node[font=\small, fill=white, rounded corners=2pt, align=center] at (axis cs:0.75,1.33) {dải giữa hai\\đường: $y = 1$};
+\end{groupplot}
+\node[font=\small] at ($(group c1r1.south)!0.5!(group c2r1.south)+(0,-1.4)$) {%
+  \tikz\node[circle, fill=cBlue, draw=cNavy, inner sep=3pt]{}; nhãn 0 \quad
+  \tikz\node[fill=cOrange, draw=cBrown, inner sep=3pt]{}; nhãn 1};
+\end{tikzpicture}

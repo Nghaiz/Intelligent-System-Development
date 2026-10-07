@@ -1,0 +1,24 @@
+% Mô hình nơ-ron McCulloch-Pitts / Perceptron: đầu vào, trọng số, tổng, hàm kích hoạt, đầu ra, quy tắc cập nhật.
+\begin{tikzpicture}[font=\small]
+  \foreach \i/\y/\c in {1/2.4/cSky, 2/1.2/cTeal, 3/0/cGreen, n/-1.8/cLime} {
+    \node[cau=\c, minimum size=10mm] (x\i) at (0,\y) {$x_{\i}$};
+  }
+  \node at (0,-0.85) {\Large$\vdots$};
+  \node[cau=cSlate, minimum size=10mm] (b) at (0,-3.2) {$1$};
+  \node[cau=cOrange, minimum size=20mm, font=\LARGE\bfseries] (sum) at (4.4,0) {$\Sigma$};
+  \foreach \i/\c in {1/cSky, 2/cTeal, 3/cGreen, n/cLime}
+    \draw[muiM=\c!70!black, line width=1.6pt] (x\i) -- node[pos=0.45, fill=white, rounded corners=2pt, inner sep=1.5pt, font=\small] {$w_{\i}$} (sum);
+  \draw[muiM=cSlate, line width=1.6pt] (b) -- node[pos=0.45, fill=white, rounded corners=2pt, inner sep=1.5pt] {$b = -\theta$} (sum);
+  \node[hop=cPurple, minimum width=26mm, minimum height=16mm] (act) at (9.4,0) {};
+  \draw[white, line width=2pt] ($(act.south west)+(0.35,0.35)$) -- ++(0.85,0) -- ++(0,0.85) -- ++(0.85,0);
+  \draw[cPurple!70!black, line width=1.6pt] ($(act.south west)+(0.35,0.35)$) -- ++(0.85,0) -- ++(0,0.85) -- ++(0.85,0);
+  \node[below=1mm of act, font=\small] {hàm bước $f(z)$};
+  \draw[mui] (sum) -- node[above=3pt, fill=white, rounded corners=2pt, inner sep=1pt] {$z = \sum_i w_i x_i + b$} (act);
+  \node[cau=cRed, minimum size=12mm] (y) at (12.6,0) {$\hat y$};
+  \draw[mui] (act) -- (y);
+  \node[hop=cRed, text width=55mm, anchor=north] at (9.4,-2.1) {\textbf{Quy tắc học Perceptron (1958)}\\[2pt]
+    $\mathbf{w} \leftarrow \mathbf{w} + \eta\,(y - \hat y)\,\mathbf{x}$\\ chỉ cập nhật khi đoán sai};
+  \node[tieude] at (0,3.4) {Đầu vào};
+  \node[tieude] at (4.4,1.5) {Tổng có trọng số};
+  \node[tieude] at (12.6,1.0) {Đầu ra};
+\end{tikzpicture}

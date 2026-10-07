@@ -1,23 +1,36 @@
-% Chu kỳ kỳ vọng (định tính) và hai mùa đông AI; đường cong là minh họa, không phải số đo.
+% Chu kỳ kỳ vọng (định tính) và hai mùa đông AI; vùng dưới đường cong tô chuyển sắc.
 \begin{tikzpicture}
-\begin{axis}[a06, width=14cm, height=5.6cm, xmin=1950, xmax=2026, ymin=0, ymax=10.5,
-  xlabel={Năm}, ylabel={Mức kỳ vọng và đầu tư (định tính)}, ytick=\empty, grid=none,
-  xtick={1950,1960,...,2020}, xticklabel style={/pgf/number format/1000 sep={}}]
-  \fill[lightGray] (axis cs:1974,0) rectangle (axis cs:1980,10.5);
-  \fill[lightGray] (axis cs:1987,0) rectangle (axis cs:1993,10.5);
-  \node[font=\footnotesize\bfseries, text=accentRed, align=center] at (axis cs:1977,9.3) {Mùa đông\\AI lần I};
-  \node[font=\footnotesize\bfseries, text=accentRed, align=center] at (axis cs:1990,9.3) {Mùa đông\\AI lần II};
-  \addplot[ptitblue, very thick, smooth, tension=0.6] coordinates {
+\begin{axis}[a06, width=15.5cm, height=7cm, xmin=1950, xmax=2026, ymin=0, ymax=11,
+  xlabel={Năm}, ylabel={Kỳ vọng và đầu tư (định tính)}, ytick=\empty, grid=none, axis lines=left,
+  xtick={1950,1960,...,2020}, xticklabel style={/pgf/number format/1000 sep={}}, clip=false]
+  \fill[cSlate!18] (axis cs:1974,0) rectangle (axis cs:1980,11);
+  \fill[cSlate!18] (axis cs:1987,0) rectangle (axis cs:1993,11);
+  \node[font=\small\bfseries, text=cRed, align=center] at (axis cs:1977,9.9) {Mùa đông\\AI lần I};
+  \node[font=\small\bfseries, text=cRed, align=center] at (axis cs:1990,9.9) {Mùa đông\\AI lần II};
+  \addplot[name path=hc, draw=none, smooth, tension=0.6] coordinates {
     (1950,1.5) (1956,4.2) (1962,6.6) (1967,7.2) (1971,5.0) (1975,2.0) (1979,2.3)
     (1983,5.8) (1986,7.4) (1989,3.4) (1992,2.2) (1997,3.6) (2003,4.2) (2009,4.9)
     (2012,6.0) (2016,7.6) (2020,8.3) (2023,9.6) (2026,10.0)};
-  \tikzset{nhanhype/.style={font=\scriptsize, anchor=south, fill=white, inner sep=1pt}}
-  \node[nhanhype] at (axis cs:1956,4.3) {Dartmouth};
-  \node[nhanhype] at (axis cs:1965,7.3) {Perceptron, GPS};
-  \node[nhanhype] at (axis cs:1985,7.5) {Hệ chuyên gia, BP};
-  \node[nhanhype, anchor=north west] at (axis cs:2011.5,5.9) {AlexNet};
-  \node[nhanhype, anchor=south east] at (axis cs:2016.5,7.7) {Transformer};
-  \node[nhanhype, anchor=south east] at (axis cs:2022.5,9.7) {LLM};
-  \node[font=\scriptsize, align=left, anchor=west] at (axis cs:1995,1.2) {Học máy thống kê: SVM, Boosting, Random Forest};
+  \addplot[name path=day, draw=none] coordinates {(1950,0) (2026,0)};
+  \addplot[top color=cPurple!55, bottom color=cSky!15, draw=none] fill between[of=hc and day];
+  \addplot[cNavy, line width=2.2pt, smooth, tension=0.6] coordinates {
+    (1950,1.5) (1956,4.2) (1962,6.6) (1967,7.2) (1971,5.0) (1975,2.0) (1979,2.3)
+    (1983,5.8) (1986,7.4) (1989,3.4) (1992,2.2) (1997,3.6) (2003,4.2) (2009,4.9)
+    (2012,6.0) (2016,7.6) (2020,8.3) (2023,9.6) (2026,10.0)};
+  \tikzset{nh/.style={font=\small, fill=white, draw=#1, rounded corners=2pt, inner sep=2pt, text=#1!70!black},
+           ch/.style={circle, ball color=#1, minimum size=2.6mm, inner sep=0pt}}
+  \node[ch=cBlue] at (axis cs:1956,4.2) {};
+  \node[ch=cBlue] at (axis cs:1967,7.2) {};
+  \node[ch=cOrange] at (axis cs:1986,7.4) {};
+  \node[ch=cPurple] at (axis cs:2012,6.0) {};
+  \node[ch=cPurple] at (axis cs:2017,7.8) {};
+  \node[ch=cRed] at (axis cs:2023,9.6) {};
+  \node[nh=cBlue, anchor=south] at (axis cs:1955,4.7) {Dartmouth};
+  \node[nh=cBlue, anchor=south] at (axis cs:1965,7.6) {Perceptron, GPS};
+  \node[nh=cOrange, anchor=south] at (axis cs:1985,7.8) {Hệ chuyên gia, BP};
+  \node[nh=cPurple, anchor=north west] at (axis cs:2012.5,5.8) {AlexNet};
+  \node[nh=cPurple, anchor=south east] at (axis cs:2016.5,8.1) {Transformer};
+  \node[nh=cRed, anchor=south east] at (axis cs:2022.5,9.9) {LLM};
+  \node[nh=cGreen, anchor=north] at (axis cs:2003,3.5) {Học máy thống kê: SVM, Boosting, Random Forest};
 \end{axis}
 \end{tikzpicture}

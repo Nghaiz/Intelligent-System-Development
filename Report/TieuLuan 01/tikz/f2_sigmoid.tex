@@ -1,0 +1,20 @@
+% Hồi quy Logistic: hàm sigmoid ánh xạ z = w^T x + b về xác suất, ngưỡng 0,5; (b) mất mát BCE theo p.
+\begin{tikzpicture}[font=\small]
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=17mm}, a06, width=7.4cm, height=6.2cm]
+  \nextgroupplot[title={(a) $\sigma(z) = 1/(1+e^{-z})$}, xlabel={$z = \mathbf{w}^\top\mathbf{x} + b$}, ylabel={$P(y=1 \mid \mathbf{x})$},
+    xmin=-7, xmax=7, ymin=-0.05, ymax=1.05]
+  \addplot[name path=s, cPurple, line width=2.4pt, domain=-7:7, samples=100] {1/(1+exp(-x))};
+  \addplot[name path=h, draw=none, domain=-7:7] {0.5};
+  \fill[cBlue!15] (axis cs:-7,-0.05) rectangle (axis cs:0,1.05);
+  \fill[cRed!15] (axis cs:0,-0.05) rectangle (axis cs:7,1.05);
+  \addplot[cPurple, line width=2.4pt, domain=-7:7, samples=100] {1/(1+exp(-x))};
+  \addplot[black, dashed, thick] coordinates {(-7,0.5) (7,0.5)};
+  \node[font=\small\bfseries, text=cBlue!70!black] at (axis cs:-3.6,0.85) {đoán 0};
+  \node[font=\small\bfseries, text=cRed!70!black] at (axis cs:3.6,0.15) {đoán 1};
+  \node[fill=white, rounded corners=2pt, font=\small] at (axis cs:2.3,0.42) {ngưỡng 0,5};
+  \nextgroupplot[title={(b) Entropy chéo nhị phân}, xlabel={xác suất dự đoán $p$}, ylabel={mất mát}, xmin=0, xmax=1, ymin=0, ymax=5,
+    legend pos=north east]
+  \addplot[cRed, line width=2.2pt, domain=0.005:1, samples=120] {-ln(x)};      \addlegendentry{$y = 1$: $-\log p$}
+  \addplot[cBlue, line width=2.2pt, domain=0:0.995, samples=120] {-ln(1-x)};   \addlegendentry{$y = 0$: $-\log(1-p)$}
+\end{groupplot}
+\end{tikzpicture}

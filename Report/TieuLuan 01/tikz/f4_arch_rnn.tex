@@ -1,0 +1,30 @@
+% Kiến trúc mạng hồi quy dùng trong thực nghiệm: 2 tầng hồi quy 64 đơn vị mở theo thời gian, lấy h_T của tầng 2,
+% Dropout, Dense 32 - ReLU - Dropout - Dense 1 (lợi suất FPT hoặc logit rời bỏ KKBox).
+\begin{tikzpicture}[font=\small,
+  c1/.style={hop=cBlue, minimum width=11mm, minimum height=9mm},
+  c2/.style={hop=cPurple, minimum width=11mm, minimum height=9mm},
+  xi/.style={hop=cGreen, minimum width=11mm}]
+  \foreach \t/\lab in {1/1, 2/2, 3/3, 5/T} {
+    \node[xi] (x\t) at (1.8*\t,0) {$x_{\lab}$};
+    \node[c1] (a\t) at (1.8*\t,1.8) {};
+    \node[c2] (b\t) at (1.8*\t,3.6) {};
+    \draw[muiM=cGreen!60!black] (x\t) -- (a\t);
+    \draw[muiM=cBlue!70!black] (a\t) -- node[right, font=\scriptsize, text=cRed] {drop} (b\t);
+  }
+  \foreach \t in {4} {\node[font=\Large] at (1.8*\t,1.8) {$\cdots$}; \node[font=\Large] at (1.8*\t,3.6) {$\cdots$}; \node[font=\Large] at (1.8*\t,0) {$\cdots$};}
+  \foreach \a/\b in {1/2, 2/3} {\draw[muiM=cBlue!70!black, line width=1.6pt] (a\a) -- (a\b); \draw[muiM=cPurple!70!black, line width=1.6pt] (b\a) -- (b\b);}
+  \draw[muiM=cBlue!70!black, line width=1.6pt] (a3) -- (6.8,1.8); \draw[muiM=cBlue!70!black, line width=1.6pt] (7.6,1.8) -- (a5);
+  \draw[muiM=cPurple!70!black, line width=1.6pt] (b3) -- (6.8,3.6); \draw[muiM=cPurple!70!black, line width=1.6pt] (7.6,3.6) -- (b5);
+  \node[anchor=east, font=\small\bfseries, text=cPurple!70!black] at (1.0,3.6) {tầng 2 (64)};
+  \node[anchor=east, font=\small\bfseries, text=cBlue!70!black] at (1.0,1.8) {tầng 1 (64)};
+  \node[anchor=east, font=\small\bfseries, text=cGreen!50!black] at (1.0,0) {đầu vào};
+  % đầu dense
+  \node[hop=cSlate, minimum height=9mm] (hT) at (11.2,3.6) {$h_T \in \mathbb{R}^{64}$};
+  \draw[mui] (b5) -- (hT);
+  \node[hop=cOrange, minimum width=30mm] (d1) at (11.2,2.2) {Dense 32, ReLU};
+  \node[hop=cRed, minimum width=30mm] (dp) at (11.2,1.0) {Dropout 0,2};
+  \node[hop=cTeal, minimum width=30mm] (d2) at (11.2,-0.2) {Dense 1};
+  \draw[mui] (hT) -- (d1); \draw[mui] (d1) -- (dp); \draw[mui] (dp) -- (d2);
+  \node[hop=cGreen, anchor=north, text width=46mm, align=center] at (11.2,-1.05) {FPT: lợi suất $\hat r_{t+1}$ (MSE)\\KKBox: logit rời bỏ (BCE)};
+  \node[hop=cBlue, anchor=north, text width=70mm, align=center] at (4.6,-1.05) {tế bào: Simple RNN · LSTM · GRU · BiLSTM\\Adam $10^{-3}$, cắt tỉa $\lVert g\rVert \le 1$, dừng sớm};
+\end{tikzpicture}

@@ -1,0 +1,18 @@
+% Quy trình thực nghiệm chung của tiểu luận: sáu bước, mỗi bước một khối 3D màu, kèm công cụ và sản phẩm.
+\begin{tikzpicture}[font=\small]
+  \foreach \i/\c/\t/\s in {0/cSlate/{Dữ liệu\\thô}/{CSV, ảnh,\\API Yahoo},
+                           1/cBlue/{EDA}/{phân bố,\\tương quan},
+                           2/cTeal/{Chia\\dữ liệu}/{80/20, phân tầng,\\theo thời gian},
+                           3/cGreen/{Tiền\\xử lý}/{fit trên tập\\huấn luyện},
+                           4/cOrange/{Huấn\\luyện}/{NumPy, Keras,\\PyTorch},
+                           5/cPurple/{Đánh giá}/{tập kiểm thử,\\mốc tham chiếu},
+                           6/cRed/{Triển\\khai}/{Flask\\Web App}} {
+    \khoibaD{2.35*\i}{0}{1.7}{1.7}{1.2}{\c}
+    \node[align=center, font=\small\bfseries, text=white] at (2.35*\i+0.85,0.85) {\t};
+    \node[align=center, font=\footnotesize, text=\c!70!black, anchor=north] at (2.35*\i+0.85,-0.15) {\s};
+  }
+  \foreach \i in {0,...,5} \draw[mui] (2.35*\i+2.0,0.85) -- (2.35*\i+2.33,0.85);
+  \draw[muiM=cPurple, dashed, rounded corners=6pt] (2.35*5+0.85,2.25) -- (2.35*5+0.85,2.8) -- node[above, font=\small] {chưa đạt: chỉnh tiền xử lý, siêu tham số} (2.35*3+0.85,2.8) -- (2.35*3+0.85,2.25);
+  \node[hop=cRed, font=\footnotesize, text width=58mm, anchor=north] at (8.2,-1.35) {Mọi số liệu ghi ra \texttt{outputs/metrics/*.json};
+    báo cáo đọc trực tiếp từ đó, không chép tay};
+\end{tikzpicture}

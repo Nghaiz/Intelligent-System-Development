@@ -1,0 +1,19 @@
+% BPTT: lan truyền tiến theo thời gian (xanh) và gradient đi ngược từ L_T, mờ dần qua mỗi lần nhân Jacobian (đỏ).
+\begin{tikzpicture}[font=\small]
+  \foreach \t in {1,...,6} {
+    \pgfmathtruncatemacro{\o}{100-14*(6-\t)}
+    \node[hop=cBlue, minimum width=13mm, minimum height=11mm, font=\normalsize] (h\t) at (2.4*\t,0) {$h_{\t}$};
+    \node[hop=cGreen, minimum width=11mm, font=\normalsize] (x\t) at (2.4*\t,-2.0) {$x_{\t}$};
+    \draw[muiM=cGreen!60!black] (x\t) -- (h\t);
+  }
+  \foreach \t/\n in {1/2, 2/3, 3/4, 4/5, 5/6} {
+    \draw[muiM=cBlue!70!black] (h\t) -- (h\n);
+    \pgfmathtruncatemacro{\o}{100-16*(5-\t)}
+    \draw[cRed!\o, -{Stealth[length=3mm]}, line width={0.5+0.5*\t pt}] (2.4*\n-0.65,0.85) to[bend right=35] node[above, font=\scriptsize, text=cRed!\o] {$\frac{\partial h_{\n}}{\partial h_{\t}}$} (2.4*\t+0.65,0.85);
+  }
+  \node[hop=cOrange, minimum width=14mm, font=\normalsize] (L) at (14.4,2.2) {$\mathcal{L}_T$};
+  \draw[muiM=cOrange!70!black] (h6) -- (L);
+  \node[hop=cRed, text width=78mm, anchor=north] at (8.4,-3.0) {%
+    Gradient từ $\mathcal{L}_T$ về $h_k$ là tích $\prod_{j=k+1}^{T} \partial h_j/\partial h_{j-1}$:
+    mỗi bước lùi nhân thêm một ma trận Jacobian, mũi tên đỏ \emph{mảnh và nhạt dần} minh họa tín hiệu suy giảm.};
+\end{tikzpicture}

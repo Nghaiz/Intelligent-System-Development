@@ -3,7 +3,7 @@
 1. Sinh macro số liệu và bảng  -> generated/      (từ src/TieuLuan 01/outputs/metrics/*.json)
 2. Trích mã nguồn theo tên     -> code/           (mỗi \\maNguon{module__ten} trong chapters/*.tex)
 3. Xóa cache của hình TikZ nào có mã hoặc số liệu đổi
-4. latexmk -lualatex -shell-escape main.tex, rồi chép PDF thành tieuluan01_CT_nghiand.600.pdf
+4. latexmk -lualatex -shell-escape main.tex, rồi chép PDF thành tieuluan01_CT_07_nghiand.600.pdf
 
 Chương không gõ tay con số thực nghiệm nào: chỉ gọi \\SL{tệp/khoá/...} hoặc \\input một bảng sinh ra ở đây.
 """
@@ -21,8 +21,9 @@ HERE = Path(__file__).resolve().parent
 SRC = HERE.parents[1] / "src" / "TieuLuan 01"
 METRICS = SRC / "outputs" / "metrics"
 GEN = HERE / "generated"
-PDF_NAME = "tieuluan01_CT_nghiand.600.pdf"
-SKIP_KEYS = ("/hist/", "/pred", "/confusion", "/sample")       # mảng dữ liệu hình và bảng, không phải số liệu chữ
+PDF_NAME = "tieuluan01_CT_07_nghiand.600.pdf"
+# mảng dữ liệu hình và bảng, không phải số liệu chữ; so khớp cả đoạn (key + "/") để "pred_ret_std" không bị loại nhầm
+SKIP_KEYS = ("/hist/", "/pred/", "/confusion/", "/sample/", "/describe/")
 CELLS = {"rnn": "Simple RNN", "lstm": "LSTM", "gru": "GRU", "bilstm": "BiLSTM"}
 ARCHS = {"custom": "Custom CNN", "vgg11": "VGG-11", "mobilenetv2": "MobileNetV2", "resnet18": "ResNet-18"}
 
@@ -89,7 +90,18 @@ def gen_macros(metrics):
 
 
 # ---------------------------------------------------------------- bảng
+def wrap_head(h, align):
+    """Ngắt tiêu đề cột dài thành hai dòng (\\makecell) để bảng nhiều cột không bị co nhỏ chữ."""
+    if len(h) <= 9 or " " not in h or "\\\\" in h:
+        return h
+    spaces = [i for i, ch in enumerate(h) if ch == " "]
+    cut = min(spaces, key=lambda i: abs(i - len(h) / 2))
+    return f"\\makecell[{align}]{{{h[:cut]}\\\\{h[cut + 1:]}}}"
+
+
 def table(spec, header, rows, note=None):
+    aligns = [c for c in re.sub(r"\{[^}]*\}", "", spec) if c in "lrcp"]
+    header = [wrap_head(h, "l" if a in "lp" else "r" if a == "r" else "c") for h, a in zip(header, aligns)]
     out = [f"\\begin{{tabular}}{{{spec}}}", "\\toprule", " & ".join(header) + " \\\\", "\\midrule"]
     out += [r if isinstance(r, str) else " & ".join(r) + " \\\\" for r in rows]
     out += ["\\bottomrule", "\\end{tabular}"]
@@ -165,32 +177,40 @@ def ch2_tables(m):
 
 def ch3_tables(m):
     b = m["bench"]
-    rows = []
+    acc_rows, cost_rows = [], []
     for ds, lab in (("svhn", "SVHN"), ("eurosat", "EuroSAT")):
         r = m[f"ch3_{ds}"]
         keys = list(ARCHS)
         acc = best([r[a]["acc"] for a in keys], [num(100 * r[a]["acc"]) for a in keys])
+        f1 = best([r[a]["f1"] for a in keys], [num(r[a]["f1"], 4) for a in keys])
+        gpu = best([b[f"ch3/{ds}/{a}"]["gpu_ms"] for a in keys], [num(b[f"ch3/{ds}/{a}"]["gpu_ms"], 2) for a in keys], higher=False)
+        cpu = best([b[f"ch3/{ds}/{a}"]["cpu_ms"] for a in keys], [num(b[f"ch3/{ds}/{a}"]["cpu_ms"], 2) for a in keys], higher=False)
         for i, a in enumerate(keys):
             bb = b[f"ch3/{ds}/{a}"]
-            rows.append([lab if i == 0 else "", ARCHS[a], acc[i], num(r[a]["f1"], 4), num(r[a]["params"] / 1e6, 2),
-                         num(r[a]["gflops"], 3), num(bb["gpu_ms"], 2), num(bb["cpu_ms"], 2), num(bb["fps"], 0),
-                         secs(r[a]["train_s"]), size(r[a]["size_kb"])])
-        if "custom_keras" in r:
-            k = r["custom_keras"]
-            rows.append(["", "Custom CNN (Keras)", num(100 * k["acc"]), num(k["f1"], 4), num(k["params"] / 1e6, 2),
-                         num(r["custom"]["gflops"], 3), "--", num(b[f"ch3/{ds}/custom_keras"]["cpu_ms"], 2), "--",
+            acc_rows.append([lab if i == 0 else "", ARCHS[a], acc[i], f1[i], str(r[a]["epochs"]), secs(r[a]["train_s"]),
+                             size(r[a]["size_kb"])])
+            cost_rows.append([lab if i == 0 else "", ARCHS[a], num(r[a]["params"] / 1e6, 2), num(r[a]["gflops"], 3), gpu[i],
+                              cpu[i], num(bb["fps"], 0)])
+        k = r["custom_keras"]
+        acc_rows.append(["", "Custom CNN (Keras)", num(100 * k["acc"]), num(k["f1"], 4), str(k["epochs"]),
                          secs(k["train_s"]) + "*", size(k["size_kb"])])
-        rows.append("\\midrule")
+        cost_rows.append(["", "Custom CNN (Keras)", num(k["params"] / 1e6, 2), num(r["custom"]["gflops"], 3), "--",
+                          num(b[f"ch3/{ds}/custom_keras"]["cpu_ms"], 2), "--"])
+        acc_rows.append("\\midrule")
+        cost_rows.append("\\midrule")
     c = m["ch3_diabetes1d"]["cnn1d"]
     bb = b["ch3/diabetes1d/cnn1d"]
-    rows.append(["Tiểu đường", "1D CNN (Conv1D)", num(100 * c["acc"]), num(c["f1"], 4), num(c["params"] / 1e6, 3),
-                 num(c["gflops"], 4), num(bb["gpu_ms"], 2), num(bb["cpu_ms"], 2), num(bb["fps"], 0), secs(c["train_s"]),
-                 size(c["size_kb"])])
-    note = ("F1 là macro trên 10 lớp (1D CNN: lớp dương). FLOPs $= 2 \\times$ số phép nhân-cộng của một ảnh. Độ trễ đo lô 1 "
-            "(trung vị), CPU 4 luồng; FPS đo trên GPU với lô 256. Huấn luyện trên GPU RTX 4060 Laptop, "
-            "* Keras chạy CPU (TensorFlow trên Windows không dùng GPU).")
-    return {"tab_ch3": table("llrrrrrrrrr", ["Dữ liệu", "Kiến trúc", "Acc (\\%)", "F1", "Tham số (M)", "GFLOPs",
-                                             "GPU (ms)", "CPU (ms)", "FPS", "Huấn luyện (s)", "Dung lượng"], rows, note)}
+    acc_rows.append(["Tiểu đường", "1D CNN", num(100 * c["acc"]), num(c["f1"], 4), str(c["epochs"]), secs(c["train_s"]),
+                     size(c["size_kb"])])
+    cost_rows.append(["Tiểu đường", "1D CNN", num(c["params"] / 1e6, 3), num(c["gflops"], 4), num(bb["gpu_ms"], 2),
+                      num(bb["cpu_ms"], 2), num(bb["fps"], 0)])
+    return {
+        "tab_ch3_acc": table("llrrrrr", ["Dữ liệu", "Kiến trúc", "Acc (\\%)", "F1 macro", "Epoch", "Huấn luyện (s)", "Dung lượng"],
+                             acc_rows, "F1 macro trên 10 lớp (1D CNN: F1 lớp dương). PyTorch huấn luyện trên GPU RTX 4060 Laptop; "
+                             "* Keras huấn luyện trên CPU vì TensorFlow trên Windows không dùng GPU. Chữ đậm: tốt nhất mỗi tập."),
+        "tab_ch3_cost": table("llrrrrr", ["Dữ liệu", "Kiến trúc", "Tham số (M)", "GFLOPs", "GPU (ms)", "CPU (ms)", "FPS"],
+                              cost_rows, "FLOPs $= 2 \\times$ số phép nhân-cộng cho một ảnh. Độ trễ: lô 1, trung vị, đo khi máy "
+                              "không chạy việc khác; CPU 4 luồng. FPS: GPU, lô 256. Chữ đậm: nhanh nhất mỗi tập.")}
 
 
 def ch4_tables(m):
@@ -236,6 +256,17 @@ def ch4_tables(m):
     return out
 
 
+def desc_table(rows, note=None):
+    """Bảng thống kê mô tả sinh từ eda.json: tên, TB, ĐLC, min, Q1, trung vị, Q3, max, % thiếu."""
+    body = []
+    for r in rows:
+        n = r[0]
+        d = 1 if max(abs(x) for x in r[1:8] if x == x) >= 100 else 2
+        body.append([n] + [num(x, d) for x in r[1:8]] + [num(100 * r[8], 1)])
+    return table("lrrrrrrrr", ["Đặc trưng", "TB", "ĐLC", "Min", "Q1", "Trung vị", "Q3", "Max", "Thiếu (\\%)"], body,
+                 note or "TB: trung bình; ĐLC: độ lệch chuẩn; Q1, Q3: tứ phân vị thứ nhất và thứ ba.")
+
+
 def sample_tables(e):
     d = e["diabetes"]
     cols = d["sample_cols"]
@@ -258,6 +289,10 @@ def sample_tables(e):
     out["tab_sample_rev"] = table("rlp{10.2cm}l", ["STT", "Số sao", "Nội dung nhận xét (nguyên văn tiếng Anh)", "Nhãn"], rows)
     rows = [[r[0], *(num(v / 1000, 2) for v in r[1:5]), num(r[5], 0), num(r[6] / 1000, 2), num(r[7], 2)]
             for r in e["stock"]["sample"]]
+    out["tab_desc_diab"] = desc_table(e["diabetes"]["describe"])
+    out["tab_desc_house"] = desc_table(e["house"]["describe"])
+    out["tab_desc_stock"] = desc_table(e["stock"]["describe"],
+                                       "Cổ phiếu FPT sau khi bỏ 50 phiên đầu (chưa đủ dữ liệu cho SMA50); giá đã điều chỉnh.")
     out["tab_sample_stock"] = table("lrrrrrrr", ["Ngày", "Open", "High", "Low", "Close", "Volume (cp)", "SMA20", "RSI-14"], rows,
                                     "Giá tính bằng nghìn đồng, đã điều chỉnh theo chia tách và cổ tức (auto\\_adjust của Yahoo Finance).")
     return out

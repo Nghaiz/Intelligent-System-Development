@@ -1,23 +1,25 @@
-% Kiến trúc MLP chung cho cả ba nền tảng: d đầu vào -> 128 -> 64 -> đầu ra.
-\begin{tikzpicture}[x=1cm, y=1cm, font=\footnotesize,
-  n/.style={circle, draw=ptitblue, fill=lightBlue, minimum size=4.5mm, inner sep=0pt},
-  ni/.style={n, fill=lightGreen, draw=mThree!80!black},
-  no/.style={n, fill=lightOrange, draw=mTwo!80!black}]
-  \foreach \i in {1,...,5} \node[ni] (a\i) at (0, 2.6-0.65*\i) {};
-  \node at (0,-1.35) {$\vdots$};
-  \foreach \i in {1,...,6} \node[n] (b\i) at (3, 2.9-0.65*\i) {};
-  \foreach \i in {1,...,4} \node[n] (c\i) at (6, 2.3-0.65*\i) {};
-  \foreach \i in {1,...,2} \node[no] (d\i) at (9, 1.0-0.65*\i) {};
-  \foreach \i in {1,...,5} \foreach \j in {1,...,6} \draw[gray!45] (a\i) -- (b\j);
-  \foreach \i in {1,...,6} \foreach \j in {1,...,4} \draw[gray!45] (b\i) -- (c\j);
-  \foreach \i in {1,...,4} \foreach \j in {1,...,2} \draw[gray!45] (c\i) -- (d\j);
-  \node[align=center, above] at (0,2.3) {Đầu vào $x \in \mathbb{R}^{d}$\\(sau tiền xử lý)};
-  \node[align=center, above] at (3,2.6) {Dense 128\\ReLU + Dropout 0,2};
-  \node[align=center, above] at (6,2.0) {Dense 64\\ReLU + Dropout 0,2};
-  \node[align=center, above] at (9,0.7) {Đầu ra};
-  \node[align=left, anchor=west, nhan] at (9.5,0.0) {sigmoid: tiểu đường\\softmax 3 lớp: cảm xúc\\tuyến tính: giá nhà};
-  \node[align=center, nhan] at (1.5,-2.2) {$z^{[1]} = W^{[1]}x + b^{[1]}$};
-  \node[align=center, nhan] at (4.5,-2.2) {$a^{[l]} = \mathrm{ReLU}(z^{[l]})$};
-  \node[align=center, nhan] at (7.5,-2.2) {$\hat y = g(W^{[3]}a^{[2]} + b^{[3]})$};
-  \draw[-{Stealth}, accentRed, thick] (9,-1.75) -- node[below, nhan] {lan truyền ngược $\delta^{[l]}$} (0,-1.75);
+% Kiến trúc MLP chung cho ba nền tảng: d đầu vào -> 128 -> 64 -> đầu ra; nơ-ron tô cầu theo tầng, mũi tên lan truyền.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\small,
+  n/.style={circle, inner color=white, outer color=#1!65, draw=#1!70!black, thick, minimum size=6.5mm, inner sep=0pt}]
+  % nền các tầng
+  \foreach \x/\c/\h in {0/cGreen/6.4, 3.6/cBlue/7.0, 7.2/cPurple/5.6, 10.8/cOrange/3.2}
+    \fill[\c!8, rounded corners=8pt, draw=\c!40] (\x-0.8,-\h/2+0.2) rectangle (\x+0.8,\h/2+0.2);
+  \foreach \i in {1,...,6} \node[n=cGreen] (a\i) at (0, 3.0-\i*0.85+0.6) {};
+  \node at (0,-2.2) {\Large$\vdots$};
+  \foreach \i in {1,...,7} \node[n=cBlue] (b\i) at (3.6, 3.4-\i*0.85+0.6) {};
+  \foreach \i in {1,...,5} \node[n=cPurple] (c\i) at (7.2, 2.6-\i*0.85+0.6) {};
+  \foreach \i in {1,...,2} \node[n=cOrange] (d\i) at (10.8, 1.3-\i*0.85+0.6) {};
+  \foreach \i in {1,...,6} \foreach \j in {1,...,7} \draw[cBlue!35, thin] (a\i) -- (b\j);
+  \foreach \i in {1,...,7} \foreach \j in {1,...,5} \draw[cPurple!35, thin] (b\i) -- (c\j);
+  \foreach \i in {1,...,5} \foreach \j in {1,...,2} \draw[cOrange!50, thin] (c\i) -- (d\j);
+  % nơ-ron bị dropout
+  \foreach \p in {b3, b6, c2} \draw[cRed, very thick] ($(\p)+(-0.22,-0.22)$) -- ($(\p)+(0.22,0.22)$) ($(\p)+(-0.22,0.22)$) -- ($(\p)+(0.22,-0.22)$);
+  \node[tieude, align=center] at (0,4.2) {Đầu vào\\$x \in \mathbb{R}^d$};
+  \node[tieude, align=center] at (3.6,4.5) {Dense 128\\ReLU, Dropout};
+  \node[tieude, align=center] at (7.2,3.7) {Dense 64\\ReLU, Dropout};
+  \node[tieude, align=center] at (10.8,2.6) {Đầu ra};
+  \node[hop=cOrange, anchor=west, text width=34mm, align=left] at (11.9,0.2) {\textbf{3 bài toán:}\\sigmoid: tiểu đường\\softmax 3 lớp: cảm xúc\\tuyến tính: giá nhà};
+  \draw[muiM=cGreen!60!black, line width=2pt] (-0.8,-3.6) -- node[below, font=\small] {lan truyền tiến: $\mathbf{z}^{[l]} = W^{[l]}\mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}$, $\mathbf{a}^{[l]} = g(\mathbf{z}^{[l]})$} (11.6,-3.6);
+  \draw[muiM=cRed, line width=2pt] (11.6,-4.6) -- node[below, font=\small] {lan truyền ngược: $\boldsymbol{\delta}^{[l]} = \big((W^{[l+1]})^\top\boldsymbol{\delta}^{[l+1]}\big) \odot g'(\mathbf{z}^{[l]})$} (-0.8,-4.6);
+  \node[font=\small, text=cRed, fill=white, rounded corners=2pt] at (7.2,-2.75) {\textbf{×}: nơ-ron bị Dropout tắt ở lượt này};
 \end{tikzpicture}

@@ -1,25 +1,26 @@
 % Mặt nạ dropout (p ≈ 0,3) trên 8 đơn vị ẩn × 12 bước: dropout thường đổi mặt nạ ở mỗi bước,
-% recurrent dropout dùng một mặt nạ cho cả chuỗi. Mặt nạ sinh giả ngẫu nhiên tất định bằng pgfmath.
-\begin{tikzpicture}[x=4.2mm, y=4.2mm, font=\footnotesize]
+% recurrent dropout dùng một mặt nạ cho cả chuỗi. Mặt nạ trái sinh giả ngẫu nhiên tất định bằng pgfmath.
+\begin{tikzpicture}[x=5.4mm, y=5.4mm, font=\small]
   \pgfmathsetseed{7}
   \foreach \t in {0,...,11} \foreach \h in {0,...,7} {
     \pgfmathsetmacro{\r}{rnd}
-    \ifdim\r pt<0.3pt \def\c{accentRed!75}\else\def\c{lightBlue}\fi
-    \fill[\c, draw=white] (\t,-\h) rectangle ++(1,1);
+    \ifdim\r pt<0.3pt \def\c{cRed!80}\else\def\c{cBlue!35}\fi
+    \fill[\c, draw=white, thick, rounded corners=1pt] (\t,-\h) rectangle ++(1,1);
   }
-  \node[above, align=center] at (6,1.2) {Dropout thường:\\mặt nạ mới ở mỗi bước $t$};
-  \begin{scope}[xshift=7.2cm]
+  \node[tieude, align=center] at (6,2.5) {Dropout thường:\\mặt nạ mới ở mỗi bước $t$};
+  \begin{scope}[xshift=8.4cm]
     \foreach \h/\drop in {0/0, 1/1, 2/0, 3/0, 4/1, 5/0, 6/0, 7/1} {
-      \ifnum\drop=1 \def\c{accentRed!75}\else\def\c{lightBlue}\fi
-      \foreach \t in {0,...,11} \fill[\c, draw=white] (\t,-\h) rectangle ++(1,1);
+      \ifnum\drop=1 \def\c{cRed!80}\else\def\c{cGreen!40}\fi
+      \foreach \t in {0,...,11} \fill[\c, draw=white, thick, rounded corners=1pt] (\t,-\h) rectangle ++(1,1);
     }
-    \node[above, align=center] at (6,1.2) {Recurrent dropout:\\một mặt nạ cho cả chuỗi};
+    \node[tieude, align=center] at (6,2.5) {Recurrent dropout:\\một mặt nạ cho cả chuỗi};
   \end{scope}
-  \foreach \x in {0, 17.15} {
-    \draw[-{Stealth}] (\x,-7.6) -- ++(12.5,0) node[right] {$t$};
+  \foreach \x in {0, 15.55} {
+    \draw[-{Stealth}, very thick, cNavy] (\x,-7.6) -- ++(12.6,0) node[right] {$t$};
     \node[left] at (\x,0.5) {$h_1$};
     \node[left] at (\x,-6.5) {$h_8$};
   }
-  \fill[accentRed!75] (11,-9.2) rectangle ++(0.8,0.8); \node[right] at (11.9,-8.8) {đơn vị bị tắt};
-  \fill[lightBlue] (18,-9.2) rectangle ++(0.8,0.8); \node[right] at (18.9,-8.8) {đơn vị giữ lại};
+  \fill[cRed!80, rounded corners=1pt] (8,-9.3) rectangle ++(0.9,0.9); \node[right] at (9.0,-8.85) {đơn vị bị tắt};
+  \fill[cBlue!35, rounded corners=1pt] (14,-9.3) rectangle ++(0.9,0.9); \fill[cGreen!40, rounded corners=1pt] (15,-9.3) rectangle ++(0.9,0.9);
+  \node[right] at (16.0,-8.85) {đơn vị giữ lại};
 \end{tikzpicture}

@@ -1,0 +1,27 @@
+% SVM: siêu phẳng lề cực đại, hai lề, vector hỗ trợ khoanh tròn; (b) nhân RBF ánh xạ dữ liệu vòng tròn lên chiều cao.
+\begin{tikzpicture}[font=\small]
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=14mm}, a06, width=7.6cm, height=7.0cm]
+  \nextgroupplot[title={(a) Lề cực đại}, xmin=0, xmax=10, ymin=0, ymax=10, xlabel={$x_1$}, ylabel={$x_2$}, grid=none]
+  \addplot[name path=up, draw=cGreen!70!black, dashed, thick, domain=0:10] {x + 1.5};
+  \addplot[name path=lo, draw=cGreen!70!black, dashed, thick, domain=0:10] {x - 1.5};
+  \addplot[cGreen!20] fill between[of=up and lo];
+  \addplot[cGreen!50!black, line width=2.4pt, domain=0:10] {x};
+  \addplot[only marks, mark=*, mark size=4pt, cBlue, mark options={draw=cNavy}] coordinates {
+    (1,4) (2,6) (1.5,7.5) (3,8) (4,9) (2.5,4) (5,8.5) (4.5,6) (0.8,2.5) (6,9.3) (3.2,7.0)};
+  \addplot[only marks, mark=square*, mark size=4pt, cOrange, mark options={draw=cBrown}] coordinates {
+    (4,1) (6,2) (7.5,3) (8,5) (9,6) (5.5,4) (8.5,2) (7,5.5) (9.5,7.5) (3,1.5)};
+  \addplot[only marks, mark=o, mark size=8pt, very thick, cRed] coordinates {(2.5,4) (4.5,6) (5.5,4) (7,5.5)};
+  \node[fill=white, rounded corners=2pt, font=\small, rotate=45] at (axis cs:7.6,7.6) {$\mathbf{w}^\top\mathbf{x} + b = 0$};
+  \draw[{Stealth}-{Stealth}, thick, cRed] (axis cs:1.15,2.65) -- (axis cs:2.65,1.15);
+  \node[fill=white, rounded corners=2pt, font=\small, text=cRed, align=center] at (axis cs:2.1,0.6) {lề $2/\lVert\mathbf{w}\rVert$};
+  \node[fill=white, rounded corners=2pt, font=\small, text=cRed] at (axis cs:7.6,9.4) {○ vector hỗ trợ};
+  \nextgroupplot[title={(b) Nhân RBF: tách dữ liệu vòng tròn}, view={40}{28}, xlabel={$x_1$}, ylabel={$x_2$},
+    zlabel={$\phi(\mathbf{x})$}, xmin=-2, xmax=2, ymin=-2, ymax=2, zmin=0, zmax=1.1, colormap/viridis, grid=major]
+  \addplot3[surf, opacity=0.35, shader=interp, domain=-2:2, y domain=-2:2, samples=21] {exp(-(x^2+y^2))};
+  \addplot3[only marks, mark=*, mark size=3pt, cBlue, mark options={draw=cNavy}] coordinates {
+    (0.2,0.1,0.95) (-0.3,0.2,0.88) (0.1,-0.4,0.84) (-0.2,-0.2,0.92) (0.4,0.3,0.78) (-0.4,-0.1,0.83)};
+  \addplot3[only marks, mark=square*, mark size=3pt, cOrange, mark options={draw=cBrown}] coordinates {
+    (1.5,0.2,0.1) (-1.4,0.5,0.11) (0.3,1.6,0.07) (-0.6,-1.5,0.08) (1.1,-1.2,0.07) (-1.2,1.1,0.07)};
+  \addplot3[cRed, line width=2pt, domain=0:360, samples=60] ({0.83*cos(x)}, {0.83*sin(x)}, {0.5});
+\end{groupplot}
+\end{tikzpicture}

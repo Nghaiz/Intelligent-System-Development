@@ -31,6 +31,8 @@ liệu thật:
 \begin{enumerate}
   \item \textbf{Chọn mô hình theo dạng dữ liệu, không theo độ “hiện đại”.} Random Forest vẫn là đối thủ khó vượt trên dữ liệu
     bảng; CNN thắng trên ảnh vì cấu trúc không gian; RNN chỉ có lợi khi chuỗi thật sự chứa tín hiệu theo thời gian.
+  \item \textbf{Luôn thử một mô hình thật đơn giản trước.} Một cây quyết định chỉ hai câu hỏi (HbA1c, đường huyết) đạt F1
+    \SL{extra/ch2/tree/f1} trên dữ liệu tiểu đường, ngang MLP; độ phức tạp của mô hình chỉ đáng giá khi nó vượt được mốc này.
   \item \textbf{Một con số đẹp cần một mốc so sánh.} $R^2 = 0{,}99$ trên giá cổ phiếu hay Accuracy 91,5\,\% trên dữ liệu tiểu
     đường đều đạt được bởi mô hình ngây thơ. Mọi đánh giá trong báo cáo vì vậy luôn đi kèm mốc tham chiếu và chỉ số phù hợp
     với bài toán (F1 lớp hiếm, $R^2$ trên lợi suất).

@@ -1,0 +1,16 @@
+% Kiến trúc Custom CNN trên ảnh 32x32: chuỗi bản đồ đặc trưng 3D (rộng ~ số kênh, cao/sâu ~ kích thước không gian).
+\begin{tikzpicture}[font=\small]
+  \def\lab#1#2#3{\node[font=\footnotesize, align=center, anchor=north] at (#1,-0.35) {#2\\[-1pt]{\scriptsize #3}};}
+  \khoibaD{0}{0}{0.25}{3.2}{3.2}{cSlate}   \lab{0.1}{Ảnh}{3×32×32}
+  \khoibaD{1.4}{0}{0.45}{3.2}{3.2}{cBlue}  \khoibaD{2.05}{0}{0.45}{3.2}{3.2}{cBlue} \lab{2.0}{2 conv 3×3}{32×32×32}
+  \khoibaD{3.4}{0.6}{0.45}{2.0}{2.0}{cOrange} \lab{3.6}{pool}{32×16×16}
+  \khoibaD{4.6}{0.6}{0.75}{2.0}{2.0}{cGreen} \khoibaD{5.55}{0.6}{0.75}{2.0}{2.0}{cGreen} \lab{5.6}{2 conv 3×3}{64×16×16}
+  \khoibaD{7.0}{0.95}{0.75}{1.2}{1.2}{cOrange} \lab{7.3}{pool}{64×8×8}
+  \khoibaD{8.2}{0.95}{1.1}{1.2}{1.2}{cPurple} \khoibaD{9.5}{0.95}{1.1}{1.2}{1.2}{cPurple} \lab{9.9}{2 conv 3×3}{128×8×8}
+  \khoibaD{11.0}{1.15}{1.1}{0.7}{0.7}{cOrange} \lab{11.5}{pool}{128×4×4}
+  \khoibaD{12.6}{1.3}{1.1}{0.3}{0.3}{cRed} \lab{13.1}{GAP}{128}
+  \khoibaD{14.1}{1.3}{0.3}{0.3}{0.3}{cTeal} \lab{14.3}{Dense}{128 → 10}
+  \foreach \a/\b in {0.85/1.35, 2.95/3.35, 4.05/4.55, 6.75/6.95, 7.95/8.15, 10.85/10.95, 12.4/12.55, 13.95/14.05}
+    \draw[muiM=cNavy, thick] (\a,1.6) -- (\b,1.6);
+  \node[hop=cBlue, anchor=south west, font=\small] at (0,4.3) {Custom CNN: \SL{ch3_svhn/custom/params} tham số · \SL{ch3_svhn/custom/gflops} GFLOPs (SVHN)};
+\end{tikzpicture}

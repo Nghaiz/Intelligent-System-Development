@@ -56,8 +56,12 @@ từ dữ liệu có nhãn theo quy tắc
   \mathbf{w}^{(t+1)} = \mathbf{w}^{(t)} + \eta\,(y - \hat y)\,\mathbf{x},
   \label{eq:perceptron}
 \end{equation}
-với $\eta > 0$ là tốc độ học. Định lý hội tụ Perceptron bảo đảm thuật toán dừng sau hữu hạn bước nếu dữ liệu khả
-tách tuyến tính. Song song với hướng kết nối (connectionism) này, hướng biểu tượng (symbolic AI) cũng gặt hái thành
+với $\eta > 0$ là tốc độ học. Hình~\ref{fig:perceptron} mô tả đầy đủ một nơ-ron Perceptron: các đầu vào nhân với trọng
+số, cộng với độ lệch $b = -\theta$, đi qua hàm bước để cho nhãn 0 hoặc 1; trọng số chỉ thay đổi khi mô hình đoán sai.
+Định lý hội tụ Perceptron bảo đảm thuật toán dừng sau hữu hạn bước nếu dữ liệu khả tách tuyến tính, tức là tồn tại
+một siêu phẳng chia đúng mọi mẫu.
+
+\hinhtikz{f1_perceptron}{Mô hình nơ-ron McCulloch–Pitts và quy tắc học Perceptron của Rosenblatt.}{perceptron} Song song với hướng kết nối (connectionism) này, hướng biểu tượng (symbolic AI) cũng gặt hái thành
 công: chương trình Logic Theorist (1956) của Newell, Simon và Shaw chứng minh được 38 trên 52 định lý ở chương 2 của
 \emph{Principia Mathematica}; General Problem Solver (1959) giải các bài toán đố bằng phân tích phương tiện -- mục đích.
 
@@ -84,8 +88,12 @@ $x_1$ & $x_2$ & $y = x_1 \oplus x_2$ & Vị trí trên mặt phẳng $\mathbb{R}
 
 Muốn tách $\{(0,1), (1,0)\}$ khỏi $\{(0,0), (1,1)\}$ cần một đường thẳng $w_1x_1 + w_2x_2 + b = 0$ để hai nhóm nằm hai
 phía, nhưng từ $b < 0$, $w_1 + b > 0$, $w_2 + b > 0$ suy ra $w_1 + w_2 + b > -b > 0$, mâu thuẫn với yêu cầu điểm
-$(1,1)$ phải âm. Minsky và Papert biết mạng nhiều tầng giải được XOR, nhưng thời đó chưa ai có cách huấn luyện các
-tầng ẩn. Cuốn sách khiến nguồn tài trợ cho hướng nơ-ron gần như đóng băng suốt hơn một thập kỷ.
+$(1,1)$ phải âm. Hình~\ref{fig:xor}a minh họa: đường thẳng nào cũng xếp sai ít nhất một điểm. Ngược lại, chỉ cần một
+tầng ẩn hai nơ-ron (mỗi nơ-ron vẽ một đường thẳng) là tạo được \emph{dải} phân tách ở Hình~\ref{fig:xor}b. Minsky và
+Papert biết mạng nhiều tầng giải được XOR, nhưng thời đó chưa ai có cách huấn luyện các tầng ẩn.
+
+\hinhtikz{f1_xor}{Bài toán XOR: (a) Perceptron một tầng không tách được; (b) mạng có một tầng ẩn hai nơ-ron tách được
+bằng một dải.}{xor} Cuốn sách khiến nguồn tài trợ cho hướng nơ-ron gần như đóng băng suốt hơn một thập kỷ.
 
 \subsection{Báo cáo Lighthill (1973) và sự cắt giảm tài trợ của DARPA}
 

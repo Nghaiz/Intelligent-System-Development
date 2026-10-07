@@ -1,38 +1,34 @@
-% Tế bào LSTM: đường cộng của cell state ở trên, bốn cổng (f, i, g = c̃, o) ở dưới.
-\begin{tikzpicture}[font=\footnotesize, x=1cm, y=1cm,
-  gate/.style={draw=ptitblue, fill=lightOrange, minimum width=8mm, minimum height=6mm, rounded corners=1pt},
-  op/.style={circle, draw=ptitblue, fill=white, inner sep=0pt, minimum size=5.5mm, font=\small},
-  line/.style={thick, ptitblue},
-  arr/.style={thick, ptitblue, -{Stealth[length=2mm]}}]
-  \draw[rounded corners=6pt, fill=lightBlue!50, draw=ptitblue] (0,0) rectangle (8.8,4.4);
-  % cell state
-  \node[op] (mf) at (1.6,3.6) {$\times$};
-  \node[op] (pl) at (4.4,3.6) {$+$};
-  \draw[arr] (-1,3.6) node[left] {$c_{t-1}$} -- (mf);
-  \draw[arr] (mf) -- (pl);
-  \draw[arr] (pl) -- (9.8,3.6) node[right] {$c_t$};
-  \node[anchor=south, mZero!80!black] at (4.4,4.45) {đường cộng: $c_t = f_t \odot c_{t-1} + i_t \odot \tilde c_t$};
-  % cổng
-  \node[gate] (gf) at (1.6,1.5) {$\sigma$};
-  \node[gate] (gi) at (3.2,1.5) {$\sigma$};
-  \node[gate] (gg) at (4.4,1.5) {$\tanh$};
-  \node[gate] (go) at (6.2,1.5) {$\sigma$};
-  \node[op] (mi) at (4.4,2.55) {$\times$};
+% Tế bào LSTM: đường cộng của cell state ở trên, bốn khối cổng tô màu riêng (quên đỏ, vào lục, ứng viên lam, ra tím).
+\begin{tikzpicture}[font=\small, x=1.2cm, y=1.2cm,
+  gate/.style={hop=#1, minimum width=10mm, minimum height=8mm, font=\normalsize\bfseries},
+  op/.style={circle, inner color=white, outer color=cOrange!50, draw=cOrange!60!black, thick, inner sep=0pt, minimum size=7mm, font=\normalsize},
+  line/.style={very thick, cNavy},
+  arr/.style={very thick, cNavy, -{Stealth[length=2.4mm]}}]
+  \fill[cBlue!5, rounded corners=10pt, draw=cBlue!45, very thick] (0,0) rectangle (8.8,4.5);
+  \node[op] (mf) at (1.6,3.65) {$\times$};
+  \node[op] (pl) at (4.4,3.65) {$+$};
+  \draw[line width=3pt, cOrange!80!black, -{Stealth[length=3mm]}] (-1.1,3.65) node[left, text=black] {$c_{t-1}$} -- (mf);
+  \draw[line width=3pt, cOrange!80!black, -{Stealth[length=3mm]}] (mf) -- (pl);
+  \draw[line width=3pt, cOrange!80!black, -{Stealth[length=3mm]}] (pl) -- (9.9,3.65) node[right, text=black] {$c_t$};
+  \node[anchor=south, hop=cOrange, font=\small] at (4.4,4.65) {đường cộng ô nhớ: $c_t = f_t \odot c_{t-1} + i_t \odot \tilde c_t$};
+  \node[gate=cRed] (gf) at (1.6,1.5) {$\sigma$};
+  \node[gate=cGreen] (gi) at (3.2,1.5) {$\sigma$};
+  \node[gate=cBlue] (gg) at (4.4,1.5) {tanh};
+  \node[gate=cPurple] (go) at (6.2,1.5) {$\sigma$};
+  \node[op] (mi) at (4.4,2.6) {$\times$};
   \node[op] (mo) at (7.4,1.5) {$\times$};
-  \node[gate, fill=lightGreen] (tc) at (7.4,2.55) {$\tanh$};
-  % đầu vào [h_{t-1}; x_t] và nhãn cổng (nằm dưới đường vào, không có dây nào đi qua)
-  \draw[line] (-1,0.65) node[left] {$h_{t-1}$} -- (6.2,0.65);
-  \draw[line] (0.8,-0.8) node[below] {$x_t$} -- (0.8,0.65);
-  \foreach \g in {gf, gi, gg, go} \draw[arr] (\g |- 0,0.65) -- (\g);
-  \foreach \g/\lab in {gf/{$f_t$ quên}, gi/{$i_t$ vào}, gg/{$\tilde c_t$}, go/{$o_t$ ra}}
-    \node[nhan, anchor=north] at (\g |- 0,0.55) {\lab};
-  % nối cổng
-  \draw[arr] (gf) -- (mf);
-  \draw[arr] (gi) |- (mi);
-  \draw[arr] (gg) -- (mi);
+  \node[gate=cTeal, minimum width=11mm] (tc) at (7.4,2.6) {tanh};
+  \draw[line] (-1.1,0.6) node[left, text=black] {$h_{t-1}$} -- (6.2,0.6);
+  \draw[line] (0.8,-0.9) node[below, text=black] {$x_t$} -- (0.8,0.6);
+  \foreach \g in {gf, gi, gg, go} \draw[arr] (\g |- 0,0.6) -- (\g);
+  \foreach \g/\lab/\c in {gf/{$f_t$ quên}/cRed, gi/{$i_t$ vào}/cGreen, gg/{$\tilde c_t$ ứng viên}/cBlue, go/{$o_t$ ra}/cPurple}
+    \node[font=\small\bfseries, text=\c!70!black, anchor=north] at (\g |- 0,0.45) {\lab};
+  \draw[arr, cRed] (gf) -- (mf);
+  \draw[arr, cGreen!60!black] (gi) |- (mi);
+  \draw[arr, cBlue] (gg) -- (mi);
   \draw[arr] (mi) -- (pl);
-  \draw[arr] (7.4,3.6) -- (tc);
+  \draw[arr] (7.4,3.65) -- (tc);
   \draw[arr] (tc) -- (mo);
-  \draw[arr] (go) -- (mo);
-  \draw[arr] (mo) -- (8.3,1.5) |- (9.8,0.65) node[right] {$h_t = o_t \odot \tanh(c_t)$};
+  \draw[arr, cPurple] (go) -- (mo);
+  \draw[arr] (mo) -- (8.3,1.5) |- (9.9,0.6) node[right, text=black] {$h_t = o_t \odot \tanh(c_t)$};
 \end{tikzpicture}

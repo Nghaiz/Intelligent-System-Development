@@ -8,14 +8,15 @@
 %  Hình dữ liệu là PDF vector vẽ bằng matplotlib (figures/); sơ đồ lý thuyết là TikZ (tikz/),
 %  được externalize vào tikzcache/.
 % =====================================================================
-\documentclass[a4paper,13pt,oneside]{extreport}
+% extreport chỉ có 8-12, 14, 17, 20pt: khai báo 13pt bị bỏ qua và cả bài rơi về 10pt. Dùng 14pt.
+\documentclass[a4paper,14pt,oneside]{extreport}
 
 % --------------------------- Ngôn ngữ & font -------------------------
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 \setsansfont{Segoe UI}
 \directlua{luaotfload.add_fallback("toanhoc", {"Cambria Math:mode=node;"})}
-\setmonofont{Consolas}[Scale=0.86, RawFeature={fallback=toanhoc}]
+\setmonofont{Consolas}[Scale=0.9, RawFeature={fallback=toanhoc}]
 \usepackage{polyglossia}
 \setmainlanguage{vietnamese}
 \gappto\captionsvietnamese{%
@@ -24,9 +25,10 @@
   \renewcommand{\contentsname}{Mục lục}}
 
 % --------------------------- Khổ trang -------------------------------
-\usepackage[a4paper,left=3cm,right=2cm,top=2.5cm,bottom=2.5cm,headheight=16pt]{geometry}
+\usepackage[a4paper,left=3cm,right=2cm,top=2.5cm,bottom=2.5cm,headheight=20pt]{geometry}
 \usepackage{setspace}
 \onehalfspacing
+\setlength{\emergencystretch}{3em}   % cho phép giãn khoảng trắng thêm thay vì để từ dài (tên lớp, \texttt) tràn lề
 
 % --------------------------- Toán học --------------------------------
 \usepackage{amsmath,amssymb,amsfonts}
@@ -38,9 +40,11 @@
 \usepackage{booktabs,longtable,array,tabularx,multirow}
 \usepackage{float}
 \usepackage[table,dvipsnames]{xcolor}
-\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage[font=normalsize,labelfont=bf,labelsep=period]{caption}
 \usepackage{subcaption}
 \usepackage{adjustbox}
+\usepackage{makecell}   % tiêu đề cột hai dòng trong bảng do build.py sinh
+\renewcommand{\cellset}{\renewcommand{\arraystretch}{0.95}}
 
 % --------------------------- Danh sách -------------------------------
 \usepackage{enumitem}
@@ -68,8 +72,8 @@
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.4pt}
-\fancyhead[L]{\footnotesize\itshape Nhóm lớp: CT \textbar{} Nguyễn Duy Nghĩa -- B23DCCN600}
-\fancyhead[R]{\footnotesize\itshape Tiểu luận: Phát triển các Hệ thống Thông minh}
+\fancyhead[L]{\small\itshape Nhóm lớp: CT \textbar{} Nhóm: 07 -- Nguyễn Duy Nghĩa}
+\fancyhead[R]{\small\itshape Tiểu luận: Phát triển Hệ thống Thông minh}
 \fancyfoot[C]{\thepage}
 \fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
 
@@ -86,7 +90,7 @@
 \tcbuselibrary{external}
 \tcbset{shield externalize}
 \usepackage{minted}
-\setminted{fontsize=\footnotesize,linenos,numbersep=6pt,breaklines,frame=lines,
+\setminted{fontsize=\small,linenos,numbersep=6pt,breaklines,frame=lines,
            framesep=2mm,baselinestretch=1.05,tabsize=4}
 \usemintedstyle{friendly}
 \renewcommand{\listingscaption}{Đoạn mã}
@@ -107,7 +111,7 @@
   colorlinks=true, linkcolor=ptitblue, citecolor=ptitblue,
   urlcolor=ptitblue, filecolor=ptitblue,
   pdftitle={Tiểu luận: Học máy cơ bản, CNN và RNN trong hệ thống thông minh},
-  pdfauthor={Nguyễn Duy Nghĩa — B23DCCN600 — Nhóm lớp CT},
+  pdfauthor={Nguyễn Duy Nghĩa — B23DCCN600 — Nhóm lớp CT — Nhóm 07},
   pdfsubject={Phát triển các Hệ thống Thông minh},
   bookmarksnumbered=true
 }
@@ -130,6 +134,13 @@
     {\fbox{\parbox[c][3cm][c]{0.8\linewidth}{\centering chưa vẽ: \detokenize{#1}}}\PackageWarning{solieu}{Thieu so lieu 'fig/#1'}}
   \caption{#3}\label{fig:#4}
   \end{figure}}
+% \haihinh{tệp1}{chú thích 1}{tệp2}{chú thích 2}{chú thích chung}{nhãn}: hai hình nửa trang cạnh nhau (a), (b).
+\newcommand{\haihinh}[6]{%
+  \begin{figure}[H]\centering
+  \begin{subfigure}[t]{0.49\linewidth}\centering\includegraphics[width=\linewidth]{#1}\caption{#2}\end{subfigure}\hfill
+  \begin{subfigure}[t]{0.49\linewidth}\centering\includegraphics[width=\linewidth]{#3}\caption{#4}\end{subfigure}
+  \caption{#5}\label{fig:#6}
+  \end{figure}}
 % \hinhtikz{tệp}{chú thích}{nhãn}: sơ đồ TikZ trong tikz/, co theo bề rộng trang nếu cần.
 \newcommand{\hinhtikz}[3]{%
   \begin{figure}[H]\centering
@@ -147,7 +158,7 @@
 \newcommand{\bang}[3]{%
   \begin{table}[H]\centering\caption{#2}\label{tab:#3}
   \IfFileExists{generated/#1.tex}%
-    {\begin{adjustbox}{max width=\linewidth}\input{generated/#1}\end{adjustbox}%
+    {{\small\setlength{\tabcolsep}{4.5pt}\begin{adjustbox}{max width=\linewidth}\input{generated/#1}\end{adjustbox}}%
      \IfFileExists{generated/#1_note.tex}{\par\smallskip{\footnotesize\input{generated/#1_note}\par}}{}}%
     {\fbox{chưa sinh bảng: \detokenize{#1}}\PackageWarning{solieu}{Thieu so lieu 'tab/#1'}}
   \end{table}}
@@ -194,6 +205,7 @@
      \renewcommand{\arraystretch}{1.8}
      \begin{tabular}{@{}p{52mm}l@{}}
        \textbf{Lớp:}                  & D23CTPM01 \\
+       \textbf{Nhóm:}                 & Nhóm lớp CT -- Nhóm 07 \\
        \textbf{Họ và tên:}            & Nguyễn Duy Nghĩa \\
        \textbf{Mã sinh viên:}         & B23DCCN600 \\
        \textbf{Giảng viên hướng dẫn:} & PGS.TS Trần Đình Quế \\

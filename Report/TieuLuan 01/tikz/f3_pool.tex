@@ -1,24 +1,24 @@
 % Max pooling, average pooling 2x2 bước 2 và Global Average Pooling trên cùng bản đồ 4x4.
-\begin{tikzpicture}[x=7mm, y=7mm, font=\footnotesize]
+\begin{tikzpicture}[x=9mm, y=9mm, font=\small,
+  cell/.style={draw=white, very thick, minimum size=9mm, inner sep=0pt, font=\small\bfseries}]
   \def\P{{{1,3,2,1},{4,6,5,0},{7,2,1,8},{0,9,3,4}}}
   \foreach \i in {0,...,3} \foreach \j in {0,...,3} {
     \pgfmathtruncatemacro{\q}{2*floor(\i/2) + floor(\j/2)}
-    \ifcase\q \def\c{lightBlue}\or \def\c{lightOrange}\or \def\c{lightGreen}\or \def\c{lightGray}\fi
+    \ifcase\q \def\c{cBlue}\or \def\c{cOrange}\or \def\c{cGreen}\or \def\c{cPurple}\fi
     \pgfmathtruncatemacro{\v}{\P[\i][\j]}
-    \node[o, minimum size=7mm, fill=\c] at (\j, -\i) {\v};}
-  \node[above] at (1.5, 0.6) {Bản đồ đặc trưng $4{\times}4$};
-  % max
-  \draw[-{Stealth}, thick, gray] (4, -0.5) -- node[above, font=\scriptsize] {max $2{\times}2$} (6, 0.2);
-  \foreach \v/\c/\x/\y in {6/lightBlue/0/0, 5/lightOrange/1/0, 9/lightGreen/0/1, 8/lightGray/1/1}
-    \node[o, minimum size=7mm, fill=\c] at (6.8+\x, 0.8-\y) {\v};
-  \node[above] at (7.3, 1.35) {Max pooling};
-  % avg
-  \draw[-{Stealth}, thick, gray] (4, -2.5) -- node[below, font=\scriptsize] {trung bình $2{\times}2$} (6, -3.2);
-  \foreach \v/\c/\x/\y in {3{,}5/lightBlue/0/0, 2/lightOrange/1/0, 4{,}5/lightGreen/0/1, 4/lightGray/1/1}
-    \node[o, minimum size=7mm, fill=\c] at (6.8+\x, -3-\y) {\v};
-  \node[below] at (7.3, -4.4) {Average pooling};
-  % GAP
-  \draw[-{Stealth}, thick, gray] (4, -1.5) -- node[above, font=\scriptsize, pos=0.7] {trung bình toàn bộ} (10.8, -1.5);
-  \node[o, minimum size=7mm, fill=accentRed!25] at (11.6, -1.5) {3,5};
-  \node[align=center, above] at (11.6, -0.9) {GAP\\$C{\times}H{\times}W \to C$};
+    \pgfmathtruncatemacro{\pp}{15+8*\v}
+    \node[cell, fill=\c!\pp] at (\j, -\i) {\v};}
+  \node[tieude] at (1.5, 1.0) {Bản đồ đặc trưng 4×4};
+  \draw[muiM=cNavy, line width=2pt] (4, -0.4) -- node[above, sloped] {max $2{\times}2$} (6.2, 0.4);
+  \foreach \v/\c/\x/\y in {6/cBlue/0/0, 5/cOrange/1/0, 9/cGreen/0/1, 8/cPurple/1/1}
+    \node[cell, fill=\c!70] at (7.0+\x, 1.0-\y) {\v};
+  \node[tieude] at (7.5, 2.0) {Max pooling};
+  \draw[muiM=cNavy, line width=2pt] (4, -2.6) -- node[below, sloped] {trung bình $2{\times}2$} (6.2, -3.4);
+  \foreach \v/\c/\x/\y in {3{,}5/cBlue/0/0, 2/cOrange/1/0, 4{,}5/cGreen/0/1, 4/cPurple/1/1}
+    \node[cell, fill=\c!45] at (7.0+\x, -3.2-\y) {\v};
+  \node[tieude] at (7.5, -5.2) {Average pooling};
+  \draw[muiM=cRed, line width=2pt] (4, -1.5) -- node[above, pos=0.62] {trung bình cả bản đồ} (10.9, -1.5);
+  \node[circle, inner color=white, outer color=cRed!60, draw=cRed!60!black, very thick, minimum size=12mm, font=\normalsize\bfseries] at (11.8, -1.5) {3,5};
+  \node[tieude, align=center] at (11.8, -0.0) {GAP};
+  \node[nhan, align=center] at (11.8, -2.75) {$C{\times}H{\times}W \to C$};
 \end{tikzpicture}

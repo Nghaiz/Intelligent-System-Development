@@ -1,11 +1,11 @@
-% Quan hệ bao hàm: AI ⊃ Học máy ⊃ Học sâu ⊃ AI tạo sinh và hệ đa tác tử.
-\begin{tikzpicture}[font=\footnotesize]
-  \draw[ptitblue, thick, fill=lightBlue!60] (0,0) ellipse (7cm and 3.5cm);
-  \draw[mThree!80!black, thick, fill=lightGreen] (1.2,-0.35) ellipse (5.4cm and 2.8cm);
-  \draw[mTwo!90!black, thick, fill=lightOrange] (2.3,-0.65) ellipse (3.9cm and 2.0cm);
-  \draw[accentRed, thick, fill=accentRed!12] (3.3,-0.9) ellipse (2.3cm and 1.15cm);
-  \node[align=center, text width=30mm] at (-4.8,0.4) {\textbf{Trí tuệ nhân tạo}\\máy thực hiện việc cần trí tuệ: suy diễn ký hiệu, tìm kiếm, hệ chuyên gia};
-  \node[align=center, text width=28mm] at (-1.7,0.9) {\textbf{Học máy}\\học quy luật từ dữ liệu: hồi quy, SVM, cây, Random Forest};
-  \node[align=center, text width=25mm] at (0.95,0.35) {\textbf{Học sâu}\\học biểu diễn nhiều tầng: MLP, CNN, RNN};
-  \node[align=center, text width=36mm] at (3.3,-0.9) {\textbf{AI tạo sinh \& đa tác tử}\\Transformer, LLM, RAG, Agent};
+% Quan hệ bao hàm AI ⊃ Học máy ⊃ Học sâu ⊃ AI tạo sinh & đa tác tử: elip tô chuyển sắc tỏa tâm, có bóng đổ.
+\begin{tikzpicture}[font=\small]
+  \foreach \cx/\cy/\rx/\ry/\c in {0/0/7.6/4.1/cBlue, 1.35/-0.4/5.9/3.25/cGreen, 2.55/-0.75/4.3/2.35/cOrange, 3.6/-1.05/2.5/1.35/cRed} {
+    \fill[inner color=white, outer color=\c!38, blur shadow={shadow blur steps=8, shadow opacity=30}] (\cx,\cy) ellipse (\rx cm and \ry cm);
+    \draw[\c!75!black, very thick] (\cx,\cy) ellipse (\rx cm and \ry cm);
+  }
+  \node[align=center, text width=31mm] at (-5.2,0.6) {\textbf{\large\color{cBlue!70!black}Trí tuệ nhân tạo}\\máy làm việc cần trí tuệ: suy diễn ký hiệu, tìm kiếm, hệ chuyên gia};
+  \node[align=center, text width=29mm] at (-1.9,1.1) {\textbf{\large\color{cGreen!70!black}Học máy}\\học quy luật từ dữ liệu: hồi quy, SVM, cây, Random Forest};
+  \node[align=center, text width=27mm] at (0.95,0.35) {\textbf{\large\color{cOrange!70!black}Học sâu}\\biểu diễn nhiều tầng: MLP, CNN, RNN};
+  \node[align=center, text width=36mm] at (3.6,-1.05) {\textbf{\color{cRed!70!black}AI tạo sinh \& đa tác tử}\\Transformer, LLM, RAG, Agent};
 \end{tikzpicture}
