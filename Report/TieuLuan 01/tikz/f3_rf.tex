@@ -1,0 +1,20 @@
+% Vùng cảm nhận tích lũy: ba tầng conv 3x3 bước 1 xếp chồng -> một nơ-ron ở tầng 3 nhìn 7 điểm đầu vào.
+\begin{tikzpicture}[x=7mm, y=12mm, font=\footnotesize]
+  \foreach \l/\n/\c in {0/9/lightGreen, 1/7/lightBlue, 2/5/lightBlue, 3/3/lightOrange} {
+    \pgfmathsetmacro{\off}{(9-\n)/2}
+    \foreach \k in {1,...,\n} \node[o, minimum size=6mm, fill=white] (n\l-\k) at (\off+\k, \l) {};
+  }
+  % vùng ảnh hưởng của nơ-ron giữa tầng 3
+  \foreach \l/\a/\b in {0/2/8, 1/2/6, 2/2/4} {
+    \foreach \k in {\a,...,\b} \node[o, minimum size=6mm, fill=lightBlue] at (n\l-\k) {};
+  }
+  \node[o, minimum size=6mm, fill=accentRed!60] at (n3-2) {};
+  \draw[accentRed, thick] (n3-2.south) -- (n2-2.north) (n3-2.south) -- (n2-4.north);
+  \draw[ptitblue, thick] (n2-2.south) -- (n1-2.north) (n2-4.south) -- (n1-6.north);
+  \draw[ptitblue, thick] (n1-2.south) -- (n0-2.north) (n1-6.south) -- (n0-8.north);
+  \foreach \l/\t in {0/{Đầu vào}, 1/{Conv $3{\times}3$ (1)}, 2/{Conv $3{\times}3$ (2)}, 3/{Conv $3{\times}3$ (3)}}
+    \node[anchor=east] at (0.2, \l) {\t};
+  \foreach \l/\t in {1/{RF = 3}, 2/{RF = 5}, 3/{RF = 7}}
+    \node[anchor=west, ptitblue] at (10, \l) {\t};
+  \node[anchor=west, nhan, align=left] at (10, 0) {$RF_l = RF_{l-1} + (k_l - 1)\prod_{i<l} s_i$};
+\end{tikzpicture}

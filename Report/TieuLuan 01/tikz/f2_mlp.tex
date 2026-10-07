@@ -1,0 +1,23 @@
+% Kiến trúc MLP chung cho cả ba nền tảng: d đầu vào -> 128 -> 64 -> đầu ra.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\footnotesize,
+  n/.style={circle, draw=ptitblue, fill=lightBlue, minimum size=4.5mm, inner sep=0pt},
+  ni/.style={n, fill=lightGreen, draw=mThree!80!black},
+  no/.style={n, fill=lightOrange, draw=mTwo!80!black}]
+  \foreach \i in {1,...,5} \node[ni] (a\i) at (0, 2.6-0.65*\i) {};
+  \node at (0,-1.35) {$\vdots$};
+  \foreach \i in {1,...,6} \node[n] (b\i) at (3, 2.9-0.65*\i) {};
+  \foreach \i in {1,...,4} \node[n] (c\i) at (6, 2.3-0.65*\i) {};
+  \foreach \i in {1,...,2} \node[no] (d\i) at (9, 1.0-0.65*\i) {};
+  \foreach \i in {1,...,5} \foreach \j in {1,...,6} \draw[gray!45] (a\i) -- (b\j);
+  \foreach \i in {1,...,6} \foreach \j in {1,...,4} \draw[gray!45] (b\i) -- (c\j);
+  \foreach \i in {1,...,4} \foreach \j in {1,...,2} \draw[gray!45] (c\i) -- (d\j);
+  \node[align=center, above] at (0,2.3) {Đầu vào $x \in \mathbb{R}^{d}$\\(sau tiền xử lý)};
+  \node[align=center, above] at (3,2.6) {Dense 128\\ReLU + Dropout 0,2};
+  \node[align=center, above] at (6,2.0) {Dense 64\\ReLU + Dropout 0,2};
+  \node[align=center, above] at (9,0.7) {Đầu ra};
+  \node[align=left, anchor=west, nhan] at (9.5,0.0) {sigmoid: tiểu đường\\softmax 3 lớp: cảm xúc\\tuyến tính: giá nhà};
+  \node[align=center, nhan] at (1.5,-2.2) {$z^{[1]} = W^{[1]}x + b^{[1]}$};
+  \node[align=center, nhan] at (4.5,-2.2) {$a^{[l]} = \mathrm{ReLU}(z^{[l]})$};
+  \node[align=center, nhan] at (7.5,-2.2) {$\hat y = g(W^{[3]}a^{[2]} + b^{[3]})$};
+  \draw[-{Stealth}, accentRed, thick] (9,-1.75) -- node[below, nhan] {lan truyền ngược $\delta^{[l]}$} (0,-1.75);
+\end{tikzpicture}

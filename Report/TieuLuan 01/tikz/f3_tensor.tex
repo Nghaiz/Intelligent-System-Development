@@ -1,0 +1,30 @@
+% Ảnh số: ma trận điểm ảnh -> tensor 3 kênh C×H×W -> lô 4D N×C×H×W.
+\begin{tikzpicture}[x=5mm, y=5mm, font=\footnotesize]
+  % (a) ma trận điểm ảnh xám
+  \def\G{{{12,40,198,201},{18,177,240,36},{25,230,150,20},{30,212,60,15}}}
+  \foreach \i in {0,...,3} \foreach \j in {0,...,3} {
+    \pgfmathtruncatemacro{\v}{\G[\i][\j]}
+    \pgfmathtruncatemacro{\p}{\v/255*100}
+    \ifnum\p>55 \def\tc{white}\else\def\tc{black}\fi
+    \node[o, minimum size=5mm, font=\tiny, fill=black!\p, text=\tc] at (\j,-\i) {\v};}
+  \node[align=center] at (1.5,1.3) {(a) Ma trận điểm ảnh\\$H{\times}W$, giá trị 0--255};
+  % (b) tensor ba kênh
+  \begin{scope}[xshift=4.2cm]
+    \foreach \c/\col/\k in {2/blue/B, 1/green!60!black/G, 0/red/R} {
+      \draw[fill=\col!25, draw=\col] (0.6*\c, -3+0.6*\c) rectangle ++(4,4);
+      \node[\col, font=\scriptsize\bfseries] at (0.6*\c+3.6, 0.65+0.6*\c) {\k};
+    }
+    \node[align=center] at (2.6,2.9) {(b) Tensor ảnh màu\\$C{\times}H{\times}W = 3{\times}32{\times}32$};
+  \end{scope}
+  % (c) lô ảnh
+  \begin{scope}[xshift=9.6cm]
+    \foreach \n in {4,3,2,1,0} {
+      \draw[fill=lightBlue, draw=ptitblue] (0.45*\n, -3+0.45*\n) rectangle ++(3.4,3.4);
+      \draw[fill=lightBlue!60, draw=ptitblue] (0.45*\n, 0.4+0.45*\n) -- ++(0.35,0.35) -- ++(3.4,0) -- ++(-0.35,-0.35) -- cycle;
+    }
+    \node[align=center] at (2.6,3.4) {(c) Lô ảnh 4D\\$N{\times}C{\times}H{\times}W$};
+    \node[nhan] at (2.6,-3.8) {ví dụ: $256{\times}3{\times}64{\times}64$ (EuroSAT)};
+  \end{scope}
+  \draw[mui] (4,-1.5) -- (8,-1.5);
+  \draw[mui] (14.6,-1.5) -- (19,-1.5);
+\end{tikzpicture}

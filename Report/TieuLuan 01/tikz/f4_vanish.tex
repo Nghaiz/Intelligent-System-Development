@@ -1,0 +1,13 @@
+% Độ lớn tích chuỗi Jacobian ~ |λ|^k theo số bước lùi k: tiêu biến khi |λ| < 1, bùng nổ khi |λ| > 1.
+\begin{tikzpicture}
+\begin{axis}[a06, width=11cm, height=5.8cm, ymode=log, xmin=0, xmax=60, ymin=1e-4, ymax=1e4,
+  xlabel={số bước lùi $k = T - t$}, ylabel={$\big\lVert \prod_{j} \partial h_j / \partial h_{j-1} \big\rVert \approx |\lambda_{\max}|^{k}$},
+  legend pos=north west, legend cell align=left, samples=61, domain=0:60]
+  \addplot[accentRed, very thick] {1.15^x};    \addlegendentry{$|\lambda_{\max}| = 1{,}15$: bùng nổ đạo hàm}
+  \addplot[mZero, very thick, dashed] {1};     \addlegendentry{$|\lambda_{\max}| = 1$}
+  \addplot[mOne, very thick] {0.9^x};          \addlegendentry{$|\lambda_{\max}| = 0{,}9$}
+  \addplot[mThree, very thick] {0.8^x};        \addlegendentry{$|\lambda_{\max}| = 0{,}8$: triệt tiêu đạo hàm}
+  \draw[gray, dotted, thick] (axis cs:30,1e-4) -- (axis cs:30,1e4);
+  \node[font=\scriptsize, anchor=west, fill=white, inner sep=1pt] at (axis cs:30.5,3e-4) {cửa sổ FPT $T = 30$: $0{,}8^{30} \approx 10^{-3}$};
+\end{axis}
+\end{tikzpicture}

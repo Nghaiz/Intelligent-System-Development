@@ -1,0 +1,25 @@
+% Kiến trúc ba tầng của Web App: trình duyệt - máy chủ Flask - tầng suy luận nạp sẵn mô hình.
+\begin{tikzpicture}[font=\footnotesize, node distance=6mm,
+  tang/.style={draw=ptitblue, rounded corners=4pt, fill=lightBlue!45, inner sep=6pt},
+  ep/.style={khoi, minimum width=27mm, font=\scriptsize}]
+  % tầng 1
+  \node[khoiG, minimum width=34mm, minimum height=26mm, align=center] (ui) at (0,0)
+    {\textbf{Trình duyệt}\\HTML5 / CSS3\\JavaScript \texttt{fetch}\\biểu đồ SVG};
+  % tầng 2
+  \foreach \e/\y in {diabetes/1.5, house/0.9, sentiment/0.3, vision/-0.3, stock/-0.9, churn/-1.5}
+    \node[ep] (\e) at (5.2,\y) {\texttt{POST /api/\e}};
+  \node[tang, fit=(diabetes)(churn), label={[font=\footnotesize\bfseries, text=ptitblue]above:Máy chủ Flask}] (srv) {};
+  % tầng 3
+  \node[khoiC, minimum width=46mm, align=left, anchor=west] (inf) at (8.2,0) {%
+    \textbf{Tầng suy luận (nạp sẵn lên RAM, CPU)}\\[2pt]
+    MLP PyTorch \texttt{.pt}, Random Forest \texttt{.joblib}\\
+    TF-IDF + Logistic Regression \texttt{.joblib}\\
+    ResNet-18, MobileNetV2 \texttt{.pt} + CAM\\
+    Simple RNN / LSTM / GRU / BiLSTM \texttt{.pt}\\
+    bộ tiền xử lý dựng lại từ \texttt{load\_*()}};
+  \draw[mui, <->] (ui.east) -- node[above, nhan] {JSON} (srv.west);
+  \draw[mui, <->] (srv.east) -- node[above, nhan] {tensor} (inf.west);
+  \node[nhan, below=3mm of ui] {Tầng giao diện};
+  \node[nhan, below=3mm of srv] {Tầng ứng dụng};
+  \node[nhan, below=3mm of inf] {Tầng mô hình};
+\end{tikzpicture}

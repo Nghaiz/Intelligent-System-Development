@@ -1,0 +1,378 @@
+{
+  "diabetes": {
+    "n": 100000,
+    "n_features": 8,
+    "pos_rate": 0.085,
+    "n_pos": 8500,
+    "corr_glucose": 0.41955799602056193,
+    "corr_hba1c": 0.4006603146474924,
+    "corr_age": 0.25800803335609984,
+    "corr_bmi": 0.2143574057995119,
+    "rate_glu200": 0.36076123931231036,
+    "rate_hba65": 0.3681544028950543,
+    "rate_hba_low": 0.0,
+    "noinfo_smoke": 0.35816,
+    "sample": [
+      [
+        "Male",
+        "67.0",
+        "0",
+        "0",
+        "not current",
+        "29.15",
+        "6.2",
+        "100",
+        "0"
+      ],
+      [
+        "Female",
+        "4.0",
+        "0",
+        "0",
+        "never",
+        "27.32",
+        "6.5",
+        "140",
+        "0"
+      ],
+      [
+        "Female",
+        "40.0",
+        "0",
+        "0",
+        "never",
+        "29.47",
+        "6.2",
+        "130",
+        "0"
+      ],
+      [
+        "Male",
+        "53.0",
+        "0",
+        "0",
+        "never",
+        "27.32",
+        "6.1",
+        "155",
+        "0"
+      ],
+      [
+        "Male",
+        "65.0",
+        "1",
+        "0",
+        "No Info",
+        "49.71",
+        "5.8",
+        "130",
+        "0"
+      ]
+    ],
+    "sample_cols": [
+      "gender",
+      "age",
+      "hypertension",
+      "heart_disease",
+      "smoking_history",
+      "bmi",
+      "HbA1c_level",
+      "blood_glucose_level",
+      "diabetes"
+    ]
+  },
+  "house": {
+    "n": 30229,
+    "n_province": 78,
+    "n_district": 342,
+    "price_mean": 5.872078136888418,
+    "price_median": 5.9,
+    "price_min": 1.0,
+    "price_max": 11.5,
+    "price_skew": -0.02899246958206515,
+    "area_skew": 3.8885177636149697,
+    "logarea_skew": 0.6464900691438511,
+    "area_median": 56.0,
+    "corr_area": 0.0975932631493419,
+    "corr_road": 0.1642795021319824,
+    "corr_floors": 0.3316389140849425,
+    "corr_bed": 0.3894318508981051,
+    "share_hcm_hn": 0.7355519534222105,
+    "miss_frontage": 0.3825465612491316,
+    "miss_road": 0.4398756161302061,
+    "miss_furniture": 0.46706804723940587,
+    "miss_direction": 0.702603460253399,
+    "sample": [
+      [
+        36.0,
+        4.0,
+        2.0,
+        4.0,
+        NaN,
+        "Hai Bà Trưng",
+        "Hà Nội",
+        6.0
+      ],
+      [
+        30.0,
+        2.0,
+        1.0,
+        3.7,
+        6.0,
+        "Quận 3",
+        "Hồ Chí Minh",
+        5.6
+      ],
+      [
+        56.0,
+        3.0,
+        3.0,
+        NaN,
+        NaN,
+        "Sơn Trà",
+        "Đà Nẵng",
+        6.85
+      ],
+      [
+        60.0,
+        5.0,
+        6.0,
+        NaN,
+        NaN,
+        "Thanh Trì",
+        "Hà Nội",
+        8.3
+      ],
+      [
+        60.0,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        "Thuận An",
+        "Bình Dương",
+        3.7
+      ]
+    ]
+  },
+  "reviews": {
+    "n_raw": 23486,
+    "n": 22641,
+    "share_pos": 0.7706373393401351,
+    "share_neu": 0.12468530541937194,
+    "share_neg": 0.10467735524049292,
+    "words_mean": 60.19667859193498,
+    "words_median": 59.0,
+    "top_pos": [
+      "holds",
+      "penny",
+      "accessories",
+      "compliment",
+      "pleasantly",
+      "booties"
+    ],
+    "top_neg": [
+      "worst",
+      "horrible",
+      "awful",
+      "unwearable",
+      "asap",
+      "potato"
+    ],
+    "words_by_class": [
+      60.9,
+      64.2,
+      59.5
+    ],
+    "sample": [
+      [
+        1,
+        "I tried this top on thinking it would be cute for the summer. it looked more like a maternity top with the ful...",
+        "Tiêu cực"
+      ],
+      [
+        2,
+        "I have been struggling to find a nice flowy summer dress that isn't too short. i am petite but do not like to ...",
+        "Tiêu cực"
+      ],
+      [
+        3,
+        "Great idea, but this was not a flattering top on me. it almost worked, but ended up making me look like i am p...",
+        "Trung tính"
+      ],
+      [
+        3,
+        "I didn't plan to wear this off shoulder. sadly the neck is too loose and big if worn on shoulder. the fabric i...",
+        "Trung tính"
+      ],
+      [
+        5,
+        "I tried these on in-store not intending to buy them (was trying on shirts and needed to see how they would loo...",
+        "Tích cực"
+      ]
+    ]
+  },
+  "stock": {
+    "n": {
+      "FPT": 3606,
+      "VCB": 3590,
+      "HPG": 3608,
+      "VIC": 3534
+    },
+    "n_total": 14338,
+    "start": "2012-01-03",
+    "end": "2026-09-30",
+    "ret_std": {
+      "FPT": 1.6645683447122197,
+      "VCB": 1.9102509522359123,
+      "HPG": 2.094541780308614,
+      "VIC": 2.0447293515249436
+    },
+    "ret_kurt": {
+      "FPT": 3.2766577076991954,
+      "VCB": 27.852977908091226,
+      "HPG": 1.9445643112199384,
+      "VIC": 7.268743779816958
+    },
+    "corr_min": 0.23788361852565687,
+    "corr_max": 0.4437966707515596,
+    "adf_price_stat": -0.6974358556249907,
+    "adf_price_p": 0.8474125915610097,
+    "adf_ret_stat": -22.605465853954684,
+    "adf_ret_p": 0.0,
+    "acf1_ret": 0.015321002314783663,
+    "n_train": 2821,
+    "n_test": 706,
+    "test_start": "2023-11-17",
+    "train_end": "2023-11-16",
+    "train_max_close": 64892.89453125,
+    "test_max_close": 118050.6640625,
+    "sample": [
+      [
+        "2012-06-18",
+        4784.216685742245,
+        4784.216685742245,
+        4716.697542903669,
+        4735.98876953125,
+        220216.0,
+        4744.187475585937,
+        49.64384031210518
+      ],
+      [
+        "2015-11-06",
+        8641.408157014615,
+        8802.92959527923,
+        8399.125299001586,
+        8479.88671875,
+        14057051.0,
+        7831.376245117188,
+        75.0446147870542
+      ],
+      [
+        "2019-07-03",
+        14772.534198885449,
+        14835.800098284251,
+        14725.086004584073,
+        14804.16796875,
+        3387397.0,
+        14346.283056640625,
+        62.56216427120876
+      ],
+      [
+        "2023-04-11",
+        44587.12844422727,
+        44753.91471342919,
+        44531.534232204525,
+        44642.72265625,
+        893361.0,
+        44153.491015625,
+        54.31607463384286
+      ],
+      [
+        "2026-09-30",
+        63400.0,
+        64000.0,
+        63000.0,
+        63000.0,
+        3041400.0,
+        65649.9998046875,
+        41.34789608719292
+      ]
+    ]
+  },
+  "churn": {
+    "n_users": 100000,
+    "T": 31,
+    "D": 8,
+    "churn_rate": 0.08964,
+    "n_train": 70000,
+    "n_val": 15000,
+    "n_test": 15000,
+    "active_days_churn": 16.011266708374023,
+    "active_days_loyal": 18.141252517700195,
+    "corr_active": -0.06289809440348987,
+    "corr_secs": -0.05717603274439715
+  },
+  "svhn": {
+    "n_train": 73257,
+    "n_test": 26032,
+    "size": 32,
+    "classes": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "mean": [
+      0.43768447637557983,
+      0.4437684118747711,
+      0.47280409932136536
+    ],
+    "std": [
+      0.19803017377853394,
+      0.2010156661272049,
+      0.19703583419322968
+    ],
+    "max_class_share": 0.18921058738414076,
+    "min_class_share": 0.06359801793685245,
+    "min_class_n": 4659,
+    "max_class_n": 13861
+  },
+  "eurosat": {
+    "n_train": 21600,
+    "n_test": 5400,
+    "size": 64,
+    "classes": [
+      "Cây hằng năm",
+      "Rừng",
+      "Thảm cỏ",
+      "Đường cao tốc",
+      "Khu công nghiệp",
+      "Đồng cỏ chăn thả",
+      "Cây lâu năm",
+      "Khu dân cư",
+      "Sông",
+      "Biển/hồ"
+    ],
+    "mean": [
+      0.34447282552719116,
+      0.3804314434528351,
+      0.40792927145957947
+    ],
+    "std": [
+      0.2026207596063614,
+      0.1368788480758667,
+      0.11552345752716064
+    ],
+    "max_class_share": 0.1111111111111111,
+    "min_class_share": 0.07407407407407407,
+    "min_class_n": 1600,
+    "max_class_n": 2400
+  }
+}

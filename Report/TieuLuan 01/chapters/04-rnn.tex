@@ -1,0 +1,287 @@
+% =====================================================================
+%  CHƯƠNG 4 — MẠNG NƠ-RON HỒI QUY (RNN)
+% =====================================================================
+\chapter{Mạng Nơ-ron Hồi Quy (RNN)}
+\label{ch:rnn}
+
+\section{Cơ sở lý thuyết mạng nơ-ron hồi quy và mô hình hóa chuỗi}
+
+Dữ liệu bảng và ảnh tĩnh ở hai chương trước thỏa giả định các mẫu độc lập cùng phân phối. Dữ liệu chuỗi vi phạm giả định
+đó: giá hôm nay phụ thuộc giá hôm qua, việc người dùng bỏ dịch vụ cuối tháng được báo trước bằng hành vi những ngày giữa
+tháng. Thứ tự là thông tin. Một tập dữ liệu chuỗi được biểu diễn thành tensor ba chiều $X \in \mathbb{R}^{B\times T\times D}$
+với $B$ mẫu, $T$ bước thời gian và $D$ đặc trưng tại mỗi bước (Hình~\ref{fig:tensor4}).
+
+\hinhtikz{f4_tensor}{Tensor chuỗi ba chiều $[B, T, D]$ dùng trong mô hình hóa học sâu tuần tự.}{tensor4}
+
+\subsection{Kiến trúc Simple RNN và đồ thị tính toán mở rộng theo thời gian}
+
+Mạng hồi quy đơn giản (Elman RNN) giữ một vector trạng thái ẩn $\mathbf{h}_t \in \mathbb{R}^H$ làm bộ nhớ. Tại mỗi bước:
+\begin{align}
+  \mathbf{h}_t &= \tanh\big(W_{xh}\mathbf{x}_t + W_{hh}\mathbf{h}_{t-1} + \mathbf{b}_h\big), \label{eq:rnn}\\
+  \hat y &= W_{hy}\mathbf{h}_T + b_y \quad \text{(dạng many-to-one dùng trong chương này)},
+\end{align}
+với $W_{xh} \in \mathbb{R}^{H\times D}$, $W_{hh} \in \mathbb{R}^{H\times H}$ được \emph{dùng chung} ở mọi bước. Mở cuộn theo
+thời gian (Hình~\ref{fig:unroll}), RNN trở thành một mạng truyền thẳng sâu $T$ tầng có chung trọng số.
+
+\hinhtikz{f4_unroll}{Đồ thị tính toán của RNN: dạng cuộn và dạng mở rộng theo thời gian với trọng số dùng chung.}{unroll}
+
+\subsection{Lan truyền ngược qua thời gian (BPTT) và hiện tượng triệt tiêu đạo hàm}
+
+Huấn luyện RNN dùng lan truyền ngược qua thời gian (Backpropagation Through Time). Gradient của mất mát ở bước $T$ theo
+$W_{hh}$ cộng dồn đóng góp của mọi bước trước:
+\begin{equation}
+  \frac{\partial \mathcal{L}_T}{\partial W_{hh}} = \sum_{k=1}^{T}\frac{\partial \mathcal{L}_T}{\partial \mathbf{h}_T}
+  \Bigg(\prod_{j=k+1}^{T}\frac{\partial \mathbf{h}_j}{\partial \mathbf{h}_{j-1}}\Bigg)\frac{\partial \mathbf{h}_k}{\partial W_{hh}},
+  \qquad
+  \frac{\partial \mathbf{h}_j}{\partial \mathbf{h}_{j-1}} = \mathrm{diag}\big(1 - \mathbf{h}_j^2\big)\,W_{hh} .
+  \label{eq:bptt}
+\end{equation}
+Tích $T - k$ ma trận Jacobian quyết định bước $k$ còn ảnh hưởng bao nhiêu \cite{bengio1994}. Vì $|1 - h^2| \le 1$, chuẩn của
+tích bị chặn bởi $|\lambda_{\max}(W_{hh})|^{T-k}$:
+\begin{itemize}
+  \item nếu $|\lambda_{\max}| < 1$: tích giảm theo hàm mũ về 0, gradient của các bước xa \emph{triệt tiêu}, mạng không học
+    được phụ thuộc dài hạn;
+  \item nếu $|\lambda_{\max}| > 1$: tích tăng theo hàm mũ, gradient \emph{bùng nổ}, trọng số dao động mạnh hoặc tràn số.
+\end{itemize}
+Hình~\ref{fig:vanish} cho thấy với $|\lambda_{\max}| = 0{,}8$, tín hiệu từ 30 bước trước (độ dài cửa sổ của bài toán chứng
+khoán) chỉ còn cỡ $10^{-3}$.
+
+\hinhtikz{f4_vanish}{Bản chất toán học của triệt tiêu và bùng nổ đạo hàm: chuẩn tích chuỗi Jacobian theo số bước lùi.}{vanish}
+
+\subsection{Kỹ thuật cắt tỉa đạo hàm (Gradient Clipping)}
+
+Chống bùng nổ đạo hàm, Pascanu và cộng sự \cite{pascanu2013} đề xuất co gradient khi chuẩn vượt ngưỡng $\theta$:
+\begin{equation}
+  \mathbf{g} \leftarrow \begin{cases} \mathbf{g}, & \lVert\mathbf{g}\rVert_2 \le \theta,\\[2pt]
+    \dfrac{\theta}{\lVert\mathbf{g}\rVert_2}\,\mathbf{g}, & \lVert\mathbf{g}\rVert_2 > \theta. \end{cases}
+\end{equation}
+Phép co giữ nguyên \emph{hướng} của bước cập nhật, chỉ giới hạn \emph{độ dài} (Hình~\ref{fig:clip}). Mọi mô hình hồi quy
+trong chương dùng $\theta = 1$ (\texttt{clip\_grad\_norm\_} trong PyTorch, \texttt{clipnorm} trong Keras). Cắt tỉa không
+chữa được triệt tiêu đạo hàm; việc đó cần thay đổi kiến trúc.
+
+\hinhtikz{f4_clip}{Hình học của cắt tỉa đạo hàm: vector $\mathbf{g}$ được co về hình cầu bán kính $\theta$, giữ nguyên hướng.}{clip}
+
+\subsection{Kiến trúc tế bào LSTM và GRU}
+
+\paragraph{LSTM \cite{hochreiter1997}.} LSTM tách bộ nhớ thành trạng thái ô nhớ $\mathbf{c}_t$ và trạng thái ẩn $\mathbf{h}_t$,
+điều khiển bằng ba cổng sigmoid nhận $[\mathbf{h}_{t-1}, \mathbf{x}_t]$:
+\begin{align}
+  \text{cổng quên:}\quad & \mathbf{f}_t = \sigma(W_f[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_f), \\
+  \text{cổng vào:}\quad & \mathbf{i}_t = \sigma(W_i[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_i), \\
+  \text{ứng viên:}\quad & \tilde{\mathbf{c}}_t = \tanh(W_c[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_c), \\
+  \text{cập nhật ô nhớ:}\quad & \mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t, \label{eq:cell}\\
+  \text{cổng ra:}\quad & \mathbf{o}_t = \sigma(W_o[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_o), \\
+  \text{trạng thái ẩn:}\quad & \mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t).
+\end{align}
+Phương trình~\eqref{eq:cell} là phép \emph{cộng}: $\partial\mathbf{c}_t/\partial\mathbf{c}_{t-1} = \mathrm{diag}(\mathbf{f}_t)$,
+không có ma trận trọng số nhân vào, nên khi cổng quên gần 1 gradient đi qua nhiều bước mà gần như không suy giảm
+(Hình~\ref{fig:lstm}).
+
+\hinhtikz{f4_lstm}{Kiến trúc vi mô của tế bào LSTM: đường cộng của ô nhớ và ba cổng điều khiển.}{lstm}
+
+\paragraph{GRU \cite{cho2014}.} GRU gộp ô nhớ và trạng thái ẩn, dùng hai cổng:
+\begin{align}
+  \mathbf{r}_t &= \sigma(W_r[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_r), \qquad
+  \mathbf{z}_t = \sigma(W_z[\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_z), \\
+  \tilde{\mathbf{h}}_t &= \tanh(W_h[\mathbf{r}_t \odot \mathbf{h}_{t-1}, \mathbf{x}_t] + \mathbf{b}_h), \qquad
+  \mathbf{h}_t = (1 - \mathbf{z}_t) \odot \mathbf{h}_{t-1} + \mathbf{z}_t \odot \tilde{\mathbf{h}}_t .
+\end{align}
+Trạng thái mới là tổ hợp lồi của trạng thái cũ và ứng viên (Hình~\ref{fig:gru}); với ba khối trọng số thay vì bốn, GRU ít
+hơn LSTM 25\,\% tham số ở tầng hồi quy.
+
+\hinhtikz{f4_gru}{Kiến trúc vi mô của tế bào GRU với cổng đặt lại $r_t$ và cổng cập nhật $z_t$.}{gru}
+
+\subsection{Mạng hồi quy hai chiều (BiLSTM) và Recurrent Dropout}
+
+Khi toàn bộ chuỗi đã có sẵn lúc dự đoán (phân loại cả một tháng hành vi), đọc theo cả hai chiều cho nhiều ngữ cảnh hơn.
+BiLSTM \cite{schuster1997} chạy một LSTM xuôi $\overrightarrow{\mathbf{h}}_t$ và một LSTM ngược $\overleftarrow{\mathbf{h}}_t$,
+rồi ghép $[\overrightarrow{\mathbf{h}}_T; \overleftarrow{\mathbf{h}}_1] \in \mathbb{R}^{2H}$ (Hình~\ref{fig:bilstm}). Lưu ý với
+dự báo chuỗi thời gian, chiều ngược vẫn chỉ đọc dữ liệu \emph{trong cửa sổ quá khứ}, không nhìn trước tương lai.
+
+\hinhtikz{f4_bilstm}{Mạng hồi quy hai chiều BiLSTM tổng hợp ngữ cảnh theo cả hai chiều thời gian.}{bilstm}
+
+Dropout thông thường lấy mặt nạ mới ở mỗi bước thời gian, làm nhiễu bộ nhớ của mạng. Gal và Ghahramani \cite{gal2016} chỉ
+ra cách đúng là dùng \emph{một} mặt nạ cho mọi bước của cùng một chuỗi (Hình~\ref{fig:dropout}). Trong thực nghiệm, dropout
+được đặt giữa hai tầng hồi quy và trước tầng ra, không đặt trong vòng hồi quy, để PyTorch và Keras dùng được nhân cuDNN/oneDNN
+tối ưu.
+
+\hinhtikz{f4_dropout}{Dropout thông thường đổi mặt nạ ở mỗi bước; recurrent dropout giữ một mặt nạ cố định cho cả chuỗi.}{dropout}
+
+% ---------------------------------------------------------------------
+\section{Khảo sát thực nghiệm và tiền xử lý hai bộ dữ liệu chuỗi}
+
+\subsection{Tập dữ liệu 1: chuỗi giá chứng khoán Việt Nam (VN30, \SL{eda/stock/start} -- \SL{eda/stock/end})}
+
+\begin{itemize}
+  \item \textbf{Nguồn:} lịch sử giao dịch trên Sở Giao dịch Chứng khoán TP.~Hồ Chí Minh của bốn mã trụ cột trong rổ VN30,
+    tải từ Yahoo Finance bằng thư viện \texttt{yfinance} \cite{yfinance}: FPT (công nghệ -- viễn thông), VCB (ngân hàng),
+    HPG (thép) và VIC (bất động sản -- dịch vụ). Giá đã điều chỉnh theo chia tách và cổ tức.
+  \item \textbf{Quy mô:} tổng \SL{eda/stock/n_total} phiên: FPT \SL{eda/stock/n/FPT}, VCB \SL{eda/stock/n/VCB},
+    HPG \SL{eda/stock/n/HPG}, VIC \SL{eda/stock/n/VIC} phiên. Mỗi phiên có 9 đặc trưng: Open, High, Low, Close, Volume và
+    bốn chỉ báo kỹ thuật tự tính -- trung bình trượt 20 và 50 phiên (SMA20, SMA50), chỉ số sức mạnh tương đối 14 phiên theo
+    Wilder (RSI-14) và độ biến động 30 phiên (độ lệch chuẩn lợi suất ngày).
+  \item \textbf{Bài toán:} từ 30 phiên gần nhất của FPT, dự báo giá đóng cửa phiên kế tiếp.
+\end{itemize}
+
+\bang{tab_sample_stock}{Năm phiên giao dịch tiêu biểu của FPT kèm chỉ báo kỹ thuật.}{sample-stock}
+
+\hinhpdf{f4_stock_price}{1}{Giá đóng cửa (nghìn đồng), đường SMA50 và khối lượng giao dịch (cột mờ) của bốn mã VN30.}{stock-price}
+\hinhpdf{f4_stock_returns}{1}{Phân phối lợi suất ngày, độ biến động 30 phiên và ma trận tương quan lợi suất giữa bốn mã.}{stock-returns}
+\hinhpdf{f4_acf}{1}{ACF của giá đóng cửa và ACF, PACF của lợi suất ngày FPT (vùng tô là khoảng tin cậy 95\,\%).}{acf}
+
+\paragraph{Nhận xét EDA.}
+\begin{itemize}
+  \item \textbf{Xu hướng và đổi chế độ:} giá FPT tăng hơn 20 lần trong giai đoạn khảo sát, đạt đỉnh
+    \SL{eda/stock/test_max_close} đồng trong giai đoạn kiểm thử, trong khi mức cao nhất của giai đoạn huấn luyện chỉ
+    \SL{eda/stock/train_max_close} đồng (Hình~\ref{fig:stock-price}). VIC tăng vọt từ 2025. Chuỗi giá \emph{không dừng}:
+    kiểm định Augmented Dickey--Fuller cho $p = \SL{eda/stock/adf_price_p}$, không bác bỏ được nghiệm đơn vị.
+  \item \textbf{Lợi suất gần như không tự tương quan:} lợi suất ngày là chuỗi dừng (ADF $p = \SL{eda/stock/adf_ret_p}$),
+    đuôi dày (độ nhọn dư của FPT \SL{eda/stock/ret_kurt/FPT}), và tự tương quan bậc 1 chỉ \SL{eda/stock/acf1_ret}
+    (Hình~\ref{fig:acf}). ACF của \emph{giá} giảm rất chậm vì giá hôm nay gần như bằng giá hôm qua, nhưng ACF của
+    \emph{lợi suất} gần như nằm trong dải tin cậy: phần dự báo được của biến động ngày mai là rất nhỏ.
+  \item \textbf{Tương quan giữa các mã} ở mức trung bình ($r$ từ \SL{eda/stock/corr_min} đến \SL{eda/stock/corr_max}),
+    phản ánh xu hướng chung của thị trường (Hình~\ref{fig:stock-returns}).
+\end{itemize}
+
+\hinhtikz{f4_window}{Cơ chế tạo mẫu cửa sổ trượt 30 phiên và chia theo thời gian chống rò rỉ thông tin tương lai.}{window}
+
+\paragraph{Tiền xử lý chống rò rỉ và chống ngoại suy (Hình~\ref{fig:window}).}
+\begin{enumerate}
+  \item \textbf{Cửa sổ trượt:} cửa sổ $T = 30$ phiên, bước 1, mỗi mẫu $X_i \in \mathbb{R}^{30\times 9}$.
+  \item \textbf{Chia theo thời gian, không xáo trộn:} 80\,\% cửa sổ đầu (\SL{eda/stock/n_train} mẫu, đến
+    \SL{eda/stock/train_end}) để huấn luyện, trong đó 10\,\% cuối làm kiểm định; 20\,\% cuối (\SL{eda/stock/n_test} mẫu,
+    từ \SL{eda/stock/test_start}) để kiểm thử.
+  \item \textbf{Chuẩn hóa theo từng cửa sổ:} lần chạy đầu tiên dùng MinMaxScaler khớp trên tập huấn luyện cho R² âm trên
+    tập kiểm thử, vì giá kiểm thử vượt xa mọi mức giá đã thấy và mạng buộc phải ngoại suy. Cách sửa là biểu diễn mọi cột giá
+    trong cửa sổ bằng phần trăm chênh so với giá đóng cửa ngày cuối cửa sổ, và dự báo \emph{lợi suất} phiên kế tiếp
+    $r_{t+1} = (P_{t+1}/P_t - 1)\cdot 100\,\%$ thay vì mức giá; dự báo giá thu được bằng $\hat P_{t+1} = P_t(1 + \hat r_{t+1})$.
+    Khối lượng lấy log rồi chuẩn hóa bằng thống kê của phần huấn luyện, RSI chia 100.
+\end{enumerate}
+
+\subsection{Tập dữ liệu 2: quỹ đạo hành vi người dùng KKBox}
+
+\begin{itemize}
+  \item \textbf{Nguồn:} cuộc thi WSDM -- KKBox's Churn Prediction Challenge \cite{kkbox2017}: nhật ký nghe nhạc theo ngày của
+    người dùng thật của dịch vụ nghe nhạc trực tuyến KKBox (Đài Loan) và nhãn rời bỏ sau khi hết hạn thuê bao.
+  \item \textbf{Quy mô:} \SL{eda/churn/n_users} người dùng lấy mẫu phân tầng từ tệp nhật ký 1,4 GB (giữ nguyên tỉ lệ rời bỏ),
+    mỗi người là một chuỗi $T = \SL{eda/churn/T}$ ngày của tháng 3/2017 với $D = \SL{eda/churn/D}$ đặc trưng: số bài nghe
+    dưới 25\,\%, 25 -- 50\,\%, 50 -- 75\,\%, 75 -- 98,5\,\% và trọn bài; số bài khác nhau; tổng số giây nghe; cờ có hoạt
+    động. Đặc trưng đếm và số giây lấy $\log(1 + x)$. Nhãn: 1 nếu người dùng rời bỏ, 0 nếu ở lại.
+  \item \textbf{Chia dữ liệu:} 70/15/15 phân tầng: \SL{eda/churn/n_train} huấn luyện, \SL{eda/churn/n_val} kiểm định,
+    \SL{eda/churn/n_test} kiểm thử; chuẩn hóa z-score theo từng đặc trưng bằng thống kê tập huấn luyện.
+\end{itemize}
+
+\hinhpdf{f4_churn_traj}{1}{Quỹ đạo trung bình theo ngày của số giây nghe, số bài khác nhau và tỉ lệ ngày hoạt động: nhóm rời
+bỏ đầu tháng nghe nhiều ngang hoặc hơn nhóm ở lại, rồi giảm dần về cuối tháng.}{churn-traj}
+\hinhpdf{f4_churn_dist}{1}{Tỉ lệ rời bỏ (\SL{eda/churn/churn_ratePct}\,\%) và ma trận tương quan giữa các đặc trưng hành vi
+(trung bình 31 ngày) với nhãn.}{churn-dist}
+
+\paragraph{Nhận xét EDA.} Tỉ lệ rời bỏ là \SL{eda/churn/churn_ratePct}\,\%, mất cân bằng mạnh. Người rời bỏ có trung bình
+\SL{eda/churn/active_days_churn} ngày hoạt động trong tháng, so với \SL{eda/churn/active_days_loyal} ngày của người ở lại
+(Hình~\ref{fig:churn-traj}). Điều đáng chú ý là \emph{hình dạng} quỹ đạo: đầu tháng nhóm rời bỏ nghe nhiều không kém,
+thậm chí hơn nhóm ở lại, nhưng mức nghe giảm dần đều về cuối tháng, trong khi nhóm ở lại giữ ổn định. Tín hiệu nằm ở xu hướng
+theo thời gian, đúng loại thông tin mà mô hình chuỗi có thể khai thác còn đặc trưng tổng hợp cả tháng thì làm mờ đi. Tuy nhiên tương quan của từng đặc trưng với nhãn đều
+yếu (tỉ lệ ngày hoạt động $r = \SL{eda/churn/corr_active}$, Hình~\ref{fig:churn-dist}): hai nhóm chồng lấn nhau rất nhiều,
+vì quyết định gia hạn còn phụ thuộc giá, khuyến mãi, phương thức thanh toán, những thông tin không có trong nhật ký nghe.
+Đây là bài toán khó; mục tiêu thực tế là xếp hạng rủi ro tốt (ROC-AUC) chứ không phải độ chính xác tuyệt đối.
+
+% ---------------------------------------------------------------------
+\section{Hiện thực hóa mã nguồn trên ba nền tảng}
+
+\subsection{Tế bào LSTM viết tay bằng NumPy}
+
+Đoạn mã~\ref{code:rnn_scratch__LSTMCellScratch} cài đặt trực tiếp sáu phương trình LSTM với thứ tự khối trọng số
+$(i, f, g, o)$ giống PyTorch; lớp \texttt{LSTMRegressorScratch} xếp chồng nhiều tế bào và nạp trọng số từ mô hình PyTorch
+đã huấn luyện.
+
+\maNguon{rnn_scratch__LSTMCellScratch}{Tế bào LSTM và lan truyền tiến qua chuỗi viết tay bằng NumPy}
+
+\paragraph{Kiểm chứng.} Nạp trọng số của mô hình LSTM hai tầng đã huấn luyện trên FPT vào bản NumPy và chạy trên toàn bộ
+\SL{eda/stock/n_test} cửa sổ kiểm thử: đầu ra lệch PyTorch tối đa \SL{ch4_scratch/lstm_stock/max_abs_diff} (sai số làm tròn
+giữa float32 và float64), RMSE dự báo giá \SL{ch4_scratch/lstm_stock/rmse_scratch} nghìn đồng so với
+\SL{ch4_scratch/lstm_stock/rmse_torch_cpu} của PyTorch, tốc độ \SL{ch4_scratch/lstm_stock/infer_ms}\,ms mỗi mẫu khi chạy theo
+lô. Các phương trình (4.6) -- (4.11) đã được hiện thực đúng.
+
+\subsection{Hiện thực bằng Keras / TensorFlow}
+
+\maNguon{rnn_keras__build_keras_seq_model}{Mô hình hồi quy many-to-one bằng Keras cho cả hồi quy và phân loại}
+
+\subsection{Hiện thực bằng PyTorch}
+
+Một lớp \texttt{SeqModel} phục vụ cả bốn loại tế bào; vòng huấn luyện cắt tỉa chuẩn gradient trước mỗi bước cập nhật.
+
+\maNguon{rnn_torch__SeqModel}{Mô hình hồi quy tổng quát bằng PyTorch: Simple RNN, LSTM, GRU, BiLSTM}
+\maNguon{rnn_torch__train_epoch}{Một epoch huấn luyện PyTorch có cắt tỉa chuẩn gradient}
+
+Cấu hình chung của cả hai nền tảng: 2 tầng hồi quy 64 đơn vị, dropout 0,2, Dense 32; Adam $10^{-3}$, cắt tỉa $\theta = 1$.
+Chứng khoán: lô 64, tối đa 100 epoch, dừng sớm sau 15 epoch không cải thiện, mất mát MSE trên lợi suất. KKBox: lô 512, tối
+đa 25 epoch, dừng sớm sau 5 epoch, mất mát entropy chéo nhị phân; ngưỡng phân loại chọn trên tập kiểm định để F1 lớn nhất.
+
+% ---------------------------------------------------------------------
+\section{Đánh giá và đối chuẩn các kiến trúc RNN trên hai tập dữ liệu}
+
+\paragraph{Phương pháp.} Bốn kiến trúc được huấn luyện từ đầu trên cùng cách chia dữ liệu. Ngoài các chỉ số chuẩn, bài toán
+chứng khoán có thêm mốc tham chiếu \emph{giữ nguyên giá} ($\hat P_{t+1} = P_t$, tương đương dự báo lợi suất bằng 0) và hai
+thước đo khó hơn $R^2$ trên giá: $R^2$ trên \emph{lợi suất} và tỉ lệ đoán đúng chiều tăng/giảm.
+
+\subsection{Dự báo chuỗi thời gian cổ phiếu FPT (hồi quy)}
+
+\bang{tab_ch4_stock}{Đối chuẩn dự báo giá đóng cửa FPT trên tập kiểm thử (\SL{eda/stock/test_start} -- \SL{eda/stock/end}).}{ch4-stock}
+
+\subsection{Phân loại chuỗi hành vi KKBox}
+
+\bang{tab_ch4_churn}{Đối chuẩn phân loại người dùng rời bỏ trên tập kiểm thử KKBox.}{ch4-churn}
+\bang{tab_ch4_fw}{Đối chuẩn PyTorch và Keras với cùng cấu hình mạng.}{ch4-fw}
+
+\hinhpdf{f4_loss}{1}{Đường cong mất mát huấn luyện (nét liền) và kiểm định (nét đứt) của bốn kiến trúc trên hai tập dữ liệu.}{loss4}
+\hinhpdf{f4_pred_stock}{1}{Giá thực tế và dự báo trên tập kiểm thử FPT, kèm mốc “giữ nguyên giá”; bên phải phóng to 60 phiên cuối.}{pred-stock}
+\hinhpdf{f4_cm_churn}{0.82}{Ma trận nhầm lẫn của LSTM và BiLSTM trên tập kiểm thử KKBox.}{cm-churn}
+\hinhpdf{f4_fw}{1}{So sánh PyTorch và Keras: RMSE trên FPT (đường chấm là mốc giữ nguyên giá), F1 trên KKBox, số tham số và độ
+trễ CPU.}{fw}
+
+\paragraph{Thảo luận kết quả.}
+\begin{itemize}
+  \item \textbf{$R^2$ cao trên giá không chứng minh năng lực dự báo.} Cả bốn mạng đạt $R^2 \approx \SL{ch4_torch/stock/lstm/r2}$
+    trên giá FPT, nhưng mốc giữ nguyên giá cũng đạt $R^2 = \SL{ch4_torch/stock/naive/r2}$ với RMSE
+    \SL{ch4_torch/stock/naive/rmse} nghìn đồng, ngang hoặc tốt hơn mọi mạng (LSTM: \SL{ch4_torch/stock/lstm/rmse}). $R^2$
+    trên lợi suất của các mạng xấp xỉ 0 và tỉ lệ đoán đúng chiều chỉ 43 -- 48\,\%, không hơn tung đồng xu. Các đường dự báo
+    trùng gần như hoàn toàn với đường thực tế dịch đi một phiên (Hình~\ref{fig:pred-stock}): mạng học được rằng dự báo tốt
+    nhất cho lợi suất ngày mai là xấp xỉ 0. Điều này khớp với EDA (tự tương quan lợi suất gần 0) và với giả thuyết thị
+    trường hiệu quả dạng yếu. Kết luận đúng là: với dữ liệu giá -- khối lượng thuần túy, không kiến trúc hồi quy nào khai thác
+    được thông tin vượt mốc ngây thơ; muốn có lợi thế cần thêm dữ liệu ngoài chuỗi giá (tin tức, báo cáo tài chính, dòng tiền).
+  \item \textbf{Khác biệt giữa các tế bào trên chuỗi giá} vì vậy rất nhỏ (Bảng~\ref{tab:ch4-stock}); Simple RNN với cửa sổ 30
+    phiên không bị bất lợi rõ rệt vì tín hiệu dài hạn vốn không có. BiLSTM, nhiều tham số nhất, có RMSE kém nhất trên PyTorch:
+    thêm năng lực biểu diễn chỉ thêm khả năng khớp nhiễu.
+  \item \textbf{KKBox: cơ chế cổng có ích nhưng giới hạn nằm ở dữ liệu.} Các tế bào có cổng (GRU, LSTM, BiLSTM) đạt ROC-AUC và
+    F1 cao hơn Simple RNN (Bảng~\ref{tab:ch4-churn}), khớp với lý thuyết rằng cổng giúp tổng hợp thông tin qua 31 bước. Nhưng
+    mức tuyệt đối thấp (ROC-AUC dưới 0,7, F1 lớp rời bỏ quanh 0,33 -- 0,35): chỉ từ nhật ký nghe nhạc, người ở lại và người rời
+    bỏ chồng lấn mạnh, đúng như EDA đã cảnh báo. Ma trận nhầm lẫn (Hình~\ref{fig:cm-churn}) cho thấy ở ngưỡng tối ưu F1, mô
+    hình chỉ bắt được khoảng một phần ba số người rời bỏ (Recall LSTM \SL{ch4_torch/churn/lstm/recall}) mà vẫn kèm nhiều
+    báo động giả; nếu dùng để giữ chân khách hàng, danh sách xếp hạng theo xác suất hữu ích hơn một nhãn cứng.
+  \item \textbf{PyTorch và Keras} cho độ chính xác cùng mức với cùng cấu hình (Bảng~\ref{tab:ch4-fw}, Hình~\ref{fig:fw});
+    khác biệt nhỏ đến từ khởi tạo ngẫu nhiên và thứ tự lô. Số tham số GRU trùng khít
+    (\SL{ch4_torch/stock/gru/params}) vì Keras mặc định \texttt{reset\_after=True} cũng dùng hai vector bias như PyTorch;
+    với Simple RNN và LSTM, PyTorch nhiều hơn vài trăm tham số do giữ hai bias riêng $b_{ih}$, $b_{hh}$ (tương đương về toán
+    học, chỉ khác cách tham số hóa). PyTorch trên GPU huấn luyện nhanh hơn Keras trên CPU nhiều lần;
+    khi suy luận một mẫu trên CPU, độ trễ hai nền tảng cùng bậc mili-giây.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\section{Đóng gói triển khai Web App tương tác thời gian thực}
+
+Hai phân hệ cuối của Web App (mục~\ref{sec:web}) dùng các mô hình PyTorch của chương này:
+\begin{enumerate}
+  \item \textbf{Dự báo giá cổ phiếu FPT:} người dùng chọn kiến trúc và số phiên hiển thị; hệ thống vẽ giá thực tế và dự báo
+    trên giai đoạn kiểm thử, dự báo giá phiên kế tiếp sau ngày dữ liệu cuối cùng, và luôn hiển thị RMSE của mốc “giữ nguyên
+    giá” cạnh RMSE của mô hình để người dùng không hiểu nhầm năng lực dự báo (Hình~\ref{fig:ui-stock}).
+  \item \textbf{Dự đoán người dùng rời bỏ:} lấy một người dùng trong tập kiểm thử (ngẫu nhiên, hoặc chọn nhóm), vẽ quỹ đạo 31
+    ngày và trả xác suất rời bỏ của cả bốn kiến trúc so với ngưỡng riêng của từng mô hình (Hình~\ref{fig:ui-churn}).
+\end{enumerate}
+
+\maNguon{app__api_churn}{Endpoint dự đoán rời bỏ: chạy bốn mô hình hồi quy trên cùng một chuỗi 31 ngày}
+
+\anhUI{ui_stock}{Phân hệ dự báo giá cổ phiếu FPT: đường giá thực tế và dự báo của LSTM, dự báo phiên kế tiếp, so sánh với
+mốc giữ nguyên giá và các chỉ báo hiện tại.}{ui-stock}
+\anhUI{ui_churn}{Phân hệ dự đoán khách hàng rời bỏ: quỹ đạo nghe nhạc 31 ngày và xác suất rời bỏ của bốn kiến trúc.}{ui-churn}
+
+Mỗi yêu cầu dự báo (bốn mô hình hoặc hàng trăm cửa sổ) được xử lý trong vài chục mili-giây trên CPU.

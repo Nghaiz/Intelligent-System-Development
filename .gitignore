@@ -93,3 +93,19 @@ Report/Assignment 06/_minted*/
 Report/Assignment 06/main.*
 !Report/Assignment 06/main.tex
 Report/Assignment 06/build.out
+
+# ===== Tiểu luận 01 =====
+# Dữ liệu ảnh SVHN/EuroSAT (~500 MB, tải lại bằng python -m tl.data_vision) và bản gom KKBox (dựng từ Assignment 06)
+src/TieuLuan 01/data/vision/
+src/TieuLuan 01/data/seq/kkbox_seq.npz
+# Mô hình lớn hơn 25 MB dựng lại bằng scripts/ (xem src/TieuLuan 01/README.md)
+src/TieuLuan 01/models/ch2/house_rf.joblib
+src/TieuLuan 01/models/ch2/reviews_rf.joblib
+# Báo cáo: các thư mục build.py tự sinh lại
+Report/TieuLuan 01/code/
+Report/TieuLuan 01/generated/
+Report/TieuLuan 01/tikzcache/
+Report/TieuLuan 01/_minted*/
+Report/TieuLuan 01/main.*
+!Report/TieuLuan 01/main.tex
+src/TieuLuan 01/models/ch3/*_vgg11.pt

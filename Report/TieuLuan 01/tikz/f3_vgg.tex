@@ -1,0 +1,31 @@
+% Hai conv 3x3 xếp chồng có cùng vùng nhìn với một conv 5x5 nhưng ít trọng số hơn.
+\begin{tikzpicture}[x=5mm, y=5mm, font=\footnotesize]
+  % lưới 5x5 đầu vào, cửa sổ 3x3 lồng nhau
+  \foreach \i in {0,...,4} \foreach \j in {0,...,4} \draw[gray!60, fill=white] (\j,-\i) rectangle ++(1,1);
+  \fill[lightBlue, opacity=0.8] (0,-2) rectangle (3,1);
+  \fill[lightOrange, opacity=0.6] (2,-4) rectangle (5,-1);
+  \draw[ptitblue, very thick] (0,-4) rectangle (5,1);
+  \node[above] at (2.5,1.1) {đầu vào: vùng $5{\times}5$};
+  % tầng giữa 3x3
+  \begin{scope}[xshift=4.5cm, yshift=-0.5cm]
+    \foreach \i in {0,...,2} \foreach \j in {0,...,2} \draw[gray!60, fill=white] (\j,-\i) rectangle ++(1,1);
+    \fill[lightBlue] (0,0) rectangle (1,1);
+    \fill[lightOrange] (2,-2) rectangle (3,-1);
+    \draw[ptitblue, very thick] (0,-2) rectangle (3,1);
+    \node[above] at (1.5,1.1) {sau conv $3{\times}3$ (1)};
+  \end{scope}
+  \begin{scope}[xshift=8.3cm, yshift=-1cm]
+    \draw[fill=accentRed!40, draw=accentRed, very thick] (0,0) rectangle (1,1);
+    \node[above] at (0.5,1.1) {sau conv $3{\times}3$ (2)};
+  \end{scope}
+  \draw[mui] (5.4,-1.5) -- (8.6,-1.5);
+  \draw[mui] (14.6,-1.5) -- (16.3,-1.5);
+  % bảng so sánh
+  \node[anchor=west, align=left] at (20.5,-1.4) {%
+    \begin{tabular}{@{}lcc@{}}
+      & 1 conv $5{\times}5$ & 2 conv $3{\times}3$\\\midrule
+      vùng nhìn & $5{\times}5$ & $5{\times}5$\\
+      trọng số (mỗi cặp kênh) & 25 & 18 ($-28\,\%$)\\
+      hàm phi tuyến ReLU & 1 & 2
+    \end{tabular}};
+\end{tikzpicture}

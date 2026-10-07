@@ -1,0 +1,24 @@
+% Tích chập chuẩn so với tách biệt chiều sâu: depthwise lọc không gian từng kênh, pointwise 1x1 trộn kênh.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\footnotesize]
+  \tikzset{lop/.style={draw=#1!80!black, fill=#1!25}}
+  % chuẩn
+  \node[font=\small\bfseries, text=ptitblue] at (2.1,1.6) {(a) Tích chập chuẩn};
+  \foreach \c/\col in {2/blue, 1/green, 0/red} \draw[lop=\col] (0.25*\c,0.25*\c-1) rectangle ++(1.4,1.4);
+  \node at (2.5,-0.1) {$\ast$};
+  \foreach \c/\col in {2/blue, 1/green, 0/red} \draw[lop=\col] (3.0+0.15*\c,0.15*\c-0.55) rectangle ++(0.6,0.6);
+  \node[nhan] at (3.4,-0.85) {$C_{out}$ bộ lọc $k{\times}k{\times}C_{in}$};
+  \draw[mui] (4.2,-0.1) -- (4.9,-0.1);
+  \draw[fill=lightGray, draw=gray] (5.0,-0.8) rectangle ++(1.4,1.4);
+  \node[nhan, align=center] at (2.9,-1.6) {chi phí: $C_{in}C_{out}HWk^2$};
+  % tách biệt
+  \begin{scope}[xshift=7.6cm]
+    \node[font=\small\bfseries, text=ptitblue] at (3.0,1.6) {(b) Depthwise separable};
+    \foreach \c/\col in {2/blue, 1/green, 0/red} \draw[lop=\col] (0.25*\c,0.25*\c-1) rectangle ++(1.4,1.4);
+    \draw[mui] (2.3,-0.1) -- node[above, nhan] {depthwise} node[below, nhan] {$k{\times}k$ mỗi kênh} (3.4,-0.1);
+    \foreach \c/\col in {2/blue, 1/green, 0/red} \draw[lop=\col] (3.5+0.25*\c,0.25*\c-1) rectangle ++(1.4,1.4);
+    \draw[mui] (5.8,-0.1) -- node[above, nhan] {pointwise} node[below, nhan] {$1{\times}1{\times}C_{in}$} (6.9,-0.1);
+    \draw[fill=lightGray, draw=gray] (7.0,-0.8) rectangle ++(1.4,1.4);
+    \node[nhan, align=center] at (3.9,-1.6) {chi phí: $C_{in}HWk^2 + C_{in}C_{out}HW$};
+  \end{scope}
+  \node[align=center] at (7.8,-2.5) {tỉ lệ chi phí $= \dfrac{1}{C_{out}} + \dfrac{1}{k^2} \approx \dfrac{1}{9}$ khi $k = 3$ và $C_{out}$ lớn};
+\end{tikzpicture}

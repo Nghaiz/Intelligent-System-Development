@@ -1,0 +1,40 @@
+% Tiến hóa khối xây dựng CNN: (a) khối VGG phẳng, (b) khối Residual, (c) khối Inverted Residual của MobileNetV2.
+\begin{tikzpicture}[node distance=4mm, every node/.append style={font=\scriptsize},
+    k/.style={khoi, minimum width=24mm, minimum height=5.5mm, font=\scriptsize},
+    kc/.style={khoiC, minimum width=24mm, minimum height=5.5mm, font=\scriptsize},
+    kg/.style={khoiG, minimum width=24mm, minimum height=5.5mm, font=\scriptsize},
+    tron/.style={draw=ptitblue, circle, inner sep=1pt, font=\scriptsize, fill=white},
+    tieude/.style={font=\small\bfseries\sffamily, text=ptitblue},
+    m/.style={-{Stealth[length=1.6mm]}, thick, ptitblue}]
+  \begin{scope}[shift={(0,0)}]
+    \node[tieude] at (0, 0.7) {(a) VGG (2014)};
+    \node[khoiX, minimum width=12mm] (ax) at (0,0) {$x$};
+    \node[k, below=of ax] (a1) {Conv $3{\times}3$ – BN – ReLU};
+    \node[k, below=of a1] (a2) {Conv $3{\times}3$ – BN – ReLU};
+    \node[kc, below=of a2] (a3) {MaxPool $2{\times}2$};
+    \draw[m] (ax) -- (a1); \draw[m] (a1) -- (a2); \draw[m] (a2) -- (a3); \draw[m] (a3) -- ++(0,-0.7);
+    \node[nhan, align=center] at (0,-3.9) {xếp chồng tuần tự;\\sâu hơn thì khó tối ưu};
+  \end{scope}
+  \begin{scope}[shift={(5.2,0)}]
+    \node[tieude] at (0, 0.7) {(b) ResNet (2015)};
+    \node[khoiX, minimum width=12mm] (bx) at (0,0) {$x$};
+    \node[k, below=of bx] (b1) {Conv $3{\times}3$ – BN – ReLU};
+    \node[k, below=of b1] (b2) {Conv $3{\times}3$ – BN};
+    \node[tron, below=4mm of b2] (bp) {$+$};
+    \draw[m] (bx) -- (b1); \draw[m] (b1) -- (b2); \draw[m] (b2) -- (bp);
+    \draw[m, mTwo] (bx.east) -- ++(1.6,0) |- node[pos=0.25, right, text=mTwo] {$x$} (bp.east);
+    \draw[m] (bp) -- ++(0,-0.6) node[below] {$\mathrm{ReLU}(F(x) + x)$};
+    \node[nhan, align=center] at (0,-3.9) {kết nối tắt: gradient\\đi thẳng về tầng đầu};
+  \end{scope}
+  \begin{scope}[shift={(10.6,0)}]
+    \node[tieude] at (0, 0.7) {(c) MobileNetV2 (2018)};
+    \node[khoiX, minimum width=12mm] (cx) at (0,0) {$x$ ($C$ kênh)};
+    \node[kg, below=of cx] (c1) {Conv $1{\times}1$ mở rộng $\to 6C$};
+    \node[kc, below=of c1] (c2) {Depthwise $3{\times}3$ (từng kênh)};
+    \node[kg, below=of c2] (c3) {Conv $1{\times}1$ chiếu $\to C$};
+    \node[tron, below=4mm of c3] (cp) {$+$};
+    \draw[m] (cx) -- (c1); \draw[m] (c1) -- (c2); \draw[m] (c2) -- (c3); \draw[m] (c3) -- (cp);
+    \draw[m, mTwo] (cx.east) -- ++(0.9,0) |- (cp.east);
+    \node[nhan, align=center] at (0,-4.4) {rẻ hơn $8$–$9$ lần FLOPs; đầu ra\\tuyến tính, không ReLU};
+  \end{scope}
+\end{tikzpicture}

@@ -1,0 +1,12 @@
+{
+  "loop_ms_per_img": 262.9707999999482,
+  "im2col_ms_per_img": 2.2761999998692772,
+  "loop_vs_im2col_maxdiff": 1.7763568394002505e-15,
+  "numpy_net_ms_per_img": 33.432846300000165,
+  "torch_cpu_ms_per_img": 3.4800545999996757,
+  "net_maxdiff": 3.4467115685998806e-06,
+  "acc_numpy": 0.9655,
+  "acc_torch": 0.9655,
+  "agree": 1.0,
+  "n_img": 2000
+}

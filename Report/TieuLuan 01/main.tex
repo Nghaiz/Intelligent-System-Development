@@ -1,0 +1,246 @@
+% =====================================================================
+%  Báo cáo Tiểu luận 01 — Phát triển các Hệ thống Thông minh
+%  Nguyễn Duy Nghĩa · D23CTPM01 · B23DCCN600
+%
+%  Dựng bằng một lệnh:  python build.py
+%  build.py sinh macro số liệu, bảng, trích mã nguồn rồi gọi
+%      latexmk -lualatex -shell-escape main.tex
+%  Hình dữ liệu là PDF vector vẽ bằng matplotlib (figures/); sơ đồ lý thuyết là TikZ (tikz/),
+%  được externalize vào tikzcache/.
+% =====================================================================
+\documentclass[a4paper,13pt,oneside]{extreport}
+
+% --------------------------- Ngôn ngữ & font -------------------------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setsansfont{Segoe UI}
+\directlua{luaotfload.add_fallback("toanhoc", {"Cambria Math:mode=node;"})}
+\setmonofont{Consolas}[Scale=0.86, RawFeature={fallback=toanhoc}]
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+\gappto\captionsvietnamese{%
+  \renewcommand{\listfigurename}{Danh mục Hình vẽ}%
+  \renewcommand{\listtablename}{Danh mục Bảng biểu}%
+  \renewcommand{\contentsname}{Mục lục}}
+
+% --------------------------- Khổ trang -------------------------------
+\usepackage[a4paper,left=3cm,right=2cm,top=2.5cm,bottom=2.5cm,headheight=16pt]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% --------------------------- Toán học --------------------------------
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+
+% --------------------------- Hình & bảng -----------------------------
+\usepackage{graphicx}
+\graphicspath{{assets/}{figures/}}
+\usepackage{booktabs,longtable,array,tabularx,multirow}
+\usepackage{float}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+
+% --------------------------- Danh sách -------------------------------
+\usepackage{enumitem}
+\setlist[itemize]{topsep=3pt,itemsep=2pt,parsep=0pt,leftmargin=1.5em}
+\setlist[enumerate]{topsep=3pt,itemsep=2pt,parsep=0pt,leftmargin=1.7em}
+
+% --------------------------- Màu & tiêu đề ---------------------------
+\definecolor{ptitblue}{HTML}{123A75}
+\definecolor{ptitred}{HTML}{C00000}
+\definecolor{softgray}{HTML}{F2F4F7}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\bfseries\color{ptitblue}}
+  {\Large\chaptertitlename\ \thechapter}{6pt}{\LARGE}
+\titlespacing*{\chapter}{0pt}{-18pt}{22pt}
+\titleformat{\section}{\normalfont\large\sffamily\bfseries\color{ptitblue}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalfont\sffamily\bfseries\color{ptitblue}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalfont\bfseries\itshape}{\thesubsubsection}{0.6em}{}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+% --------------------------- Đầu trang / chân trang ------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\footnotesize\itshape Nhóm lớp: CT \textbar{} Nguyễn Duy Nghĩa -- B23DCCN600}
+\fancyhead[R]{\footnotesize\itshape Tiểu luận: Phát triển các Hệ thống Thông minh}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% --------------------------- Tài liệu tham khảo ----------------------
+\usepackage[backend=biber,style=numeric,sorting=none,maxbibnames=6]{biblatex}
+\DeclareLanguageMapping{vietnamese}{english}
+\addbibresource{refs.bib}
+
+% --------------------------- TikZ / pgfplots -------------------------
+\input{preamble/tikzstyle}
+
+% --------------------------- Mã nguồn --------------------------------
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{external}
+\tcbset{shield externalize}
+\usepackage{minted}
+\setminted{fontsize=\footnotesize,linenos,numbersep=6pt,breaklines,frame=lines,
+           framesep=2mm,baselinestretch=1.05,tabsize=4}
+\usemintedstyle{friendly}
+\renewcommand{\listingscaption}{Đoạn mã}
+\renewcommand{\listoflistingscaption}{Danh mục Đoạn mã nguồn}
+\counterwithin{listing}{chapter}
+% \maNguon{module__ten}{chú thích}: đoạn mã build.py trích nguyên văn từ src/TieuLuan 01/tl/<module>.py
+% (hoặc app/app.py), hàm hoặc lớp <ten>; mã trong báo cáo vì vậy luôn là mã đã chạy ra số liệu.
+\newcommand{\maNguon}[2]{%
+  \begin{listing}[H]
+  \inputminted{python}{code/#1.py}
+  \caption{#2}
+  \label{code:#1}
+  \end{listing}}
+
+% --------------------------- Liên kết --------------------------------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true, linkcolor=ptitblue, citecolor=ptitblue,
+  urlcolor=ptitblue, filecolor=ptitblue,
+  pdftitle={Tiểu luận: Học máy cơ bản, CNN và RNN trong hệ thống thông minh},
+  pdfauthor={Nguyễn Duy Nghĩa — B23DCCN600 — Nhóm lớp CT},
+  pdfsubject={Phát triển các Hệ thống Thông minh},
+  bookmarksnumbered=true
+}
+\usepackage{bookmark}
+\usepackage{microtype}
+
+% --------------------------- Lệnh riêng ------------------------------
+\usepackage{etoolbox}
+\newcommand{\nhanxet}[1]{\par\smallskip\noindent\textbf{Nhận xét:} #1\par\smallskip}
+\newtcolorbox{phathien}[1]{
+  breakable,
+  colback=softgray, colframe=ptitblue, boxrule=0.7pt, arc=2pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\sffamily, title={#1}
+}
+% \hinhpdf{tệp}{rộng}{chú thích}{nhãn}: hình dữ liệu matplotlib trong figures/.
+\newcommand{\hinhpdf}[4]{%
+  \begin{figure}[H]\centering
+  \IfFileExists{figures/#1.pdf}{\includegraphics[width=#2\linewidth]{#1}}%
+    {\fbox{\parbox[c][3cm][c]{0.8\linewidth}{\centering chưa vẽ: \detokenize{#1}}}\PackageWarning{solieu}{Thieu so lieu 'fig/#1'}}
+  \caption{#3}\label{fig:#4}
+  \end{figure}}
+% \hinhtikz{tệp}{chú thích}{nhãn}: sơ đồ TikZ trong tikz/, co theo bề rộng trang nếu cần.
+\newcommand{\hinhtikz}[3]{%
+  \begin{figure}[H]\centering
+  \begin{adjustbox}{max width=\linewidth}\hinh{#1}\end{adjustbox}
+  \caption{#2}\label{fig:#3}
+  \end{figure}}
+% \anhUI{tệp}{chú thích}{nhãn}: ảnh chụp Web App (assets/ui/<tệp>.png) do app/screenshots.py sinh.
+\newcommand{\anhUI}[3]{%
+  \begin{figure}[H]\centering
+  \IfFileExists{assets/ui/#1.png}{\fbox{\includegraphics[width=0.97\linewidth]{ui/#1.png}}}%
+    {\fbox{\parbox[c][4cm][c]{0.9\linewidth}{\centering chưa chụp: \detokenize{#1}}}\PackageWarning{solieu}{Thieu so lieu 'ui/#1'}}
+  \caption{#2}\label{fig:#3}
+  \end{figure}}
+% \bang{tệp}{chú thích}{nhãn}: bảng do build.py sinh trong generated/.
+\newcommand{\bang}[3]{%
+  \begin{table}[H]\centering\caption{#2}\label{tab:#3}
+  \IfFileExists{generated/#1.tex}%
+    {\begin{adjustbox}{max width=\linewidth}\input{generated/#1}\end{adjustbox}%
+     \IfFileExists{generated/#1_note.tex}{\par\smallskip{\footnotesize\input{generated/#1_note}\par}}{}}%
+    {\fbox{chưa sinh bảng: \detokenize{#1}}\PackageWarning{solieu}{Thieu so lieu 'tab/#1'}}
+  \end{table}}
+
+% Số liệu: \SL{tệp/khoá/.../lá}, sinh tự động từ outputs/metrics/*.json bởi build.py.
+\newcommand{\defSL}[2]{\expandafter\def\csname sl@#1\endcsname{#2}}
+\newcommand{\SL}[1]{\ifcsname sl@#1\endcsname\csname sl@#1\endcsname\else
+  \PackageWarning{solieu}{Thieu so lieu '#1'}\textbf{??}\fi}
+\input{generated/so_lieu}
+
+\renewcommand{\arraystretch}{1.16}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+\begin{document}
+
+% =====================================================================
+%  TRANG BÌA (mẫu Assignment 04: khung lùi 6,5 mm, nội dung đặt tuyệt đối trong khung)
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\tikzexternaldisable
+\begin{tikzpicture}[remember picture,overlay]
+  \node[anchor=north west, inner sep=0pt] at ([xshift=6.5mm,yshift=-6.5mm]current page.north west)
+    {\includegraphics[width=197mm,height=284mm]{cover-frame.png}};
+  \node[anchor=north, inner sep=0pt, text width=161mm, align=center]
+    at ([yshift=-(6.5mm+20mm+6mm)]current page.north) {%
+    {\bfseries\fontsize{15}{21}\selectfont HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG\par}
+    \vspace{4mm}
+    {\bfseries\fontsize{14}{19}\selectfont KHOA CÔNG NGHỆ THÔNG TIN 1\par}
+    \vspace{4mm}
+    {\bfseries\fontsize{13.5}{18}\selectfont HỌC PHẦN PHÁT TRIỂN CÁC HỆ THỐNG THÔNG MINH\par}
+    \vspace{12mm}
+    \includegraphics[height=40mm]{ptit-logo.png}\par
+    \vspace{10mm}
+    {\bfseries\fontsize{22}{27}\selectfont\addfontfeature{LetterSpace=2}BÁO CÁO TIỂU LUẬN MÔN HỌC\par}
+    \vspace{5mm}
+    {\bfseries\fontsize{13}{19.5}\selectfont ĐỀ TÀI: NGHIÊN CỨU VÀ TRIỂN KHAI CÁC MÔ HÌNH\\
+     HỌC MÁY CƠ BẢN, MẠNG NƠ-RON TÍCH CHẬP (CNN)\\
+     VÀ MẠNG NƠ-RON HỒI QUY (RNN) TRONG HỆ THỐNG THÔNG MINH\par}
+    \vspace{11mm}
+    {\fontsize{13}{16}\selectfont
+     \renewcommand{\arraystretch}{1.8}
+     \begin{tabular}{@{}p{52mm}l@{}}
+       \textbf{Lớp:}                  & D23CTPM01 \\
+       \textbf{Họ và tên:}            & Nguyễn Duy Nghĩa \\
+       \textbf{Mã sinh viên:}         & B23DCCN600 \\
+       \textbf{Giảng viên hướng dẫn:} & PGS.TS Trần Đình Quế \\
+       \textbf{Học kỳ:}               & Học kỳ 1 năm học 2026 -- 2027 \\
+     \end{tabular}\par}};
+  \node[anchor=south, inner sep=0pt] at ([yshift=6.5mm+10mm+14mm]current page.south)
+    {\bfseries\itshape\fontsize{13}{18}\selectfont Hà Nội, Tháng 10/2026};
+\end{tikzpicture}
+\tikzexternalenable
+\null
+\end{titlepage}
+
+% =====================================================================
+%  DANH MỤC
+% =====================================================================
+\pagenumbering{roman}
+\setcounter{page}{1}
+\tableofcontents
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Danh mục Hình vẽ}
+\listoffigures
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Danh mục Bảng biểu}
+\listoftables
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Danh mục Đoạn mã nguồn}
+\listoflistings
+
+% =====================================================================
+%  PHẦN THÂN
+% =====================================================================
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\input{chapters/00-mo-dau}
+\input{chapters/01-lich-su}
+\input{chapters/02-hoc-may}
+\input{chapters/03-cnn}
+\input{chapters/04-rnn}
+\input{chapters/05-ket-luan}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Tài liệu tham khảo}
+{\sloppy\printbibliography[title={Tài liệu tham khảo}]}
+
+\end{document}

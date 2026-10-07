@@ -1,0 +1,394 @@
+% =====================================================================
+%  CHƯƠNG 2 — CÁC KỸ THUẬT HỌC MÁY CƠ BẢN
+% =====================================================================
+\chapter{Các Kỹ Thuật Học Máy Cơ Bản}
+\label{ch:hoc-may}
+
+\section{Cơ sở lý thuyết các thuật toán học máy cốt lõi}
+
+Học máy có giám sát giải hai lớp bài toán: \emph{hồi quy} (dự báo một giá trị liên tục) và \emph{phân loại} (gán
+nhãn rời rạc). Cho tập huấn luyện $\{(\mathbf{x}^{(i)}, y^{(i)})\}_{i=1}^{N}$ với $\mathbf{x} \in \mathbb{R}^{D}$, ta chọn
+một họ hàm $f_\theta$ và tìm tham số $\theta$ cực tiểu hóa một hàm mất mát trung bình trên dữ liệu. Bốn họ thuật toán
+dưới đây khác nhau ở họ hàm và cách tối ưu \cite{raschka2015,goodfellow2016}.
+
+\subsection{Hồi quy tuyến tính (Linear Regression)}
+
+Mô hình giả định đầu ra là tổ hợp tuyến tính của đặc trưng:
+\begin{equation}
+  \hat y = f(\mathbf{x}) = \mathbf{w}^\top\mathbf{x} + b = \sum_{j=1}^{D} w_j x_j + b ,
+\end{equation}
+và cực tiểu hóa sai số toàn phương trung bình
+\begin{equation}
+  \mathcal{L}_{\mathrm{MSE}}(\mathbf{w}, b) = \frac{1}{2N}\sum_{i=1}^{N}\big(\hat y^{(i)} - y^{(i)}\big)^2
+    = \frac{1}{2N}\lVert X\mathbf{w} + b\mathbf{1} - \mathbf{y}\rVert_2^2 .
+\end{equation}
+Nghiệm đóng là phương trình chuẩn $\mathbf{w}^* = (X^\top X)^{-1}X^\top\mathbf{y}$; khi $D$ lớn có thể dùng hạ gradient
+$\mathbf{w} \leftarrow \mathbf{w} - \eta\,\tfrac{1}{N}X^\top(X\mathbf{w} - \mathbf{y})$. Khi các đặc trưng tương quan mạnh
+(đa cộng tuyến), $X^\top X$ gần suy biến và hệ số dao động lớn; \textbf{Ridge} thêm phạt $\alpha\lVert\mathbf{w}\rVert_2^2$
+để nghiệm thành $(X^\top X + \alpha I)^{-1}X^\top\mathbf{y}$, luôn khả nghịch.
+
+\subsection{Hồi quy Logistic (Logistic Regression)}
+
+Với nhãn $y \in \{0, 1\}$, tổ hợp tuyến tính được ép về khoảng $(0, 1)$ bằng hàm sigmoid:
+\begin{equation}
+  p = P(y = 1 \mid \mathbf{x}) = \sigma(z) = \frac{1}{1 + e^{-z}}, \qquad z = \mathbf{w}^\top\mathbf{x} + b .
+\end{equation}
+Ước lượng hợp lý cực đại dẫn tới hàm mất mát entropy chéo nhị phân
+\begin{equation}
+  \mathcal{L}_{\mathrm{BCE}} = -\frac{1}{N}\sum_{i=1}^{N}\Big[y^{(i)}\log\hat y^{(i)} + (1 - y^{(i)})\log(1 - \hat y^{(i)})\Big],
+  \label{eq:bce}
+\end{equation}
+có đạo hàm theo $z$ rút gọn thành $\partial\mathcal{L}/\partial z = \hat y - y$, nên
+$\nabla_{\mathbf{w}}\mathcal{L} = \tfrac{1}{N}\sum_i (\hat y^{(i)} - y^{(i)})\mathbf{x}^{(i)}$. Mất mát là hàm lồi, mọi
+cực tiểu đều là toàn cục. Với $K$ lớp, sigmoid được thay bằng softmax $\hat y_k = e^{z_k}/\sum_j e^{z_j}$ và mất mát là
+entropy chéo $-\log \hat y_{y}$. Khi dữ liệu mất cân bằng, trọng số lớp \texttt{class\_weight="balanced"} nhân mất mát của
+mỗi mẫu với $N/(K\,N_k)$ để lớp hiếm có tiếng nói ngang lớp phổ biến.
+
+\subsection{Cây quyết định và Rừng ngẫu nhiên (Random Forest)}
+
+Cây quyết định chia không gian bằng chuỗi câu hỏi nhị phân “$x_j \le \theta$?”. Độ thuần của một nút $t$ có các lớp với tỉ
+lệ $p_k$ được đo bằng chỉ số Gini hoặc entropy:
+\begin{equation}
+  \mathrm{Gini}(t) = 1 - \sum_{k=1}^{K} p_k^2, \qquad \mathrm{Entropy}(t) = -\sum_{k=1}^{K} p_k\log_2 p_k .
+\end{equation}
+Tại mỗi nút, thuật toán chọn cặp $(j, \theta)$ làm giảm tạp chất nhiều nhất:
+\begin{equation}
+  \Delta\mathrm{Gini} = \mathrm{Gini}(t) - \Big(\frac{N_L}{N_t}\mathrm{Gini}(t_L) + \frac{N_R}{N_t}\mathrm{Gini}(t_R)\Big).
+\end{equation}
+Với hồi quy, tạp chất là phương sai của nhãn trong nút. Một cây sâu khớp rất sát dữ liệu huấn luyện nhưng có phương sai
+lớn. \textbf{Random Forest} \cite{breiman2001} trung bình hóa $B$ cây với hai nguồn ngẫu nhiên: mỗi cây học trên một mẫu
+bootstrap (rút có hoàn lại $N$ mẫu) và mỗi lần chia chỉ xét một tập con ngẫu nhiên $\sqrt{D}$ đặc trưng. Hai cơ chế này
+làm các cây ít tương quan với nhau, nên trung bình của chúng có phương sai nhỏ hơn hẳn từng cây mà độ chệch gần như giữ
+nguyên.
+
+\subsection{Máy vector hỗ trợ (Support Vector Machine)}
+
+SVM \cite{cortes1995} tìm siêu phẳng phân tách có lề lớn nhất, cho phép vi phạm qua biến nới lỏng $\xi_i$:
+\begin{equation}
+  \min_{\mathbf{w}, b, \boldsymbol{\xi}}\ \frac{1}{2}\lVert\mathbf{w}\rVert^2 + C\sum_{i=1}^{N}\xi_i
+  \quad\text{với}\quad y^{(i)}(\mathbf{w}^\top\mathbf{x}^{(i)} + b) \ge 1 - \xi_i,\ \ \xi_i \ge 0 ,
+\end{equation}
+trong đó $C$ cân bằng giữa lề rộng và lỗi huấn luyện. Bài toán đối ngẫu chỉ phụ thuộc vào tích vô hướng giữa các mẫu, nên
+có thể thay bằng một hàm nhân. Nhân RBF
+\begin{equation}
+  K(\mathbf{x}, \mathbf{x}') = \exp\!\big(-\gamma\lVert\mathbf{x} - \mathbf{x}'\rVert^2\big)
+\end{equation}
+tương ứng với ánh xạ lên không gian vô hạn chiều. Cái giá là bộ giải phải làm việc với ma trận nhân $N \times N$: thời gian
+huấn luyện tăng cỡ $O(N^2)$ tới $O(N^3)$ và mô hình phải lưu toàn bộ vector hỗ trợ. \textbf{SVR} là phiên bản hồi quy, phạt
+các điểm nằm ngoài ống sai số rộng $\varepsilon$. Với văn bản TF-IDF hàng nghìn chiều, dữ liệu thường đã gần khả tách tuyến
+tính nên \textbf{LinearSVC} (nhân tuyến tính, độ phức tạp tuyến tính theo $N$) là lựa chọn hợp lý hơn.
+
+% ---------------------------------------------------------------------
+\section{Khảo sát thực nghiệm và tiền xử lý ba bộ dữ liệu}
+
+Ba tập dữ liệu được chọn để phủ ba dạng bài toán: phân loại nhị phân mất cân bằng (y tế), hồi quy (bất động sản Việt Nam)
+và phân loại văn bản ba lớp (thương mại điện tử). Mọi tập đều chia 80\,\% huấn luyện / 20\,\% kiểm thử với
+\texttt{random\_state = 42} (phân tầng theo nhãn với bài toán phân loại); mạng MLP tách thêm 10\,\% của phần huấn luyện làm
+tập kiểm định cho dừng sớm.
+
+\subsection{Tập dữ liệu 1: Sàng lọc nguy cơ tiểu đường (\SL{eda/diabetes/n} mẫu)}
+
+\begin{itemize}
+  \item \textbf{Nguồn:} Diabetes Prediction Dataset trên Kaggle \cite{kaggle_diabetes}, tổng hợp hồ sơ khám bệnh.
+  \item \textbf{Quy mô:} \SL{eda/diabetes/n} hồ sơ, \SL{eda/diabetes/n_features} thuộc tính: giới tính, tuổi, tăng huyết áp,
+    bệnh tim, tiền sử hút thuốc, chỉ số khối cơ thể BMI, HbA1c (\%), đường huyết (mg/dL); nhãn \texttt{diabetes}
+    (0: không mắc, 1: mắc).
+\end{itemize}
+
+\bang{tab_sample_diab}{Năm bản ghi ngẫu nhiên của tập dữ liệu tiểu đường.}{sample-diab}
+
+\hinhpdf{f2_diab_target}{0.62}{Phân bố nhãn của tập tiểu đường: lớp dương chỉ chiếm \SL{eda/diabetes/pos_ratePct}\,\%.}{diab-target}
+\hinhpdf{f2_diab_kde}{1}{Mật độ xác suất của đường huyết, HbA1c, BMI và tuổi theo tình trạng bệnh.}{diab-kde}
+\hinhpdf{f2_diab_corr}{0.72}{Ma trận tương quan Pearson giữa các chỉ số lâm sàng và nhãn tiểu đường.}{diab-corr}
+
+\paragraph{Nhận xét EDA.}
+\begin{itemize}
+  \item \textbf{Mất cân bằng lớp:} chỉ \SL{eda/diabetes/n_pos} trên \SL{eda/diabetes/n} hồ sơ là dương tính
+    (Hình~\ref{fig:diab-target}). Một mô hình ngây thơ luôn đoán “không mắc” đã đạt Accuracy
+    $100 - \SL{eda/diabetes/pos_ratePct} \approx 91{,}5\,\%$ mà không phát hiện được ca bệnh nào; vì vậy Accuracy không
+    đủ để đánh giá, cần Precision, Recall và F1 của lớp dương cùng ROC-AUC.
+  \item \textbf{Hai đặc trưng quyết định:} đường huyết và HbA1c có tương quan với nhãn lần lượt
+    $r = \SL{eda/diabetes/corr_glucose}$ và $r = \SL{eda/diabetes/corr_hba1c}$, cao nhất trong các chỉ số
+    (Hình~\ref{fig:diab-corr}). Phân bố của người mắc bệnh dịch hẳn sang phải (Hình~\ref{fig:diab-kde}): tỉ lệ mắc bệnh là
+    \SL{eda/diabetes/rate_glu200Pct}\,\% khi đường huyết $\ge 200$\,mg/dL, \SL{eda/diabetes/rate_hba65Pct}\,\% khi
+    HbA1c $\ge 6{,}6$\,\%, nhưng chỉ \SL{eda/diabetes/rate_hba_lowPct}\,\% khi HbA1c $< 5{,}7$\,\%.
+  \item \textbf{Quan hệ dạng ngưỡng:} cả hai chỉ số đều có “ngưỡng gãy” rõ (đặc biệt HbA1c), một dạng phi tuyến mà
+    mô hình tuyến tính không biểu diễn trọn được nhưng cây quyết định và mạng nơ-ron thì có thể.
+  \item \textbf{Tiền xử lý:} chuẩn hóa z-score bốn biến số, giữ nguyên hai biến nhị phân, mã hóa one-hot giới tính và tiền
+    sử hút thuốc (\SL{eda/diabetes/noinfo_smokePct}\,\% hồ sơ ghi “No Info”, được giữ thành một nhóm riêng).
+\end{itemize}
+
+\subsection{Tập dữ liệu 2: Định giá bất động sản Việt Nam (\SL{eda/house/n} mẫu)}
+
+\begin{itemize}
+  \item \textbf{Nguồn:} Vietnam Housing Dataset \cite{kaggle_vnhouse}, tin đăng bán nhà trên các trang bất động sản Việt Nam.
+  \item \textbf{Quy mô:} \SL{eda/house/n} tin đăng thuộc \SL{eda/house/n_province} tỉnh/thành và \SL{eda/house/n_district}
+    quận/huyện; các thuộc tính diện tích, mặt tiền, độ rộng đường vào, số tầng, số phòng ngủ, số phòng tắm, hướng nhà,
+    hướng ban công, tình trạng pháp lý, nội thất, địa chỉ; nhãn là giá bán (tỷ đồng).
+\end{itemize}
+
+\bang{tab_sample_house}{Năm tin đăng ngẫu nhiên của tập dữ liệu giá nhà.}{sample-house}
+
+\hinhpdf{f2_house_dist}{1}{Phân bố giá bán, diện tích gốc và diện tích sau biến đổi $\log(1 + x)$.}{house-dist}
+\hinhpdf{f2_house_scatter}{1}{Trái: giá theo diện tích (thang log), tô màu theo độ rộng đường vào. Phải: giá theo sáu
+tỉnh/thành có nhiều tin nhất.}{house-scatter}
+\hinhpdf{f2_house_corr}{0.62}{Ma trận tương quan giữa các thuộc tính vật lý và giá bán.}{house-corr}
+
+\paragraph{Nhận xét EDA.}
+\begin{itemize}
+  \item \textbf{Giá đã bị chặn:} giá nằm trong $[\SL{eda/house/price_min}; \SL{eda/house/price_max}]$ tỷ đồng, trung bình
+    \SL{eda/house/price_mean}, độ lệch $\SL{eda/house/price_skew}$ (Hình~\ref{fig:house-dist}). Phân bố gần đối xứng nên
+    \emph{không} cần biến đổi log cho nhãn; ngược lại diện tích lệch phải mạnh (độ lệch \SL{eda/house/area_skew}), sau
+    $\log(1 + x)$ còn \SL{eda/house/logarea_skew}.
+  \item \textbf{Tương quan yếu và phi tuyến:} tương quan tuyến tính của giá với diện tích chỉ $r = \SL{eda/house/corr_area}$,
+    với số tầng $r = \SL{eda/house/corr_floors}$, với đường vào $r = \SL{eda/house/corr_road}$ (Hình~\ref{fig:house-corr}).
+    Giá phụ thuộc mạnh vào vị trí: trung vị giá ở TP.~Hồ Chí Minh và Hà Nội cao nhất, Đà Nẵng thấp hơn một chút, còn Bình
+    Dương và Đồng Nai thấp hơn gần một nửa (Hình~\ref{fig:house-scatter}), mà vị trí là biến phân loại có hàng trăm giá trị.
+  \item \textbf{Thiếu dữ liệu nhiều:} \SL{eda/house/miss_frontagePct}\,\% tin thiếu mặt tiền, \SL{eda/house/miss_roadPct}\,\%
+    thiếu đường vào, \SL{eda/house/miss_directionPct}\,\% thiếu hướng nhà.
+  \item \textbf{Tiền xử lý:} tách tỉnh và quận/huyện từ địa chỉ; biến số được điền trung vị \emph{kèm cờ đánh dấu thiếu} rồi
+    chuẩn hóa z-score; biến phân loại điền “Không rõ” rồi mã hóa one-hot, gộp các giá trị xuất hiện dưới 40 lần thành một
+    nhóm “hiếm” để không sinh hàng trăm cột thưa.
+\end{itemize}
+
+\subsection{Tập dữ liệu 3: Phân loại cảm xúc nhận xét thương mại điện tử (\SL{eda/reviews/n} mẫu)}
+
+\begin{itemize}
+  \item \textbf{Nguồn:} Women's E-Commerce Clothing Reviews \cite{kaggle_reviews}, nhận xét thật (tiếng Anh) của khách
+    hàng một nhà bán lẻ thời trang trực tuyến.
+  \item \textbf{Quy mô:} \SL{eda/reviews/n_raw} bản ghi, giữ \SL{eda/reviews/n} bản có nội dung nhận xét. Nhãn cảm xúc ba
+    lớp suy từ số sao: 1 -- 2 sao là \emph{tiêu cực}, 3 sao là \emph{trung tính}, 4 -- 5 sao là \emph{tích cực}. Tiêu đề và
+    nội dung được ghép thành một văn bản.
+\end{itemize}
+
+\bang{tab_sample_rev}{Năm nhận xét tiêu biểu kèm nhãn cảm xúc.}{sample-rev}
+
+\hinhpdf{f2_rev_dist}{0.95}{Phân bố số sao và nhãn cảm xúc: lớp tích cực chiếm \SL{eda/reviews/share_posPct}\,\%.}{rev-dist}
+\hinhpdf{f2_rev_len}{0.65}{Phân bố độ dài nhận xét (số từ) theo nhãn; nét đứt là trung bình \SL{eda/reviews/words_mean} từ.}{rev-len}
+\hinhpdf{f2_rev_words}{1}{Mười lăm từ đặc trưng nhất của nhận xét tích cực và tiêu cực, xếp theo tỉ số log-odds so với
+phần còn lại.}{rev-words}
+
+\paragraph{Nhận xét EDA và quy trình tiền xử lý văn bản.} Dữ liệu lệch mạnh về phía tích cực
+(\SL{eda/reviews/share_posPct}\,\%), trong khi trung tính chỉ \SL{eda/reviews/share_neuPct}\,\% và tiêu cực
+\SL{eda/reviews/share_negPct}\,\% (Hình~\ref{fig:rev-dist}); vì vậy chỉ số chính là F1 trung bình macro trên ba lớp.
+Độ dài gần như không phân biệt được các lớp: trung bình \SL{eda/reviews/words_by_class/0} từ ở nhận xét tiêu cực,
+\SL{eda/reviews/words_by_class/1} ở trung tính và \SL{eda/reviews/words_by_class/2} ở tích cực (Hình~\ref{fig:rev-len}),
+nên tín hiệu nằm ở \emph{từ ngữ} chứ không ở độ dài. Từ đặc trưng nhất của lớp tiêu cực là \emph{\SL{eda/reviews/top_neg/0}},
+\emph{\SL{eda/reviews/top_neg/1}}, \emph{\SL{eda/reviews/top_neg/2}}, \emph{\SL{eda/reviews/top_neg/3}}; của lớp tích cực là
+\emph{\SL{eda/reviews/top_pos/3}}, \emph{\SL{eda/reviews/top_pos/4}}, \emph{\SL{eda/reviews/top_pos/0}}
+(Hình~\ref{fig:rev-words}). Quy trình tiền xử lý:
+\begin{enumerate}
+  \item chuyển về chữ thường, bỏ URL và mọi ký tự không phải chữ cái hay dấu nháy;
+  \item loại từ dừng tiếng Anh (danh sách của scikit-learn);
+  \item vector hóa TF-IDF với unigram và bigram, giữ 5.000 đặc trưng tần suất cao nhất, bỏ từ xuất hiện dưới 3 văn bản,
+    dùng $1 + \log(\text{tf})$ để giảm ảnh hưởng của từ lặp nhiều lần.
+\end{enumerate}
+
+% ---------------------------------------------------------------------
+\section{Hiện thực hóa và thực nghiệm các mô hình học máy cơ bản}
+
+Mỗi mô hình được đóng gói thành một \texttt{Pipeline} của scikit-learn \cite{pedregosa2011} gồm bộ tiền xử lý và bộ ước
+lượng. Gọi \texttt{fit} trên phần huấn luyện sẽ khớp cả hai, nên không thống kê nào của tập kiểm thử rò vào quá trình
+học; lưu pipeline bằng \texttt{joblib} là có ngay đối tượng nhận dữ liệu thô cho Web App.
+
+\subsection{Pipeline hồi quy tuyến tính và Ridge}
+
+Bộ tiền xử lý giá nhà (Đoạn mã~\ref{code:data_tabular__house_preprocessor}) xử lý riêng nhóm cột số và nhóm cột phân loại
+bằng \texttt{ColumnTransformer}; Đoạn mã~\ref{code:ml_classic__build_linear_regression_pipeline} ghép nó với mô hình
+tuyến tính, \texttt{alpha=None} cho bình phương tối thiểu thường và \texttt{alpha=1.0} cho Ridge.
+
+\maNguon{data_tabular__house_preprocessor}{Bộ tiền xử lý dữ liệu giá nhà: điền thiếu kèm cờ, chuẩn hóa, one-hot có gộp nhóm hiếm}
+\maNguon{ml_classic__build_linear_regression_pipeline}{Pipeline hồi quy tuyến tính và Ridge với scikit-learn}
+
+\subsection{Pipeline hồi quy Logistic cho dữ liệu y tế}
+
+\texttt{class\_weight="balanced"} bù cho tỉ lệ dương \SL{eda/diabetes/pos_ratePct}\,\%; bộ giải \texttt{lbfgs} là phương
+pháp quasi-Newton hội tụ nhanh với số đặc trưng nhỏ.
+
+\maNguon{ml_classic__build_logistic_regression_pipeline}{Pipeline hồi quy Logistic có cân bằng trọng số lớp}
+
+\subsection{Pipeline Rừng ngẫu nhiên}
+
+Rừng gồm 200 cây không giới hạn độ sâu, mỗi lá tối thiểu 2 mẫu; với phân loại, trọng số lớp được cân bằng lại trên từng
+mẫu bootstrap. Cây không cần chuẩn hóa đặc trưng, nhưng dùng chung bộ tiền xử lý giúp mọi mô hình nhận cùng một đầu vào.
+
+\maNguon{ml_classic__build_rf_pipeline}{Pipeline Random Forest cho cả hồi quy và phân loại}
+
+\subsection{Pipeline Máy vector hỗ trợ}
+
+Nhân RBF tính khoảng cách Euclid nên đặc trưng bắt buộc cùng thang đo; bộ tiền xử lý đã chuẩn hóa z-score. Văn bản dùng
+\texttt{LinearSVC}.
+
+\maNguon{ml_classic__build_svm_pipeline}{Pipeline SVM: SVC/SVR nhân RBF cho dữ liệu bảng, LinearSVC cho văn bản}
+
+\subsection{Kết quả thực nghiệm các mô hình học máy cơ bản}
+
+Ba bảng dưới đây tách theo bản chất bài toán. Thời gian là thời gian huấn luyện trên CPU (Random Forest dùng 12 luồng);
+dung lượng là kích thước tệp \texttt{joblib} nén.
+
+\bang{tab_ch2_diab_sk}{Kết quả các mô hình học máy cơ bản trên tập tiểu đường (\SL{eda/diabetes/n} hồ sơ, kiểm thử 20\,\%).}{ch2-diab-sk}
+\bang{tab_ch2_house_sk}{Kết quả các mô hình học máy cơ bản trên tập giá nhà Việt Nam.}{ch2-house-sk}
+\bang{tab_ch2_rev_sk}{Kết quả các mô hình học máy cơ bản trên tập nhận xét khách hàng (TF-IDF 5.000 chiều).}{ch2-rev-sk}
+
+\subsection{Phân tích kết quả và giới hạn của các mô hình cơ bản}
+
+\begin{enumerate}
+  \item \textbf{Mô hình tuyến tính.} Trên tập tiểu đường, Logistic Regression có trọng số cân bằng đạt Recall
+    \SL{ch2_sklearn/diabetes/logreg/recall} nhưng Precision chỉ \SL{ch2_sklearn/diabetes/logreg/precision}: trọng số lớp
+    đẩy ngưỡng quyết định về phía bắt nhiều ca bệnh, đổi lại hơn một nửa cảnh báo là báo động giả. ROC-AUC
+    \SL{ch2_sklearn/diabetes/logreg/auc} cho thấy khả năng \emph{xếp hạng} vẫn tốt; điểm yếu nằm ở ranh giới tuyến tính
+    không bắt được ngưỡng gãy của HbA1c. Trên tập giá nhà, OLS và Ridge cùng chỉ đạt $R^2 \approx \SL{ch2_sklearn/house/ols/r2}$
+    (MAE \SL{ch2_sklearn/house/ols/mae} tỷ): phạt L2 gần như không giúp gì vì vấn đề là thiếu khớp chứ không phải đa
+    cộng tuyến.
+  \item \textbf{SVM nhân RBF.} SVC nâng ROC-AUC lên \SL{ch2_sklearn/diabetes/svm/auc} và F1 lên
+    \SL{ch2_sklearn/diabetes/svm/f1}, nhưng huấn luyện mất \SL{ch2_sklearn/diabetes/svm/train_s}\,s trên
+    80.000 mẫu, gấp hàng trăm lần Logistic Regression, và suy luận chậm nhất (\SL{ch2_sklearn/diabetes/svm/infer_ms}\,ms
+    mỗi mẫu) vì phải so mẫu mới với mọi vector hỗ trợ. SVR đạt $R^2 = \SL{ch2_sklearn/house/svr/r2}$ trên giá nhà. Với văn
+    bản, LinearSVC huấn luyện trong \SL{ch2_sklearn/reviews/linsvm/train_s}\,s và đạt Accuracy
+    \SL{ch2_sklearn/reviews/linsvm/accPct}\,\%.
+  \item \textbf{Random Forest.} Là mô hình cơ bản mạnh nhất trên cả hai tập bảng: F1 \SL{ch2_sklearn/diabetes/rf/f1} trên
+    tiểu đường và $R^2 = \SL{ch2_sklearn/house/rf/r2}$, MAE \SL{ch2_sklearn/house/rf/mae} tỷ trên giá nhà. Đổi lại, tệp mô
+    hình nặng \SL{ch2_sklearn/house/rf/size_kb}\,KB (200 cây sâu), không ngoại suy được ra ngoài khoảng giá đã thấy, và trên
+    văn bản 5.000 chiều thưa thì kém hơn mô hình tuyến tính (F1 macro \SL{ch2_sklearn/reviews/rf/f1}) vì mỗi lần chia
+    chỉ xét một từ.
+  \item \textbf{Động lực chuyển sang MLP.} Mô hình tuyến tính thiếu khả năng biểu diễn, SVM nhân không mở rộng theo số
+    mẫu, Random Forest cồng kềnh. Mạng nơ-ron đa tầng hứa hẹn cả ba: xấp xỉ được hàm phi tuyến bất kỳ (định lý xấp xỉ phổ
+    quát), huấn luyện theo lô nhỏ nên chi phí tuyến tính theo $N$ và chạy song song trên GPU, tệp mô hình chỉ vài chục
+    đến vài trăm KB.
+\end{enumerate}
+
+% ---------------------------------------------------------------------
+\section{Mạng nơ-ron đa tầng (MLP) trên ba nền tảng: NumPy, Keras, PyTorch}
+
+\subsection{Cơ sở lý thuyết và kiến trúc mạng}
+
+Một MLP gồm các tầng kết nối đầy đủ. Tầng $l$ nhận kích hoạt $\mathbf{a}^{[l-1]}$ của tầng trước và tính
+\begin{equation}
+  \mathbf{z}^{[l]} = W^{[l]}\mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}, \qquad \mathbf{a}^{[l]} = g^{[l]}\big(\mathbf{z}^{[l]}\big),
+\end{equation}
+với $g$ là ReLU ở tầng ẩn và sigmoid, softmax hoặc hàm đồng nhất ở tầng ra tùy bài toán. Lan truyền ngược áp dụng quy tắc
+dây chuyền từ tầng ra về tầng vào:
+\begin{align}
+  \boldsymbol{\delta}^{[L]} &= \hat{\mathbf{y}} - \mathbf{y}, \\
+  \boldsymbol{\delta}^{[l]} &= \big((W^{[l+1]})^\top\boldsymbol{\delta}^{[l+1]}\big) \odot g'^{[l]}\big(\mathbf{z}^{[l]}\big), \\
+  \frac{\partial\mathcal{L}}{\partial W^{[l]}} &= \boldsymbol{\delta}^{[l]}\big(\mathbf{a}^{[l-1]}\big)^\top, \qquad
+  \frac{\partial\mathcal{L}}{\partial\mathbf{b}^{[l]}} = \boldsymbol{\delta}^{[l]} .
+\end{align}
+Đẳng thức đầu đúng cho cả ba cặp đầu ra -- mất mát dùng ở đây (sigmoid + BCE, softmax + entropy chéo, tuyến tính + MSE
+với hệ số 2), nên một hàm \texttt{backward} phục vụ cả ba bài toán. Trọng số khởi tạo theo He \cite{he2015init}
+($\mathcal{N}(0, 2/n_{in})$) để biên độ kích hoạt ổn định qua các tầng ReLU, và cập nhật bằng Adam \cite{kingma2015}.
+
+Để so sánh ba nền tảng một cách công bằng, cả ba cài đặt dùng \emph{cùng một kiến trúc} (Hình~\ref{fig:mlp}): hai tầng ẩn
+128 và 64 nơ-ron, ReLU, Dropout 0,2 \cite{srivastava2014}; Adam với tốc độ học $10^{-3}$, lô 256; dừng sớm khi mất mát
+kiểm định không giảm trong 8 epoch và khôi phục trọng số tốt nhất.
+
+\hinhtikz{f2_mlp}{Kiến trúc MLP dùng chung cho cả ba nền tảng và ba bài toán.}{mlp}
+
+\subsection{Hiện thực từ đầu bằng NumPy}
+
+Lớp \texttt{MLPScratch} chỉ dùng phép toán ma trận của NumPy. Lan truyền tiến (Đoạn mã~\ref{code:mlp_scratch__MLPScratch.forward})
+lưu lại $\mathbf{z}$, $\mathbf{a}$ và mặt nạ Dropout của từng tầng; lan truyền ngược
+(Đoạn mã~\ref{code:mlp_scratch__MLPScratch.backward}) dùng lại chúng để tính gradient đúng như các công thức trên; Adam
+(Đoạn mã~\ref{code:mlp_scratch__MLPScratch._adam}) giữ hai mômen cho mỗi tham số và hiệu chỉnh độ chệch khởi đầu.
+
+\maNguon{mlp_scratch__MLPScratch.forward}{Lan truyền tiến của MLP viết tay bằng NumPy, kèm Dropout ngược}
+\maNguon{mlp_scratch__MLPScratch.backward}{Lan truyền ngược của MLP viết tay: một sai số tầng ra chung cho ba bài toán}
+\maNguon{mlp_scratch__MLPScratch._adam}{Bộ tối ưu Adam viết tay}
+
+\subsection{Hiện thực bằng Keras / TensorFlow}
+
+Keras gói cả kiến trúc, hàm mất mát và vòng huấn luyện vào API cấp cao; phần đầu ra chọn theo bảng \texttt{HEADS}.
+
+\maNguon{mlp_keras__build_keras_mlp}{MLP bằng Keras Sequential API cho ba loại đầu ra}
+
+\subsection{Hiện thực bằng PyTorch}
+
+PyTorch tách mô hình (\texttt{nn.Module}) khỏi vòng huấn luyện do ta tự viết. Mô hình trả logit thô; sigmoid và softmax
+nằm trong \texttt{BCEWithLogitsLoss} và \texttt{CrossEntropyLoss} để ổn định số học. Vì dữ liệu bảng nhỏ, toàn bộ tập
+được đưa lên GPU một lần và chia lô bằng chỉ số thay vì \texttt{DataLoader}.
+
+\maNguon{mlp_torch__TorchMLP}{MLP bằng PyTorch với lớp \texttt{nn.Module}}
+\maNguon{mlp_torch__train_epoch}{Một epoch huấn luyện PyTorch trên dữ liệu đã nằm sẵn trên GPU}
+
+% ---------------------------------------------------------------------
+\section{Đánh giá và đối chuẩn trên ba tập dữ liệu}
+
+\subsection{Đối chuẩn hiệu năng chi tiết trên từng tập dữ liệu}
+
+Ba bảng sau đặt ba bản MLP cạnh các mô hình cơ bản, trên cùng tập kiểm thử.
+
+\bang{tab_ch2_diab_all}{Đối chuẩn mọi mô hình trên tập tiểu đường.}{ch2-diab-all}
+\bang{tab_ch2_house_all}{Đối chuẩn mọi mô hình trên tập giá nhà Việt Nam.}{ch2-house-all}
+\bang{tab_ch2_rev_all}{Đối chuẩn mọi mô hình trên tập nhận xét khách hàng.}{ch2-rev-all}
+\bang{tab_ch2_fw}{Cùng một kiến trúc MLP trên ba nền tảng.}{ch2-fw}
+
+\hinhpdf{f2_loss_mlp}{1}{Đường cong mất mát huấn luyện (nét đứt) và kiểm định (nét liền) của MLP trên ba nền tảng.}{loss-mlp}
+\hinhpdf{f2_house_pred}{0.95}{Giá thực tế và giá dự báo trên tập kiểm thử của Random Forest và MLP PyTorch.}{house-pred}
+\hinhpdf{f2_bar_diab}{1}{So sánh đa tiêu chí trên tập tiểu đường.}{bar-diab}
+\hinhpdf{f2_bar_house}{1}{So sánh sai số (MAE, RMSE) và hệ số xác định $R^2$ trên tập giá nhà.}{bar-house}
+\hinhpdf{f2_bar_rev}{1}{So sánh Accuracy và các chỉ số macro trên tập nhận xét khách hàng.}{bar-rev}
+\hinhpdf{f2_cm_diab}{1}{Ma trận nhầm lẫn trên tập kiểm thử tiểu đường: Logistic Regression, Random Forest, MLP PyTorch.}{cm-diab}
+\hinhpdf{f2_cm_rev}{1}{Ma trận nhầm lẫn trên tập kiểm thử nhận xét khách hàng.}{cm-rev}
+
+\paragraph{Thảo luận kết quả.}
+\begin{itemize}
+  \item \textbf{MLP tốt nhất trên dữ liệu y tế.} Cả ba bản MLP đạt F1 lớp dương quanh
+    \SL{ch2_mlp_torch/diabetes/f1} (PyTorch), cao hơn Random Forest (\SL{ch2_sklearn/diabetes/rf/f1}) và vượt xa Logistic
+    Regression (\SL{ch2_sklearn/diabetes/logreg/f1}). Ma trận nhầm lẫn (Hình~\ref{fig:cm-diab}) cho thấy MLP gần như không
+    báo động giả (Precision \SL{ch2_mlp_torch/diabetes/precision}) nhưng vẫn bỏ sót khoảng một phần ba ca bệnh
+    (Recall \SL{ch2_mlp_torch/diabetes/recall}). ROC-AUC của bốn mô hình phi tuyến chỉ chênh nhau ở chữ số thứ ba
+    (\SL{ch2_sklearn/diabetes/svm/auc} -- \SL{ch2_mlp_torch/diabetes/auc}): khác biệt lớn về F1 phần nhiều đến từ
+    \emph{điểm cắt} trên đường ROC chứ không từ khả năng phân biệt. Trong sàng lọc y tế, bỏ sót đắt hơn báo động giả, nên
+    khi triển khai nên hạ ngưỡng của MLP xuống dưới 0,5 để đổi Precision lấy Recall.
+  \item \textbf{Random Forest vẫn nhỉnh nhất trên giá nhà.} $R^2$ của Random Forest (\SL{ch2_sklearn/house/rf/r2}) cao hơn
+    MLP PyTorch (\SL{ch2_mlp_torch/house/r2}) một chút, hai mô hình bám nhau trên đồ thị phân tán
+    (Hình~\ref{fig:house-pred}). Cả hai đều chỉ giải thích khoảng 62\,\% phương sai: phần còn lại nằm ở thông tin dữ liệu
+    không có (vị trí chính xác trong quận, dự án, chất lượng xây dựng), nên không mô hình nào vượt xa được. Cây quyết
+    định chia trực tiếp không gian theo từng quận/huyện, một lợi thế tự nhiên trên dữ liệu bảng có nhiều biến phân loại.
+  \item \textbf{Văn bản: MLP chính xác nhất nhưng lớp trung tính là điểm mù chung.} MLP đạt Accuracy cao nhất
+    (\SL{ch2_mlp_scratch/reviews/accPct}\,\% với bản NumPy), F1 macro ngang các mô hình tuyến tính. Cả ba bản MLP quá khớp
+    rất nhanh: mất mát kiểm định chạm đáy ở epoch 2 -- 3 rồi tăng (Hình~\ref{fig:loss-mlp}), vì \SL{ch2_mlp_torch/reviews/params} tham số học
+    trên chưa đến 17.000 văn bản. Ma trận nhầm lẫn (Hình~\ref{fig:cm-rev}) cho thấy lớp trung tính (3 sao) bị lẫn
+    sang cả hai phía: một nhận xét 3 sao thường vừa khen vừa chê.
+  \item \textbf{Ba nền tảng cho kết quả tương đương.} Với cùng kiến trúc và siêu tham số, chênh lệch F1/$R^2$ giữa NumPy,
+    Keras và PyTorch nằm trong khoảng dao động do khởi tạo ngẫu nhiên khác nhau (Bảng~\ref{tab:ch2-fw}). Bản NumPy tự viết
+    đạt độ chính xác ngang thư viện công nghiệp, xác nhận các công thức lan truyền ngược được cài đặt đúng. Khác biệt nằm
+    ở chi phí kỹ thuật: PyTorch chạy GPU, Keras có tệp lưu lớn nhất do chứa cả trạng thái bộ tối ưu.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\section{Đóng gói triển khai và giao diện Web thực tế}
+\label{sec:web}
+
+\subsection{Kiến trúc triển khai hệ thống}
+
+Toàn bộ mô hình của ba chương được phục vụ bởi một ứng dụng Flask duy nhất gồm ba tầng (Hình~\ref{fig:deploy}):
+\begin{enumerate}
+  \item \textbf{Tầng giao diện:} một trang HTML5/CSS3 với sáu thẻ, JavaScript gọi API bằng \texttt{fetch} và vẽ biểu đồ
+    bằng SVG thuần, không phụ thuộc thư viện ngoài.
+  \item \textbf{Tầng ứng dụng:} máy chủ Flask nhận yêu cầu \texttt{POST} JSON tại sáu endpoint
+    \texttt{/api/diabetes}, \texttt{/api/house}, \texttt{/api/sentiment}, \texttt{/api/vision}, \texttt{/api/stock},
+    \texttt{/api/churn}.
+  \item \textbf{Tầng mô hình:} mọi mô hình (\texttt{.pt}, \texttt{.joblib}) được nạp lên RAM một lần lúc khởi động và suy
+    luận trên CPU. Bộ tiền xử lý được dựng lại bằng chính hàm \texttt{load\_*} đã dùng khi huấn luyện nên dữ liệu người
+    dùng đi qua đúng phép biến đổi mà mô hình đã học.
+\end{enumerate}
+
+\hinhtikz{f2_deploy}{Kiến trúc ba tầng của Web App phục vụ sáu phân hệ thông minh.}{deploy}
+
+Endpoint sàng lọc tiểu đường (Đoạn mã~\ref{code:app__api_diabetes}) minh họa khuôn chung: dựng một dòng
+\texttt{DataFrame} từ JSON, biến đổi bằng bộ tiền xử lý, chạy mô hình, đo thời gian và trả JSON.
+
+\maNguon{app__api_diabetes}{Endpoint sàng lọc tiểu đường: MLP PyTorch và Random Forest cho cùng một hồ sơ}
+
+\subsection{Giao diện thực tế các hệ thống thông minh}
+
+\anhUI{ui_diabetes}{Phân hệ sàng lọc nguy cơ tiểu đường: người dùng nhập chỉ số lâm sàng, hệ thống trả xác suất của MLP và
+Random Forest, mức nguy cơ và khuyến nghị.}{ui-diabetes}
+\anhUI{ui_house}{Phân hệ định giá bất động sản: giá ước tính của Random Forest, khoảng hợp lý $\pm$ RMSE kiểm thử, dự báo
+của MLP và đơn giá theo m².}{ui-house}
+\anhUI{ui_sentiment}{Phân hệ phân tích cảm xúc nhận xét: xác suất ba lớp của MLP, đối chiếu Logistic Regression và các từ
+đóng góp nhiều nhất.}{ui-sentiment}
+
+Ba phân hệ trả kết quả trong vài đến vài chục mili-giây trên CPU, cho thấy các mô hình học máy cơ bản và MLP chuyển được trực tiếp
+vào một quy trình nghiệp vụ thực tế.

@@ -1,0 +1,49 @@
+% =====================================================================
+%  KẾT LUẬN
+% =====================================================================
+\chapter*{Kết Luận}
+\addcontentsline{toc}{chapter}{Kết Luận}
+\markboth{Kết Luận}{}
+\label{ch:ket-luan}
+
+\section*{Kết quả đạt được}
+
+Tiểu luận đã đi trọn một vòng từ lịch sử, lý thuyết, cài đặt, thực nghiệm đến triển khai cho ba họ mô hình trên bảy tập dữ
+liệu thật:
+\begin{itemize}
+  \item \textbf{Lịch sử AI} được hệ thống hóa qua mười sáu mốc, cho thấy mỗi mô hình hiện đại là lời đáp cho một thất bại cụ
+    thể trước đó: lan truyền ngược cho giới hạn XOR, học máy thống kê cho tính giòn của hệ chuyên gia, LSTM cho triệt tiêu
+    đạo hàm, ResNet cho thoái hóa mạng sâu.
+  \item \textbf{Học máy cơ bản và MLP:} trên dữ liệu y tế mất cân bằng, MLP đạt F1 lớp dương \SL{ch2_mlp_torch/diabetes/f1},
+    cao nhất trong bảy mô hình; trên giá nhà Việt Nam, Random Forest vẫn nhỉnh nhất ($R^2 = \SL{ch2_sklearn/house/rf/r2}$);
+    trên văn bản, MLP chính xác nhất nhưng quá khớp nhanh. MLP cài đặt bằng NumPy thuần đạt kết quả ngang Keras và PyTorch.
+  \item \textbf{CNN:} ResNet-18 huấn luyện từ đầu đạt \SL{ch3_svhn/resnet18/accPct}\,\% trên SVHN và
+    \SL{ch3_eurosat/resnet18/accPct}\,\% trên EuroSAT; MobileNetV2 đạt độ chính xác sát nút với số tham số ít hơn khoảng
+    5 lần, nhưng không nhanh hơn trên GPU ở lô 1. Mạng CNN chạy bằng các hàm NumPy viết tay cho cùng dự đoán với PyTorch.
+  \item \textbf{RNN:} trên KKBox, các tế bào có cổng vượt Simple RNN; trên giá FPT, cả bốn kiến trúc chỉ ngang mốc “giữ nguyên
+    giá” dù $R^2$ trên giá đạt \SL{ch4_torch/stock/lstm/r2}. LSTM viết tay bằng NumPy tái tạo đúng đầu ra của PyTorch.
+  \item \textbf{Triển khai:} một Web App Flask sáu phân hệ phục vụ mọi mô hình trên CPU với thời gian phản hồi vài đến vài
+    chục mili-giây, có bản đồ CAM giải thích dự đoán ảnh.
+\end{itemize}
+
+\section*{Bài học rút ra}
+
+\begin{enumerate}
+  \item \textbf{Chọn mô hình theo dạng dữ liệu, không theo độ “hiện đại”.} Random Forest vẫn là đối thủ khó vượt trên dữ liệu
+    bảng; CNN thắng trên ảnh vì cấu trúc không gian; RNN chỉ có lợi khi chuỗi thật sự chứa tín hiệu theo thời gian.
+  \item \textbf{Một con số đẹp cần một mốc so sánh.} $R^2 = 0{,}99$ trên giá cổ phiếu hay Accuracy 91,5\,\% trên dữ liệu tiểu
+    đường đều đạt được bởi mô hình ngây thơ. Mọi đánh giá trong báo cáo vì vậy luôn đi kèm mốc tham chiếu và chỉ số phù hợp
+    với bài toán (F1 lớp hiếm, $R^2$ trên lợi suất).
+  \item \textbf{Tiền xử lý quyết định nhiều hơn kiến trúc.} Chuẩn hóa theo mức giá khiến mọi RNN thất bại khi giá vượt vùng
+    huấn luyện; chuẩn hóa theo từng cửa sổ sửa được ngay. Ngưỡng phân loại thay đổi F1 nhiều hơn việc đổi mô hình.
+  \item \textbf{FLOPs không phải độ trễ.} MobileNetV2 rẻ hơn nhiều lần về phép tính nhưng chậm hơn ResNet-18 trên GPU ở lô 1;
+    hiệu năng thực phụ thuộc phần cứng đích.
+  \item \textbf{Viết tay để hiểu, dùng thư viện để chạy.} Các bản NumPy giúp kiểm chứng từng công thức; PyTorch trên GPU nhanh
+    hơn nhiều bậc khi huấn luyện thật.
+\end{enumerate}
+
+\section*{Hướng phát triển}
+
+Các hướng tiếp theo bám sát lộ trình của học phần: thay RNN bằng Transformer cho chuỗi dài; bổ sung dữ liệu ngoài chuỗi giá
+(tin tức, báo cáo tài chính) và thông tin giao dịch thuê bao cho bài toán rời bỏ; dùng học chuyển giao với trọng số tiền huấn
+luyện cho ảnh; và kết nối các mô hình trong báo cáo với đồ thị tri thức, RAG và hệ đa tác tử ở các chương sau của học phần.

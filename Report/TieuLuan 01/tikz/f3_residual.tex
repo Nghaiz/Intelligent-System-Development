@@ -1,0 +1,19 @@
+% Khối Residual: lan truyền xuôi y = F(x) + x và lan truyền ngược dE/dx = dE/dy (dF/dx + I).
+\begin{tikzpicture}[node distance=5mm, font=\footnotesize,
+  k/.style={khoi, minimum width=30mm, minimum height=6mm},
+  tron/.style={draw=ptitblue, circle, inner sep=1pt, fill=white}]
+  \node[khoiX, minimum width=14mm] (x) at (0,0) {$x$};
+  \node[k, below=of x] (c1) {Conv $3{\times}3$, BN, ReLU};
+  \node[k, below=of c1] (c2) {Conv $3{\times}3$, BN};
+  \node[tron, below=5mm of c2] (p) {$+$};
+  \node[khoi, below=5mm of p, minimum width=14mm] (y) {ReLU $\to y$};
+  \draw[mui] (x) -- (c1); \draw[mui] (c1) -- (c2); \draw[mui] (c2) -- node[right, nhan] {$F(x)$} (p); \draw[mui] (p) -- (y);
+  \draw[mui, mTwo!90!black, very thick] (x.east) -- ++(2.2,0) |- node[pos=0.25, right, align=left] {kết nối tắt\\(đồng nhất $I$,\\hoặc conv $1{\times}1$\\khi đổi số kênh)} (p.east);
+  % gradient đi ngược
+  \draw[-{Stealth[length=2.5mm]}, accentRed, very thick, dashed] (-2.6,-5.6) -- node[left, align=right] {$\dfrac{\partial E}{\partial y}$ đi ngược\\qua nhánh $F$:\\có thể nhỏ dần} (-2.6,-0.2);
+  \node[anchor=west, align=left, text width=62mm] at (4.6,-2.8) {%
+    $\displaystyle \frac{\partial E}{\partial x} = \frac{\partial E}{\partial y}\Big(\frac{\partial F}{\partial x} + I\Big)$\\[4pt]
+    Thành phần $I$ là “đường cao tốc”: dù $\partial F/\partial x \to 0$, gradient vẫn
+    đến được các tầng đầu với độ lớn của $\partial E/\partial y$. Nhờ vậy ResNet-18 (18 tầng)
+    huấn luyện được từ đầu mà không thoái hóa.};
+\end{tikzpicture}

@@ -19,6 +19,12 @@ Bài tập lớn học phần **Phát triển các Hệ thống Thông minh** �
 | **05** | CNN nhìn như hợp của các hàm | Khái niệm CNN viết thành hàm NumPy, 9 kiến trúc từ LeNet đến ViT, một CNN cơ bản và ba mô hình phát triển (VGG, ResNet, SE-ResNet) huấn luyện trên CIFAR-10, CIFAR-100 và Diabetes; báo cáo LaTeX với mọi hình vẽ bằng TikZ | [`src/Assignment 05`](src/Assignment%2005) | [PDF](Report/Assignment%2005/A05_CT_nghiand.600.pdf) |
 | **06** | Mạng nơ-ron hồi quy trên dữ liệu chuỗi | Simple RNN, LSTM, GRU, BiLSTM bằng PyTorch và Keras (16 mô hình) trên giá cổ phiếu AMZN 1997–2024 và log nghe nhạc của 100.000 người dùng KKBox; lý thuyết viết bằng NumPy, đối chuẩn hai framework, Web App Flask | [`src/Assignment 06`](src/Assignment%2006) | [PDF](Report/Assignment%2006/A06_CT_nghiand.600.pdf) |
 
+## Tiểu luận
+
+| # | Chủ đề | Nội dung chính | Mã nguồn | Báo cáo |
+|---|---|---|---|---|
+| **TL01** | Học máy cơ bản, CNN và RNN trong hệ thống thông minh | Lịch sử AI; Linear/Logistic/SVM/Random Forest và MLP (NumPy, Keras, PyTorch) trên tiểu đường, giá nhà Việt Nam, nhận xét khách hàng; Custom CNN, VGG-11, MobileNetV2, ResNet-18 trên SVHN và EuroSAT; RNN/LSTM/GRU/BiLSTM trên cổ phiếu VN30 và KKBox; Web App Flask sáu phân hệ | [`src/TieuLuan 01`](src/TieuLuan%2001) | [PDF](Report/TieuLuan%2001/tieuluan01_CT_nghiand.600.pdf) |
+
 Mỗi bài có README riêng trong thư mục mã nguồn, hướng dẫn dựng lại từ đầu.
 
 ---

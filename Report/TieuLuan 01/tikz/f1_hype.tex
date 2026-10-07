@@ -1,0 +1,23 @@
+% Chu kỳ kỳ vọng (định tính) và hai mùa đông AI; đường cong là minh họa, không phải số đo.
+\begin{tikzpicture}
+\begin{axis}[a06, width=14cm, height=5.6cm, xmin=1950, xmax=2026, ymin=0, ymax=10.5,
+  xlabel={Năm}, ylabel={Mức kỳ vọng và đầu tư (định tính)}, ytick=\empty, grid=none,
+  xtick={1950,1960,...,2020}, xticklabel style={/pgf/number format/1000 sep={}}]
+  \fill[lightGray] (axis cs:1974,0) rectangle (axis cs:1980,10.5);
+  \fill[lightGray] (axis cs:1987,0) rectangle (axis cs:1993,10.5);
+  \node[font=\footnotesize\bfseries, text=accentRed, align=center] at (axis cs:1977,9.3) {Mùa đông\\AI lần I};
+  \node[font=\footnotesize\bfseries, text=accentRed, align=center] at (axis cs:1990,9.3) {Mùa đông\\AI lần II};
+  \addplot[ptitblue, very thick, smooth, tension=0.6] coordinates {
+    (1950,1.5) (1956,4.2) (1962,6.6) (1967,7.2) (1971,5.0) (1975,2.0) (1979,2.3)
+    (1983,5.8) (1986,7.4) (1989,3.4) (1992,2.2) (1997,3.6) (2003,4.2) (2009,4.9)
+    (2012,6.0) (2016,7.6) (2020,8.3) (2023,9.6) (2026,10.0)};
+  \tikzset{nhanhype/.style={font=\scriptsize, anchor=south, fill=white, inner sep=1pt}}
+  \node[nhanhype] at (axis cs:1956,4.3) {Dartmouth};
+  \node[nhanhype] at (axis cs:1965,7.3) {Perceptron, GPS};
+  \node[nhanhype] at (axis cs:1985,7.5) {Hệ chuyên gia, BP};
+  \node[nhanhype, anchor=north west] at (axis cs:2011.5,5.9) {AlexNet};
+  \node[nhanhype, anchor=south east] at (axis cs:2016.5,7.7) {Transformer};
+  \node[nhanhype, anchor=south east] at (axis cs:2022.5,9.7) {LLM};
+  \node[font=\scriptsize, align=left, anchor=west] at (axis cs:1995,1.2) {Học máy thống kê: SVM, Boosting, Random Forest};
+\end{axis}
+\end{tikzpicture}

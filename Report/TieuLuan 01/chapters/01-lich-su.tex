@@ -1,0 +1,220 @@
+% =====================================================================
+%  CHƯƠNG 1 — LỊCH SỬ PHÁT TRIỂN TRÍ TUỆ NHÂN TẠO
+% =====================================================================
+\chapter{Lịch Sử Phát Triển Trí Tuệ Nhân Tạo}
+\label{ch:lich-su}
+
+\section{Tổng quan bức tranh hơn tám thập kỷ của AI}
+
+Lịch sử trí tuệ nhân tạo không phải một đường đi lên đều đặn. Đó là chuỗi các chu kỳ kỳ vọng: mỗi đột phá kéo theo
+lời hứa vượt quá năng lực thật của công nghệ, rồi một giai đoạn thoái trào khi tiền tài trợ cạn, gọi là
+\emph{mùa đông AI}. Qua các chu kỳ đó, cách máy tính “suy nghĩ” đổi ba lần: từ suy diễn trên ký hiệu do con người
+viết, sang mô hình xác suất học từ dữ liệu, rồi tới học biểu diễn nhiều tầng của học sâu. Hình~\ref{fig:timeline}
+đặt mười sáu mốc then chốt lên cùng một trục thời gian, kèm các kỷ nguyên tương ứng.
+
+\hinhtikz{f1_timeline}{Dòng thời gian tiến hóa của trí tuệ nhân tạo (1943 -- 2026): các mốc then chốt và các kỷ
+nguyên công nghệ. Hai dải xám là hai mùa đông AI (1974 -- 1980 và 1987 -- 1993), dải cam giữa chúng là thời kỳ hệ chuyên
+gia (1980 -- 1987).}{timeline}
+
+Hiểu lịch sử không chỉ để biết ai làm gì, năm nào. Mỗi mô hình được hiện thực ở các chương sau đều là lời đáp cho
+một thất bại cụ thể trong quá khứ: MLP và lan truyền ngược trả lời giới hạn XOR của Perceptron, SVM và Random Forest
+trả lời sự giòn của hệ chuyên gia, LSTM trả lời hiện tượng triệt tiêu đạo hàm của RNN, ResNet trả lời sự thoái hóa của
+mạng rất sâu.
+
+\section{Khởi nguồn và kỷ nguyên logic biểu tượng (1940s -- 1960s)}
+
+\subsection{Ý niệm về máy tính có tư duy và phép thử Turing}
+
+Năm 1950, Alan Turing công bố bài báo \emph{“Computing Machinery and Intelligence”} trên tạp chí \emph{Mind}
+\cite{turing1950}, mở đầu bằng câu hỏi “Máy móc có thể suy nghĩ không?”. Để tránh tranh cãi triết học về khái niệm
+“ý thức”, Turing thay câu hỏi bằng một thí nghiệm hành vi, \emph{trò chơi bắt chước}: một người thẩm vấn trò chuyện
+bằng văn bản với hai đối tượng giấu mặt, một người và một máy. Nếu người thẩm vấn không phân biệt được đâu là máy,
+ta nói máy đã thể hiện hành vi thông minh. Phép thử Turing là phương pháp luận đầu tiên định lượng hóa trí tuệ nhân
+tạo bằng hành vi quan sát được, và đến nay vẫn là điểm quy chiếu khi bàn về các mô hình ngôn ngữ lớn.
+
+\subsection{Mô hình nơ-ron hình thức và Hội thảo Dartmouth (1956)}
+
+Trước cả Turing, năm 1943, nhà thần kinh học Warren McCulloch và nhà logic học Walter Pitts đề xuất mô hình
+nơ-ron hình thức \cite{mcculloch1943}: một nơ-ron tính tổng có trọng số các tín hiệu nhị phân rồi so với một ngưỡng,
+\begin{equation}
+  y = f\Big(\sum_{i=1}^{n} w_i x_i - \theta\Big), \qquad x_i \in \{0, 1\},
+  \label{eq:mcp}
+\end{equation}
+với $f$ là hàm bước Heaviside. Hai tác giả chứng minh mạng các nơ-ron như vậy thực hiện được mọi hàm logic AND, OR,
+NOT. Năm 1949, Donald Hebb bổ sung quy tắc học “các nơ-ron cùng phát xung thì liên kết mạnh lên”, cơ sở sinh học đầu
+tiên cho việc \emph{thay đổi} trọng số.
+
+Ngành AI chính thức ra đời mùa hè năm 1956 tại Hội thảo Dartmouth do John McCarthy, Marvin Minsky, Claude Shannon và
+Nathaniel Rochester tổ chức. McCarthy đặt tên “Artificial Intelligence” với giả thuyết: mọi khía cạnh của việc học hay
+của trí tuệ, về nguyên tắc, đều mô tả được chính xác tới mức một cỗ máy có thể mô phỏng nó.
+
+\subsection{Perceptron của Rosenblatt và các hệ suy diễn ký hiệu đầu tiên}
+
+Năm 1958, Frank Rosenblatt công bố Perceptron \cite{rosenblatt1958}, mô hình nơ-ron đầu tiên \emph{tự học} trọng số
+từ dữ liệu có nhãn theo quy tắc
+\begin{equation}
+  \mathbf{w}^{(t+1)} = \mathbf{w}^{(t)} + \eta\,(y - \hat y)\,\mathbf{x},
+  \label{eq:perceptron}
+\end{equation}
+với $\eta > 0$ là tốc độ học. Định lý hội tụ Perceptron bảo đảm thuật toán dừng sau hữu hạn bước nếu dữ liệu khả
+tách tuyến tính. Song song với hướng kết nối (connectionism) này, hướng biểu tượng (symbolic AI) cũng gặt hái thành
+công: chương trình Logic Theorist (1956) của Newell, Simon và Shaw chứng minh được 38 trên 52 định lý ở chương 2 của
+\emph{Principia Mathematica}; General Problem Solver (1959) giải các bài toán đố bằng phân tích phương tiện -- mục đích.
+
+\section{“Mùa đông AI” lần thứ nhất (1970s)}
+
+\subsection{Giới hạn toán học của Perceptron và cuốn sách của Minsky \& Papert (1969)}
+
+Năm 1969, Minsky và Papert xuất bản \emph{Perceptrons} \cite{minsky1969}, chứng minh chặt chẽ rằng Perceptron một tầng
+chỉ học được các hàm khả tách tuyến tính, và vì vậy thất bại với cả hàm XOR đơn giản (Bảng~\ref{tab:xor}).
+
+\begin{table}[H]\centering
+\caption{Bảng chân lý của hàm XOR: hai lớp nằm trên hai đường chéo nên không đường thẳng nào tách được.}\label{tab:xor}
+\begin{tabular}{cccl}
+\toprule
+$x_1$ & $x_2$ & $y = x_1 \oplus x_2$ & Vị trí trên mặt phẳng $\mathbb{R}^2$ \\
+\midrule
+0 & 0 & 0 & gốc tọa độ $(0, 0)$ -- nhãn âm \\
+0 & 1 & 1 & điểm $(0, 1)$ -- nhãn dương \\
+1 & 0 & 1 & điểm $(1, 0)$ -- nhãn dương \\
+1 & 1 & 0 & điểm $(1, 1)$ -- nhãn âm \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Muốn tách $\{(0,1), (1,0)\}$ khỏi $\{(0,0), (1,1)\}$ cần một đường thẳng $w_1x_1 + w_2x_2 + b = 0$ để hai nhóm nằm hai
+phía, nhưng từ $b < 0$, $w_1 + b > 0$, $w_2 + b > 0$ suy ra $w_1 + w_2 + b > -b > 0$, mâu thuẫn với yêu cầu điểm
+$(1,1)$ phải âm. Minsky và Papert biết mạng nhiều tầng giải được XOR, nhưng thời đó chưa ai có cách huấn luyện các
+tầng ẩn. Cuốn sách khiến nguồn tài trợ cho hướng nơ-ron gần như đóng băng suốt hơn một thập kỷ.
+
+\subsection{Báo cáo Lighthill (1973) và sự cắt giảm tài trợ của DARPA}
+
+Năm 1973, Báo cáo Lighthill \cite{lighthill1973} gửi Hội đồng Nghiên cứu Khoa học Anh kết luận rằng các hệ AI ký hiệu
+chỉ chạy được trong “thế giới đồ chơi” và bất lực trước bài toán thật vì \emph{bùng nổ tổ hợp}: số trạng thái cần tìm
+kiếm tăng theo hàm mũ của kích thước bài toán. Chính phủ Anh cắt tài trợ AI ở hầu hết các trường đại học; cùng lúc, tu
+chính án Mansfield khiến DARPA của Hoa Kỳ ngừng chi cho nghiên cứu không có ứng dụng quân sự trực tiếp. Giai đoạn
+1974 -- 1980 được gọi là mùa đông AI thứ nhất.
+
+\section{Sự trỗi dậy của hệ chuyên gia và “mùa đông AI” lần thứ hai (1980s -- 1990s)}
+
+\subsection{Kỷ nguyên vàng của hệ chuyên gia}
+
+Đầu thập niên 1980, AI hồi sinh khi chuyển từ tìm kiếm tổng quát sang \emph{tri thức chuyên ngành hẹp}. Một hệ chuyên
+gia tách hai thành phần: \textbf{cơ sở tri thức} gồm sự kiện và luật dạng \texttt{IF} điều kiện \texttt{THEN} kết luận,
+và \textbf{máy suy diễn} chạy luật theo chiều tiến (từ dữ kiện ra kết luận) hoặc chiều lùi (từ giả thuyết truy về dữ
+kiện). Các hệ tiêu biểu gồm DENDRAL (xác định cấu trúc phân tử từ phổ khối), MYCIN (chẩn đoán nhiễm trùng máu, độ chính
+xác ngang bác sĩ chuyên khoa) và XCON/R1 của Digital Equipment Corporation, tự cấu hình máy VAX và được ước tính tiết
+kiệm khoảng 40 triệu USD mỗi năm. Thành công của XCON kéo theo làn sóng đầu tư vào máy Lisp chuyên dụng và dự án Máy
+tính Thế hệ Thứ năm của Nhật Bản.
+
+\subsection{Sự tái sinh của mạng nơ-ron: thuật toán lan truyền ngược (1986)}
+
+Năm 1986, Rumelhart, Hinton và Williams công bố trên \emph{Nature} thuật toán lan truyền ngược cho mạng nhiều tầng
+\cite{rumelhart1986}. Dùng quy tắc dây chuyền với hàm kích hoạt khả vi như sigmoid $\sigma(z) = 1/(1+e^{-z})$, đạo hàm
+của mất mát $L$ theo một trọng số bất kỳ ở tầng ẩn $l$ tách thành tích của sai số truyền ngược và kích hoạt tầng trước:
+\begin{equation}
+  \frac{\partial L}{\partial w^{(l)}_{ij}} = \delta^{(l)}_i \, a^{(l-1)}_j .
+  \label{eq:bp}
+\end{equation}
+Kết quả này phá “lời nguyền XOR”: mạng hai tầng học được biểu diễn ẩn phi tuyến. Cùng giai đoạn, Fukushima
+(1980) đề xuất Neocognitron \cite{fukushima1980} với các tầng trích đặc trưng cục bộ (S-cells) xen kẽ các tầng bất biến
+vị trí (C-cells), tiền thân trực tiếp của CNN. Chương~\ref{ch:hoc-may} hiện thực lại công thức~\eqref{eq:bp} bằng NumPy.
+
+\subsection{“Mùa đông AI” lần thứ hai (1987 -- 1993)}
+
+Hệ chuyên gia sớm lộ ba điểm yếu cấu trúc. \emph{Nút thắt thu nhận tri thức}: phỏng vấn chuyên gia để mã hóa hàng vạn
+luật vừa đắt vừa chậm, lại sinh mâu thuẫn. \emph{Tính giòn}: hệ thống trả lời sai hoặc lặp vô tận khi gặp tình huống
+nằm ngoài các luật đã viết, chi phí bảo trì vượt lợi ích. \emph{Sụp đổ phần cứng}: máy trạm Unix và vi xử lý x86 rẻ
+hơn khiến máy Lisp lỗi thời, kéo theo phá sản dây chuyền. Hình~\ref{fig:hype} minh họa định tính các chu kỳ kỳ vọng và
+hai mùa đông AI.
+
+\hinhtikz{f1_hype}{Chu kỳ kỳ vọng và hai thời kỳ “mùa đông AI” (minh họa định tính, không phải số đo).}{hype}
+
+Sau mỗi lần thoái trào, cộng đồng tái cấu trúc phương pháp luận theo hướng thực dụng hơn và có cơ sở toán học chắc hơn.
+
+\section{Kỷ nguyên học máy thống kê (1990s -- 2010)}
+
+Bài học rút ra từ thất bại của hệ chuyên gia: thay vì cố viết tay mọi quy tắc của thế giới, hãy để máy học quy luật
+xác suất trực tiếp từ dữ liệu.
+
+\subsection{Lý thuyết học thống kê và máy vector hỗ trợ (SVM)}
+
+Vapnik và Chervonenkis xây dựng lý thuyết học thống kê với nguyên lý cực tiểu hóa rủi ro cấu trúc: kiểm soát cùng lúc
+sai số huấn luyện và độ phức tạp của lớp hàm (đo bằng chiều VC). Đỉnh cao là máy vector hỗ trợ \cite{cortes1995}, tìm
+siêu phẳng có \emph{lề lớn nhất} tới các điểm gần nhất:
+\begin{equation}
+  \min_{\mathbf{w}, b}\ \tfrac{1}{2}\lVert \mathbf{w} \rVert^2 \quad \text{với}\quad y_i(\mathbf{w}^\top\mathbf{x}_i + b) \ge 1,\ \forall i.
+\end{equation}
+Nhờ thủ thuật hàm nhân, ví dụ nhân RBF $K(\mathbf{x}, \mathbf{x}') = \exp(-\gamma\lVert\mathbf{x}-\mathbf{x}'\rVert^2)$,
+SVM tách được dữ liệu phi tuyến bằng cách ngầm ánh xạ lên không gian vô hạn chiều. Bài toán tối ưu là lồi nên không
+mắc cực tiểu địa phương; SVM thống trị nhận dạng ảnh và phân loại văn bản suốt hơn một thập kỷ.
+
+\subsection{Cây quyết định và các phương pháp học tập hợp}
+
+Cây quyết định (CART, C4.5) chia không gian bằng chuỗi câu hỏi đúng/sai, dễ diễn giải. Hai cách kết hợp nhiều mô hình
+yếu thành một mô hình mạnh xác lập vị thế trên dữ liệu bảng: \textbf{Boosting} (AdaBoost \cite{freund1997}, sau đó
+Gradient Boosting) huấn luyện tuần tự các mô hình sửa lỗi của nhau, còn \textbf{Random Forest} \cite{breiman2001}
+lấy trung bình hàng trăm cây học trên các mẫu bootstrap với tập con đặc trưng ngẫu nhiên, giảm phương sai mà không
+tăng độ chệch. Chương~\ref{ch:hoc-may} cho thấy Random Forest đến nay vẫn là đối thủ khó vượt trên dữ liệu bảng.
+
+\subsection{LeNet-5 (1998): nền tảng của mạng tích chập hiện đại}
+
+Năm 1998, LeCun và cộng sự công bố LeNet-5 \cite{lecun1998}, ghép ba ý tưởng: vùng tiếp nhận cục bộ, chia sẻ trọng số
+và lấy mẫu giảm (pooling). LeNet-5 đọc hàng triệu tấm séc ngân hàng mỗi ngày ở Hoa Kỳ, nhưng giới hạn CPU và thiếu dữ
+liệu ảnh lớn khiến nó chưa mở rộng được sang ảnh tự nhiên phức tạp.
+
+\section{Cuộc cách mạng học sâu (2012 -- 2020)}
+
+\subsection{Bước ngoặt ImageNet 2012 và AlexNet}
+
+Tại cuộc thi ILSVRC 2012, AlexNet của Krizhevsky, Sutskever và Hinton \cite{krizhevsky2012} đạt sai số top-5 15,3\,\%,
+bỏ xa vị trí thứ hai (26,2\,\%) dùng đặc trưng thủ công SIFT/HOG cùng SVM. Ba yếu tố hội tụ: \textbf{dữ liệu lớn}
+(ImageNet hơn 1,2 triệu ảnh, 1.000 lớp), \textbf{GPU} với CUDA tăng tốc nhân ma trận hàng chục lần so với CPU, và
+\textbf{các cải tiến thuật toán} như hàm kích hoạt ReLU $f(x) = \max(0, x)$ không bão hòa ở vùng dương và điều chuẩn
+Dropout \cite{srivastava2014} ngắt ngẫu nhiên nơ-ron để chống đồng thích nghi.
+
+\subsection{Sự tiến hóa của các kiến trúc thị giác: VGG, ResNet, MobileNet}
+
+\textbf{VGGNet} \cite{simonyan2015} chuẩn hóa thiết kế bằng cách xếp chồng các bộ lọc $3{\times}3$: hai tầng $3{\times}3$
+có cùng vùng nhìn với một tầng $5{\times}5$ nhưng ít hơn 28\,\% trọng số và thêm một hàm phi tuyến. \textbf{ResNet}
+\cite{he2016} giải quyết hiện tượng thoái hóa (mạng sâu hơn lại có sai số huấn luyện cao hơn) bằng kết nối tắt
+$\mathbf{y} = F(\mathbf{x}) + \mathbf{x}$, cho phép huấn luyện mạng 152 tầng và đưa sai số top-5 ImageNet xuống 3,57\,\%.
+\textbf{MobileNet} \cite{howard2017,sandler2018} tách tích chập chuẩn thành depthwise và pointwise, giảm chi phí tính
+toán 8 -- 9 lần để chạy trên điện thoại. Cả ba kiến trúc được hiện thực và đối chuẩn ở Chương~\ref{ch:cnn}.
+
+\subsection{Mô hình hóa chuỗi: từ RNN, LSTM đến Transformer}
+
+RNN duy trì một trạng thái ẩn qua các bước thời gian, nhưng lan truyền ngược qua thời gian nhân liên tiếp các ma trận
+Jacobian nên gradient suy giảm theo hàm mũ \cite{bengio1994}. LSTM \cite{hochreiter1997} thêm ô nhớ được điều khiển bởi
+ba cổng (quên, vào, ra), tạo đường đi cộng cho gradient; GRU \cite{cho2014} rút gọn còn hai cổng. Năm 2017, Transformer
+\cite{vaswani2017} bỏ hẳn liên kết hồi quy, dùng cơ chế tự chú ý đa đầu để mọi vị trí trong chuỗi nhìn thấy nhau trực
+tiếp và tính song song hoàn toàn trên GPU, mở đường cho các mô hình ngôn ngữ khổng lồ. Chương~\ref{ch:rnn} hiện thực
+và so sánh bốn kiến trúc hồi quy.
+
+\section{Kỷ nguyên AI tạo sinh, mô hình nền tảng và hệ đa tác tử (2020 -- nay)}
+
+\subsection{Mô hình ngôn ngữ lớn và định luật tỷ lệ}
+
+Kaplan và cộng sự \cite{kaplan2020}, rồi Hoffmann và cộng sự (Chinchilla) \cite{hoffmann2022} cho thấy mất mát của mô
+hình ngôn ngữ giảm theo luật lũy thừa khá đều với ba đại lượng: số tham số, lượng dữ liệu và ngân sách tính toán. Ở quy
+mô hàng trăm tỷ tham số xuất hiện các năng lực nổi trội: học trong ngữ cảnh từ vài ví dụ mà không cập nhật trọng số,
+suy luận từng bước (chain-of-thought), sinh mã nguồn. Hình~\ref{fig:nested} tóm tắt quan hệ bao hàm giữa các thế hệ.
+
+\hinhtikz{f1_nested}{Quan hệ bao hàm giữa trí tuệ nhân tạo, học máy, học sâu và AI tạo sinh / hệ đa tác tử.}{nested}
+
+\subsection{Giới hạn của mô hình thuần tham số và vai trò của đồ thị tri thức, RAG}
+
+Mô hình ngôn ngữ chỉ lưu tri thức trong trọng số nên có ba giới hạn: \emph{ảo giác} (sinh câu trả lời trôi chảy nhưng
+sai sự thật, vì mô hình tối ưu xác suất từ tiếp theo chứ không kiểm chứng), \emph{tri thức đóng băng} tại thời điểm
+tiền huấn luyện, và \emph{khó truy vết nguồn} trong các lĩnh vực cần trích dẫn như y tế, pháp luật. Xu hướng khắc phục
+là ghép thêm bộ nhớ phi tham số: \textbf{đồ thị tri thức} lưu sự kiện dưới dạng bộ ba (thực thể, quan hệ, thực thể) để
+suy diễn tường minh; \textbf{mạng nơ-ron đồ thị} mở rộng học sâu sang dữ liệu có cấu trúc đồ thị bằng truyền thông điệp
+giữa các nút; \textbf{RAG} \cite{lewis2020} truy xuất tài liệu liên quan rồi đưa vào ngữ cảnh trước khi sinh câu trả lời.
+
+\subsection{Xu hướng: hệ đa tác tử tự trị}
+
+Bước tiếp theo là các \emph{tác tử} (agent) tự chủ có chu trình nhận thức đầy đủ: quan sát, lập kế hoạch và suy luận,
+gọi công cụ hay API, rồi tự đánh giá và sửa sai. Nhiều tác tử chuyên biệt (lập kế hoạch, nghiên cứu, lập trình, kiểm thử)
+phối hợp và phản biện nhau trong một hệ đa tác tử giải được những việc kỹ thuật mà một mô hình đơn lẻ không làm nổi.
+Đây là định hướng then chốt của hệ thống thông minh thế hệ mới, và cũng là nội dung các chương sau của học phần
+(đồ thị tri thức, mạng nơ-ron đồ thị, hệ đa tác tử) sẽ kế thừa từ nền tảng mô hình hóa được xây dựng trong tiểu luận này.

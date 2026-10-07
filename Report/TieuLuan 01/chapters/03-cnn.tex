@@ -1,0 +1,274 @@
+% =====================================================================
+%  CHƯƠNG 3 — MẠNG NƠ-RON TÍCH CHẬP (CNN)
+% =====================================================================
+\chapter{Mạng Nơ-ron Tích Chập (CNN)}
+\label{ch:cnn}
+
+\section{Cơ sở lý thuyết mạng nơ-ron tích chập và biểu diễn không gian}
+
+MLP của Chương~\ref{ch:hoc-may} gặp hai trở ngại khi nhận đầu vào là ảnh:
+\begin{enumerate}
+  \item \textbf{Bùng nổ tham số.} Duỗi một ảnh màu $224{\times}224{\times}3$ thành vector 150.528 chiều, chỉ một tầng
+    ẩn 1.024 nơ-ron đã cần hơn 154 triệu trọng số, vừa tốn bộ nhớ vừa dễ quá khớp.
+  \item \textbf{Mất cấu trúc không gian.} Duỗi phẳng xóa thông tin “điểm nào cạnh điểm nào”; cùng một nét chữ dịch sang
+    phải hai điểm ảnh trở thành một vector hoàn toàn khác.
+\end{enumerate}
+Mạng nơ-ron tích chập \cite{lecun1998} khắc phục bằng ba nguyên lý: \emph{vùng tiếp nhận cục bộ} (mỗi nơ-ron chỉ nhìn một
+ô nhỏ), \emph{chia sẻ trọng số} (cùng một bộ lọc quét toàn ảnh, nên một mẫu hình được nhận ra ở mọi vị trí) và
+\emph{lấy mẫu giảm} (pooling). Đầu vào được biểu diễn thành tensor (Hình~\ref{fig:tensor3}).
+
+\hinhtikz{f3_tensor}{Biểu diễn ảnh số: từ ma trận điểm ảnh đến tensor ba kênh và lô ảnh 4D trong học sâu.}{tensor3}
+
+\subsection{Toán học của phép tích chập hai chiều}
+
+Trong học sâu, “tích chập” thực chất là tương quan chéo. Với tensor vào $X \in \mathbb{R}^{C_{in}\times H\times W}$ và
+$C_{out}$ bộ lọc $K \in \mathbb{R}^{C_{out}\times C_{in}\times k_h\times k_w}$, giá trị tại vị trí $(i, j)$ của kênh ra $c$ là
+\begin{equation}
+  Y_{c,i,j} = \sum_{m=1}^{C_{in}}\sum_{u=0}^{k_h-1}\sum_{v=0}^{k_w-1} X_{m,\,i s+u,\,j s+v}\,K_{c,m,u,v} + b_c ,
+  \label{eq:conv}
+\end{equation}
+với bước trượt $s$. Kích thước bản đồ đặc trưng ra phụ thuộc đệm số 0 $p$:
+\begin{equation}
+  H_{out} = \Big\lfloor\frac{H - k_h + 2p}{s}\Big\rfloor + 1, \qquad W_{out} = \Big\lfloor\frac{W - k_w + 2p}{s}\Big\rfloor + 1 .
+  \label{eq:outsize}
+\end{equation}
+Hình~\ref{fig:conv} tính tay một ví dụ với bộ lọc phát hiện cạnh dọc. Số tham số của một tầng chỉ là
+$C_{out}(C_{in}k_hk_w + 1)$, không phụ thuộc kích thước ảnh.
+
+\hinhtikz{f3_conv}{Minh họa số học từng bước của phép tích chập 2D: ảnh $5{\times}5$, bộ lọc cạnh dọc $3{\times}3$, bước 1.}{conv}
+
+\subsection{Vùng cảm nhận và phép gộp (pooling)}
+
+Vùng cảm nhận (receptive field, RF) là vùng ảnh vào mà một nơ-ron ở tầng sâu “nhìn thấy”. Xếp chồng các tầng $k{\times}k$
+làm RF tăng dần:
+\begin{equation}
+  RF_l = RF_{l-1} + (k_l - 1)\prod_{i=1}^{l-1} s_i .
+\end{equation}
+Với bước 1, ba tầng $3{\times}3$ cho RF $= 7$ (Hình~\ref{fig:rf}); mỗi lần pooling bước 2 nhân đôi tốc độ tăng của RF ở
+các tầng sau. Đây là lý do VGG chỉ dùng bộ lọc $3{\times}3$: hai tầng $3{\times}3$ nhìn được vùng $5{\times}5$ với 18 thay
+vì 25 trọng số mỗi cặp kênh và có hai hàm ReLU thay vì một.
+
+\hinhtikz{f3_rf}{Cơ chế tích lũy vùng cảm nhận khi xếp chồng ba tầng tích chập $3{\times}3$ bước 1.}{rf}
+
+Pooling giảm kích thước không gian, tăng khả năng chịu dịch chuyển nhỏ và mở rộng nhanh vùng cảm nhận
+(Hình~\ref{fig:pool}). \textbf{Max pooling} giữ giá trị lớn nhất trong cửa sổ (đặc trưng mạnh nhất);
+\textbf{average pooling} lấy trung bình. \textbf{Global Average Pooling} (GAP) \cite{lin2013} lấy trung bình toàn bộ mỗi
+bản đồ đặc trưng, biến $C{\times}H{\times}W$ thành vector $C$ chiều, thay cho tầng Flatten + Dense khổng lồ. Mọi kiến trúc
+trong chương này kết thúc bằng GAP, nên cùng một mạng nhận được cả ảnh $32{\times}32$ lẫn $64{\times}64$.
+
+\hinhtikz{f3_pool}{So sánh max pooling, average pooling ($2{\times}2$, bước 2) và Global Average Pooling trên cùng một
+bản đồ đặc trưng.}{pool}
+
+\subsection{Tiến hóa kiến trúc: VGG, ResNet và MobileNet}
+
+Hình~\ref{fig:evolution} tóm tắt ba thế hệ khối xây dựng được hiện thực trong chương này.
+
+\hinhtikz{f3_evolution}{Sơ đồ tiến hóa khối xây dựng CNN: khối VGG phẳng, khối Residual và khối Inverted Residual
+(tích chập tách biệt chiều sâu).}{evolution}
+
+\paragraph{VGG \cite{simonyan2015}.} Các khối gồm hai hoặc ba tầng Conv $3{\times}3$ rồi MaxPool, số kênh nhân đôi sau mỗi
+lần giảm kích thước. Thiết kế đơn giản, đều đặn nhưng nhiều tham số và khó tối ưu khi sâu (Hình~\ref{fig:vgg}).
+
+\hinhtikz{f3_vgg}{Khối VGG: hai tầng $3{\times}3$ có cùng vùng nhìn $5{\times}5$ với một tầng $5{\times}5$ nhưng ít trọng
+số hơn.}{vgg}
+
+\paragraph{ResNet \cite{he2016}.} Khi mạng sâu quá khoảng 20 tầng, sai số \emph{huấn luyện} lại tăng (thoái hóa), không
+phải do quá khớp mà do tối ưu khó. Khối Residual học phần dư $F(\mathbf{x})$ rồi cộng với đầu vào,
+$\mathbf{y} = F(\mathbf{x}) + \mathbf{x}$. Theo quy tắc dây chuyền
+\begin{equation}
+  \frac{\partial E}{\partial \mathbf{x}} = \frac{\partial E}{\partial \mathbf{y}}\Big(\frac{\partial F}{\partial \mathbf{x}} + I\Big),
+\end{equation}
+ma trận đơn vị $I$ là “đường cao tốc” để gradient về tới tầng đầu ngay cả khi $\partial F/\partial\mathbf{x}$ nhỏ
+(Hình~\ref{fig:residual}).
+
+\hinhtikz{f3_residual}{Khối Residual và cơ chế “đường cao tốc” của dòng gradient.}{residual}
+
+\paragraph{MobileNet \cite{howard2017,sandler2018}.} Tích chập tách biệt chiều sâu chia tích chập chuẩn thành
+\emph{depthwise} (mỗi kênh một bộ lọc $k{\times}k$, chi phí $C_{in}HWk^2$) và \emph{pointwise} (Conv $1{\times}1$ trộn
+kênh, chi phí $C_{in}C_{out}HW$). Tỉ lệ chi phí so với tích chập chuẩn là
+\begin{equation}
+  \frac{C_{in}HWk^2 + C_{in}C_{out}HW}{C_{in}C_{out}HWk^2} = \frac{1}{C_{out}} + \frac{1}{k^2} \approx \frac{1}{9}\quad (k = 3).
+\end{equation}
+MobileNetV2 bọc phép này trong khối \emph{Inverted Residual}: Conv $1{\times}1$ mở rộng số kênh lên 6 lần, depthwise
+$3{\times}3$ ở không gian rộng, rồi Conv $1{\times}1$ chiếu về ít kênh \emph{không} qua ReLU (nút cổ chai tuyến tính, tránh
+mất thông tin ở không gian hẹp), kèm kết nối tắt khi kích thước giữ nguyên (Hình~\ref{fig:depthwise}).
+
+\hinhtikz{f3_depthwise}{Tích chập chuẩn so với tích chập tách biệt chiều sâu: lọc không gian riêng từng kênh rồi trộn kênh
+bằng $1{\times}1$.}{depthwise}
+
+% ---------------------------------------------------------------------
+\section{Khảo sát thực nghiệm và tiền xử lý ba bộ dữ liệu đa miền}
+
+\subsection{Tập dữ liệu 1: nhận dạng chữ số nhà SVHN}
+
+\begin{itemize}
+  \item \textbf{Nguồn:} Street View House Numbers của Stanford \cite{netzer2011}, cắt từ ảnh Google Street View; tải qua
+    lớp \texttt{SVHN} của \texttt{torchvision}.
+  \item \textbf{Quy mô:} \SL{eda/svhn/n_train} ảnh huấn luyện và \SL{eda/svhn/n_test} ảnh kiểm thử theo cách chia gốc, ảnh
+    màu $32{\times}32{\times}3$, 10 lớp chữ số 0 -- 9.
+\end{itemize}
+
+\hinhpdf{f3_svhn_grid}{1}{Bốn ảnh mẫu mỗi lớp của SVHN: đa dạng phông chữ, ánh sáng, màu nền và có chữ số lân cận lọt vào
+khung.}{svhn-grid}
+\hinhpdf{f3_svhn_dist}{1}{Trái: số ảnh theo lớp của SVHN. Phải: phân bố cường độ điểm ảnh trên ba kênh màu.}{svhn-dist}
+
+\paragraph{Nhận xét EDA.} Khác MNIST viết tay trên nền trắng, ảnh SVHN có nền thật (tường, cửa, biển kim loại), độ tương
+phản thấp và thường có chữ số hàng xóm lọt vào hai bên (Hình~\ref{fig:svhn-grid}). Phân bố lớp lệch: chữ số 1 nhiều nhất
+(\SL{eda/svhn/max_class_n} ảnh), chữ số 9 ít nhất (\SL{eda/svhn/min_class_n} ảnh), vì số nhà bắt đầu bằng 1 nhiều hơn
+(Hình~\ref{fig:svhn-dist}). Ba kênh có phân bố gần nhau, trung bình $(\SL{eda/svhn/mean/0}; \SL{eda/svhn/mean/1};
+\SL{eda/svhn/mean/2})$ và độ lệch chuẩn $(\SL{eda/svhn/std/0}; \SL{eda/svhn/std/1}; \SL{eda/svhn/std/2})$, dùng để chuẩn
+hóa z-score từng kênh. Tăng cường dữ liệu chỉ dùng dịch ngẫu nhiên $\pm 4$ điểm ảnh (đệm phản chiếu); \emph{không} lật ảnh
+vì chữ số lật không còn là chữ số đó.
+
+\subsection{Tập dữ liệu 2: phân loại ảnh vệ tinh EuroSAT}
+
+\begin{itemize}
+  \item \textbf{Nguồn:} EuroSAT \cite{helber2019}, ảnh vệ tinh Sentinel-2 của Cơ quan Vũ trụ châu Âu, bản RGB, tải qua
+    lớp \texttt{EuroSAT} của \texttt{torchvision}.
+  \item \textbf{Quy mô:} 27.000 ảnh $64{\times}64{\times}3$, 10 lớp sử dụng đất (cây hằng năm, rừng, thảm cỏ, đường cao
+    tốc, khu công nghiệp, đồng cỏ chăn thả, cây lâu năm, khu dân cư, sông, biển/hồ). Không có tập kiểm thử chính thức nên
+    chia phân tầng 80/20: \SL{eda/eurosat/n_train} ảnh huấn luyện, \SL{eda/eurosat/n_test} ảnh kiểm thử.
+\end{itemize}
+
+\hinhpdf{f3_eurosat_grid}{1}{Bốn ảnh mẫu mỗi lớp của EuroSAT.}{eurosat-grid}
+\hinhpdf{f3_eurosat_dist}{1}{Trái: số ảnh theo lớp của EuroSAT. Phải: phân bố cường độ điểm ảnh trên ba kênh màu.}{eurosat-dist}
+
+\paragraph{Nhận xét EDA.} Các lớp gần cân bằng, từ \SL{eda/eurosat/min_class_n} đến \SL{eda/eurosat/max_class_n} ảnh
+huấn luyện mỗi lớp (Hình~\ref{fig:eurosat-dist}). Phân biệt lớp dựa nhiều vào \emph{kết cấu} (vân ruộng, lưới đường phố)
+và \emph{màu} (nước xanh thẫm, rừng xanh tối) hơn là hình dạng đối tượng. Ảnh chụp từ trên xuống không có chiều “trên
+dưới”, nên ngoài dịch ngẫu nhiên còn lật ngang, lật dọc và chuyển vị (tương đương xoay $90^\circ$) mà không đổi nhãn.
+
+\subsection{Tập dữ liệu 3: chuỗi đặc trưng lâm sàng cho 1D CNN}
+
+Để thấy tích chập không chỉ dành cho ảnh, ta áp dụng 1D CNN lên tập tiểu đường của Chương~\ref{ch:hoc-may}. Mười lăm đặc
+trưng sau tiền xử lý (4 biến số chuẩn hóa, 2 biến nhị phân, 9 cột one-hot) được xếp thành tensor $[B, 1, 15]$; hai tầng
+Conv1D kích thước $1{\times}3$ (32 và 64 bộ lọc) học tương tác giữa các đặc trưng kề nhau, rồi tầng Dense 64 và đầu ra
+sigmoid, tổng cộng \SL{ch3_diabetes1d/cnn1d/params} tham số. Mô hình dùng cùng cách chia và cùng dừng sớm như MLP.
+
+% ---------------------------------------------------------------------
+\section{Hiện thực hóa mã nguồn trên ba nền tảng}
+
+\subsection{Tích chập 2D và Max Pooling viết tay bằng NumPy}
+
+Đoạn mã~\ref{code:cnn_scratch__conv2d_loop} cài đặt đúng công thức~\eqref{eq:conv} bằng bốn vòng lặp để dễ đối chiếu.
+Cách này quá chậm cho cả mạng, nên Đoạn mã~\ref{code:cnn_scratch__conv2d_im2col} dùng \texttt{sliding\_window\_view} để
+lấy mọi cửa sổ thành một tensor rồi nhân một lần bằng \texttt{einsum}, cũng là ý tưởng im2col mà các thư viện thật dùng.
+
+\maNguon{cnn_scratch__conv2d_loop}{Tích chập 2D nhiều kênh bằng vòng lặp, bám sát công thức (3.1)}
+\maNguon{cnn_scratch__conv2d_im2col}{Tích chập 2D kiểu im2col bằng NumPy}
+\maNguon{cnn_scratch__maxpool2d}{Max Pooling bằng NumPy}
+
+Để kiểm chứng, ta nạp trọng số của Custom CNN đã huấn luyện bằng PyTorch trên SVHN vào các hàm NumPy và chạy toàn bộ mạng
+(ba khối conv -- BN -- ReLU, GAP, Dense) trên \SL{ch3_scratch/n_img} ảnh kiểm thử:
+\begin{itemize}
+  \item bản vòng lặp và bản im2col lệch nhau tối đa \SL{ch3_scratch/loop_vs_im2col_maxdiff} (sai số làm tròn), nhưng
+    tốn \SL{ch3_scratch/loop_ms_per_img}\,ms so với \SL{ch3_scratch/im2col_ms_per_img}\,ms mỗi ảnh cho riêng tầng đầu;
+  \item logit của mạng NumPy lệch PyTorch tối đa \SL{ch3_scratch/net_maxdiff}; nhãn dự đoán trùng
+    \SL{ch3_scratch/agreePct}\,\%, độ chính xác \SL{ch3_scratch/acc_numpyPct}\,\% so với \SL{ch3_scratch/acc_torchPct}\,\%;
+  \item cả mạng NumPy mất \SL{ch3_scratch/numpy_net_ms_per_img}\,ms mỗi ảnh, PyTorch trên cùng CPU
+    \SL{ch3_scratch/torch_cpu_ms_per_img}\,ms: hiểu thuật toán thì viết tay được, nhưng hiệu năng cần thư viện tối ưu.
+\end{itemize}
+
+\subsection{Custom CNN với khối kiểu VGG bằng Keras / TensorFlow}
+
+Mô hình cơ sở gồm ba khối kiểu VGG (32, 64, 128 kênh), mỗi khối hai Conv $3{\times}3$ kèm BatchNorm \cite{ioffe2015} và
+ReLU, MaxPool, Dropout tăng dần; sau đó GAP, Dense 128 và softmax. Cùng kiến trúc này được viết lại bằng PyTorch để so
+sánh hai nền tảng.
+
+\maNguon{cnn_keras__build_vgg_block}{Khối tích chập kiểu VGG bằng Keras}
+\maNguon{cnn_keras__build_keras_custom_cnn}{Custom CNN bằng Keras Functional API}
+
+\subsection{Khối Inverted Residual kiểu MobileNetV2 bằng PyTorch}
+
+\maNguon{cnn_torch__InvertedResidual}{Khối Inverted Residual: mở rộng $1{\times}1$, depthwise $3{\times}3$, chiếu tuyến tính $1{\times}1$}
+
+Toàn mạng MobileNetV2 xếp 17 khối theo bảng cấu hình của bài báo gốc, đổi bước của hai nhóm khối đầu từ 2 về 1 vì ảnh vào
+nhỏ hơn ImageNet nhiều lần. Với ảnh EuroSAT $64{\times}64$, tầng thân giữ bước 2 như bản gốc để bản đồ đặc trưng sau thân là
+$32{\times}32$, đúng bằng trường hợp SVHN. Lần chạy đầu giữ nguyên $64{\times}64$ qua các khối mở rộng 6 lần đã cần hơn
+8\,GB bộ nhớ GPU ở lô 256: VRAM tràn sang bộ nhớ chia sẻ của Windows và một epoch kéo dài hơn 35 phút, nên cấu hình này được
+thay.
+
+\subsection{Kiến trúc ResNet-18 bằng PyTorch}
+
+\maNguon{cnn_torch__ResidualBlock}{Khối Residual cơ bản với kết nối tắt chiếu $1{\times}1$ khi đổi kích thước}
+\maNguon{cnn_torch__ResNet18}{Kiến trúc ResNet-18: thân $3{\times}3$, bốn tầng $[2, 2, 2, 2]$ khối, GAP và FC}
+
+\subsection{Quy trình huấn luyện trên GPU}
+
+Mọi mô hình PyTorch huấn luyện từ đầu với SGD Nesterov (momentum 0,9, weight decay $5\cdot10^{-4}$), lịch học One-Cycle
+\cite{smith2019} đỉnh 0,1, lô 256; SVHN 15 epoch, EuroSAT 30 epoch. Toàn bộ ảnh \texttt{uint8} nạp lên GPU một lần; chuẩn
+hóa và tăng cường dữ liệu làm ngay trên GPU (Đoạn mã~\ref{code:run_ch3_torch__augment}), và lan truyền chạy ở độ chính xác hỗn hợp
+bfloat16. Nhờ vậy CPU rảnh cho các tiến trình Keras và scikit-learn chạy song song.
+
+\maNguon{run_ch3_torch__augment}{Tăng cường dữ liệu trên GPU: dịch ngẫu nhiên từng ảnh bằng chỉ số nâng cao, lật và chuyển vị cho ảnh vệ tinh}
+
+% ---------------------------------------------------------------------
+\section{Đánh giá và đối chuẩn các biến thể kiến trúc CNN}
+
+\paragraph{Phương pháp.} Bốn kiến trúc được huấn luyện từ trọng số ngẫu nhiên trên cùng dữ liệu, cùng siêu tham số, không
+dùng trọng số tiền huấn luyện ImageNet, để phản ánh năng lực trích đặc trưng của từng cấu trúc trên dữ liệu đích:
+\begin{enumerate}
+  \item \textbf{Custom CNN} (mô hình cơ sở): 6 tầng Conv trong ba khối kiểu VGG và GAP, \SL{ch3_svhn/custom/params} tham số.
+  \item \textbf{VGG-11}: cấu hình A (8 Conv có BN), bỏ ba tầng FC 4.096 nơ-ron thay bằng GAP, \SL{ch3_svhn/vgg11/params} tham số.
+  \item \textbf{MobileNetV2}: 17 khối Inverted Residual, \SL{ch3_svhn/mobilenetv2/params} tham số.
+  \item \textbf{ResNet-18}: 8 khối Residual, \SL{ch3_svhn/resnet18/params} tham số.
+\end{enumerate}
+Độ trễ suy luận được đo lại sau khi mọi huấn luyện kết thúc (máy không chạy việc khác): lô 1 ảnh, trung vị của 300 lần
+trên GPU và 100 lần trên CPU 4 luồng; thông lượng FPS đo trên GPU với lô 256.
+
+\bang{tab_ch3}{Đối chuẩn đa chiều các biến thể CNN huấn luyện từ đầu trên SVHN, EuroSAT và 1D CNN trên dữ liệu tiểu đường.}{ch3}
+
+\hinhpdf{f3_curves_svhn}{1}{Mất mát huấn luyện và độ chính xác kiểm thử theo epoch của các kiến trúc trên SVHN.}{curves-svhn}
+\hinhpdf{f3_cm_svhn}{0.62}{Ma trận nhầm lẫn (\% theo hàng) của ResNet-18 trên tập kiểm thử SVHN.}{cm-svhn}
+\hinhpdf{f3_curves_eurosat}{1}{Mất mát huấn luyện và độ chính xác kiểm thử theo epoch của các kiến trúc trên EuroSAT.}{curves-eurosat}
+\hinhpdf{f3_cm_eurosat}{0.72}{Ma trận nhầm lẫn (\% theo hàng) của ResNet-18 trên tập kiểm thử EuroSAT.}{cm-eurosat}
+\hinhpdf{f3_latency}{1}{Độ trễ suy luận (GPU và CPU, lô 1) và thông lượng GPU (lô 256) của bốn kiến trúc.}{latency}
+
+\paragraph{Phân tích đánh đổi thiết kế.}
+\begin{itemize}
+  \item \textbf{Độ chính xác.} Trên SVHN, ResNet-18 đạt \SL{ch3_svhn/resnet18/accPct}\,\%, MobileNetV2
+    \SL{ch3_svhn/mobilenetv2/accPct}\,\%, VGG-11 \SL{ch3_svhn/vgg11/accPct}\,\% và Custom CNN \SL{ch3_svhn/custom/accPct}\,\%:
+    bốn kiến trúc cách nhau chưa tới một điểm phần trăm, vì SVHN $32{\times}32$ không đòi hỏi mạng rất sâu. Trên EuroSAT
+    $64{\times}64$, ResNet-18 dẫn đầu rõ hơn với \SL{ch3_eurosat/resnet18/accPct}\,\%, tiếp theo là VGG-11
+    \SL{ch3_eurosat/vgg11/accPct}\,\% và MobileNetV2 \SL{ch3_eurosat/mobilenetv2/accPct}\,\% gần như ngang nhau, Custom CNN
+    \SL{ch3_eurosat/custom/accPct}\,\%: ảnh lớn hơn, kết cấu phức tạp hơn thì độ sâu và kết nối tắt mới phát huy tác dụng.
+    Lỗi còn lại tập trung ở các cặp lớp có kết cấu giống nhau (cây hằng năm -- cây lâu năm, thảm cỏ -- đồng cỏ chăn thả)
+    và ở SVHN là các chữ số có nét gần nhau (Hình~\ref{fig:cm-svhn}, \ref{fig:cm-eurosat}).
+  \item \textbf{Chi phí tính toán.} MobileNetV2 có \SL{ch3_svhn/mobilenetv2/params} tham số, ít hơn ResNet-18 khoảng 5 lần
+    và VGG-11 khoảng 4 lần, FLOPs cũng thấp hơn ResNet-18 nhiều lần (Bảng~\ref{tab:ch3}). Nhưng trên GPU, ở lô 1, MobileNetV2
+    \emph{không} nhanh hơn: nó có hơn 50 tầng nhỏ nối tiếp, mỗi tầng một lần khởi chạy kernel, và tích chập depthwise có
+    cường độ tính toán thấp nên GPU không tận dụng được. Ít FLOPs không đồng nghĩa nhanh hơn trên mọi phần cứng; lợi thế
+    của MobileNet thể hiện rõ nhất trên CPU và thiết bị di động, nơi số phép tính mới là nút thắt.
+  \item \textbf{VGG-11.} Nhiều tham số thứ hai nhưng kiến trúc phẳng, ít tầng, nên độ trễ GPU thấp; độ chính xác đứng sau
+    hai kiến trúc hiện đại hơn. Đây là minh chứng cho bước tiến của kết nối tắt và tích chập tách biệt chiều sâu.
+  \item \textbf{Custom CNN.} Chỉ \SL{ch3_svhn/custom/params} tham số, tệp vài MB, đủ tốt cho SVHN và là mốc kiểm chứng ban
+    đầu hợp lý. Bản Keras cùng kiến trúc, cùng số epoch nhưng huấn luyện bằng Adam (tốc độ học $10^{-3}$, giảm theo
+    cosine) và tăng cường dữ liệu bằng các lớp có sẵn của Keras (dịch, lật; không có chuyển vị). Trên SVHN nó đạt
+    \SL{ch3_svhn/custom_keras/accPct}\,\%, sát bản PyTorch (\SL{ch3_svhn/custom/accPct}\,\%); trên EuroSAT chỉ đạt
+    \SL{ch3_eurosat/custom_keras/accPct}\,\% so với \SL{ch3_eurosat/custom/accPct}\,\%, và đường độ chính xác kiểm thử của nó
+    dừng ở mức thấp hơn trong khi các mô hình PyTorch hội tụ dần khi tốc độ học One-Cycle giảm về cuối
+    (Hình~\ref{fig:curves-eurosat}). Khoảng cách này đến từ công thức huấn luyện (SGD Nesterov với lịch
+    One-Cycle tổng quát hóa tốt hơn Adam trên CNN có BatchNorm, cộng thêm phép chuyển vị), không phải từ nền tảng. Thời gian
+    huấn luyện Keras dài hơn nhiều lần vì TensorFlow trên Windows không dùng được GPU.
+  \item \textbf{1D CNN trên dữ liệu bảng} đạt F1 \SL{ch3_diabetes1d/cnn1d/f1}, ngang MLP của Chương~\ref{ch:hoc-may}
+    (\SL{ch2_mlp_torch/diabetes/f1}): tích chập 1D dùng được, nhưng với dữ liệu bảng thứ tự cột là tùy ý nên “tính cục bộ”
+    không mang ý nghĩa như với ảnh, và lợi ích so với MLP là không đáng kể.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\section{Đóng gói triển khai hệ thống Web App thị giác máy tính}
+
+ResNet-18 và MobileNetV2 của cả hai tập dữ liệu được nạp vào phân hệ \emph{Vision AI} của Web App (mục~\ref{sec:web}). Người
+dùng chọn một ảnh kiểm thử hoặc tải ảnh lên; hệ thống trả năm lớp có xác suất cao nhất cùng \emph{bản đồ kích hoạt lớp}
+(Class Activation Map, CAM) \cite{zhou2016}. Vì mạng kết thúc bằng GAP rồi một tầng tuyến tính, điểm của lớp $c$ là
+$\sum_k w^c_k \cdot \mathrm{GAP}(f_k)$; đổi thứ tự lấy tổng và trung bình cho bản đồ $M_c(x, y) = \sum_k w^c_k f_k(x, y)$,
+chỉ ra vùng ảnh đã đẩy mô hình về lớp $c$ (Đoạn mã~\ref{code:app__cam_png}).
+
+\maNguon{app__cam_png}{Tính bản đồ kích hoạt lớp CAM từ bản đồ đặc trưng cuối và trọng số tầng FC}
+
+\anhUI{ui_vision}{Phân hệ Vision AI: ảnh vệ tinh EuroSAT, bản đồ CAM của lớp dự đoán và xác suất năm lớp hàng đầu của ResNet-18.}{ui-vision}
+\anhUI{ui_vision_svhn}{Phân hệ Vision AI với ảnh số nhà SVHN và mô hình MobileNetV2.}{ui-vision-svhn}
+
+Bản đồ CAM tập trung vào đúng chữ số ở giữa ảnh SVHN (bỏ qua chữ số hàng xóm) và vào vùng kết cấu đặc trưng của ảnh vệ tinh,
+cho thấy mô hình dựa vào đúng bằng chứng thị giác. Suy luận một ảnh kèm CAM trên CPU của máy chủ mất vài chục mili-giây (Hình~\ref{fig:ui-vision}, đo
+khi máy đang đồng thời huấn luyện mô hình Keras), đủ cho tương tác thời gian thực.

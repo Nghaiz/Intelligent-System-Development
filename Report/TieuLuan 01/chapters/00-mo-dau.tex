@@ -1,0 +1,98 @@
+% =====================================================================
+%  PHẦN MỞ ĐẦU
+% =====================================================================
+\chapter*{Phần Mở Đầu}
+\addcontentsline{toc}{chapter}{Phần Mở Đầu}
+\markboth{Phần Mở Đầu}{}
+
+\section*{1. Bối cảnh và tính cấp thiết của đề tài}
+
+Trí tuệ nhân tạo (Artificial Intelligence -- AI) và học máy (Machine Learning -- ML) đã rời phòng thí nghiệm để
+trở thành một thành phần thường trực của phần mềm nghiệp vụ: hệ thống sàng lọc bệnh, công cụ định giá tài sản,
+bộ lọc phản hồi khách hàng, ứng dụng nhận dạng ảnh, mô hình dự báo tài chính. Điểm chung của các hệ thống này là
+chúng không được lập trình bằng luật viết tay mà \emph{học từ dữ liệu}. Sự chuyển dịch đó gắn với ba điều kiện
+xuất hiện cùng lúc trong thập niên 2010: dữ liệu lớn, phần cứng tính toán song song (GPU) và các thuật toán tối ưu
+cho mạng nhiều tầng \cite{goodfellow2016}.
+
+Một kỹ sư phát triển hệ thống thông minh hiếm khi chỉ gặp một dạng dữ liệu. Trong thực tế có ít nhất ba hình thái,
+mỗi hình thái hợp với một họ mô hình riêng:
+
+\begin{itemize}
+  \item \textbf{Dữ liệu bảng} (y tế, bất động sản, tài chính doanh nghiệp): mỗi dòng là một đối tượng độc lập với
+    các thuộc tính số và phân loại. Đây là địa hạt của các thuật toán học máy cổ điển (hồi quy tuyến tính,
+    Logistic Regression, cây quyết định, Random Forest, SVM) và của mạng nơ-ron đa tầng (MLP).
+  \item \textbf{Dữ liệu không gian} (ảnh): các điểm ảnh kề nhau tương quan chặt, và cùng một mẫu hình có thể xuất
+    hiện ở bất kỳ vị trí nào. Mạng nơ-ron tích chập (CNN) khai thác đúng hai tính chất này nhờ chia sẻ trọng số
+    và vùng tiếp nhận cục bộ.
+  \item \textbf{Dữ liệu chuỗi} (giá chứng khoán, nhật ký hành vi người dùng): thứ tự thời gian mang thông tin, các
+    mẫu không còn độc lập. Mạng nơ-ron hồi quy (RNN) và các biến thể có cổng (LSTM, GRU, BiLSTM) mang một trạng
+    thái ẩn đi qua từng bước thời gian để ghi nhớ ngữ cảnh.
+\end{itemize}
+
+Từ yêu cầu đó, tiểu luận \emph{“Nghiên cứu và triển khai các mô hình học máy cơ bản, mạng nơ-ron tích chập (CNN)
+và mạng nơ-ron hồi quy (RNN) trong hệ thống thông minh”} đặt mục tiêu đi trọn một vòng từ lý thuyết đến sản phẩm
+cho cả ba hình thái dữ liệu: hiểu toán học của mô hình, tự cài đặt lại nó, huấn luyện trên dữ liệu thật, đo đạc
+khách quan rồi đóng gói thành ứng dụng web chạy được.
+
+\section*{2. Mục tiêu và nhiệm vụ}
+
+Mục tiêu tổng quát là xây dựng nền tảng kiến thức vững cùng năng lực thực hành trên toàn bộ tiến trình từ học máy
+cổ điển đến các kiến trúc học sâu xử lý không gian và thời gian. Sáu nhiệm vụ cụ thể:
+
+\begin{description}[leftmargin=2.2em, style=nextline]
+  \item[Nhiệm vụ 1 -- Khảo cứu lịch sử AI.] Hệ thống hóa các mốc phát triển từ thập niên 1940 đến nay, phân tích
+    nguyên nhân hai “mùa đông AI”, sự chuyển dịch sang học máy thống kê, cuộc cách mạng học sâu và xu hướng hiện tại
+    (mô hình nền tảng, RAG, hệ đa tác tử).
+  \item[Nhiệm vụ 2 -- Cơ sở lý thuyết.] Trình bày hàm mất mát và cách tối ưu của từng họ mô hình: lan truyền ngược
+    trong MLP, phép tích chập và pooling trong CNN, lan truyền ngược qua thời gian và cơ chế cổng trong RNN.
+  \item[Nhiệm vụ 3 -- Khảo sát dữ liệu thật.] Phân tích khám phá (EDA) và tiền xử lý \textbf{bảy} tập dữ liệu thuộc
+    năm lĩnh vực: y tế (\SL{eda/diabetes/n} hồ sơ tiểu đường), bất động sản Việt Nam (\SL{eda/house/n} tin đăng),
+    thương mại điện tử (\SL{eda/reviews/n} nhận xét khách hàng), thị giác máy tính (SVHN
+    \SL{eda/svhn/n_train}\,+\,\SL{eda/svhn/n_test} ảnh, EuroSAT \SL{eda/eurosat/n_train}\,+\,\SL{eda/eurosat/n_test} ảnh vệ tinh),
+    tài chính (\SL{eda/stock/n_total} phiên giao dịch của bốn mã VN30) và hành vi người dùng
+    (\SL{eda/churn/n_users} chuỗi nghe nhạc của KKBox).
+  \item[Nhiệm vụ 4 -- Hiện thực trên ba nền tảng.] Cài đặt mô hình bằng \textbf{NumPy thuần} (tự viết lan truyền tiến,
+    lan truyền ngược, tích chập, tế bào LSTM), bằng \textbf{Keras/TensorFlow} (API cấp cao) và bằng
+    \textbf{PyTorch} (lớp \texttt{nn.Module}, vòng huấn luyện tự viết, chạy GPU).
+  \item[Nhiệm vụ 5 -- Đánh giá và đối chuẩn.] So sánh các mô hình trên cùng một cách chia dữ liệu theo độ chính xác
+    (Accuracy, Precision, Recall, F1, ROC-AUC, MAE, RMSE, $R^2$), số tham số, dung lượng tệp, thời gian huấn luyện
+    và độ trễ suy luận đo trong cùng điều kiện phần cứng.
+  \item[Nhiệm vụ 6 -- Triển khai.] Đóng gói các mô hình tốt nhất thành một ứng dụng web Flask gồm sáu phân hệ, nhận
+    dữ liệu người dùng và trả kết quả dự báo theo thời gian thực.
+\end{description}
+
+\section*{3. Đối tượng và phương pháp nghiên cứu}
+
+\paragraph{Đối tượng.} Các mô hình học máy cơ bản (Linear/Ridge Regression, Logistic Regression, Random Forest, SVM,
+MLP); các kiến trúc CNN (Custom CNN, VGG-11, MobileNetV2, ResNet-18 và 1D CNN); các kiến trúc RNN (Simple RNN, LSTM,
+GRU, BiLSTM); cùng bảy tập dữ liệu kể trên. Mọi mô hình học sâu được \emph{huấn luyện từ đầu} với trọng số ngẫu
+nhiên, không dùng trọng số tiền huấn luyện, để kết quả phản ánh đúng năng lực của từng kiến trúc trên dữ liệu đích.
+
+\paragraph{Phương pháp.} Kết hợp nghiên cứu lý thuyết với kiểm chứng thực nghiệm có kiểm soát:
+\begin{itemize}
+  \item cùng một hạt giống ngẫu nhiên (\texttt{seed = 42}) và cùng một cách chia huấn luyện/kiểm thử cho mọi mô hình
+    trên một tập dữ liệu; bộ tiền xử lý chỉ được khớp trên phần huấn luyện;
+  \item chia phân tầng theo nhãn cho bài toán phân loại mất cân bằng, chia theo trục thời gian (không xáo trộn) cho
+    chuỗi giá chứng khoán để tránh rò rỉ thông tin tương lai;
+  \item tập kiểm định tách riêng cho dừng sớm và chọn ngưỡng; tập kiểm thử chỉ dùng một lần để báo cáo;
+  \item mỗi kết luận so sánh đi kèm một mốc tham chiếu (ví dụ dự báo “giữ nguyên giá hôm nay” cho chứng khoán);
+  \item mọi con số trong báo cáo được sinh tự động từ tệp kết quả JSON của chính lần chạy, không chép tay.
+\end{itemize}
+
+\paragraph{Phân bổ phần cứng.} Máy thực nghiệm có CPU 32 luồng và GPU NVIDIA GeForce RTX 4060 Laptop (8 GB). PyTorch
+dùng GPU; TensorFlow~2.21 trên Windows không hỗ trợ GPU nên các mô hình Keras chạy CPU. Các tiến trình độc lập chạy
+song song: scikit-learn, mạng NumPy và Keras trên CPU (giới hạn số luồng mỗi tiến trình), PyTorch trên GPU.
+
+\section*{4. Bố cục báo cáo}
+
+\begin{itemize}
+  \item \textbf{Chương 1 -- Lịch sử phát triển trí tuệ nhân tạo:} bức tranh hơn 80 năm từ nơ-ron hình thức đến hệ đa tác tử.
+  \item \textbf{Chương 2 -- Các kỹ thuật học máy cơ bản:} lý thuyết bốn họ thuật toán, EDA ba tập dữ liệu bảng và văn bản,
+    pipeline scikit-learn, MLP trên ba nền tảng, đối chuẩn và Web App.
+  \item \textbf{Chương 3 -- Mạng nơ-ron tích chập:} phép tích chập, vùng cảm nhận, pooling, ba thế hệ kiến trúc;
+    SVHN, EuroSAT và 1D CNN; hiện thực NumPy/Keras/PyTorch; đối chuẩn độ chính xác -- chi phí; Web App thị giác.
+  \item \textbf{Chương 4 -- Mạng nơ-ron hồi quy:} RNN, BPTT, triệt tiêu đạo hàm, cắt tỉa gradient, LSTM, GRU, BiLSTM;
+    chứng khoán VN30 và KKBox; hiện thực ba nền tảng; đối chuẩn PyTorch -- Keras; Web App dự báo.
+\end{itemize}
+Phần Kết luận tổng hợp các phát hiện và hướng phát triển. Mã nguồn đầy đủ nằm trong thư mục
+\texttt{src/TieuLuan 01} của kho lưu trữ; mỗi đoạn mã trong báo cáo được trích nguyên văn từ đó.
