@@ -1,0 +1,81 @@
+% =====================================================================
+%  CHƯƠNG 7 — KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+% =====================================================================
+\chapter{Kết luận và hướng phát triển}\label{chap:ketluan}
+
+\section{Kết luận}
+Tiểu luận đã nghiên cứu đồ thị tri thức, sinh tăng cường truy xuất và tác tử thông minh, rồi hiện thực hóa toàn bộ
+thành một hệ thống chạy được cho hai bài toán của Việt Nam: tư vấn cho người bệnh đái tháo đường típ 2 và phân tích
+tác động vĩ mô lên cổ phiếu VN30 và vàng SJC. Mọi con số trong báo cáo được sinh tự động từ kết quả thí nghiệm, và mọi
+đoạn mã được trích từ chính mã nguồn đã chạy ra các con số đó. Kết quả chính:
+
+\begin{enumerate}
+  \item \textbf{Đồ thị tri thức.} Hai KG có bản thể học riêng, ràng buộc miền -- miền giá trị và nguồn văn bản cho
+        từng cạnh: \texttt{VietnamDiabetesKG} (\SL{kg/health/nodes} thực thể, \SL{kg/health/edges} quan hệ) và
+        \texttt{VietnamFinanceKG} (\SL{kg/finance/nodes} thực thể, \SL{kg/finance/edges} quan hệ). Suy diễn RDFS làm
+        \SL{dem/sparql} truy vấn SPARQL trả đúng kết quả, trong đó có truy vấn chỉ có kết quả \emph{sau} suy diễn. Với
+        câu hỏi có điều kiện số trên dữ liệu bảng, truy vấn KG trả đúng
+        \SL{kg/tabular/numeric_query/kg_hits}/\SL{kg/tabular/numeric_query/truth} hồ sơ, trong khi tìm kiếm văn bản
+        TF-IDF chỉ đưa \SL{kg/tabular/numeric_query/tfidf_top20_correct} hồ sơ đúng vào top-20.
+  \item \textbf{Truy xuất.} Trên \SL{retrieval_grid/n_questions} câu hỏi, chia đoạn theo cấu trúc kết hợp BM25,
+        e5 và xếp hạng lại đạt Hit@1 \SL{retrieval_grid/grid/structure/hybrid_rerank/hit@1Pct}\%, so với
+        \SL{retrieval_grid/grid/fixed/dense/hit@1Pct}\% của chia đoạn cố định với dense thuần. Hai kỹ thuật RAG nâng
+        cao phổ biến lại \emph{làm giảm} chất lượng khi dùng LLM 1,5B: HyDE hạ Hit@1 từ
+        \SL{advanced/agg/dense/hit@1Pct}\% xuống \SL{advanced/agg/hyde/hit@1Pct}\%, Multi-Query xuống
+        \SL{advanced/agg/multiquery/hit@1Pct}\%. GraphRAG cục bộ nâng độ phủ đáp án từ
+        \SL{graphrag/agg/naive/ans_covPct}\% lên \SL{graphrag/agg/graph_local/ans_covPct}\%.
+  \item \textbf{Học sâu.} MLP nguy cơ đái tháo đường đạt ROC-AUC \SL{diabetes/mlp/roc_aucPct}\% và PR-AUC
+        \SL{diabetes/mlp/pr_aucPct}\% trên tập kiểm thử. BiLSTM dự báo lợi suất không thắng có ý nghĩa dự báo ngây thơ
+        (\SL{dem/fc_beat}/\SL{dem/fc_models} mô hình có tỉ số RMSE dưới 1, tốt nhất chỉ giảm
+        \SL{dem/fc_best_gainPct}\% sai số), phù hợp giả thuyết thị trường hiệu quả dạng yếu.
+  \item \textbf{Tác tử.} Tác tử ReAct với \SL{dem/tools} công cụ gọi đủ công cụ cần thiết ở mọi kịch bản và nâng độ
+        phủ dữ kiện từ \SL{agent/agg/all/coverage_llm_onlyPct}\% (LLM trả lời một mình) lên
+        \SL{agent/agg/all/coveragePct}\%, đồng thời loại bỏ các lỗi nguy hiểm của LLM như khẳng định metformin không
+        ảnh hưởng khi uống bia hay đề xuất thuốc chống chỉ định cho người suy tim.
+  \item \textbf{Ứng dụng.} Web App Flask chạy toàn bộ mô hình cục bộ trên một GPU 8 GB, hiển thị vết suy luận, câu
+        trả lời có trích dẫn, đồ thị tri thức tương tác và so sánh ba bộ truy xuất.
+\end{enumerate}
+
+Bài học chung của tiểu luận là các thành phần bổ trợ nhau đúng như lý thuyết dự đoán: KG cho ràng buộc chính xác và
+suy luận nhiều bước, RAG cho văn bản gốc để giải thích và trích dẫn, mô hình học sâu cho đánh giá định lượng từ dữ
+liệu của từng người, còn LLM chỉ làm việc nó làm tốt nhất là diễn đạt. Khi LLM được giao thêm việc nhớ tri thức, tự
+viết truy vấn giả định (HyDE) hay tự chọn công cụ, chất lượng giảm rõ rệt với mô hình nhỏ.
+
+\section{Hạn chế}
+\begin{itemize}
+  \item \textbf{LLM nhỏ không tuân thủ định dạng trích dẫn.} Chỉ \SL{agent/agg/all/llm_passPct}\% bản nháp qua
+        kiểm chứng; \SL{dem/agent_nocite} bản bị từ chối vì không có số hiệu [n]. Câu trả lời cuối vì vậy thường là
+        bản tổng hợp theo khuôn: đúng và truy vết được, nhưng kém tự nhiên.
+  \item \textbf{Bộ kiểm chứng chỉ kiểm con số và trích dẫn.} Nó không phát hiện được câu trộn cơ chế hay viện dẫn
+        ngoài bằng chứng khi câu đó không chứa con số (Mục~\ref{sec:agent-ketqua}).
+  \item \textbf{Xác suất của MLP chưa hiệu chỉnh.} Trọng số lớp dương làm xác suất bị đẩy cao so với tần suất thực;
+        con số ``xác suất mắc bệnh'' chỉ nên đọc như điểm xếp hạng nguy cơ.
+  \item \textbf{KG viết tay và nhỏ.} Hai KG có vài chục thực thể, cạnh được viết từ kho văn bản thay vì trích xuất
+        tự động; dấu cạnh tài chính cố định trong khi tương quan thực tế đổi dấu theo giai đoạn, như cạnh USD/VND $\to$
+        FPT chỉ khớp dữ liệu khi xét độ trễ.
+  \item \textbf{Bộ lập kế hoạch dựa trên luật.} Nó tái lập được và chính xác trên tập kịch bản, nhưng không thích
+        nghi với câu hỏi ngoài mẫu, và xét vai trò nguyên nhân -- kết quả theo lớp của thực thể thay vì theo câu.
+  \item \textbf{Quy mô đánh giá.} \SL{retrieval_grid/n_questions} câu hỏi truy xuất, \SL{dem/grag_q} câu hỏi GraphRAG
+        và \SL{dem/agent_scen} kịch bản tác tử đủ để so sánh các phương án trong bài, nhưng chưa đủ để kết luận có ý
+        nghĩa thống kê cho những chênh lệch nhỏ.
+\end{itemize}
+
+\section{Hướng phát triển}
+\begin{itemize}
+  \item \textbf{LLM tuân thủ trích dẫn tốt hơn}: dùng mô hình 7B lượng tử hóa 4-bit vừa với GPU 8 GB, hoặc tinh chỉnh
+        LoRA mô hình 1,5B trên các cặp (bằng chứng, câu trả lời có trích dẫn) sinh từ chính bản tổng hợp theo khuôn.
+  \item \textbf{Kiểm chứng theo ngữ nghĩa}: đối chiếu từng câu của câu trả lời với bằng chứng được trích bằng một mô
+        hình suy diễn ngôn ngữ tự nhiên (NLI) đa ngữ, thay cho chỉ kiểm con số.
+  \item \textbf{Hiệu chỉnh xác suất}: áp dụng temperature scaling hoặc hồi quy isotonic trên tập kiểm định để xác
+        suất của MLP phản ánh đúng tần suất mắc bệnh.
+  \item \textbf{Nối tầng học sâu với KG}: đối chiếu chỉ số xét nghiệm của hồ sơ với các ngưỡng chẩn đoán đã có trong
+        KG, để tác tử tự kết luận ``tiền đái tháo đường'' thay vì chỉ báo điểm nguy cơ.
+  \item \textbf{KG tài chính có bằng chứng thực nghiệm}: gắn tương quan, độ trễ và khoảng thời gian hiệu lực vào thuộc
+        tính của từng cạnh, cập nhật định kỳ từ dữ liệu, để tác tử nói ``tác động cùng chiều thể hiện sau khoảng hai
+        tháng'' thay vì một dấu cố định.
+  \item \textbf{Mở rộng KG tự động}: dùng LLM trích xuất bộ ba từ văn bản mới của Bộ Y tế, NHNN và báo cáo doanh
+        nghiệp, kiểm tra bằng ràng buộc bản thể học trước khi nạp, và chuyển lưu trữ từ NetworkX sang cơ sở dữ liệu đồ
+        thị như Neo4j khi quy mô tăng.
+  \item \textbf{Bộ lập kế hoạch lai}: giữ luật làm mặc định, nhưng cho LLM đề xuất thêm công cụ khi luật không khớp,
+        với bộ kiểm tra tên và tham số trước khi thực thi.
+\end{itemize}

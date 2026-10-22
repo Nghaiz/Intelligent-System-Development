@@ -1,0 +1,145 @@
+% =====================================================================
+%  CHƯƠNG 1 — MỞ ĐẦU VỀ KNOWLEDGE GRAPH VÀ RAG
+% =====================================================================
+\chapter{Mở đầu về Knowledge Graph và RAG}\label{chap:mo-dau}
+
+Chương này đặt nền cho toàn bài: đồ thị tri thức là gì, RAG là gì, vì sao hai kỹ thuật này bổ sung đúng chỗ yếu
+của LLM, và chúng được ghép với nhau như thế nào trong hệ thống của tiểu luận. Hình~\ref{fig:hesinhthai} là bản đồ
+của cả báo cáo; mỗi khối trên hình tương ứng một chương phía sau.
+
+\hinhtikz{t1_ecosystem}{Tổng quan hệ sinh thái tri thức đa miền của tiểu luận: nguồn tri thức thô được tổ chức
+thành hai kho bổ sung cho nhau là đồ thị tri thức và chỉ mục vector; tác tử ReAct phối hợp hai kho với các mô hình
+học sâu để trả lời người dùng}{hesinhthai}
+
+\section{Khái niệm đồ thị tri thức và RAG}
+
+\subsection{Khái niệm đồ thị tri thức (Knowledge Graph, KG)}
+Đồ thị tri thức là một đồ thị dữ liệu dùng để tích lũy và truyền đạt tri thức về thế giới thực, trong đó
+\textbf{nút} biểu diễn thực thể và \textbf{cạnh} biểu diễn quan hệ giữa các thực thể~\cite{hogan2021kg}. Khác một
+cơ sở dữ liệu quan hệ, KG không cố định lược đồ thành các bảng: muốn thêm một loại quan hệ mới chỉ cần thêm một
+nhãn cạnh mới. Khác một văn bản, mỗi mẩu tri thức trong KG là một đơn vị nguyên tử, máy đọc được và có thể truy
+vấn chính xác.
+
+Về hình thức, gọi $\mathcal{E}$ là tập thực thể, $\mathcal{R}$ là tập quan hệ (vị từ). Một KG là tập các
+\textbf{bộ ba} (chủ thể, vị từ, đối tượng):
+\begin{equation}
+  \mathcal{G} = \{ (s, p, o) \mid s, o \in \mathcal{E},\ p \in \mathcal{R} \} \subseteq \mathcal{E} \times \mathcal{R} \times \mathcal{E}.
+  \label{eq:kg}
+\end{equation}
+Ví dụ, sự kiện ``metformin tương tác nguy hiểm với rượu bia'' trong \texttt{VietnamDiabetesKG} được lưu thành bộ
+ba
+\[
+  (\textsf{Metformin},\ \textsf{TUONG\_TAC\_NGUY\_HIEM},\ \textsf{Ruou\_Bia}).
+\]
+Đi kèm tập bộ ba là một
+\textbf{bản thể học} (ontology) quy định thực thể thuộc lớp nào, vị từ nào được nối những lớp nào; bản thể học
+biến một đồ thị nhãn tự do thành tri thức có ngữ nghĩa, để máy kiểm tra được và suy ra được tri thức mới
+(Chương~\ref{chap:kg}).
+
+Ba tính chất làm KG có giá trị với hệ thống thông minh:
+\begin{itemize}
+  \item \textbf{Tường minh và truy vết được.} Mỗi cạnh trong hai KG của bài mang thuộc tính \texttt{source} trỏ về
+        tài liệu gốc; câu trả lời dựa trên KG luôn nêu được căn cứ.
+  \item \textbf{Đa bước.} Câu hỏi ``Fed tăng lãi suất thì vàng SJC ra sao'' không có câu trả lời trong bất kỳ
+        đoạn văn đơn lẻ nào, nhưng là một đường đi qua 3--4 cạnh trên đồ thị nhân quả tài chính.
+  \item \textbf{Có ràng buộc.} Bản thể học chặn được bộ ba vô nghĩa như ``rau xanh là thuốc đầu tay của metformin''
+        ngay khi nạp dữ liệu, trước khi nó lan vào câu trả lời.
+\end{itemize}
+
+\subsection{Khái niệm sinh tăng cường truy xuất (RAG)}
+RAG được Lewis và cộng sự đề xuất năm 2020~\cite{lewis2020rag} để giải bài toán tri thức chuyên sâu: thay vì bắt
+mô hình nhớ mọi thứ trong tham số, ta cho nó \emph{tra cứu} một kho văn bản ngoài trước khi sinh. Một hệ RAG có
+hai thành phần: bộ truy xuất $p_\eta(z \mid x)$ chọn các đoạn văn $z$ liên quan tới câu hỏi $x$, và bộ sinh
+$p_\theta(y \mid x, z)$ viết câu trả lời $y$ dựa trên cả câu hỏi lẫn đoạn văn. Xác suất câu trả lời là tổng theo
+các đoạn văn được truy xuất:
+\begin{equation}
+  p(y \mid x) \approx \sum_{z \in \operatorname{top-}k\, p_\eta(\cdot \mid x)} p_\eta(z \mid x)\, p_\theta(y \mid x, z).
+  \label{eq:rag}
+\end{equation}
+Trong thực hành hiện nay, các đoạn top-$k$ được nối vào prompt và LLM sinh một lần; công thức~\eqref{eq:rag} vẫn
+là cách hiểu đúng: chất lượng câu trả lời bị chặn trên bởi chất lượng truy xuất. Nếu đoạn văn chứa đáp án không
+nằm trong top-$k$, bộ sinh dù mạnh tới đâu cũng chỉ còn cách đoán.
+
+Hình~\ref{fig:bonho} đặt RAG trong khung hai loại bộ nhớ. \textbf{Bộ nhớ tham số} là trọng số LLM: rộng, nén, học
+một lần, không sửa được từng mẩu và không chỉ ra được nguồn. \textbf{Bộ nhớ phi tham số} là kho tri thức ngoài:
+cập nhật bằng cách thêm hay sửa tài liệu, mỗi câu trả lời trỏ được về đoạn văn cụ thể. RAG nối hai bộ nhớ qua bộ
+truy xuất.
+
+\hinhtikz{t1_memory}{Hai loại bộ nhớ của một hệ RAG: bộ nhớ tham số nằm trong trọng số LLM, bộ nhớ phi tham số là
+kho tri thức ngoài; bộ truy xuất là cầu nối}{bonho}
+
+\subsection{Quá trình phát triển}
+Biểu diễn tri thức bằng đồ thị không mới. Mạng ngữ nghĩa có từ thập niên 1960; Web ngữ nghĩa của Berners-Lee năm
+2001~\cite{bernerslee2001semantic} chuẩn hóa nó thành RDF, OWL và SPARQL; năm 2012 Google đưa thuật ngữ
+``Knowledge Graph'' vào sản phẩm tìm kiếm. Nhánh thứ hai là mô hình ngôn ngữ: kiến trúc Transformer
+năm 2017~\cite{vaswani2017attention} mở đường cho LLM, rồi RAG năm 2020 nối LLM với kho văn bản. Hai nhánh gặp
+nhau từ 2023~\cite{pan2024unifying}: ReAct~\cite{yao2023react} cho LLM gọi công cụ trong vòng suy luận, GraphRAG năm
+2024~\cite{edge2024graphrag} dùng đồ thị và cộng đồng để trả lời câu hỏi tổng hợp (Hình~\ref{fig:dongthoigian}).
+
+\hinhtikz{t1_timeline}{Dòng thời gian của biểu diễn tri thức và RAG: từ mạng ngữ nghĩa, Web ngữ nghĩa, Google
+Knowledge Graph tới Transformer, RAG, ReAct và GraphRAG}{dongthoigian}
+
+\section{Vai trò và ý nghĩa của Knowledge Base và RAG}
+Cơ sở tri thức (Knowledge Base, KB) là tập tri thức của một miền được tổ chức để máy truy cập được; trong bài này
+KB có hai dạng song song: kho văn bản Markdown (dạng phi cấu trúc, phục vụ RAG) và hai KG (dạng có cấu trúc).
+Giá trị của KB với một hệ thống dùng LLM nằm ở năm điểm.
+
+\begin{enumerate}
+  \item \textbf{Giảm ảo giác.} Ảo giác (hallucination) là khi mô hình sinh nội dung trôi chảy nhưng sai hoặc không
+        có căn cứ~\cite{ji2023hallucination}. Ở Mục~\ref{sec:agent-ketqua}, cùng mô hình Qwen2.5-1.5B trả lời
+        \SL{dem/agent_scen} câu hỏi kiểm thử: khi không có công cụ, câu trả lời chỉ chứa
+        \SL{agent/agg/all/coverage_llm_onlyPct}\% dữ kiện bắt buộc; khi có KB qua tác tử, tỉ lệ này là
+        \SL{agent/agg/all/coveragePct}\%.
+  \item \textbf{Cập nhật không cần huấn luyện lại.} Nghị định 232/2025/NĐ-CP sửa Nghị định 24/2012 về vàng; với KB,
+        chỉ cần thêm một thực thể và một cạnh \texttt{SUA\_DOI}, không phải tinh chỉnh mô hình.
+  \item \textbf{Truy vết nguồn.} Trong y tế, một khuyến nghị không có nguồn thì không dùng được. Mọi cạnh trong
+        hai KG đều mang mã tài liệu nguồn (\SL{kg/health/with_source} trên \SL{kg/health/edges} cạnh y tế,
+        \SL{kg/finance/with_source} trên \SL{kg/finance/edges} cạnh tài chính).
+  \item \textbf{Bảo mật dữ liệu.} Hồ sơ xét nghiệm của người bệnh không rời máy: LLM, embedder, reranker và cả hai
+        KG chạy cục bộ.
+  \item \textbf{Suy luận có kiểm soát.} Quy tắc nghiệp vụ (chống chỉ định, dấu tác động vĩ mô) nằm trong KG dưới
+        dạng tường minh; LLM chỉ diễn đạt lại, không phải tự suy ra.
+\end{enumerate}
+
+Bảng~\ref{tab:sosanh-kb} so sánh ba cách đưa tri thức miền vào một hệ thống dùng LLM.
+
+\begin{table}[H]\centering
+\caption{So sánh LLM đơn lẻ, tinh chỉnh (fine-tuning) và hệ thống tích hợp KB + RAG}\label{tab:sosanh-kb}
+{\small\begin{tabular}{L{3.3cm}L{3.5cm}L{3.5cm}L{3.9cm}}
+\toprule
+Tiêu chí & LLM đơn lẻ & Tinh chỉnh & KB + RAG (+ KG) \\
+\midrule
+Nguồn tri thức & tham số, cố định lúc huấn luyện & tham số, học thêm dữ liệu miền & kho ngoài, đọc lúc trả lời \\
+Cập nhật & không & huấn luyện lại, tốn GPU & thêm, sửa tài liệu hoặc bộ ba \\
+Truy vết nguồn & không & không & có, tới từng đoạn hoặc cạnh \\
+Ảo giác & cao với tri thức hiếm & giảm nhưng vẫn còn & thấp nếu có bộ kiểm chứng \\
+Câu hỏi đa bước & tự suy, khó kiểm soát & tự suy & duyệt đường trên KG \\
+Chi phí triển khai & thấp & cao & trung bình: chỉ mục + truy xuất \\
+Độ trễ & một lượt sinh & một lượt sinh & thêm truy xuất, rerank \\
+Phù hợp & hội thoại chung & đổi văn phong, định dạng & y tế, pháp lý, tài chính \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Tinh chỉnh và RAG không loại trừ nhau: tinh chỉnh dạy mô hình \emph{cách} trả lời (văn phong, định dạng trích dẫn),
+RAG cung cấp \emph{nội dung} để trả lời. Với một mô hình nhỏ như Qwen2.5-1.5B, Chương~\ref{chap:agent} cho thấy mô
+hình hiểu nội dung bằng chứng tốt nhưng thường quên ghi số hiệu trích dẫn; đó chính là phần việc mà tinh chỉnh
+có thể bù.
+
+\section{Bài toán và cách tiếp cận của tiểu luận}
+Đề bài đặt hai bài toán ứng dụng có tính chất rất khác nhau, và chính sự khác nhau đó làm rõ khi nào cần KG,
+khi nào cần RAG, khi nào cần mô hình học sâu.
+
+\begin{itemize}
+  \item \textbf{Y tế} là miền của \emph{ràng buộc}: tiêu chuẩn chẩn đoán có ngưỡng cụ thể, thuốc có chống chỉ định,
+        thực phẩm có chỉ số đường huyết. Câu trả lời phải đúng từng con số và có nguồn. KG lưu ràng buộc, RAG cung
+        cấp lời giải thích, MLP ước lượng nguy cơ từ hồ sơ xét nghiệm.
+  \item \textbf{Tài chính} là miền của \emph{quan hệ nhân quả và bất định}: tỷ giá tác động lên cổ phiếu qua nhiều
+        kênh, có kênh trái dấu nhau; giá tương lai không biết trước. KG lưu chiều tác động, dữ liệu thị trường kiểm
+        chứng lại chiều đó, BiLSTM dự báo kèm khoảng bất định.
+\end{itemize}
+
+Cả hai miền dùng chung một lõi: lớp \texttt{KnowledgeGraph} với bản thể học, cùng một kho văn bản và đường ống
+truy xuất, cùng một LLM cục bộ và cùng một tác tử ReAct. Mỗi thành phần được đánh giá riêng trước khi ghép:
+truy xuất ở Chương~\ref{chap:rag}, KG ở Chương~\ref{chap:kg}, \ref{chap:yte}, \ref{chap:taichinh}, mô hình học
+sâu ở Chương~\ref{chap:yte}, \ref{chap:taichinh}, và toàn hệ thống ở Chương~\ref{chap:agent}.

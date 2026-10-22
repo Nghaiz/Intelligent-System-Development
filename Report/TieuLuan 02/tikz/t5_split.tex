@@ -1,0 +1,22 @@
+% Chia dữ liệu theo thời gian cho dự báo (không xáo trộn): huấn luyện 2015-2023, kiểm định 2024, kiểm thử 2025 trở đi; cửa sổ trượt 30 phiên.
+% Trục thời gian theo đúng tỉ lệ: 1,2 cm mỗi năm, dữ liệu kết thúc tháng 10/2026.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  \fill[cBlue!70] (0,0) rectangle (10.8,1.0);
+  \fill[cOrange!80] (10.8,0) rectangle (12.0,1.0);
+  \fill[cRed!75] (12.0,0) rectangle (14.2,1.0);
+  \node[text=white, font=\small\bfseries] at (5.4,0.5) {Huấn luyện 2015 -- 2023 (\SL{forecast/FPT/n/train} mẫu)};
+  \node[font=\scriptsize\bfseries, align=center] at (11.4,0.5) {KĐ\\2024};
+  \node[text=white, font=\scriptsize\bfseries, align=center] at (13.1,0.5) {Kiểm thử\\2025--26};
+  \foreach \x/\yr in {0/2015, 2.4/2017, 4.8/2019, 7.2/2021, 9.6/2023, 10.8/2024, 12.0/2025, 13.2/2026}
+    {\draw[thick] (\x,0) -- (\x,-0.15); \node[font=\scriptsize, below] at (\x,-0.15) {\yr};}
+  % cửa sổ trượt
+  \foreach \k/\c in {0/cTeal, 1/cTeal!75, 2/cTeal!50} {
+    \draw[\c, line width=1.6pt, rounded corners=2pt] (3.0+0.55*\k,1.35+0.45*\k) rectangle ++(2.4,0.35);
+    \fill[cRed] (5.5+0.55*\k,1.52+0.45*\k) circle (3pt);
+  }
+  \node[font=\scriptsize, anchor=west, text width=6.6cm, align=left] at (7.2,2.05)
+    {30 phiên đầu vào $\to$ dự báo lợi suất phiên kế tiếp (chấm đỏ)};
+  \node[font=\scriptsize, text=cSlate, anchor=north west, text width=14.2cm, align=left] at (-0.1,-0.75)
+    {Chuẩn hoá bằng trung bình, độ lệch chuẩn của tập huấn luyện; dừng sớm theo MSE kiểm định; mốc so sánh là dự
+     báo ngây thơ $\hat r_{t+1}=0$ ($\hat P_{t+1}=P_t$).};
+\end{tikzpicture}

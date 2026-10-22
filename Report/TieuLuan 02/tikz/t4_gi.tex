@@ -1,0 +1,33 @@
+% Thang chỉ số đường huyết (GI) của các món trong KG (ngưỡng 55/70) và mô hình đĩa ăn: nửa rau, 1/4 đạm, 1/4 tinh bột.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  % thang GI ngang
+  \shade[left color=cGreen, right color=cYellow] (0,0) rectangle (5.5,0.7);
+  \shade[left color=cYellow, right color=cOrange] (5.5,0) rectangle (7.0,0.7);
+  \shade[left color=cOrange, right color=cRed] (7.0,0) rectangle (10,0.7);
+  \foreach \v in {0,10,...,100} {\draw[thick] (\v/10,0) -- (\v/10,-0.15); \node[font=\scriptsize, below] at (\v/10,-0.15) {\v};}
+  \node[font=\scriptsize\bfseries, text=white] at (2.7,0.35) {GI thấp $\le 55$};
+  \node[font=\scriptsize\bfseries] at (6.25,0.35) {TB};
+  \node[font=\scriptsize\bfseries, text=white] at (8.5,0.35) {GI cao $\ge 70$};
+  % nhãn xếp ba tầng; điểm neo (giữa / mép trái / mép phải) chọn sao cho không đường dẫn nào cắt qua nhãn khác
+  \foreach \v/\t/\c/\lvl/\anc in {36/{Táo, cam}/cGreen/1/south, 53/{Bún, phở}/cLime/2/south east, 68/{Gạo lứt}/cYellow/3/south east,
+                                  73/{Cơm trắng}/cOrange/2/south west, 78/{Khoai tây}/cRed/1/south west} {
+    \pgfmathsetmacro{\hy}{0.9+0.75*\lvl}
+    \draw[\c!70!black, thick] (\v/10,0.7) -- (\v/10,\hy);
+    \node[hop=\c, font=\scriptsize\bfseries, anchor=\anc] at (\v/10,\hy) {\t\ \v};
+  }
+  \node[font=\scriptsize, anchor=north west, text=cSlate, text width=10.6cm, align=left] at (-0.1,-0.75)
+    {Nguồn: bảng GI quốc tế (Atkinson và cộng sự, 2008), dùng làm thuộc tính \texttt{gi} của nút thực phẩm.};
+  % đĩa ăn
+  \begin{scope}[xshift=13.7cm, yshift=0.8cm]
+    \fill[gray!25] (0.08,-0.1) circle (2.45);
+    \fill[white, draw=gray!60, very thick] (0,0) circle (2.4);
+    \fill[cGreen!70] (0,0) -- (90:2.15) arc (90:270:2.15) -- cycle;
+    \fill[cRed!55] (0,0) -- (-90:2.15) arc (-90:0:2.15) -- cycle;
+    \fill[cYellow!85!black] (0,0) -- (0:2.15) arc (0:90:2.15) -- cycle;
+    \draw[white, line width=2pt] (0,-2.15) -- (0,2.15) (0,0) -- (2.15,0);
+    \node[font=\scriptsize\bfseries, text=white, align=center] at (-1.05,0) {Rau xanh\\$\tfrac12$ đĩa\\ăn trước};
+    \node[font=\scriptsize\bfseries, align=center] at (1.05,1.0) {Tinh bột\\$\tfrac14$\\(gạo lứt)};
+    \node[font=\scriptsize\bfseries, text=white, align=center] at (1.05,-1.0) {Đạm nạc\\$\tfrac14$\\(ức gà)};
+    \node[font=\scriptsize\bfseries, text=cNavy] at (0,-2.85) {Mô hình đĩa ăn};
+  \end{scope}
+\end{tikzpicture}

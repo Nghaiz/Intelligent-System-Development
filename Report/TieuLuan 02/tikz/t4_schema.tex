@@ -1,0 +1,33 @@
+% Lược đồ VietnamDiabetesKG: các lớp chính và vị từ nối chúng (kèm miền -> giá trị), đúng health_ontology().
+% Hai cột lớp đặt cách Disease 7 cm để mỗi nhãn vị từ nằm gọn trên đoạn cạnh của nó, không đè lên nút.
+\begin{tikzpicture}[font=\small,
+  cls/.style={hop=#1, minimum width=2.7cm, minimum height=1.0cm, font=\small\bfseries},
+  r/.style={-{Stealth[length=2.6mm]}, line width=1.4pt, #1},
+  lb/.style={font=\scriptsize\ttfamily, fill=white, inner sep=1pt, text=#1!70!black}]
+  \node[cls=cRed, minimum width=3.4cm, minimum height=1.3cm] (dis) at (0,0) {Disease};
+  \node[cls=cOrange] (bio) at (-7.0,2.6) {Biomarker};
+  \node[cls=cBrown] (rf) at (-7.0,0) {RiskFactor};
+  \node[cls=cPink] (cmp) at (-7.0,-2.6) {Complication};
+  \node[cls=cBlue] (drug) at (7.0,2.6) {Drug};
+  \node[cls=cSlate] (rs) at (7.0,5.4) {RiskSubstance};
+  \node[cls=cPurple] (cond) at (-3.0,5.4) {Condition};
+  \node[cls=cGreen] (food) at (7.0,-0.6) {Food};
+  \node[cls=cLime] (fg) at (7.0,-3.4) {FoodGroup};
+  \node[cls=cTeal] (life) at (0,-4.2) {Lifestyle};
+  \node[cls=cNavy] (gl) at (4.2,-5.4) {Guideline};
+  \draw[r=cOrange] (bio) -- node[lb=cOrange, sloped] {TIEU\_CHUAN\_CHAN\_DOAN} (dis);
+  \draw[r=cBrown] (rf) -- node[lb=cBrown] {YEU\_TO\_NGUY\_CO} (dis);
+  \draw[r=cPink] (cmp) -- node[lb=cPink, sloped] {BIEN\_CHUNG\_CUA} (dis);
+  \draw[r=cBlue] (dis) to[bend left=15] node[lb=cBlue, sloped] {CHI\_DINH\_DAU\_TAY} (drug);
+  \draw[r=cBlue] (drug) to[bend left=15] node[lb=cBlue, sloped] {DIEU\_TRI} (dis);
+  \draw[r=cRed] (drug) -- node[lb=cRed] {TUONG\_TAC\_NGUY\_HIEM} (rs);
+  \draw[r=cPurple] (drug) -- node[lb=cPurple, sloped, pos=0.55] {CHONG\_CHI\_DINH\_KHI / UU\_TIEN\_KHI} (cond);
+  \draw[r=cGreen] (dis) -- node[lb=cGreen, sloped, align=center, pos=0.6] {KHUYEN\_NGHI\_AN\\HAN\_CHE\_AN\\AN\_DINH\_LUONG} (food);
+  \draw[r=cLime] (food) -- node[lb=cLime, align=center] {LA\_MOT\_DANG\_CUA\\(bắc cầu)} (fg);
+  \draw[r=cTeal] (dis) -- node[lb=cTeal, left] {KHUYEN\_NGHI\_LOI\_SONG} (life);
+  \draw[r=cNavy] (dis) -- node[lb=cNavy, sloped] {THEO\_HUONG\_DAN} (gl);
+  \draw[r=cTeal] (cmp) |- node[lb=cTeal, pos=0.75] {XU\_TRI\_BANG} (life);
+  \draw[r=cOrange] (rs) -- node[lb=cOrange, pos=0.3] {TANG\_NGUY\_CO} (cond);
+  \draw[r=cRed] (dis.north west) to[out=120, in=60, looseness=2.2] node[lb=cRed, above] {TIEN\_TRIEN\_THANH} (dis.north east);
+  \node[font=\scriptsize, text=cSlate, align=left, anchor=north west] at (-8.4,6.0) {23 lớp $\cdot$ 17 vị từ\\46 thực thể $\cdot$ 59 cạnh\\mọi cạnh mang \texttt{source}};
+\end{tikzpicture}

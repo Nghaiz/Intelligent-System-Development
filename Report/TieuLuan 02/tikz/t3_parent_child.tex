@@ -1,0 +1,16 @@
+% Truy xuất cha-con (small-to-big): khớp chính xác trên đoạn con nhỏ, đưa đoạn cha đủ ngữ cảnh cho LLM.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  \foreach \p/\x/\c in {1/0/cBlue, 2/5.4/cGreen, 3/10.8/cOrange} {
+    \khoibaD{\x}{0}{4.6}{2.6}{1.2}{\c}
+    \node[text=white, font=\small\bfseries] at (\x+2.3,2.25) {Đoạn cha P\p\ (900)};
+    \foreach \k in {0,1,2} \filldraw[draw=white, fill=\c!35, rounded corners=2pt] (\x+0.25+1.45*\k,0.35) rectangle ++(1.25,1.3);
+    \foreach \k in {0,1,2} \node[font=\tiny\bfseries] at (\x+0.875+1.45*\k,1.0) {c\p.\the\numexpr\k+1\relax};
+  }
+  \node[hop=cSlate, font=\small] (q) at (6.0,5.4) {``Metformin có tương tác với rượu không?''};
+  \draw[line width=2pt, cRed, -{Stealth[length=3mm]}] (q.south) .. controls (6.6,4.4) and (7.4,3.2) .. (7.775,1.7)
+    node[pos=0.55, right, font=\scriptsize\bfseries, text=cRed] {1. khớp đoạn con c2.2 (220 ký tự)};
+  \draw[cRed, line width=2pt] (7.15,0.35) rectangle ++(1.25,1.3);
+  \draw[line width=2.4pt, cGreen!60!black, -{Stealth[length=3mm]}] (5.3,2.9) .. controls (3.6,4.0) and (2.4,4.4) .. (1.2,4.2)
+    node[left, font=\scriptsize\bfseries, text=cGreen!40!black, align=right] {2. trả nguyên P2\\cho LLM};
+  \node[font=\scriptsize, text=cSlate, align=center] at (7.8,-0.65) {nhúng nhỏ để khớp sắc nét $\cdot$ sinh trên khối lớn để không mất điều kiện, ngoại lệ};
+\end{tikzpicture}

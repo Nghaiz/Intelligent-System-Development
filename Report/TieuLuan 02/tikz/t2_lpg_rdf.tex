@@ -1,0 +1,32 @@
+% Cùng một sự kiện "Metformin tương tác nguy hiểm với rượu, mức độ cao" trong LPG (thuộc tính trên cạnh) và RDF (reification).
+% Hai khung xếp dọc để phần RDF có đủ chỗ cho năm cạnh mô tả câu lệnh.
+\begin{tikzpicture}[font=\small,
+  ent/.style={hop=#1, minimum width=2.6cm, minimum height=9mm, font=\small\bfseries},
+  lit/.style={draw=#1!70!black, fill=#1!10, font=\scriptsize\ttfamily, inner sep=3pt},
+  r/.style={-{Stealth[length=2.6mm]}, line width=1.5pt, #1},
+  lb/.style={font=\scriptsize\ttfamily, text=#1!70!black}]
+  % LPG
+  \node[hop=cSky, minimum width=15.6cm, minimum height=3.6cm, opacity=0.28] at (7.5,-0.1) {};
+  \node[tieude] at (7.5,1.3) {Labeled Property Graph (Neo4j)};
+  \node[ent=cBlue] (m) at (3.0,0.2) {Metformin};
+  \node[ent=cSlate] (r) at (12.0,0.2) {Ruou\_Bia};
+  \draw[r=cRed] (m) -- node[above, font=\scriptsize\bfseries\ttfamily, text=cRed] {TUONG\_TAC} (r);
+  \node[lit=cRed, align=left, anchor=north] at (7.5,-0.45) {muc\_do: "cao"\\source: "h03-ruou-bia"};
+  \draw[cRed, dotted, thick] (7.5,0.15) -- (7.5,-0.45);
+  \node[font=\scriptsize, text=cSlate, align=center] at (3.0,-1.05) {1 cạnh, thuộc tính\\gắn thẳng lên cạnh};
+  % RDF
+  \node[hop=cPurple, minimum width=15.6cm, minimum height=5.75cm, opacity=0.18] at (7.5,-5.07) {};
+  \node[tieude] at (7.5,-2.6) {RDF + reification (rdflib)};
+  \node[ent=cPurple, minimum width=2.4cm] (st) at (7.5,-4.9) {\_:stmt};
+  \node[ent=cBlue] (m2) at (2.4,-3.5) {Metformin};
+  \node[ent=cSlate] (r2) at (12.6,-3.5) {Ruou\_Bia};
+  \node[lit=cRed] (md) at (2.4,-6.4) {"cao"};
+  \node[lit=cRed] (sr) at (12.6,-6.4) {"h03-ruou-bia"};
+  \node[lit=cPurple] (pp) at (7.5,-7.0) {ex:TUONG\_TAC};
+  \draw[r=cPurple] (st) -- node[sloped, above, lb=cPurple] {rdf:subject} (m2);
+  \draw[r=cPurple] (st) -- node[sloped, above, lb=cPurple] {rdf:object} (r2);
+  \draw[r=cPurple] (st) -- node[right, lb=cPurple] {rdf:predicate} (pp);
+  \draw[r=cRed] (st) -- node[sloped, below, lb=cRed] {ex:muc\_do} (md);
+  \draw[r=cRed] (st) -- node[sloped, below, lb=cRed] {ex:source} (sr);
+  \node[font=\scriptsize, text=cSlate, align=center] at (7.5,-7.6) {1 bộ ba gốc + 5 bộ ba mô tả câu lệnh};
+\end{tikzpicture}

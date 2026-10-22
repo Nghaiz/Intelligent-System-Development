@@ -1,0 +1,19 @@
+% Kiến trúc năm tầng theo sơ đồ trên lớp, mỗi tầng ghi lớp/hàm hiện thực tương ứng trong tl2/.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  \foreach \i/\c/\t/\impl in {
+      0/cSlate/{Tầng dữ liệu nguồn}/{\texttt{corpus.load\_documents}, \texttt{data.market\_frame}, \texttt{data.load\_diabetes}},
+      1/cTeal/{Tầng tri thức}/{\texttt{KnowledgeGraph}, \texttt{Ontology}, \texttt{rdfs\_closure}, \texttt{chunk\_corpus}},
+      2/cBlue/{Tầng truy xuất}/{\texttt{BM25Retriever}, \texttt{DenseRetriever}, \texttt{HybridRRF}, \texttt{RerankPipeline}, \texttt{GraphRAG}},
+      3/cPurple/{Tầng mô hình}/{\texttt{DiabetesRiskModel} (MLP), \texttt{Forecaster} (BiLSTM), \texttt{LocalLLM} (Qwen2.5)},
+      4/cOrange/{Tầng điều phối tác tử}/{\texttt{ReActAgent.plan / run / synthesize}, \texttt{verify}}} {
+    \pgfmathsetmacro{\y}{1.55*\i}
+    \pgfmathsetmacro{\x}{0.32*\i}
+    \khoibaD{\x}{\y}{5.6}{1.05}{1.6}{\c}
+    \node[anchor=west, text=white, font=\small\bfseries] at (\x+0.2,\y+0.52) {\t};
+    \node[anchor=west, font=\scriptsize, text width=8.4cm] at (7.6,\y+0.62) {\impl};
+    \draw[\c!70!black, thick, dashed] (\x+5.65,\y+0.62) -- (7.55,\y+0.62);
+  }
+  \node[hop=cRed, font=\small\bfseries, minimum width=5.6cm] at (1.6,8.3) {Web App Flask (\texttt{app/app.py})};
+  \draw[mui] (2.5,7.55) -- (2.5,7.9);
+  \draw[-{Stealth[length=4mm]}, line width=3pt, cGreen!60!black] (-0.9,0.2) -- (-0.9,7.4) node[midway, sloped, above, font=\scriptsize\bfseries] {dữ liệu đi lên, câu hỏi đi xuống};
+\end{tikzpicture}

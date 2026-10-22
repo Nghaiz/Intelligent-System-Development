@@ -1,0 +1,20 @@
+% Cách tính Hit@k, MRR và nDCG@10 trên một danh sách xếp hạng: đoạn liên quan là đoạn chứa đúng chuỗi đáp án.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  \foreach \r/\rel in {1/0, 2/1, 3/0, 4/1, 5/0} {
+    \pgfmathsetmacro{\y}{-0.85*\r}
+    \ifnum\rel=1
+      \filldraw[draw=cGreen!60!black, fill=cGreen!25, rounded corners=2pt, thick] (0,\y) rectangle ++(6.6,0.68);
+      \node[anchor=west, font=\scriptsize] at (0.15,\y+0.34) {\#\r\ \ đoạn chứa ``\textbf{nhiễm toan lactic}'' \textcolor{cGreen!50!black}{\checkmark}};
+    \else
+      \filldraw[draw=cSlate!60, fill=cSlate!8, rounded corners=2pt, thick] (0,\y) rectangle ++(6.6,0.68);
+      \node[anchor=west, font=\scriptsize, text=cSlate] at (0.15,\y+0.34) {\#\r\ \ đoạn không chứa đáp án};
+    \fi
+  }
+  \node[tieude] at (3.3,0.3) {Danh sách xếp hạng cho câu $q$};
+  \node[draw=cBlue, fill=cBlue!6, rounded corners=4pt, anchor=north west, text width=8.4cm, align=left, font=\small] at (7.1,0.55) {%
+    \textbf{Hit@1} $= 0$, \quad \textbf{Hit@3} $= 1$ \quad (có đoạn đúng trong 3 đầu)\\[4pt]
+    \textbf{MRR} $= \dfrac{1}{|Q|}\sum_{q}\dfrac{1}{\mathrm{rank}_q}$, ở đây $\dfrac{1}{2}=0{,}5$\\[6pt]
+    \textbf{nDCG@10} $= \dfrac{\sum_{i\le 10} \mathrm{rel}_i/\log_2(i+1)}{\mathrm{IDCG}}$\\[4pt]
+    \phantom{\textbf{nDCG@10}} $= \dfrac{1/\log_2 3 + 1/\log_2 5}{1 + 1/\log_2 3} \approx 0{,}65$\\[4pt]
+    \textcolor{cSlate}{\footnotesize trung bình trên 114 câu hỏi; đáp án là chuỗi con của đúng một tài liệu}};
+\end{tikzpicture}

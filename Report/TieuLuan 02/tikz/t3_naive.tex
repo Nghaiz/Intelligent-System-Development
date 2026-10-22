@@ -1,0 +1,28 @@
+% Naive RAG ba pha: lập chỉ mục (ngoại tuyến), truy xuất và tạo sinh (trực tuyến); kèm ba điểm nghẽn.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm,
+  b/.style={hop=#1, minimum height=1.1cm, text width=2.3cm, font=\scriptsize\bfseries},
+  lane/.style={rounded corners=6pt, fill=#1!8, draw=#1!40, thick}]
+  \draw[lane=cBlue] (-0.6,1.0) rectangle (16.4,3.2);
+  \draw[lane=cOrange] (-0.6,-1.6) rectangle (16.4,0.6);
+  \node[tieude, anchor=west] at (-0.4,2.95) {\footnotesize 1. Lập chỉ mục (ngoại tuyến)};
+  \node[tieude, anchor=west] at (-0.4,0.35) {\footnotesize 2--3. Truy xuất và tạo sinh (mỗi câu hỏi)};
+  % chỉ mục
+  \node[b=cSlate] (doc) at (0.9,1.9) {17 tài liệu\\Markdown};
+  \node[b=cTeal] (chk) at (4.2,1.9) {Chia đoạn\\$d \to \{c_i\}$};
+  \node[b=cPurple] (emb) at (7.5,1.9) {Embedding\\$\mathbf{v}_i = E(c_i)$};
+  \node[b=cIndigo] (idx) at (10.8,1.9) {Chỉ mục vector\\$\{\mathbf{v}_i\}$};
+  \foreach \a/\c in {doc/chk, chk/emb, emb/idx} \draw[mui] (\a) -- (\c);
+  % truy xuất và sinh
+  \node[b=cSlate] (q) at (0.9,-0.6) {Câu hỏi $q$};
+  \node[b=cPurple] (qe) at (4.2,-0.6) {$\mathbf{v}_q = E(q)$};
+  \node[b=cIndigo] (top) at (7.5,-0.6) {top-$k$ theo\\$\cos(\mathbf{v}_q,\mathbf{v}_i)$};
+  \node[b=cOrange] (pr) at (10.8,-0.6) {Prompt\\$q \oplus c_{1..k}$};
+  \node[b=cRed] (llm) at (14.4,-0.6) {LLM sinh\\câu trả lời};
+  \foreach \a/\c in {q/qe, qe/top, top/pr, pr/llm} \draw[mui] (\a) -- (\c);
+  \draw[muiM=cIndigo, line width=1.6pt, dashed] (idx) -- (top);
+  % điểm nghẽn
+  \foreach \x/\t in {4.2/{cắt ngang ý, mất ngữ cảnh}, 7.5/{tìm theo nghĩa bỏ sót tên riêng, số hiệu}, 14.4/{bằng chứng nhiễu $\Rightarrow$ ảo giác}} {
+    \node[draw=cRed, fill=cRed!8, rounded corners=3pt, font=\scriptsize, text width=3.0cm, align=center] at (\x,-2.55) {\textcolor{cRed}{\textbf{!}} \t};
+  }
+  \foreach \x in {4.2,7.5,14.4} \draw[cRed, thick, dotted] (\x,-1.15) -- (\x,-2.05);
+\end{tikzpicture}

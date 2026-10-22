@@ -1,0 +1,36 @@
+% Suy diễn tiến trên VietnamFinanceKG (rdfs_closure): cạnh tường minh nét liền, bộ ba suy ra nét đứt đỏ.
+% Một đồ thị duy nhất (đồ thị tường minh là tập con của đồ thị sau suy diễn); số bộ ba ghi ở hàng tiêu đề.
+\begin{tikzpicture}[font=\small,
+  n/.style={hop=#1, minimum width=2.0cm, minimum height=8mm, font=\scriptsize\bfseries},
+  r/.style={-{Stealth[length=2.4mm]}, line width=1.4pt, #1},
+  inf/.style={-{Stealth[length=2.4mm]}, line width=1.6pt, dashed, cRed},
+  lb/.style={font=\tiny\ttfamily}]
+  \node[tieude, text=cBlue!70!black, anchor=east] at (2.6,4.4) {Tường minh: \SL{kg/finance/rdf_triples} bộ ba};
+  \draw[-{Stealth[length=3mm]}, line width=2.4pt, cPurple] (2.8,4.4) -- node[above, font=\scriptsize\bfseries, text=cPurple]
+    {+\SL{kg/finance/inferred}, \SL{kg/finance/inference_ms} ms} (5.6,4.4);
+  \node[tieude, text=cRed!70!black, anchor=west] at (5.8,4.4) {Sau suy diễn: \SL{kg/finance/rdf_after} bộ ba};
+  \node[n=cTeal] (stock) at (0,2.8) {Stock};
+  \node[n=cPurple] (asset) at (4.0,2.8) {Asset};
+  \node[n=cTeal] (index) at (8.0,2.8) {Index};
+  \node[n=cGreen] (fpt) at (0,0) {FPT};
+  \node[n=cOrange] (vn30) at (4.0,0) {VN30};
+  \node[n=cOrange] (hose) at (8.0,0) {HOSE};
+  \node[n=cSlate] (cntt) at (0,-2.0) {Công nghệ};
+  % bộ ba tường minh
+  \draw[r=cTeal] (stock) -- node[above, lb] {subClassOf} (asset);
+  \draw[r=cTeal] (index) -- node[above, lb] {subClassOf} (asset);
+  \draw[r=cTeal] (fpt) -- node[left, lb] {a} (stock);
+  \draw[r=cTeal] (vn30) -- node[sloped, below, lb] {a} (index);
+  \draw[r=cOrange] (fpt) -- node[above, lb] {THUOC\_VE} (vn30);
+  \draw[r=cOrange] (vn30) -- node[above, lb] {THUOC\_VE} (hose);
+  \draw[r=cSlate] (fpt) -- node[left, lb] {THUOC\_NGANH} (cntt);
+  % bộ ba suy ra
+  \draw[inf] (fpt) -- node[sloped, above, lb, text=cRed] {a (kế thừa)} (asset);
+  \draw[inf] (vn30) -- node[right, lb, text=cRed] {a} (asset);
+  \draw[inf] (fpt.south east) to[out=-30, in=-150] node[below, lb, text=cRed] {THUOC\_VE (bắc cầu)} (hose.south west);
+  % chú giải
+  \draw[r=cSlate] (4.2,-2.6) -- (5.2,-2.6);
+  \node[font=\scriptsize, anchor=west] at (5.3,-2.6) {tường minh};
+  \draw[inf] (4.2,-3.2) -- (5.2,-3.2);
+  \node[font=\scriptsize, anchor=west, text=cRed!80!black] at (5.3,-3.2) {suy ra bởi \texttt{rdfs\_closure}};
+\end{tikzpicture}

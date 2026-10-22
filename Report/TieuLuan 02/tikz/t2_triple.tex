@@ -1,0 +1,23 @@
+% Bộ ba RDF (chủ thể, vị từ, đối tượng) với URI đầy đủ, và cách một đồ thị là tập các bộ ba.
+\begin{tikzpicture}[font=\small]
+  % ba quả cầu lớn
+  \node[cau=cBlue, minimum size=2.6cm, font=\normalsize\bfseries, align=center] (s) at (0,0) {Chủ thể\\[-1pt]\scriptsize Subject};
+  \node[cau=cPurple, minimum size=2.6cm, font=\normalsize\bfseries, align=center, rectangle, rounded corners=12pt, minimum width=3.4cm] (p) at (5.2,0) {Vị từ\\[-1pt]\scriptsize Predicate};
+  \node[cau=cGreen, minimum size=2.6cm, font=\normalsize\bfseries, align=center] (o) at (10.4,0) {Đối tượng\\[-1pt]\scriptsize Object};
+  \draw[line width=3pt, cNavy, -{Stealth[length=4mm]}] (s) -- (p);
+  \draw[line width=3pt, cNavy, -{Stealth[length=4mm]}] (p) -- (o);
+  \node[font=\scriptsize\ttfamily, text=cBlue!70!black, below=3mm of s] {ex:Metformin};
+  \node[font=\scriptsize\ttfamily, text=cPurple!70!black, below=3mm of p] {ex:TUONG\_TAC\_NGUY\_HIEM};
+  \node[font=\scriptsize\ttfamily, text=cGreen!60!black, below=3mm of o] {ex:Ruou\_Bia};
+  % khung Turtle
+  \node[draw=cNavy, fill=softgray, rounded corners=4pt, anchor=north, align=left, font=\scriptsize\ttfamily, inner sep=6pt,
+        text width=15.2cm] at (5.2,-2.6) {%
+    @prefix ex:   <http://tl02.ptit.local/kg\#> .\\
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema\#> .\\[2pt]
+    \textcolor{cBlue}{ex:Metformin} \textcolor{cPurple}{a} ex:Biguanide ;\\
+    \quad\textcolor{cPurple}{rdfs:label} "Metformin"@vi ;\\
+    \quad\textcolor{cPurple}{ex:TUONG\_TAC\_NGUY\_HIEM} \textcolor{cGreen!60!black}{ex:Ruou\_Bia} .\\
+    ex:Biguanide \textcolor{cPurple}{rdfs:subClassOf} ex:OralDrug .\quad \textcolor{gray}{\# tri thức lược đồ (TBox)}};
+  % IRI giải thích
+  \node[font=\scriptsize, text=cSlate, align=center] at (5.2,2.2) {mỗi thành phần là một IRI toàn cục;\ đối tượng có thể là literal (\texttt{"E11"}, \texttt{6.5})};
+\end{tikzpicture}

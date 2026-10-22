@@ -1,0 +1,97 @@
+% =====================================================================
+%  Style dùng chung cho mọi hình TikZ/pgfplots của báo cáo.
+%  Bảng màu phong phú, khối có bóng đổ và chuyển sắc, macro khối hộp 3D.
+% =====================================================================
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{external,positioning,arrows.meta,matrix,fit,calc,shapes.geometric,shapes.misc,shapes.arrows,
+                backgrounds,decorations.pathreplacing,decorations.pathmorphing,shadows,shadows.blur,patterns,3d,
+                perspective,fadings,shadings,trees}
+\usepgfplotslibrary{groupplots,colormaps,fillbetween}
+
+% Externalize: mỗi hình biên dịch một lần thành tikzcache/<tên>.pdf.
+\tikzexternalize[prefix=tikzcache/]
+\newcommand{\hinh}[1]{\tikzsetnextfilename{#1}\input{tikz/#1}}
+
+% Cỡ chữ trong hình: lớp 14pt cho \tiny = 6pt, \scriptsize = 8pt, \footnotesize = 10pt; hình lại bị co theo bề
+% rộng trang nên chữ còn nhỏ hơn. Trong mọi tikzpicture nâng ba cỡ này lên để chữ hình gần cỡ chữ thân bài.
+\makeatletter
+\tikzset{every picture/.append style={execute at begin picture={%
+  \def\tiny{\@setfontsize\tiny{9.5}{11.5}}%
+  \def\scriptsize{\@setfontsize\scriptsize{11}{13}}%
+  \def\footnotesize{\@setfontsize\footnotesize{12}{14}}}}}
+\makeatother
+
+% ----------------------------------------------------------------- bảng màu
+\definecolor{mZero}{HTML}{7F7F7F}
+\definecolor{mOne}{HTML}{0072B2}
+\definecolor{mTwo}{HTML}{E69F00}
+\definecolor{mThree}{HTML}{009E73}
+\definecolor{accentRed}{HTML}{C0392B}
+\definecolor{lightBlue}{HTML}{DCE8F5}
+\definecolor{lightOrange}{HTML}{FCE9CF}
+\definecolor{lightGreen}{HTML}{D5F0E6}
+\definecolor{lightGray}{HTML}{EDEDED}
+% màu tươi cho sơ đồ
+\definecolor{cBlue}{HTML}{2F80ED}
+\definecolor{cSky}{HTML}{56CCF2}
+\definecolor{cTeal}{HTML}{1ABC9C}
+\definecolor{cGreen}{HTML}{27AE60}
+\definecolor{cLime}{HTML}{A3D977}
+\definecolor{cYellow}{HTML}{F2C94C}
+\definecolor{cOrange}{HTML}{F2994A}
+\definecolor{cRed}{HTML}{EB5757}
+\definecolor{cPink}{HTML}{E86FA8}
+\definecolor{cPurple}{HTML}{9B51E0}
+\definecolor{cIndigo}{HTML}{5B5FE0}
+\definecolor{cBrown}{HTML}{A0522D}
+\definecolor{cNavy}{HTML}{123A75}
+\definecolor{cSlate}{HTML}{4F5D75}
+
+\pgfplotsset{
+  a06/.style={
+    width=8cm, height=5.6cm, grid=major, grid style={gray!25},
+    tick label style={font=\small}, label style={font=\normalsize},
+    legend style={font=\small, draw=gray!50, fill=white, fill opacity=0.9, text opacity=1, rounded corners=2pt},
+    title style={font=\normalsize\bfseries},
+    /pgf/number format/use comma, /pgf/number format/1000 sep={.}},
+  m0/.style={mZero, very thick, mark=none},
+  m1/.style={mOne, very thick, mark=none},
+  m2/.style={mTwo, very thick, mark=none},
+  m3/.style={mThree, very thick, mark=none},
+}
+
+\tikzset{
+  % khối chữ nhật bo góc có bóng mờ và chuyển sắc từ trên xuống
+  hop/.style={rounded corners=3pt, draw=#1!75!black, thick, top color=#1!12, bottom color=#1!38,
+              blur shadow={shadow blur steps=6, shadow xshift=0.8pt, shadow yshift=-0.8pt, shadow opacity=25},
+              align=center, inner sep=4pt, font=\small},
+  hop/.default=cBlue,
+  khoi/.style={hop=cBlue, minimum height=8mm},
+  khoiC/.style={hop=cOrange, minimum height=8mm},
+  khoiG/.style={hop=cGreen, minimum height=8mm},
+  khoiX/.style={hop=cSlate, minimum height=8mm},
+  khoiP/.style={hop=cPurple, minimum height=8mm},
+  khoiR/.style={hop=cRed, minimum height=8mm},
+  khoiT/.style={hop=cTeal, minimum height=8mm},
+  % quả cầu có bóng (nơ-ron, phép toán)
+  cau/.style={circle, inner color=white, outer color=#1!55, draw=#1!65!black, thick, text=black!85,
+              font=\small\bfseries, inner sep=1pt, minimum size=8mm,
+              blur shadow={shadow blur steps=5, shadow opacity=30}},
+  cau/.default=cBlue,
+  mui/.style={-{Stealth[length=2.6mm]}, very thick, cNavy},
+  muiM/.style={-{Stealth[length=2.6mm]}, very thick, #1},
+  nhan/.style={font=\small, text=black!75},
+  o/.style={draw=gray!70, minimum size=7mm, inner sep=0pt, font=\small},
+  tieude/.style={font=\normalsize\bfseries\sffamily, text=cNavy},
+}
+
+% \khoibaD{x}{y}{rộng}{cao}{sâu}{màu}: khối hộp 3D, góc dưới-trái-trước tại (x,y),
+% chiều sâu vẽ xiên lên phải (0,6 × sâu theo 30 độ). Mặt trên sáng, mặt bên tối.
+\newcommand{\khoibaD}[6]{%
+  \pgfmathsetmacro{\kdx}{0.6*#5*cos(30)}\pgfmathsetmacro{\kdy}{0.6*#5*sin(30)}%
+  \filldraw[draw=#6!60!black, fill=#6!85!black, line join=round] (#1,#2) rectangle ++(#3,#4);
+  \filldraw[draw=#6!60!black, fill=#6!45, line join=round] (#1,#2+#4) -- ++(\kdx,\kdy) -- ++(#3,0) -- ++(-\kdx,-\kdy) -- cycle;
+  \filldraw[draw=#6!60!black, fill=#6!60!black, line join=round] (#1+#3,#2) -- ++(\kdx,\kdy) -- ++(0,#4) -- ++(-\kdx,-\kdy) -- cycle;
+}

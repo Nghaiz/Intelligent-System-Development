@@ -1,0 +1,30 @@
+% Ba thành phần của KG trên ví dụ thật của VietnamDiabetesKG: thực thể (nút), quan hệ (cạnh có nhãn), thuộc tính (trên nút và trên cạnh).
+\begin{tikzpicture}[font=\small,
+  ent/.style={hop=#1, minimum width=3.2cm, minimum height=1.1cm, font=\small\bfseries},
+  prop/.style={draw=#1!70!black, fill=#1!8, rounded corners=2pt, font=\scriptsize\ttfamily, align=left, inner sep=3pt},
+  rel/.style={-{Stealth[length=3mm]}, line width=1.8pt, #1}]
+  \node[ent=cBlue] (met) at (0,0) {Metformin};
+  \node[ent=cSlate] (alc) at (10.5,0) {Rượu bia (ethanol)};
+  \node[ent=cGreen] (big) at (0,-4.6) {Biguanide};
+  \node[ent=cRed] (t2) at (4.8,-4.6) {Đái tháo đường típ 2};
+  \node[ent=cOrange] (lac) at (10.5,-4.6) {Nhiễm toan lactic};
+  % cạnh có thuộc tính: nhãn vị từ ngay trên cạnh, khối thuộc tính phía trên nhãn
+  \draw[rel=cRed] (met) -- node[above, font=\small\bfseries, text=cRed] (lbl) {TUONG\_TAC\_NGUY\_HIEM} (alc);
+  \node[prop=cRed, anchor=south] at ([yshift=2pt]lbl.north) {muc\_do = "cao"\\source = "h03-ruou-bia"};
+  % vẽ từ Metformin xuống để chữ nghiêng không bị lật, mũi tên đặt ở đầu Metformin
+  \draw[cBlue, line width=1.8pt, {Stealth[length=3mm]}-] (met) -- node[sloped, below=4pt, pos=0.42, font=\small\bfseries, text=cBlue] {CHI\_DINH\_DAU\_TAY} (t2);
+  \draw[rel=cOrange] (met) -- node[sloped, above, pos=0.4, font=\small\bfseries, text=cOrange!70!black] {TANG\_NGUY\_CO} (lac);
+  \draw[rel=cOrange] (alc) -- node[right, font=\small\bfseries, text=cOrange!70!black] {TANG\_NGUY\_CO} (lac);
+  \draw[rel=cGreen, dashed] (met) -- node[left, font=\small\ttfamily, text=cGreen!60!black] {rdf:type} (big);
+  \node[prop=cBlue, anchor=south] at (met.north) {type = Biguanide\\aliases = [metformin,\\\ \ glucophage]};
+  \node[prop=cRed, anchor=north] at (t2.south) {icd10 = "E11"};
+  % chú giải: một hàng ngang dưới đồ thị
+  \begin{scope}[yshift=-7.0cm]
+    \node[ent=cPurple, minimum width=2.2cm, minimum height=0.8cm, font=\scriptsize\bfseries] at (0,0) {Thực thể};
+    \node[font=\scriptsize, align=left, anchor=west] at (1.3,0) {nút, định danh\\duy nhất (URI)};
+    \draw[rel=cPurple] (4.6,0) -- (5.9,0);
+    \node[font=\scriptsize, align=left, anchor=west] at (6.0,0) {quan hệ có\\hướng, có nhãn};
+    \node[prop=cPurple, anchor=west] at (9.0,0) {khoá = giá trị};
+    \node[font=\scriptsize, align=left, anchor=west] at (12.0,0) {thuộc tính\\(mô hình LPG)};
+  \end{scope}
+\end{tikzpicture}

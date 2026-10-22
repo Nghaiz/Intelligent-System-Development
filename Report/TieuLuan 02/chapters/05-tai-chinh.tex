@@ -1,0 +1,444 @@
+% =====================================================================
+%  CHƯƠNG 5 — HỆ THỐNG TÀI CHÍNH: VN30 VÀ GIÁ VÀNG SJC
+% =====================================================================
+\chapter{Hệ thống tài chính: VN30 và giá vàng SJC}\label{chap:taichinh}
+
+Phân hệ tài chính trả lời loại câu hỏi mà nhà đầu tư cá nhân Việt Nam hay đặt ra: tỷ giá USD/VND tăng thì cổ phiếu
+nào hưởng lợi, Fed tăng lãi suất thì vàng SJC đi đâu, phiên tới FPT có thể ở mức giá nào. Ba câu hỏi đó cần ba loại
+tri thức khác nhau. Câu đầu cần \emph{cơ chế} (doanh thu bằng ngoại tệ, chi phí bằng đồng); câu thứ hai cần \emph{suy
+luận nhiều bước} qua các biến trung gian (DXY, giá vàng thế giới, giá quy đổi); câu thứ ba cần \emph{dữ liệu chuỗi
+thời gian}. Chương này dựng ba lớp tương ứng: \texttt{VietnamFinanceKG} lưu đồ thị nhân quả có dấu và có nguồn,
+bộ suy luận đa bước tính chiều tác động ròng trên đồ thị đó, và mạng BiLSTM dự báo lợi suất phiên kế tiếp. Lớp thứ
+tư, ít hiển nhiên hơn, là bước \emph{kiểm chứng KG bằng dữ liệu}: dấu của mỗi cạnh lý thuyết được đối chiếu với
+tương quan thực nghiệm trên gần 12 năm giao dịch.
+
+\begin{phathien}{Lưu ý về phạm vi}
+Hệ thống phục vụ mục đích học tập, không phải công cụ khuyến nghị đầu tư. Kho văn bản tài chính tổng hợp từ văn bản
+pháp luật (Nghị định 24/2012/NĐ-CP, Nghị định 232/2025/NĐ-CP), thông cáo của Ngân hàng Nhà nước và báo cáo thường
+niên doanh nghiệp; mọi câu trả lời của tác tử đều kết thúc bằng câu ``Thông tin chỉ mang tính tham khảo, không phải
+khuyến nghị đầu tư''.
+\end{phathien}
+
+% ---------------------------------------------------------------------
+\section{Bối cảnh vĩ mô và dữ liệu thị trường}\label{sec:tc-boicanh}
+\subsection{Bốn cổ phiếu, bốn kênh truyền dẫn}
+Rổ VN30 gồm 30 cổ phiếu vốn hóa và thanh khoản lớn nhất sàn HOSE. Bài chọn bốn mã không phải vì vốn hóa mà vì mỗi
+mã đại diện một kênh truyền dẫn vĩ mô khác nhau, để KG có đủ dấu dương và dấu âm cho cùng một biến nguồn:
+
+\begin{itemize}
+  \item \textbf{FPT} (công nghệ thông tin): doanh thu xuất khẩu phần mềm thanh toán bằng USD, JPY, EUR, còn chi phí
+        chủ yếu là lương kỹ sư trả bằng đồng. Tỷ giá tăng làm doanh thu quy đổi tăng nhanh hơn chi phí, nên về mặt
+        cơ bản FPT \emph{hưởng lợi} khi USD/VND tăng; Nhật Bản là thị trường xuất khẩu lớn nhất nên FPT còn nhạy với
+        đồng yên.
+  \item \textbf{HPG} (thép): nhập quặng sắt và than cốc bằng USD và có nợ vay ngoại tệ, nên tỷ giá tăng làm giá vốn
+        tăng và phát sinh lỗ tỷ giá; ngược lại, giải ngân đầu tư công làm tăng cầu thép xây dựng.
+  \item \textbf{VCB} (ngân hàng): lợi nhuận phụ thuộc tăng trưởng tín dụng, mà tín dụng nhạy với lãi suất điều hành
+        của Ngân hàng Nhà nước (NHNN).
+  \item \textbf{VIC} (bất động sản, ô tô): chi phí tài chính lớn và có nợ vay ngoại tệ, chịu cả hai kênh lãi suất
+        và tỷ giá.
+\end{itemize}
+
+Chỉ số VN30 được đại diện bằng giá chứng chỉ quỹ ETF mô phỏng VN30 (chuỗi \texttt{VN30ETF}). Ngoài bốn cổ phiếu, dữ liệu gồm giá vàng thế giới XAU/USD, tỷ giá USD/VND và chỉ số đồng
+đô la DXY. Hàm \texttt{market\_frame} lấy lịch giao dịch của HOSE làm trục thời gian và điền tiến các chuỗi nước
+ngoài vào ngày giao dịch Việt Nam, nên mọi tài sản cùng có \SL{market/n_days} phiên chung từ \SL{market/range/0} tới
+\SL{market/range/1}.
+
+\bang{tab_market_desc}{Thống kê mô tả các tài sản trong giai đoạn nghiên cứu}{marketdesc}
+
+\hinhpdf{mk_prices}{1.0}{Diễn biến giá điều chỉnh của bốn cổ phiếu, ETF VN30 và vàng quy đổi, chuẩn hóa về 100
+ở đầu kỳ (thang log)}{mk_prices}
+
+Bảng~\ref{tab:marketdesc} và Hình~\ref{fig:mk_risk} cho thấy lợi suất cao luôn đi cùng rủi ro cao. VIC có lợi suất
+năm hóa cao nhất (\SL{market/describe/VIC/ann_retPct}\%) nhưng từng sụt \SL{market/describe/VIC/max_ddPct}\% từ
+đỉnh; HPG sụt sâu nhất, \SL{market/describe/HPG/max_ddPct}\%, đúng tính chu kỳ của ngành thép. Vàng quy đổi ra
+đồng có lợi suất \SL{market/describe/GOLD_VND/ann_retPct}\% mỗi năm, ngang VCB, nhưng mức sụt tối đa chỉ
+\SL{market/describe/GOLD_VND/max_ddPct}\%, vì vậy vàng đóng vai trò tài sản phòng thủ trong danh mục của người Việt.
+Tỷ giá USD/VND biến động chỉ \SL{market/describe/USDVND/ann_volPct}\% mỗi năm do NHNN điều hành trong biên độ, nhưng
+chính vì ít biến động nên mỗi lần tỷ giá tăng nhanh đều là tin lớn với thị trường.
+
+\hinhpdf{mk_risk}{0.92}{Lợi suất -- rủi ro năm hóa; diện tích bong bóng tỷ lệ với mức sụt giảm tối đa}{mk_risk}
+
+\subsection{Tương quan giữa các tài sản}
+Ma trận tương quan (Hình~\ref{fig:mk_corr}) được tính trên hai thang: lợi suất ngày và lợi suất cộng dồn 20 phiên.
+Thang 20 phiên ít nhiễu hơn và gần với tầm nhìn của nhà đầu tư cá nhân. Ba nhóm quan hệ hiện ra rõ:
+
+\begin{enumerate}
+  \item Bốn cổ phiếu cùng tương quan dương với ETF VN30 (từ \SL{market/corr_20d/VIC/VN30ETF} với VIC tới
+        \SL{market/corr_20d/VCB/VN30ETF} với VCB): rủi ro chung của thị trường chiếm phần lớn biến động.
+  \item USD/VND tương quan \emph{âm} với cả bốn cổ phiếu (FPT \SL{market/corr_20d/USDVND/FPT}, HPG
+        \SL{market/corr_20d/USDVND/HPG}): tỷ giá tăng thường đi cùng khối ngoại bán ròng và tâm lý rủi ro.
+  \item Vàng thế giới gần như quyết định vàng quy đổi (\SL{market/corr_20d/XAU/GOLD_VND}), và ngược chiều với DXY
+        (\SL{market/corr_20d/DXY/XAU}) vì vàng được định giá bằng USD.
+\end{enumerate}
+
+\hinhpdf{mk_corr}{1.0}{Ma trận tương quan Pearson của lợi suất ngày (trái) và lợi suất 20 phiên (phải)}{mk_corr}
+
+Tương quan không đứng yên. Hình~\ref{fig:mk_rolling} vẽ tương quan trượt 252 phiên (khoảng một năm) của các cặp
+tương ứng với cạnh trong KG: cặp DXY -- vàng luôn âm, còn cặp tỷ giá -- cổ phiếu dao động quanh 0 và đổi dấu theo
+giai đoạn. Đây là cảnh báo đầu tiên rằng một cạnh có dấu cố định trong KG chỉ mô tả \emph{xu hướng cơ bản}, không
+phải quy luật đúng ở mọi thời điểm.
+
+\hinhpdf{mk_rolling}{1.0}{Tương quan trượt một năm của các cặp tương ứng với cạnh trong \texttt{VietnamFinanceKG}}{mk_rolling}
+
+\subsection{Thị trường vàng Việt Nam: giá quy đổi và phần bù SJC}\label{sec:vang}
+Giá vàng trong nước niêm yết theo \emph{lượng} (37,5 g), còn giá thế giới theo \emph{ounce troy} (31,1035 g). Giá
+vàng thế giới quy đổi ra đồng, chưa gồm thuế phí, là
+
+\begin{equation}\label{eq:vangquydoi}
+  G_t \;=\; \frac{\mathrm{XAU}_t \times (\mathrm{USD/VND})_t \times 1{,}2057}{10^6}
+  \quad\text{(triệu đồng/lượng)},
+\end{equation}
+
+\noindent với hệ số $1{,}2057 \approx 37{,}5 / 31{,}1035$ đổi giá mỗi ounce sang giá mỗi lượng. Giá vàng miếng SJC
+bằng giá quy đổi cộng một \emph{phần bù} do cung cầu trong nước quyết định:
+$P^{\mathrm{SJC}}_t = G_t + \Delta_t$. Ngày \SL{market/gold/last/date}, XAU/USD $=$ \SL{market/gold/last/xau}
+USD/ounce và USD/VND $=$ \SL{market/gold/last/usdvnd}, nên $G_t \approx$ \SL{market/gold/last/gold_vnd} triệu
+đồng/lượng. Công thức~\eqref{eq:vangquydoi} chính là công cụ \texttt{quy\_doi\_vang} của tác tử, và là lý do hai cạnh
+\textsf{XAU\_USD} $\to$ \textsf{Vang\_Quy\_Doi}, \textsf{USD\_VND} $\to$ \textsf{Vang\_Quy\_Doi} trong KG đều mang
+dấu dương.
+
+\hinhtikz{t5_gold}{Cấu thành giá vàng miếng SJC: giá thế giới, tỷ giá và hệ số đổi đơn vị tạo nên giá quy đổi; phần
+bù trong nước phụ thuộc chính sách}{t5_gold}
+
+\hinhpdf{mk_gold}{1.0}{XAU/USD, USD/VND và giá vàng quy đổi theo~\eqref{eq:vangquydoi}}{mk_gold}
+
+Phần bù $\Delta_t$ là đại lượng chịu tác động của chính sách, và là nơi KG cần tri thức pháp luật:
+
+\begin{itemize}
+  \item \textbf{Nghị định 24/2012/NĐ-CP}~\cite{nd24_2012} quy định Nhà nước độc quyền sản xuất vàng miếng, độc quyền
+        xuất nhập khẩu vàng nguyên liệu để sản xuất vàng miếng; NHNN chọn SJC làm thương hiệu vàng miếng quốc gia.
+        Từ năm 2014 NHNN gần như không nhập vàng nguyên liệu, nguồn cung bị giới hạn trong khi nhu cầu tích trữ tăng,
+        nên phần bù có lúc lên tới 15 -- 18 triệu đồng/lượng đầu năm 2024.
+  \item \textbf{Can thiệp năm 2024}: NHNN đấu thầu vàng miếng từ tháng 4, rồi bán trực tiếp qua bốn ngân hàng thương
+        mại nhà nước và Công ty SJC từ tháng 6; phần bù thu hẹp còn khoảng 3 -- 5 triệu đồng/lượng.
+  \item \textbf{Nghị định 232/2025/NĐ-CP}~\cite{nd232_2025} sửa đổi Nghị định 24, có hiệu lực từ tháng 10/2025,
+        bãi bỏ cơ chế độc quyền sản xuất vàng miếng và cho phép doanh nghiệp, ngân hàng đủ điều kiện sản xuất vàng
+        miếng, nhập khẩu vàng nguyên liệu theo hạn mức do NHNN quản lý.
+\end{itemize}
+
+Trong KG, ba sự kiện này là ba cạnh vào nút \textsf{Chenh\_Lech\_SJC}: Nghị định 24 làm phần bù tăng (dấu $+$),
+hai biện pháp còn lại làm phần bù giảm (dấu $-$). Vàng nhẫn 9999 không chịu cơ chế độc quyền nên chỉ nối với giá
+quy đổi, không nối với phần bù.
+
+% ---------------------------------------------------------------------
+\section{Đồ thị tri thức tài chính \texttt{VietnamFinanceKG}}\label{sec:kgtc}
+\subsection{Bản thể học}
+Bản thể học tài chính nhỏ hơn bản thể học y tế nhưng có cấu trúc khác: \SL{kg/finance/classes} lớp và chỉ
+\SL{kg/finance/predicates} vị từ. Lớp gốc \textsf{FinancialEntity} tách thành yếu tố vĩ mô (\textsf{MacroFactor},
+với ba lớp con \textsf{PolicyTool}, \textsf{GlobalFactor}, \textsf{MarketFlow}), tài sản (\textsf{Asset} $\to$
+\textsf{Commodity} $\to$ \textsf{GoldAsset}, \textsf{Stock}, \textsf{Index}), văn bản pháp luật, sự kiện, chỉ báo,
+ngành và sàn giao dịch. Hai vị từ quan trọng nhất mang \emph{dấu}: \textsf{TAC\_DONG\_CUNG\_CHIEU} ($+1$, biến
+nguồn tăng thì biến đích có xu hướng tăng) và \textsf{TAC\_DONG\_NGUOC\_CHIEU} ($-1$). Bốn vị từ còn lại là quan hệ
+cấu trúc (thành viên chỉ số, ngành, sửa đổi văn bản, phạm vi điều chỉnh) và không tham gia lan truyền tác động.
+\textsf{THUOC\_VE} được khai báo bắc cầu, nên suy diễn RDFS (Hình~\ref{fig:suydien}) tự sinh ``FPT thuộc về HOSE'' từ
+hai cạnh ``FPT thuộc VN30'' và ``VN30 thuộc HOSE''.
+
+\maNguon{kg_finance__finance_ontology}{Bản thể học tài chính: \SL{kg/finance/classes} lớp và
+\SL{kg/finance/predicates} vị từ, hai vị từ nhân quả mang dấu}
+
+\subsection{Thực thể và quan hệ nhân quả}
+KG có \SL{kg/finance/nodes} thực thể và \SL{kg/finance/edges} cạnh, trong đó
+\SL{kg/finance/relations/TAC_DONG_CUNG_CHIEU} cạnh cùng chiều và \SL{kg/finance/relations/TAC_DONG_NGUOC_CHIEU}
+cạnh ngược chiều. Cả \SL{kg/finance/with_source} cạnh đều có thuộc tính \texttt{source} trỏ về tài liệu trong kho
+văn bản (\texttt{f01} -- \texttt{f09}) và thuộc tính \texttt{mechanism} giải thích cơ chế bằng một câu, nên mỗi kết
+luận của tác tử đều truy được về văn bản gốc. Thực thể có chuỗi giá thật mang thuộc tính \texttt{series}, nối KG với
+dữ liệu thị trường; nhờ đó Mục~\ref{sec:kiemchung} kiểm chứng được dấu cạnh. Hình~\ref{fig:t5_causal} tách đồ thị
+nhân quả thành hai kênh để dễ đọc, Hình~\ref{fig:kg_finance_graph} vẽ toàn bộ KG.
+
+\hinhtikz{t5_causal}{Đồ thị nhân quả của \texttt{VietnamFinanceKG}: (a) kênh vàng, (b) kênh tỷ giá -- lãi suất --
+cổ phiếu; xanh liền là cùng chiều, đỏ đứt là ngược chiều}{t5_causal}
+
+\maDai{kg_finance__build_finance_kg}{Xây \texttt{VietnamFinanceKG}: thực thể kèm bí danh, chuỗi giá, và các cạnh
+nhân quả có nguồn, có cơ chế}
+
+\hinhpdf{kg_finance_graph}{1.0}{Toàn cảnh \texttt{VietnamFinanceKG}: \SL{kg/finance/nodes} thực thể,
+\SL{kg/finance/edges} quan hệ; màu nút theo lớp, màu cạnh theo dấu tác động}{kg_finance_graph}
+
+Khi xuất ra RDF, KG có \SL{kg/finance/rdf_triples} bộ ba; bộ suy diễn RDFS thêm \SL{kg/finance/inferred} bộ ba
+(kiểu kế thừa từ lớp cha, quan hệ bắc cầu) để tổng số đạt \SL{kg/finance/rdf_after}. Chẳng hạn ``FPT là một
+\textsf{Stock}'' kéo theo ``FPT là một \textsf{Asset}'' và ``FPT là một \textsf{FinancialEntity}''. Nhờ vậy truy vấn SPARQL hỏi ``mọi tài sản chịu tác động ngược chiều của tỷ giá'' không
+cần liệt kê từng lớp con.
+
+% ---------------------------------------------------------------------
+\section{Suy luận tác động đa bước}\label{sec:multihop}
+\subsection{Dấu của đường đi và tác động ròng}
+Với một biến nguồn $u$ (chẳng hạn lãi suất Fed) và một biến đích $v$ (vàng SJC), hàm \texttt{impact\_paths} liệt kê
+mọi đường đơn $\pi = (u = x_0 \to x_1 \to \dots \to x_k = v)$ dài không quá 4 bước trên đồ thị con nhân quả. Dấu của
+đường là tích dấu các cạnh, và tác động ròng là tổng dấu các đường có trọng số nghịch đảo độ dài:
+
+\begin{equation}\label{eq:rong}
+  s(\pi) \;=\; \prod_{j=1}^{k} s(x_{j-1}, x_j), \qquad
+  N(u, v) \;=\; \sum_{\pi:\, u \rightsquigarrow v} \frac{s(\pi)}{|\pi|}.
+\end{equation}
+
+Trọng số $1/|\pi|$ thể hiện giả định rằng tác động suy giảm qua mỗi bước trung gian: một kênh trực tiếp đáng tin hơn
+một chuỗi bốn mắt xích. Khi mọi đường cùng dấu, kết luận là ``tích cực'' hoặc ``tiêu cực''; khi các đường mâu thuẫn,
+bộ suy luận \emph{không} gộp thành một chiều mà trả về ``hỗn hợp'' kèm số kênh mỗi dấu, để tác tử nói rõ kết quả phụ
+thuộc kênh truyền dẫn nào mạnh hơn.
+
+\maNguon{kg_finance__impact_paths}{Suy luận đa bước: liệt kê đường nhân quả, tính dấu từng đường và tác động
+ròng~\eqref{eq:rong}}
+
+\hinhtikz{t5_multihop}{Ba đường nhân quả từ lãi suất Fed tới vàng SJC mà \texttt{impact\_paths} tìm được, dấu của
+từng đường và tác động ròng}{t5_multihop}
+
+\bang{tab_multihop}{Kết quả suy luận đa bước cho bảy cặp nguồn -- đích}{multihop}
+
+Bảng~\ref{tab:multihop} có hai trường hợp ``hỗn hợp'' đáng phân tích:
+
+\begin{itemize}
+  \item \textbf{Fed $\to$ vàng SJC}: hai đường âm (Fed $\to$ XAU $\to$ quy đổi $\to$ SJC, và Fed $\to$ DXY $\to$ XAU
+        $\to$ quy đổi $\to$ SJC) và một đường dương (Fed $\to$ DXY $\to$ USD/VND $\to$ quy đổi $\to$ SJC). Đường dương
+        có thật về kinh tế: Fed tăng lãi suất làm USD mạnh, tỷ giá tăng, và giá vàng tính bằng đồng được đỡ một phần.
+        Tác động ròng $N = -1/3 - 1/4 + 1/4 =$ \SL{kg/demo_finance/Lai_Suat_Fed->Vang_SJC/net}: chiều chi phí cơ hội
+        của vàng thắng, nhưng nhà đầu tư trong nước chịu giảm ít hơn nhà đầu tư nắm vàng tính bằng USD.
+  \item \textbf{Lãi suất NHNN $\to$ HPG}: một đường trực tiếp âm (lãi suất cao làm giảm cầu xây dựng) và một đường
+        hai bước dương (lãi suất VND cao làm giảm áp lực tỷ giá, mà tỷ giá thấp có lợi cho doanh nghiệp nhập nguyên
+        liệu). Ròng $-1 + 1/2 =$ \SL{kg/demo_finance/Lai_Suat_NHNN->HPG/net}.
+\end{itemize}
+
+\subsection{Lan truyền cú sốc}
+Câu hỏi ngược lại, ``một cú sốc ở $u$ ảnh hưởng tới những gì'', được trả lời bằng hàm \texttt{downstream}: duyệt
+theo chiều rộng từ $u$ tối đa 3 bước, mỗi thực thể nhận dấu của đường ngắn nhất tới nó. Hình~\ref{fig:kg_shock} và
+Bảng~\ref{tab:shock} là kết quả cho cú sốc DXY tăng: mười thực thể bị ảnh hưởng. FPT là cổ phiếu duy nhất có lợi
+(qua tỷ giá); VN30, HPG, VIC và cả bốn nút vàng đều chịu chiều giảm; VCB không nằm trong danh sách vì KG không có
+kênh nối VCB với tỷ giá.
+
+\maNguon{kg_finance__downstream}{Lan truyền cú sốc theo chiều rộng, giữ dấu của đường ngắn nhất}
+
+\hinhpdf{kg_shock}{0.92}{Lan truyền cú sốc ``DXY tăng'' trong \texttt{VietnamFinanceKG}: xanh là tăng, đỏ là
+giảm}{kg_shock}
+
+\bang{tab_shock}{Chiều tác động lên các thực thể khi DXY tăng, theo đường ngắn nhất}{shock}
+
+\subsection{Kiểm chứng dấu cạnh bằng dữ liệu}\label{sec:kiemchung}
+Một KG tài chính viết tay dễ chứa những ``hiểu biết thông thường'' sai. Bài kiểm chứng mọi cạnh nhân quả có chuỗi
+giá ở cả hai đầu: tính tương quan Pearson giữa lợi suất 20 phiên của biến nguồn và biến đích trên toàn giai đoạn, rồi
+so dấu với dấu lý thuyết. Kết quả (Bảng~\ref{tab:edgeev}, Hình~\ref{fig:mk_edges}): \SL{dem/edges_agree} trên
+\SL{dem/edges_checked} cạnh khớp dấu. Cạnh \textsf{XAU\_USD} $\to$ \textsf{Vang\_Quy\_Doi} gần như tất định
+(\SL{market/corr_20d/XAU/GOLD_VND}); cạnh DXY $\to$ XAU mạnh và đúng chiều; các cạnh tỷ giá $\to$ HPG, VIC yếu
+nhưng đúng dấu.
+
+\bang{tab_edges_evidence}{Đối chiếu dấu lý thuyết của cạnh KG với tương quan thực nghiệm}{edgeev}
+
+\hinhpdf{mk_edges}{1.0}{Tương quan thực nghiệm (thanh) và dấu lý thuyết trong KG (hình thoi) của bảy cạnh có chuỗi
+giá ở hai đầu}{mk_edges}
+
+Cạnh không khớp là USD/VND $\to$ FPT: lý thuyết cho dấu dương, dữ liệu cho tương quan cùng kỳ
+\SL{market/corr_20d/USDVND/FPT}. Sai lệch này không có nghĩa cạnh sai, mà cho thấy hai cơ chế chạy ở hai thang thời
+gian khác nhau. Trong ngắn hạn, tỷ giá tăng nhanh đi cùng dòng vốn ngoại rút khỏi thị trường và tâm lý né rủi ro, kéo
+mọi cổ phiếu lớn giảm cùng lúc, kể cả FPT. Lợi ích cơ bản của doanh thu ngoại tệ chỉ hiện ra khi doanh nghiệp công
+bố kết quả kinh doanh, tức là vài tháng sau. Tương quan trễ (Hình~\ref{fig:mk_lag}) xác nhận cách giải thích này:
+tương quan giữa lợi suất 20 phiên của tỷ giá hôm nay và của FPT $k$ phiên sau tăng dần theo $k$, đổi dấu quanh
+$k = 20$ và đạt cực đại \SL{dem/lag_corr_FPT} ở độ trễ \SL{dem/lag_peak_FPT} phiên, trong khi với HPG, đường tương
+quan chỉ tiến về 0 mà không đổi dấu đáng kể.
+
+\hinhpdf{mk_lag}{1.0}{Tương quan giữa lợi suất 20 phiên của USD/VND và của cổ phiếu sau $k$ phiên}{mk_lag}
+
+\nhanxet{Cạnh KG mã hóa cơ chế cơ bản, còn tương quan cùng kỳ đo phản ứng của dòng tiền. Bài giữ nguyên cạnh
+USD/VND $\to$ FPT vì có căn cứ văn bản; đây là ví dụ cho thấy KG tài chính cần được đối chiếu với dữ liệu thay vì chỉ
+dựa vào hiểu biết thông thường, và là lý do Chương~\ref{chap:ketluan} đề xuất gắn tương quan thực nghiệm cùng độ trễ
+vào thuộc tính của từng cạnh. Một lưu ý về phương pháp: lợi suất 20 phiên tính trên cửa sổ chồng lấn nên các quan sát liền nhau phụ
+thuộc nhau; độ lớn tương quan dùng được để so chiều, nhưng không nên đọc như kiểm định ý nghĩa thống kê.}
+
+% ---------------------------------------------------------------------
+\section{Dự báo chuỗi thời gian bằng BiLSTM}\label{sec:bilstm}
+\subsection{Phát biểu bài toán}
+Mô hình không dự báo trực tiếp giá mà dự báo \emph{lợi suất log} phiên kế tiếp, $r_{t+1} = \ln(P_{t+1}/P_t)$,
+rồi suy ra giá $\hat P_{t+1} = P_t\, e^{\hat r_{t+1}}$. Chuỗi giá không dừng: một mô hình hồi quy trên giá đạt $R^2$
+rất cao chỉ bằng cách chép giá hôm qua, và con số đó không nói gì về khả năng dự báo. Lợi suất gần dừng hơn, và cho
+phép so sánh với mốc khó nhất: \emph{dự báo ngây thơ} ``giá không đổi'', tức $\hat r_{t+1} = 0$. Với mốc này,
+$\mathrm{RMSE}_{\text{ngây thơ}} = \sqrt{\tfrac{1}{n}\sum r_{t+1}^2}$, và chỉ số chính của bài là tỉ số
+$\mathrm{RMSE}/\mathrm{RMSE}_{\text{ngây thơ}}$: dưới 1 mới là có năng lực dự báo.
+
+Mỗi phiên có 7 đặc trưng với cổ phiếu (6 với vàng): lợi suất log của chính tài sản; lợi suất của bốn biến ngoại sinh
+USD/VND, XAU, DXY, ETF VN30 (bỏ XAU khi dự báo vàng quy đổi vì XAU là thành phần của chính nó); độ lệch của giá so
+với trung bình trượt 20 phiên; và độ biến động 20 phiên. Mỗi mẫu là một cửa sổ
+\SL{forecast/config/window} phiên liên tiếp, tức một tenxơ $30 \times 7$.
+
+\maNguon{data__forecast_features}{Đặc trưng dự báo: lợi suất của đích và biến ngoại sinh, độ lệch MA20, độ biến
+động 20 phiên; \texttt{keep\_last} giữ phiên mới nhất khi suy luận}
+
+\maNguon{data__make_windows}{Cắt chuỗi đặc trưng thành các cửa sổ trượt cho mô hình tuần tự}
+
+Dữ liệu được chia \emph{theo thời gian}, không xáo trộn (Hình~\ref{fig:t5_split}): huấn luyện trước
+\SL{forecast/config/val_start}, kiểm định năm 2024, kiểm thử từ \SL{forecast/config/test_start} tới hết dữ liệu.
+Trung bình và độ lệch chuẩn để chuẩn hóa chỉ tính trên tập huấn luyện. Với FPT, ba tập có \SL{forecast/FPT/n/train},
+\SL{forecast/FPT/n/val} và \SL{forecast/FPT/n/test} cửa sổ.
+
+\hinhtikz{t5_split}{Chia dữ liệu theo thời gian và cửa sổ trượt 30 phiên: mô hình không bao giờ nhìn thấy tương lai
+của mẫu nó dự báo}{t5_split}
+
+\subsection{Kiến trúc LSTM hai chiều}
+LSTM~\cite{hochreiter1997lstm} giải quyết bài toán gradient biến mất của RNN bằng một ô nhớ $c_t$ và ba cổng điều
+khiển luồng thông tin. Với đầu vào $x_t$ và trạng thái ẩn trước $h_{t-1}$:
+
+\begin{align}
+  f_t &= \sigma\!\left(W_f [h_{t-1}, x_t] + b_f\right) & &\text{cổng quên} \label{eq:lstm-f}\\
+  i_t &= \sigma\!\left(W_i [h_{t-1}, x_t] + b_i\right), \quad
+  \tilde c_t = \tanh\!\left(W_c [h_{t-1}, x_t] + b_c\right) & &\text{cổng vào, ứng viên} \\
+  c_t &= f_t \odot c_{t-1} + i_t \odot \tilde c_t & &\text{cập nhật ô nhớ} \\
+  o_t &= \sigma\!\left(W_o [h_{t-1}, x_t] + b_o\right), \quad h_t = o_t \odot \tanh(c_t) & &\text{cổng ra} \label{eq:lstm-o}
+\end{align}
+
+LSTM hai chiều~\cite{schuster1997brnn} chạy thêm một LSTM ngược thời gian trên \emph{cùng cửa sổ} và ghép hai trạng
+thái, $h_t = [\overrightarrow{h}_t ; \overleftarrow{h}_t]$. Vì cửa sổ chỉ gồm các phiên đã qua, chiều ngược đọc từ
+phiên $t$ lùi về phiên $t-29$ và không làm rò rỉ tương lai; tác dụng của nó là để trạng thái cuối mang thông tin của
+cả đầu lẫn cuối cửa sổ. Mạng gồm hai tầng BiLSTM 64 chiều mỗi hướng, lấy trạng thái ở bước cuối (128 chiều) qua
+Dropout và hai lớp tuyến tính $128 \to 32 \to 1$; tổng cộng 140.865 tham số với 7 đặc trưng, so với 54.081 tham số
+của LSTM một chiều cùng cấu hình.
+
+\hinhtikz{t5_bilstm3d}{Bộ dự báo BiLSTM: tenxơ cửa sổ $30 \times 7$, hai tầng LSTM xuôi và ngược thời gian, đầu
+tuyến tính cho lợi suất phiên kế tiếp và MC Dropout cho khoảng dự báo}{t5_bilstm3d}
+
+\maNguon{dl_models__SeqForecaster}{Mô hình tuần tự dùng chung cho BiLSTM và LSTM một chiều}
+
+\bang{tab_fc_config}{Cấu hình bộ dự báo}{fcconfig}
+
+\subsection{Huấn luyện}
+Hàm mất mát là Huber~\cite{huber1964robust} với $\delta = 1$ trên lợi suất đã chuẩn hóa:
+\begin{equation}
+  \mathcal{L}_\delta(e) = \begin{cases} \tfrac12 e^2 & |e| \le \delta \\ \delta\left(|e| - \tfrac12\delta\right) &
+  |e| > \delta \end{cases}
+\end{equation}
+Lợi suất có đuôi dày: vài phiên giảm sàn hay tăng trần có thể chi phối MSE, trong khi Huber chỉ phạt tuyến tính các
+sai số lớn. Tối ưu bằng AdamW~\cite{loshchilov2019adamw} (tốc độ học $10^{-3}$, suy giảm trọng số $10^{-4}$), lô 128,
+cắt chuẩn gradient ở 1,0 để tránh bùng nổ gradient trong LSTM, tối đa 80 epoch và dừng sớm khi mất mát kiểm định
+không giảm sau 10 epoch. Huấn luyện chạy trên GPU, mỗi mô hình mất vài giây
+(Bảng~\ref{tab:forecast}). Đối chứng gồm LSTM một chiều cùng cấu hình, hồi quy Ridge trên 30 trễ của mọi đặc
+trưng, và dự báo ngây thơ.
+
+\maDai{train_forecast__train_rnn}{Vòng huấn luyện: Huber, AdamW, cắt gradient, dừng sớm theo mất mát kiểm định}
+
+\maNguon{train_forecast__evaluate}{Đánh giá trên tập kiểm thử: RMSE lợi suất, tỉ số với dự báo ngây thơ, MAE giá,
+độ chính xác hướng}
+
+\hinhpdf{fc_history}{1.0}{Đường cong học của BiLSTM cho FPT và vàng quy đổi}{fc_history}
+
+Đường cong học (Hình~\ref{fig:fc_history}) cho thấy dấu hiệu đầu tiên của kết quả: mất mát huấn luyện giảm đều,
+còn mất mát kiểm định gần như đi ngang hoặc tăng ngay từ những epoch đầu. Với HPG, VIC và vàng quy đổi, trọng số tốt
+nhất là của epoch thứ nhất và quá trình dừng ở epoch 11; với FPT, mất mát kiểm định tốt nhất (epoch 22) chỉ thấp hơn
+epoch đầu khoảng 2\%. Phần mô hình học thêm từ tập huấn luyện gần như không tổng quát hóa sang năm 2024.
+
+\subsection{Kết quả và diễn giải}
+\bang{tab_forecast}{Kết quả dự báo trên tập kiểm thử của năm tài sản và bốn mô hình}{forecast}
+
+\haihinh{fc_ratio}{Tỉ số RMSE so với dự báo ngây thơ}{fc_diracc}{Tỉ lệ đoán đúng chiều tăng/giảm}{So sánh BiLSTM,
+LSTM và Ridge trên năm tài sản}{fc_compare}
+
+Kết quả cần được nói thẳng. Chỉ \SL{dem/fc_beat} trên \SL{dem/fc_models} mô hình có tỉ số RMSE dưới 1, và mô hình
+tốt nhất (LSTM trên vàng quy đổi) chỉ giảm sai số \SL{dem/fc_best_gainPct}\% so với dự báo ngây thơ, một mức không có
+ý nghĩa thực tế. BiLSTM của FPT, mô hình phức tạp nhất trên tài sản biến động mạnh nhất trong nhóm, kém mốc ngây thơ
+tới tỉ số \SL{dem/fc_worst_ratio}. Ridge trên 30 trễ kém dự báo ngây thơ ở mọi tài sản: với hơn 200 đặc trưng tuyến
+tính, mô hình khớp nhiễu của tập huấn luyện. Tỉ lệ đoán đúng chiều dao động quanh 50\%, cao nhất là LSTM trên vàng
+(\SL{forecast/GOLD_VND/lstm/dir_accPct}\%) và thấp nhất là hai mô hình LSTM trên VIC (khoảng 41\%, tức tệ hơn tung
+đồng xu). Dự báo ngây thơ không có cột đúng chiều
+vì lợi suất 0 không có dấu.
+
+\hinhpdf{fc_test}{1.0}{Giá thực tế và giá dự báo một phiên của BiLSTM trên tập kiểm thử}{fc_test}
+
+Hình~\ref{fig:fc_test} dễ gây hiểu lầm nếu đọc thiếu cẩn thận: đường dự báo bám sát đường thực tế, nhưng đó là vì
+$\hat P_{t+1} = P_t e^{\hat r_{t+1}}$ và lợi suất một phiên chỉ vài phần trăm, nên bất kỳ dự báo nào gần giá hôm qua
+cũng trông khớp. Hình~\ref{fig:fc_scatter} đặt lợi suất dự báo cạnh lợi suất thực tế và cho thấy hai kiểu thất bại
+khác nhau. Với vàng quy đổi, BiLSTM \emph{co hẳn về 0}: độ lệch chuẩn của dự báo chỉ \SL{dem/fc_std_pred_GOLD_VND}\% so với
+\SL{dem/fc_std_true_GOLD_VND}\% của thực tế, tức mô hình tự học ra dự báo ngây thơ, và tỉ số RMSE vì vậy sát 1. Với
+FPT, BiLSTM làm điều ngược lại: dự báo dao động mạnh (độ lệch chuẩn \SL{dem/fc_std_pred_FPT}\% so với
+\SL{dem/fc_std_true_FPT}\%) và lệch dương trung bình \SL{dem/fc_mean_pred_FPT}\% mỗi phiên, nhưng các
+dao động đó không trùng chiều với thực tế, nên mỗi lần đoán mạnh là một lần cộng thêm sai số; đó là lý do tỉ số RMSE
+của nó tệ nhất bảng. Cả hai kiểu đều dẫn tới cùng kết luận: lợi suất ngày mai gần như không dự đoán được từ thông tin
+công khai của 30 phiên trước, và mô hình nào ``dám'' dự báo xa khỏi 0 thì bị phạt.
+
+\hinhpdf{fc_scatter}{1.0}{Lợi suất dự báo và lợi suất thực tế trên tập kiểm thử: FPT dự báo mạnh nhưng sai chiều,
+vàng quy đổi co về 0}{fc_scatter}
+
+Kết quả này phù hợp với giả thuyết thị trường hiệu quả dạng yếu~\cite{fama1970efficient}: nếu giá đã phản ánh mọi
+thông tin trong lịch sử giá, không mô hình nào chỉ dùng lịch sử giá có thể dự báo lợi suất tốt hơn bước ngẫu nhiên.
+Thị trường Việt Nam được xem là kém hiệu quả hơn thị trường phát triển, nhưng ở tầm một phiên và với các cổ phiếu
+thanh khoản cao nhất VN30, phần dự báo được, nếu có, nhỏ hơn nhiễu. Bài không coi đây là thất bại cần che đi, mà là
+một kết quả thực nghiệm quyết định cách tác tử dùng mô hình.
+
+\subsection{Khoảng dự báo cho tác tử}
+Công cụ \texttt{du\_bao\_bilstm} của tác tử không chỉ trả một con số. Lớp \texttt{Forecaster} lấy cửa sổ 30 phiên
+mới nhất và chạy 200 lượt với Dropout bật, mỗi lượt là một mẫu từ phân phối hậu nghiệm xấp xỉ của trọng số theo MC
+Dropout~\cite{gal2016dropout}. Tuy nhiên MC Dropout chỉ đo \emph{bất định của mô hình}; với chuỗi lợi suất, phần này
+rất nhỏ so với nhiễu vốn có của giá. Phiên bản đầu của công cụ dùng riêng MC Dropout và báo ``xác suất tăng 100\%''
+với khoảng 90\% rộng chưa tới $\pm 0{,}2\%$ quanh giá hiện tại, một kết luận tự tin sai hoàn toàn. Bản cuối cộng vào
+mỗi mẫu một nhiễu phần dư có độ lệch chuẩn bằng RMSE trên tập kiểm thử:
+
+\begin{equation}\label{eq:khoangdubao}
+  r^{(s)} = f_{\theta^{(s)}}(\mathbf{x}_{t-29:t}) + \varepsilon^{(s)}, \quad
+  \varepsilon^{(s)} \sim \mathcal{N}\!\left(0, \mathrm{RMSE}^2_{\text{kiểm thử}}\right), \quad s = 1, \dots, 200,
+\end{equation}
+
+\noindent rồi lấy phân vị 5\% và 95\% của $P_t e^{r^{(s)}}$ làm khoảng dự báo 90\% và tỉ lệ $r^{(s)} > 0$ làm xác suất
+tăng. Bảng~\ref{tab:fclive} đặt hai nguồn bất định cạnh nhau: với FPT, độ lệch chuẩn của MC Dropout chỉ
+\SL{forecast_live/FPT/mc_std_pct}\% trong khi RMSE kiểm thử là \SL{forecast_live/FPT/rmse_pct}\%, tức nhiễu của dữ
+liệu lớn hơn bất định của mô hình hơn hai mươi lần. Xác suất tăng sau khi sửa nằm trong khoảng 50 -- 60\%, đúng với
+mức hiểu biết thật của mô hình.
+
+\maNguon{dl_models__Forecaster.predict}{Công cụ dự báo của tác tử: MC Dropout cộng nhiễu phần dư cho khoảng dự báo
+90\% và xác suất tăng}
+
+\bang{tab_fc_live}{Dự báo phiên tới của năm tài sản: bất định mô hình so với sai số dự báo thực tế}{fclive}
+
+Văn bản công cụ trả cho tác tử luôn đi kèm hai chỉ số kiểm thử: tỉ lệ đoán đúng chiều và tỉ số RMSE so với dự báo
+ngây thơ, cùng câu ``không vượt dự báo giữ nguyên giá'' khi tỉ số không dưới 1. Như vậy câu trả lời cuối cùng của tác
+tử tự mang theo mức độ tin cậy của chính nó.
+
+% ---------------------------------------------------------------------
+\section{Tình huống minh họa: tác tử trả lời nhà đầu tư}\label{sec:tc-tinhhuong}
+\subsection{Câu hỏi tác động vĩ mô}
+Câu hỏi ``Tỷ giá USD/VND tăng mạnh thì cổ phiếu FPT và giá vàng SJC ảnh hưởng thế nào?'' cần cả ba lớp. Liên kết
+thực thể nhận ra \textsf{USD\_VND}, \textsf{FPT} và \textsf{Vang\_SJC}; bộ lập kế hoạch gọi \texttt{kg\_tai\_chinh}
+để suy luận hai cặp tác động, \texttt{du\_lieu\_thi\_truong} để lấy giá FPT gần nhất, \texttt{quy\_doi\_vang} để tính
+giá quy đổi theo~\eqref{eq:vangquydoi}, và \texttt{truy\_xuat\_rag} để lấy đoạn văn bản giải thích cơ chế. Khung
+dưới đây là vết suy luận thật của tác tử, do \texttt{build.py} sinh từ \texttt{agent.json}.
+
+\begin{vetsuyluan}{Vết suy luận ReAct thật cho câu hỏi tài chính (kịch bản 9)}
+\input{generated/trace_finance}
+\end{vetsuyluan}
+
+\begin{vetsuyluan}{Câu trả lời cuối của tác tử (bản tổng hợp theo khuôn, có trích dẫn [n])}
+\input{generated/answer_finance}
+\end{vetsuyluan}
+
+Bản nháp của Qwen2.5-1.5B cho câu hỏi này không sai số liệu nào (trung thực số học 1,00) nhưng không ghi số hiệu
+bằng chứng [n] nào, nên bộ kiểm chứng từ chối và trả bản tổng hợp theo khuôn; Mục~\ref{sec:agent-ketqua} phân tích
+hiện tượng này trên toàn bộ kịch bản. Bản cuối đặt cạnh nhau hai loại bằng chứng: kết luận suy luận từ KG (FPT và
+vàng SJC cùng chịu tác động cùng chiều của tỷ giá, mỗi kết luận kèm kênh truyền dẫn và cơ chế) và số liệu tính từ dữ
+liệu (giá FPT, giá vàng quy đổi), mỗi dòng mang số hiệu [n] trỏ về bằng chứng gốc. Hình~\ref{fig:ui_finance} là cùng
+câu hỏi trên Web App.
+
+\anhUI{ui_finance}{Trợ lý tài chính trên Web App: câu hỏi tác động tỷ giá, vết suy luận và câu trả lời có trích
+dẫn}{ui_finance}
+
+\subsection{Câu hỏi dự báo}
+Với ``Dự báo giá cổ phiếu FPT phiên tới?'', bộ lập kế hoạch nhận ra ý định dự báo và gọi \texttt{du\_bao\_bilstm} sau
+\texttt{du\_lieu\_thi\_truong} (Hình~\ref{fig:ui_finance_forecast}). Câu trả lời nêu giá dự báo, khoảng dự báo 90\%,
+xác suất tăng, và ngay sau đó là hai chỉ số kiểm thử cho thấy mô hình không vượt dự báo ngây thơ. Một nhà đầu tư đọc
+câu trả lời này biết chính xác nên tin con số tới đâu, điều mà một câu trả lời chỉ có ``giá dự kiến 63.315 đồng''
+không làm được.
+
+\anhUI{ui_finance_forecast}{Câu hỏi dự báo FPT: tác tử gọi BiLSTM và trả kèm khoảng dự báo, xác suất tăng và độ tin
+cậy trên tập kiểm thử}{ui_finance_forecast}
+
+\subsection{Khám phá đồ thị tri thức trên giao diện}
+Trang ``Đồ thị tri thức'' của Web App vẽ \texttt{VietnamFinanceKG} bằng SVG thuần, tô màu nút theo lớp, cạnh ngược
+chiều màu đỏ (Hình~\ref{fig:ui_kg_finance}). Người dùng nhấn vào một nút để xem lớp của nó và mọi cạnh vào ra kèm
+tài liệu nguồn; đây là cách nhanh nhất để kiểm tra vì sao tác tử kết luận một chiều tác động.
+
+\anhUI{ui_kg_finance}{Trang khám phá \texttt{VietnamFinanceKG} trên Web App}{ui_kg_finance}
+
+% ---------------------------------------------------------------------
+\section{Tổng kết chương}
+\begin{itemize}
+  \item KG tài chính với \SL{kg/finance/nodes} thực thể và \SL{kg/finance/edges} cạnh có dấu, có nguồn, đủ để suy
+        luận đa bước và lan truyền cú sốc; khi các kênh mâu thuẫn, bộ suy luận trả ``hỗn hợp'' thay vì ép một chiều.
+  \item \SL{dem/edges_agree} trên \SL{dem/edges_checked} cạnh kiểm chứng được khớp dấu với dữ liệu; cạnh tỷ giá
+        $\to$ FPT chỉ khớp khi xét độ trễ khoảng \SL{dem/lag_peak_FPT} phiên.
+  \item BiLSTM không thắng có ý nghĩa dự báo ngây thơ ở tầm một phiên, phù hợp giả thuyết thị trường hiệu quả dạng
+        yếu; giá trị của nó với tác tử nằm ở khoảng dự báo trung thực và các chỉ số tin cậy đi kèm, không ở con số
+        điểm.
+  \item Khoảng dự báo chỉ dựa trên MC Dropout tự tin sai; cộng nhiễu phần dư theo~\eqref{eq:khoangdubao} đưa xác
+        suất tăng về đúng mức 50 -- 60\%.
+\end{itemize}

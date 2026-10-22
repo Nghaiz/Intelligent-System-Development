@@ -1,0 +1,83 @@
+% =====================================================================
+%  TỔNG QUAN BÁO CÁO
+% =====================================================================
+\chapter*{Tổng quan báo cáo}
+\addcontentsline{toc}{chapter}{Tổng quan báo cáo}
+\markboth{Tổng quan báo cáo}{Tổng quan báo cáo}
+
+Mô hình ngôn ngữ lớn (LLM) viết trôi chảy nhưng không biết mình đang sai. Hỏi một trợ lý thông thường
+\emph{``đang uống metformin thì tối nay uống bia được không''}, nó có thể trả lời bằng một đoạn văn nghe rất hợp
+lý mà không nêu được căn cứ nào, hoặc nêu một con số không có trong bất kỳ tài liệu nào. Trong y tế và tài
+chính, một câu trả lời như vậy còn nguy hiểm hơn là không trả lời. Tiểu luận này nghiên cứu ba kỹ thuật bổ sung
+cho LLM chính phần ``biết'' và ``kiểm chứng'' mà nó thiếu: \textbf{đồ thị tri thức} (Knowledge Graph, KG) lưu tri
+thức có cấu trúc và có nguồn; \textbf{sinh tăng cường truy xuất} (Retrieval-Augmented Generation, RAG) đưa văn
+bản gốc vào ngữ cảnh trước khi sinh; và \textbf{tác tử thông minh} theo vòng lặp ReAct phối hợp KG, RAG với các
+mô hình học sâu chuyên biệt để trả lời câu hỏi nhiều bước.
+
+\section*{Mục tiêu và phạm vi}
+Đề bài yêu cầu trình bày khái niệm và kiến trúc của KG, các thế hệ RAG, rồi áp dụng vào hai miền của Việt Nam:
+quản lý \textbf{bệnh đái tháo đường típ 2} và phân tích \textbf{rổ cổ phiếu VN30 cùng giá vàng SJC}, cuối cùng
+triển khai một AI Agent có giao diện web. Báo cáo này làm trọn chuỗi đó trên máy cá nhân, không gọi một API
+LLM bên ngoài nào:
+
+\begin{itemize}
+  \item Viết kho tri thức \SL{retrieval_grid/n_docs} tài liệu Markdown (\SL{retrieval_grid/n_chars} ký tự) tổng
+        hợp từ Quyết định 5481/QĐ-BYT, ADA, các Nghị định về vàng và báo cáo doanh nghiệp, kèm bộ
+        \SL{retrieval_grid/n_questions} cặp hỏi đáp có đáp án nằm nguyên văn trong kho để chấm điểm truy xuất.
+  \item Dựng hai đồ thị tri thức có bản thể học: \texttt{VietnamDiabetesKG} (\SL{kg/health/nodes} thực thể,
+        \SL{kg/health/edges} quan hệ) và \texttt{VietnamFinanceKG} (\SL{kg/finance/nodes} thực thể,
+        \SL{kg/finance/edges} quan hệ), xuất RDF, suy diễn RDFS và truy vấn SPARQL.
+  \item So sánh định lượng 5 chiến lược chia đoạn $\times$ 5 bộ truy xuất, 3 mô hình nhúng, 7 cỡ đoạn,
+        hai kỹ thuật tiền truy xuất bằng LLM (HyDE, Multi-Query) và bốn kiến trúc từ Naive RAG tới GraphRAG.
+  \item Huấn luyện trên GPU hai mô hình học sâu làm công cụ cho tác tử: MLP chẩn đoán nguy cơ đái tháo đường
+        (\SL{diabetes/data/n} hồ sơ) và BiLSTM dự báo lợi suất cho bốn cổ phiếu và vàng quy đổi.
+  \item Ghép tất cả thành tác tử ReAct có bảy công cụ, bộ kiểm chứng trích dẫn và con số, đánh giá trên
+        \SL{dem/agent_scen} kịch bản, và đóng gói thành Web App Flask.
+\end{itemize}
+
+\section*{Phân bổ CPU và GPU}
+Máy thực nghiệm có một GPU laptop 8 GB và một CPU 32 luồng. Nguyên tắc phân bổ là: việc nào là phép nhân ma
+trận lớn lặp lại nhiều lần thì chạy GPU, việc nào là tra cứu, duyệt đồ thị hay tính toán nhỏ thì để CPU, vì chi
+phí chép dữ liệu qua PCIe lớn hơn phần tính toán. Bảng~\ref{tab:moitruong} ghi cụ thể từng thành phần.
+
+\begin{table}[H]\centering
+\caption{Môi trường thực nghiệm và phân bổ tính toán}\label{tab:moitruong}
+{\small\begin{tabular}{L{4.6cm}L{2.0cm}L{7.6cm}}
+\toprule
+Thành phần & Thiết bị & Lý do \\
+\midrule
+Qwen2.5-1.5B-Instruct (bf16) & GPU & sinh văn bản tự hồi quy, mỗi token một lượt qua 28 tầng Transformer \\
+bge-reranker-v2-m3 (bf16) & GPU & chấm 30 cặp (câu hỏi, đoạn) mỗi truy vấn bằng cross-encoder 568 triệu tham số \\
+multilingual-e5 (fp16 khi chung tiến trình với LLM) & GPU & mã hóa câu hỏi và toàn bộ đoạn khi lập chỉ mục \\
+Huấn luyện MLP và BiLSTM & GPU & lô 1024 và 128 mẫu, lan truyền ngược \\
+BM25, TF-IDF, chia đoạn & CPU & tính trên chỉ mục thưa, dưới 1 ms mỗi truy vấn \\
+Hai KG (NetworkX), RDF, SPARQL, suy diễn & CPU & duyệt đồ thị vài chục nút, rdflib chỉ chạy CPU \\
+Suy luận MLP, BiLSTM trong tác tử & GPU & đã nạp sẵn trên GPU cùng LLM; MC Dropout chạy 200 mẫu một lô \\
+Vẽ hình, dựng báo cáo & CPU & matplotlib và LuaLaTeX \\
+\midrule
+\multicolumn{3}{L{14.6cm}}{GPU: NVIDIA GeForce RTX 4060 Laptop 8 GB; CPU: AMD Ryzen 9 7945HX, 32 luồng; RAM
+40 GB. Python 3.13, PyTorch 2.13 + CUDA 12.6, sentence-transformers, NetworkX, rdflib, Flask.} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Một ràng buộc thực tế đã định hình kiến trúc: trên Windows, trình điều khiển WDDM tính cả bộ nhớ GPU đã cấp
+phát vào hạn mức \emph{commit} của hệ điều hành. Nạp LLM sau embedder và reranker khiến tiến trình vượt hạn mức và
+dừng đột ngột khi đọc tệp trọng số. Cách khắc phục được giữ lại trong mã: nạp LLM trước, lưu sẵn reranker ở dạng
+bf16 trên đĩa và dùng embedder fp16 khi chung tiến trình với LLM; cả ba mô hình khi đó cùng chạy trong khoảng 8 GB.
+
+\section*{Cấu trúc báo cáo}
+Báo cáo bám theo bảy phần của đề bài. \textbf{Chương 1} nêu khái niệm KG, RAG và vai trò của cơ sở tri thức.
+\textbf{Chương 2} đi vào cấu tạo KG: thành phần, mô hình bộ ba RDF, bản thể học, suy diễn và so sánh Graph DB
+với Vector DB. \textbf{Chương 3} trình bày ba thế hệ RAG, từ Naive RAG, các chiến lược chia đoạn, Advanced RAG tới
+GraphRAG, mỗi phần đều có thực nghiệm trên kho tri thức của bài. \textbf{Chương 4} xây hệ thống y tế cho bệnh
+đái tháo đường típ 2, \textbf{Chương 5} xây hệ thống tài chính cho VN30 và vàng SJC. \textbf{Chương 6} ghép thành
+tác tử ReAct, đánh giá và triển khai Web App. \textbf{Chương 7} kết luận và nêu hướng phát triển.
+
+\begin{phathien}{Quy ước về số liệu và mã nguồn}
+Không con số thực nghiệm nào trong báo cáo được gõ tay. Mỗi kịch bản trong \texttt{scripts/} ghi kết quả ra
+\texttt{outputs/metrics/*.json}; \texttt{build.py} đọc các tệp đó để sinh macro số liệu, bảng và vết suy luận, rồi
+trích nguyên văn từng hàm được trích dẫn từ mã nguồn trong \texttt{src/TieuLuan 02}. Hình dữ liệu vẽ bằng
+matplotlib từ cùng các tệp JSON; sơ đồ lý thuyết vẽ bằng TikZ. Chạy lại thực nghiệm rồi dựng lại báo cáo thì mọi
+con số, bảng và hình đổi theo.
+\end{phathien}

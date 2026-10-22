@@ -1,0 +1,265 @@
+% =====================================================================
+%  CHƯƠNG 4 — HỆ THỐNG Y TẾ: ĐÁI THÁO ĐƯỜNG TÍP 2 TẠI VIỆT NAM
+% =====================================================================
+\chapter{Hệ thống y tế: bệnh đái tháo đường típ 2 tại Việt Nam}\label{chap:yte}
+
+Chương này dựng phân hệ y tế của tác tử gồm ba lớp: kho tri thức văn bản về chẩn đoán, điều trị, dinh dưỡng;
+\texttt{VietnamDiabetesKG} lưu các ràng buộc lâm sàng có nguồn; và một mạng MLP ước lượng nguy cơ đái tháo đường
+từ hồ sơ xét nghiệm. Ba lớp được kiểm tra trên ba tình huống thường gặp ở người bệnh Việt Nam: uống rượu bia
+khi đang dùng metformin, ăn thịt gà, và ăn cơm, bún, xôi.
+
+\begin{phathien}{Lưu ý về phạm vi}
+Hệ thống được xây cho mục đích học tập. Nội dung y khoa tổng hợp từ Quyết định 5481/QĐ-BYT, tiêu chuẩn của ADA và
+các bảng chỉ số đường huyết đã công bố; mọi câu trả lời của tác tử đều kèm lời nhắc ``không thay thế chỉ định của
+bác sĩ''.
+\end{phathien}
+
+\section{Bối cảnh dịch tễ và phác đồ của Bộ Y tế}
+Đái tháo đường đang tăng nhanh tại Việt Nam cùng đô thị hóa, thay đổi chế độ ăn và giảm vận động. Theo Liên đoàn
+Đái tháo đường Quốc tế, Việt Nam có khoảng 4 đến 5 triệu người trưởng thành mắc bệnh, tức khoảng 6 đến 7\% dân số
+trưởng thành~\cite{idf2021atlas}, và các điều tra quốc gia ghi nhận tới khoảng một nửa số người mắc chưa biết mình
+bị bệnh. Đái tháo đường típ 2 chiếm 90 đến 95\% số ca; cơ chế chính là đề kháng insulin ở cơ, gan và mô mỡ kèm suy
+giảm dần chức năng tế bào beta của tụy.
+
+Hướng dẫn chẩn đoán và điều trị đái tháo đường típ 2 hiện hành là tài liệu ban hành kèm Quyết định 5481/QĐ-BYT ngày
+30/12/2020~\cite{byt5481}, thống nhất với tiêu chuẩn của Hiệp hội Đái tháo đường Hoa Kỳ~\cite{ada2024standards}.
+Bảng~\ref{tab:chandoan} ghi bốn tiêu chuẩn chẩn đoán; đây chính là các thực thể loại \textsf{Biomarker} trong KG.
+
+\begin{table}[H]\centering
+\caption{Tiêu chuẩn chẩn đoán đái tháo đường và tiền đái tháo đường theo Quyết định 5481/QĐ-BYT}\label{tab:chandoan}
+{\small\begin{tabular}{L{6.2cm}L{3.8cm}L{4.2cm}}
+\toprule
+Xét nghiệm & Đái tháo đường & Tiền đái tháo đường \\
+\midrule
+Glucose huyết tương lúc đói (nhịn ăn $\ge$ 8 giờ) & $\ge$ 126 mg/dL (7,0 mmol/L) & 100 -- 125 mg/dL \\
+Glucose 2 giờ sau nghiệm pháp 75 g glucose & $\ge$ 200 mg/dL (11,1 mmol/L) & 140 -- 199 mg/dL \\
+HbA1c (phòng xét nghiệm chuẩn hóa) & $\ge$ 6,5\% (48 mmol/mol) & 5,7 -- 6,4\% \\
+Glucose bất kỳ kèm triệu chứng kinh điển & $\ge$ 200 mg/dL & -- \\
+\bottomrule
+\multicolumn{3}{l}{\footnotesize Không có triệu chứng kinh điển thì cần hai kết quả bất thường, cùng mẫu hoặc hai thời điểm.}
+\end{tabular}}
+\end{table}
+
+Về điều trị, metformin là thuốc đầu tay; nhóm ức chế SGLT2 (empagliflozin) được ưu tiên khi người bệnh có suy tim
+hoặc bệnh thận mạn; insulin bắt buộc với típ 1 và dùng khi típ 2 không kiểm soát được bằng thuốc uống. Mục tiêu
+HbA1c cho đa số người trưởng thành là dưới 7\%. Thay đổi lối sống đi cùng mọi bậc điều trị: vận động ít nhất 150
+phút mỗi tuần và giảm 5 đến 7\% cân nặng; ở người tiền đái tháo đường, chương trình DPP cho thấy can thiệp lối
+sống giảm 58\% nguy cơ tiến triển thành bệnh~\cite{dpp2002}.
+
+Ba đặc điểm của người bệnh Việt Nam khiến tri thức chung chưa đủ. Bữa ăn lấy \emph{cơm trắng} làm nền, chỉ số
+đường huyết GI khoảng 73; các món xôi, bánh, bún, phở phổ biến; và \emph{rượu bia} gắn với tiệc tùng, đám cưới,
+giỗ chạp, nên câu hỏi ``đang dùng thuốc thì uống được không'' là câu hỏi thật, thường xuyên. KG của bài vì vậy có
+một phân hệ dinh dưỡng với các món ăn Việt và một phân hệ tương tác thuốc -- rượu.
+
+\section{Thiết kế bản thể học và đồ thị tri thức y tế}
+\subsection{Hệ thống thực thể y tế}
+Bản thể học y tế có \SL{kg/health/classes} lớp (Hình~\ref{fig:ontology} ở Chương~\ref{chap:kg}), xếp quanh lớp gốc
+\textsf{MedicalEntity}: bệnh, tình trạng và biến chứng, chỉ số sinh học, yếu tố nguy cơ, sáu nhóm thuốc, chất và
+thực phẩm phân loại theo mức an toàn (\textsf{SafeFood}, \textsf{ModerateFood}, \textsf{RiskFood}), lối sống và
+hướng dẫn chuyên môn. Hình~\ref{fig:schema} là lược đồ: các lớp chính và vị từ được phép nối chúng.
+
+\hinhtikz{t4_schema}{Lược đồ \texttt{VietnamDiabetesKG}: các lớp chính và vị từ nối chúng theo ràng buộc miền
+$\to$ miền giá trị của \texttt{health\_ontology()}}{schema}
+
+\maNguon{kg_health__health_ontology}{Bản thể học y tế: \SL{kg/health/classes} lớp và \SL{kg/health/predicates}
+vị từ kèm ràng buộc}
+
+Mỗi thực thể có nhãn tiếng Việt, bí danh và thuộc tính lâm sàng: \textsf{HbA1c\_Cao} có \texttt{threshold=6.5},
+\textsf{Suy\_Than\_Nang} có \texttt{egfr\_max=30}, \textsf{Com\_Trang} có \texttt{gi=73, gl=29}. Bảng~\ref{tab:kgtypes}
+đếm thực thể theo lớp của cả hai KG, Hình~\ref{fig:kg_health_graph} vẽ toàn bộ đồ thị y tế.
+
+\bang{tab_kg_node_types}{Số thực thể theo lớp của hai đồ thị tri thức}{kgtypes}
+
+\hinhpdf{kg_health_graph}{1.0}{Toàn cảnh \texttt{VietnamDiabetesKG}: \SL{kg/health/nodes} thực thể xếp vòng theo
+lớp, \SL{kg/health/edges} quan hệ}{kg_health_graph}
+
+\subsection{Mối quan hệ tri thức và ràng buộc lâm sàng}
+\texttt{VietnamDiabetesKG} có \SL{kg/health/predicates} vị từ, chia thành bốn phân hệ: \emph{chẩn đoán}
+(\textsf{TIEU\_CHUAN\_CHAN\_DOAN}, \textsf{TIEN\_TRIEN\_THANH}, \textsf{YEU\_TO\_NGUY\_CO}), \emph{điều trị}
+(\textsf{CHI\_DINH\_DAU\_TAY} và nghịch đảo \textsf{DIEU\_TRI}, \textsf{UU\_TIEN\_KHI},
+\textsf{CHONG\_CHI\_DINH\_KHI}), \emph{an toàn thuốc} (\textsf{TUONG\_TAC\_NGUY\_HIEM}, \textsf{TANG\_NGUY\_CO},
+\textsf{BIEN\_CHUNG\_CUA}, \textsf{XU\_TRI\_BANG}) và \emph{dinh dưỡng, lối sống} (\textsf{KHUYEN\_NGHI\_AN},
+\textsf{HAN\_CHE\_AN}, \textsf{AN\_DINH\_LUONG}, \textsf{LA\_MOT\_DANG\_CUA} bắc cầu, \textsf{KHUYEN\_NGHI\_LOI\_SONG}).
+Bảng~\ref{tab:kgrel} và Hình~\ref{fig:kg_relations} đếm số cạnh mỗi vị từ.
+
+\bang{tab_kg_relations}{Số cạnh theo vị từ của hai đồ thị tri thức}{kgrel}
+\hinhpdf{kg_relations}{1.0}{Phân bố quan hệ theo vị từ của hai KG}{kg_relations}
+
+Đoạn mã~\ref{code:kg_health__build_health_kg} là toàn bộ dữ liệu của KG y tế. Mỗi lời gọi \texttt{F(\dots)} thêm
+một bộ ba kèm \texttt{source} là mã tài liệu trong kho và các thuộc tính lâm sàng (mức độ, hậu quả, quy tắc, lý
+do). Mọi bộ ba đều qua bộ kiểm tra ràng buộc của Chương~\ref{chap:kg} trước khi vào đồ thị.
+
+\maDai{kg_health__build_health_kg}{Dữ liệu của \texttt{VietnamDiabetesKG}: thực thể có thuộc tính và bộ ba có nguồn}
+
+\section{Mô hình học sâu chẩn đoán nguy cơ}
+\subsection{Dữ liệu}
+Công cụ \texttt{chan\_doan\_nguy\_co} của tác tử là một mạng MLP huấn luyện trên bộ dữ liệu dự báo đái tháo
+đường~\cite{mustafa2023diabetes}: hồ sơ gồm giới tính, tuổi, tăng huyết áp, bệnh tim, tiền sử hút thuốc, BMI, HbA1c,
+glucose máu và nhãn mắc bệnh. Sau khi bỏ trùng còn \SL{diabetes/data/n} hồ sơ, tỉ lệ mắc bệnh
+\SL{diabetes/data/pos_ratePct}\%, chia phân tầng thành ba tập (Bảng~\ref{tab:diadata}). Hình~\ref{fig:dia_dist}
+cho thấy HbA1c và glucose tách hai lớp rõ nhất, còn tuổi và BMI chồng lấn nhiều.
+
+\bang{tab_dia_data}{Bộ dữ liệu chẩn đoán đái tháo đường sau tiền xử lý}{diadata}
+\hinhpdf{dia_dist}{1.0}{Phân bố các đặc trưng chính theo nhãn mắc bệnh}{dia_dist}
+
+Hồ sơ được mã hóa thành \SL{diabetes/data/n_features} đặc trưng: bốn cột số (tuổi, BMI, HbA1c, glucose), giới
+tính, hai cờ bệnh nền và sáu cột one-hot của tiền sử hút thuốc; mọi đặc trưng được chuẩn hóa z-score theo trung
+bình và độ lệch chuẩn của tập huấn luyện.
+
+\maNguon{data__diabetes_features}{Mã hóa hồ sơ thành \SL{diabetes/data/n_features} đặc trưng}
+
+\subsection{Kiến trúc và huấn luyện}
+Mạng \texttt{DiabetesMLP} có hai tầng ẩn 128 và 64 nơ-ron (Hình~\ref{fig:mlp3d}). Với $\mathbf{x} \in
+\mathbb{R}^{13}$:
+\begin{align}
+  \mathbf{h}_1 &= \operatorname{Dropout}_{0{,}2}\bigl(\operatorname{ReLU}(\operatorname{BN}(W_1\mathbf{x} + \mathbf{b}_1))\bigr) \in \mathbb{R}^{128},\\
+  \mathbf{h}_2 &= \operatorname{Dropout}_{0{,}2}\bigl(\operatorname{ReLU}(\operatorname{BN}(W_2\mathbf{h}_1 + \mathbf{b}_2))\bigr) \in \mathbb{R}^{64},\\
+  z &= \mathbf{w}_3^\top \mathbf{h}_2 + b_3, \qquad \hat{p} = \sigma(z).
+\end{align}
+Tổng cộng \SL{diabetes/mlp/params} tham số. Vì lớp dương chỉ chiếm chưa tới một phần mười, hàm mất mát là
+entropy chéo nhị phân có trọng số lớp dương $w_+ = N_-/N_+$:
+\begin{equation}
+  \mathcal{L} = -\frac{1}{N}\sum_{i=1}^{N}\Bigl[w_+\, y_i \log \sigma(z_i) + (1-y_i)\log\bigl(1-\sigma(z_i)\bigr)\Bigr].
+\end{equation}
+Mạng được tối ưu bằng AdamW (tốc độ học $10^{-3}$, suy giảm trọng số $10^{-4}$), lô 1024 mẫu, giảm tốc độ học một
+nửa khi PR-AUC trên tập kiểm định không tăng sau 3 epoch, dừng sớm nếu không cải thiện sau 8 epoch, tối đa 60
+epoch. Huấn luyện chạy trên GPU trong \SL{diabetes/mlp/train_s} s.
+
+\hinhtikz{t4_mlp3d}{Kiến trúc \texttt{DiabetesMLP}: 13 đặc trưng $\to$ 128 $\to$ 64 $\to$ 1 logit, mỗi tầng ẩn
+gồm BatchNorm, ReLU và Dropout}{mlp3d}
+
+\maNguon{dl_models__DiabetesMLP}{Mạng \texttt{DiabetesMLP} trong PyTorch}
+\maDai{train_diabetes__fit_mlp}{Vòng huấn luyện MLP: BCE có \texttt{pos\_weight}, AdamW, giảm tốc độ học và dừng
+sớm theo PR-AUC}
+
+Đường học (Hình~\ref{fig:dia_history}) hội tụ êm: mất mát huấn luyện và kiểm định giảm cùng nhịp, không có dấu
+hiệu quá khớp; mạng chạy đủ \SL{diabetes/mlp/epochs} epoch mà không kích hoạt dừng sớm, tốc độ học được giảm
+nhiều lần ở nửa sau khi PR-AUC kiểm định chững lại.
+
+\hinhpdf{dia_history}{1.0}{Đường học của MLP: mất mát BCE và chỉ số trên tập kiểm định qua các epoch}{dia_history}
+
+\subsection{Kết quả và phân tích}
+Ngưỡng quyết định được chọn để F1 lớn nhất trên tập kiểm định, ra \SL{diabetes/mlp/threshold}. Ngưỡng cao như vậy
+là hệ quả trực tiếp của $w_+$: mất mát có trọng số đẩy mọi xác suất lên, nên 0,5 không còn là điểm cân bằng.
+Trên tập kiểm thử, MLP đạt F1 \SL{diabetes/mlp/f1} và ROC-AUC \SL{diabetes/mlp/roc_auc}, vượt Logistic Regression
+ở mọi chỉ số (Bảng~\ref{tab:diamodels}, Hình~\ref{fig:dia_compare}).
+
+\bang{tab_dia_models}{MLP và Logistic Regression trên tập kiểm thử}{diamodels}
+
+\hinhpdf{dia_roc_pr}{1.0}{Đường ROC và Precision -- Recall của hai mô hình trên tập kiểm thử}{dia_roc_pr}
+\hinhpdf{dia_confusion}{1.0}{Ma trận nhầm lẫn tại ngưỡng đã chọn}{dia_confusion}
+\hinhpdf{dia_compare}{1.0}{So sánh MLP và Logistic Regression theo từng chỉ số}{dia_compare}
+
+Ma trận nhầm lẫn (Hình~\ref{fig:dia_confusion}) cho thấy tính cách của mô hình: chỉ
+\SL{diabetes/mlp/confusion/0/1} ca dương tính giả trên \SL{diabetes/data/n_test} hồ sơ, precision
+\SL{diabetes/mlp/precision}, nhưng bỏ sót \SL{diabetes/mlp/confusion/1/0} ca bệnh, recall
+\SL{diabetes/mlp/recall}. Với một công cụ \emph{sàng lọc}, ngưỡng nên hạ thấp để đổi precision lấy recall; với một
+công cụ trong tác tử trả lời người bệnh, ngưỡng cao giảm báo động giả. Bài giữ ngưỡng F1 và để tác tử trình bày
+xác suất cùng ngưỡng thay vì một kết luận có/không.
+
+Hai phân tích sau giải thích mô hình đã học gì. Độ quan trọng hoán vị (Hình~\ref{fig:dia_importance}) đo PR-AUC
+giảm bao nhiêu khi xáo trộn một đặc trưng: HbA1c (\SL{diabetes/importance/HbA1c}) và glucose
+(\SL{diabetes/importance/Glucose}) chiếm gần như toàn bộ, tuổi và BMI đóng góp nhỏ, các cờ còn lại gần bằng
+không. Đường đáp ứng theo HbA1c (Hình~\ref{fig:dia_hba1c_curve}) cố định các đặc trưng khác và quét HbA1c: xác suất
+vượt ngưỡng quyết định ở HbA1c \SL{dem/dia_cross_140}\% khi glucose 140 mg/dL và \SL{dem/dia_cross_100}\% khi glucose
+100 mg/dL, sát ngưỡng chẩn đoán 6,5\% của Bộ Y tế. Mô hình tự học lại được tiêu chuẩn lâm sàng từ dữ liệu.
+
+\hinhpdf{dia_importance}{1.0}{Độ quan trọng hoán vị của các đặc trưng}{dia_importance}
+\hinhpdf{dia_hba1c_curve}{1.0}{Xác suất mắc bệnh theo HbA1c ở ba mức glucose}{dia_hba1c_curve}
+
+Biểu đồ tin cậy (Hình~\ref{fig:dia_calibration}) cho thấy giới hạn quan trọng nhất: xác suất của MLP \emph{không
+hiệu chuẩn}. Ở ngăn có xác suất dự đoán trung bình \SL{diabetes/calibration/5/pred}, tỉ lệ mắc thực tế chỉ
+\SL{diabetes/calibration/5/obs}; chỉ ngăn trên cùng là khớp. Đây vẫn là hệ quả của $w_+$. Vì vậy con số mà tác tử
+và giao diện hiển thị phải đọc như một \emph{điểm nguy cơ} so với ngưỡng, không phải xác suất mắc bệnh; muốn dùng
+như xác suất cần hiệu chuẩn thêm bằng Platt scaling hoặc hồi quy isotonic trên tập kiểm định. Bộ dữ liệu cũng là
+dữ liệu mô phỏng có quan hệ rất sắc giữa HbA1c và nhãn, nên hồ sơ có HbA1c trên 7\% gần như luôn được chấm sát
+100\%; mô hình không nên dùng cho quyết định lâm sàng thật.
+
+\hinhpdf{dia_calibration}{1.0}{Biểu đồ tin cậy: xác suất dự đoán bị đẩy cao so với tần suất thực tế}{dia_calibration}
+
+Khi chạy trong tác tử, lớp \texttt{DiabetesRiskModel} nạp trọng số và tham số chuẩn hóa, điền giá trị mặc định
+cho trường người dùng không cung cấp và trả mức nguy cơ ba bậc (Đoạn mã~\ref{code:dl_models__DiabetesRiskModel.predict}).
+
+\maNguon{dl_models__DiabetesRiskModel.predict}{Suy luận nguy cơ từ hồ sơ trong tác tử}
+
+\section{Phân tích các tình huống lâm sàng thực tế}
+Ba bài toán dưới đây đều là câu hỏi người bệnh Việt Nam thường hỏi, và mỗi bài cần một loại suy luận khác nhau
+trên KG. Bảng~\ref{tab:demohealth} là kết quả nguyên văn của các truy vấn KG tương ứng.
+
+\bang{tab_demo_health}{Kết quả truy vấn \texttt{VietnamDiabetesKG} cho ba bài toán lâm sàng}{demohealth}
+
+\subsection{Bài toán 1: tương tác giữa metformin và rượu bia}
+Câu hỏi ``đang uống metformin, tối nay đi tiệc uống bia được không'' cần hai mẩu tri thức. Mẩu thứ nhất là một
+cạnh trực tiếp $\textsf{Metformin} \xrightarrow{\textsf{TUONG\_TAC\_NGUY\_HIEM}} \textsf{Ruou\_Bia}$ với mức độ
+\texttt{cao}. Mẩu thứ hai không được ghi tường minh mà là một \emph{đường hai bước}: cả metformin và rượu bia đều có
+cạnh \textsf{TANG\_NGUY\_CO} tới \textsf{Nhiem\_Toan\_Lactic}. Hàm \texttt{drug\_warnings} lấy cạnh trực tiếp và
+giao hai tập nguy cơ để tìm nguy cơ chung (Đoạn mã~\ref{code:kg_health__drug_warnings}). Cơ chế sinh học đằng sau
+được vẽ ở Hình~\ref{fig:metformin}: ethanol tiêu thụ NAD$^+$ ở gan và ức chế tân tạo glucose từ lactat, metformin
+cũng giảm tân tạo glucose, hai tác động cộng lại làm lactat ứ đọng.
+
+\hinhtikz{t4_metformin}{Cơ chế tương tác metformin -- rượu bia: hai con đường cùng làm giảm sử dụng lactat ở gan,
+dẫn tới nguy cơ nhiễm toan lactic}{metformin}
+
+\maNguon{kg_health__drug_warnings}{Cảnh báo tương tác: cạnh trực tiếp và nguy cơ chung qua đường hai bước}
+
+Câu trả lời đúng không phải ``tuyệt đối cấm'' mà là cảnh báo có mức độ: tránh uống quá mức và tránh say, không
+uống khi đói, theo dõi dấu hiệu bất thường; với người dùng sulfonylurea hoặc insulin, rượu còn làm tăng mạnh nguy cơ
+hạ glucose huyết tới 24 giờ sau khi uống. Khung dưới đây là vết suy luận thật của tác tử cho câu hỏi này, do
+\texttt{build.py} sinh từ \texttt{agent.json}.
+
+\begin{vetsuyluan}{Vết suy luận ReAct thật cho câu hỏi y tế (kịch bản 1)}
+\input{generated/trace_health}
+\end{vetsuyluan}
+
+Bộ kiểm chứng đã từ chối bản nháp của LLM và trả bản tổng hợp theo khuôn. Bản nháp (dưới đây) đúng về nội dung,
+nhưng không ghi số hiệu bằng chứng [n] nào, nên không truy vết được từng ý về nguồn; Mục~\ref{sec:agent-ketqua}
+phân tích hiện tượng này trên toàn bộ kịch bản.
+
+\begin{vetsuyluan}{Bản nháp của Qwen2.5-1.5B (bị bộ kiểm chứng từ chối vì thiếu trích dẫn)}
+\input{generated/llmdraft_health}
+\end{vetsuyluan}
+
+\subsection{Bài toán 2: dinh dưỡng thịt gà}
+``Người tiểu đường ăn thịt gà được không'' không có một câu trả lời: ức gà bỏ da luộc là đạm nạc 31 g/100 g, không
+carbohydrate, được khuyến nghị; gà rán và da gà nhiều chất béo bão hòa, làm tăng đề kháng insulin, nên hạn chế.
+Trong KG, \textsf{Thit\_Ga} là một \textsf{FoodGroup}, các dạng cụ thể nối tới nó bằng \textsf{LA\_MOT\_DANG\_CUA}.
+Hàm \texttt{food\_advice} nhận ra câu hỏi về \emph{nhóm} thực phẩm và duyệt xuống các dạng con trước khi tra lời
+khuyên (Đoạn mã~\ref{code:kg_health__food_advice}), nên trả cả hai chiều khuyến nghị thay vì một câu ``được'' hay
+``không'' sai một nửa.
+
+\maNguon{kg_health__food_advice}{Lời khuyên dinh dưỡng: duyệt nhóm thực phẩm xuống các dạng cụ thể}
+
+\subsection{Bài toán 3: định lượng tinh bột và ẩm thực truyền thống}
+Chỉ số đường huyết GI so sánh tốc độ một thực phẩm làm tăng glucose máu với glucose chuẩn (GI = 100); GI dưới 55
+là thấp, trên 70 là cao~\cite{atkinson2008gi}. Tải lượng đường huyết GL $=$ GI $\times$ lượng carbohydrate (g) $/
+100$ tính cả khẩu phần. Các món tinh bột Việt Nam trải khắp thang GI (Hình~\ref{fig:gi}): bún, phở GI khoảng 53, gạo
+lứt 68, cơm trắng 73, khoai tây luộc 78, xôi nếp rất cao. KG không cấm cơm mà mã hóa ba mức: \textsf{AN\_DINH\_LUONG}
+cho cơm trắng (tối đa khoảng một bát con mỗi bữa, ăn rau trước), \textsf{HAN\_CHE\_AN} cho khoai tây và xôi,
+\textsf{KHUYEN\_NGHI\_AN} cho rau xanh (ít nhất nửa đĩa). Truy vấn SPARQL Q2 ở Chương~\ref{chap:kg} trả đúng danh
+sách món có GI, sắp theo GI giảm dần, nhờ suy diễn kiểu từ các lớp \textsf{ModerateFood}, \textsf{RiskFood} lên
+\textsf{Food}.
+
+\hinhtikz{t4_gi}{Thang chỉ số đường huyết GI của các món trong KG và mô hình đĩa ăn: nửa đĩa rau, một phần tư
+đạm, một phần tư tinh bột}{gi}
+
+\subsection{Cơ chế phản ứng đa tầng trước tình huống phức tạp}
+Câu hỏi thật hiếm khi chỉ một ý. Người bệnh nam 52 tuổi, HbA1c 7,3\%, glucose lúc đói 138 mg/dL, BMI 26,5 hỏi
+``tôi đang uống metformin 500 mg, tối nay đi liên hoan có uống bia và ăn gà rán được không''. Tác tử phản ứng theo
+ba tầng (Hình~\ref{fig:ui_health}):
+
+\begin{enumerate}
+  \item \textbf{Tầng học sâu}: hồ sơ xét nghiệm được gửi kèm, nên bộ lập kế hoạch gọi \texttt{chan\_doan\_nguy\_co}
+        trước; MLP chấm điểm nguy cơ vượt ngưỡng, mức ``cao''.
+  \item \textbf{Tầng đồ thị}: liên kết thực thể nhận ra \textsf{Metformin}, \textsf{Ruou\_Bia}, \textsf{Ga\_Ran};
+        \texttt{kg\_y\_te} trả cảnh báo tương tác, các chống chỉ định của metformin và lời khuyên hạn chế gà rán.
+  \item \textbf{Tầng văn bản}: \texttt{truy\_xuat\_rag} lấy các đoạn về rượu bia trong bữa tiệc và cơ chế nhiễm toan
+        lactic từ tài liệu \texttt{h03-ruou-bia} để giải thích.
+\end{enumerate}
+
+Mỗi tầng trả lời một phần mà tầng khác không trả lời được: MLP không biết gì về bia, KG không biết người này có
+nguy cơ cao, văn bản không chấm điểm được hồ sơ. Hình~\ref{fig:ui_health_food} là câu hỏi về cơm trắng trên cùng
+giao diện, khi không gửi kèm hồ sơ: bộ lập kế hoạch bỏ qua MLP và chỉ dùng KG cùng RAG.
+
+\anhUI{ui_health}{Trợ lý y tế trên Web App: hồ sơ xét nghiệm, vết suy luận ReAct, câu trả lời có trích dẫn và danh
+sách bằng chứng}{ui_health}
+\anhUI{ui_health_food}{Câu hỏi về cơm trắng không kèm hồ sơ: tác tử chỉ gọi KG và RAG}{ui_health_food}

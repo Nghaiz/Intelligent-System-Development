@@ -1,0 +1,21 @@
+% Bộ kiểm chứng câu trả lời: trích dẫn phải trỏ tới bằng chứng có thật, con số phải xuất hiện trong bằng chứng; không đạt -> bản theo khuôn.
+% Sơ đồ khối dọc: nhánh "có" đi xuống, nhánh "không" rẽ phải về bản theo khuôn.
+\begin{tikzpicture}[font=\small,
+  b/.style={hop=#1, text width=3.6cm, minimum height=1.0cm, font=\scriptsize},
+  dec/.style={diamond, aspect=2.2, draw=#1!70!black, fill=#1!15, thick, font=\scriptsize, align=center, inner sep=1pt},
+  ar/.style={-{Stealth[length=2.4mm]}, very thick, cNavy}]
+  \node[b=cPink] (llm) at (0,0) {Câu trả lời của Qwen2.5};
+  \node[dec=cBlue] (c1) at (0,-2.5) {có trích dẫn [i]\\và mọi $i \le n$?};
+  \node[dec=cPurple] (c2) at (0,-5.9) {tỉ lệ con số có\\trong bằng chứng\\$\ge 0{,}8$?};
+  \node[b=cGreen] (ok) at (0,-9.0) {\textbf{dùng câu trả lời LLM}\\\texttt{used = "llm"}};
+  \node[b=cOrange] (tpl) at (6.4,-4.2) {\textbf{bản tổng hợp theo khuôn}\\liệt kê bằng chứng, \texttt{used = "template"}, ghi lý do vào vết};
+  \draw[ar] (llm) -- (c1);
+  \draw[ar] (c1) -- node[right, font=\scriptsize] {có} (c2);
+  \draw[ar] (c2) -- node[right, font=\scriptsize] {có} (ok);
+  \draw[ar, cRed] (c1) -| node[above, pos=0.25, font=\scriptsize] {không} (tpl);
+  \draw[ar, cRed] (c2) -| node[below, pos=0.25, font=\scriptsize] {không} (tpl);
+  \node[font=\scriptsize, text=cSlate, align=left, text width=6.4cm, anchor=north west] at (3.4,-6.9)
+    {Con số được chuẩn hoá trước khi so (\texttt{1.234,5} $\equiv$ \texttt{1,234.5}); số một chữ số và số hiệu \texttt{[n]}
+     không tính; con số người dùng tự nêu trong câu hỏi được coi là có căn cứ; cả hai nhánh đều nối thêm lời miễn trừ
+     của miền.};
+\end{tikzpicture}

@@ -1,0 +1,27 @@
+% Vòng lặp ReAct: Thought -> Action -> Observation quay vòng quanh bộ nhớ vết suy luận, kết thúc bằng tổng hợp + kiểm chứng.
+\begin{tikzpicture}[font=\small]
+  \fill[cNavy!6] (0,0) circle (3.8);
+  % dòng mô tả đặt trong tabular: \\ của nút TikZ đặt lại cỡ chữ, \\ của tabular thì không
+  \foreach \a/\c/\t/\s in {90/cPurple/THOUGHT/{lập luận:\\cần công cụ nào?}, -30/cOrange/ACTION/{gọi công cụ\\với tham số},
+                           210/cGreen/OBSERVATION/{kết quả + bằng\\chứng có nguồn}} {
+    \node[cau=\c, minimum size=2.6cm, font=\small\bfseries, align=center] (\t) at (\a:2.95)
+      {\t\\[-1pt]\tiny\normalfont\begin{tabular}{@{}c@{}}\s\end{tabular}};
+  }
+  \draw[-{Stealth[length=4mm]}, line width=3pt, cPurple!80!black] (THOUGHT) to[bend left=28] (ACTION);
+  \draw[-{Stealth[length=4mm]}, line width=3pt, cOrange!80!black] (ACTION) to[bend left=28] (OBSERVATION);
+  \draw[-{Stealth[length=4mm]}, line width=3pt, cGreen!60!black] (OBSERVATION) to[bend left=28] (THOUGHT);
+  \node[hop=cSlate, font=\scriptsize\bfseries, align=center] at (0,0) {Vết suy luận\\$\tau = (t_1,a_1,o_1,\dots)$};
+  % công cụ
+  \node[draw=cOrange, fill=cOrange!6, rounded corners=4pt, anchor=west, font=\scriptsize, align=left, text width=5.3cm] (tools) at (5.2,0.6)
+    {\textbf{7 công cụ}\\[1pt]
+     \textcolor{cRed}{\textbf{DL}} \texttt{chan\_doan\_nguy\_co}, \texttt{du\_bao\_bilstm}\\
+     \textcolor{cPurple}{\textbf{KG}} \texttt{kg\_y\_te}, \texttt{kg\_tai\_chinh}\\
+     \textcolor{cBlue}{\textbf{RAG}} \texttt{truy\_xuat\_rag}\\
+     \textcolor{cTeal}{\textbf{CALC}} \texttt{quy\_doi\_vang}, \texttt{du\_lieu\_thi\_truong}};
+  \draw[mui, dashed] (ACTION.east) -- (tools.west);
+  % kết thúc vòng lặp: tổng hợp nằm dưới OBSERVATION, ngoài vòng tròn nền
+  \node[hop=cRed, text width=5.6cm, font=\scriptsize, anchor=north] (fin) at (-3.4,-4.1)
+    {\textbf{Tổng hợp}: Qwen2.5 viết câu trả lời chỉ từ bằng chứng $[1..n]$ $\to$ \textbf{kiểm chứng}};
+  \draw[mui] (OBSERVATION.south) -- node[right, font=\scriptsize] {đủ bằng chứng} (OBSERVATION.south |- fin.north);
+  \node[hop=cSlate, font=\scriptsize, anchor=south] at (0,4.25) {câu hỏi + hồ sơ người dùng};
+\end{tikzpicture}

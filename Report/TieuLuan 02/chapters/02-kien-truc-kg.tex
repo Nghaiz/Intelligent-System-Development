@@ -1,0 +1,230 @@
+% =====================================================================
+%  CHƯƠNG 2 — KIẾN TRÚC KNOWLEDGE GRAPH VÀ CƠ SỞ TRI THỨC
+% =====================================================================
+\chapter{Kiến trúc Knowledge Graph và cơ sở tri thức}\label{chap:kg}
+
+Chương~\ref{chap:mo-dau} định nghĩa KG là một tập bộ ba. Chương này mở tập bộ ba đó ra: một KG được cấu tạo từ
+những gì, được viết ra theo chuẩn RDF thế nào, bản thể học thêm vào đó những ràng buộc và luật suy diễn ra sao,
+và khi nào nên lưu tri thức trong một cơ sở dữ liệu đồ thị thay vì một cơ sở dữ liệu vector. Mọi ví dụ đều lấy
+từ hai KG thật của bài, cài trong \texttt{tl2/kg\_base.py}.
+
+\section{Các thành phần cấu tạo của Knowledge Graph}
+Một KG có ba loại thành phần (Hình~\ref{fig:thanhphan}):
+
+\begin{itemize}
+  \item \textbf{Thực thể (entity)} là nút của đồ thị, đại diện cho một đối tượng có danh tính: một bệnh
+        (\textsf{DTD\_Tip2}), một thuốc (\textsf{Metformin}), một món ăn (\textsf{Com\_Trang}), một chính sách
+        (\textsf{ND\_232\_2025}), một cổ phiếu (\textsf{FPT}). Mỗi thực thể có mã định danh duy nhất, một
+        \textbf{kiểu} là một lớp trong bản thể học, nhãn tiếng Việt để hiển thị và danh sách bí danh để liên kết
+        với câu hỏi tự nhiên (``tiểu đường'', ``đtđ'', ``type 2'' đều trỏ về \textsf{DTD\_Tip2}).
+  \item \textbf{Quan hệ (relation)} là cạnh có hướng, gán nhãn bằng một vị từ:
+        $\textsf{Metformin} \xrightarrow{\textsf{TUONG\_TAC\_NGUY\_HIEM}} \textsf{Ruou\_Bia}$. Giữa hai thực thể có
+        thể có nhiều cạnh với vị từ khác nhau, nên cấu trúc dữ liệu phù hợp là \emph{đa đồ thị có hướng}
+        (\texttt{networkx.MultiDiGraph}~\cite{hagberg2008networkx}).
+  \item \textbf{Thuộc tính (attribute)} gắn lên nút (mã ICD-10 \texttt{E11}, chỉ số GI 73 của cơm trắng, ngưỡng
+        126 mg/dL) hoặc lên cạnh (mức độ \texttt{cao}, hậu quả, nguồn trích dẫn \texttt{h03-ruou-bia}).
+\end{itemize}
+
+\hinhtikz{t2_components}{Ba thành phần của một KG, minh họa trên \texttt{VietnamDiabetesKG}: thực thể là nút
+có kiểu và thuộc tính, quan hệ là cạnh có nhãn vị từ, thuộc tính có thể nằm trên cả nút lẫn cạnh}{thanhphan}
+
+Thuộc tính trên cạnh là chỗ hai mô hình dữ liệu đồ thị phổ biến khác nhau. \textbf{Đồ thị thuộc tính có nhãn}
+(Labeled Property Graph, LPG), mô hình của Neo4j, cho phép gắn trực tiếp cặp khóa--giá trị lên cạnh.
+\textbf{RDF} chỉ có bộ ba, nên muốn nói ``cạnh này có mức độ cao'' phải biến chính cạnh thành một thực thể, kỹ
+thuật gọi là \emph{reification} (Hình~\ref{fig:lpgrdf}). Lớp \texttt{KnowledgeGraph} của bài làm việc theo LPG
+khi xây dựng và truy vấn, rồi xuất sang RDF có reification khi cần suy diễn và SPARQL; nhờ vậy dùng được thế mạnh
+của cả hai.
+
+\hinhtikz{t2_lpg_rdf}{Cùng một sự kiện ``metformin tương tác nguy hiểm với rượu bia, mức độ cao'' trong mô hình
+LPG (thuộc tính nằm trên cạnh) và mô hình RDF (cạnh được reification thành một \texttt{rdf:Statement})}{lpgrdf}
+
+Bản thể học được cài bằng hai lớp dữ liệu nhỏ. \texttt{Predicate} mô tả một vị từ: miền (domain) là lớp của chủ
+thể, miền giá trị (range) là lớp của đối tượng, cùng ba tính chất logic đối xứng, bắc cầu, nghịch đảo.
+\texttt{Ontology} giữ cây lớp dưới dạng từ điển \emph{lớp $\to$ lớp cha} và trả lời câu hỏi ``lớp $A$ có phải
+là một loại $B$ không'' bằng cách đi ngược lên gốc (Đoạn mã~\ref{code:kg_base__Ontology}).
+
+\maNguon{kg_base__Predicate}{Lớp \texttt{Predicate}: vị từ kèm miền, miền giá trị và tính chất logic}
+\maNguon{kg_base__Ontology}{Lớp \texttt{Ontology}: cây phân cấp lớp và phép kiểm tra \texttt{is\_a}}
+
+Điểm quan trọng nhất của lõi KG là mọi bộ ba đều được \textbf{kiểm tra ràng buộc trước khi nạp}
+(Đoạn mã~\ref{code:kg_base__KnowledgeGraph.validate}): chủ thể phải thuộc miền của vị từ, đối tượng phải thuộc
+miền giá trị, xét theo cả lớp con. Thêm $(\textsf{Rau\_Xanh}, \textsf{CHI\_DINH\_DAU\_TAY}, \textsf{Metformin})$
+bị từ chối ngay vì rau xanh không phải một bệnh. Mục~\ref{sec:rangbuoc} thử bốn bộ ba cố tình sai như vậy.
+
+\maNguon{kg_base__KnowledgeGraph.validate}{Kiểm tra ràng buộc miền và miền giá trị khi thêm một bộ ba}
+
+Để LLM đọc được tri thức, mỗi bộ ba được \textbf{diễn đạt thành câu} tiếng Việt kèm các thuộc tính cạnh
+(Đoạn mã~\ref{code:kg_base__KnowledgeGraph.verbalize}). Đây là định dạng mà tác tử đưa vào prompt ở
+Chương~\ref{chap:agent}, ví dụ ``Metformin —[tương tác nguy hiểm với]→ Rượu bia (ethanol) (severity: cao; effect:
+tăng nguy cơ nhiễm toan lactic\dots)''.
+
+\maNguon{kg_base__KnowledgeGraph.verbalize}{Diễn đạt bộ ba thành câu tiếng Việt để đưa vào ngữ cảnh LLM}
+
+\section{Mô hình biểu diễn bộ ba RDF}
+RDF (Resource Description Framework) là chuẩn W3C để mô tả tài nguyên trên Web bằng bộ
+ba~\cite{w3c2014rdf}. Mỗi thành phần của bộ ba là một \textbf{IRI} (định danh tài nguyên toàn cục), một
+\textbf{literal} (giá trị có kiểu như số, chuỗi có nhãn ngôn ngữ) hoặc một \textbf{nút trống}. Chủ thể là IRI hoặc
+nút trống, vị từ luôn là IRI, đối tượng là bất kỳ loại nào. Một đồ thị RDF đơn giản là \emph{tập hợp} các bộ ba
+(Hình~\ref{fig:bobardf}); hai đồ thị gộp lại bằng phép hợp tập hợp, điều làm RDF đặc biệt hợp để tích hợp dữ liệu
+từ nhiều nguồn.
+
+\hinhtikz{t2_triple}{Bộ ba RDF (chủ thể, vị từ, đối tượng) viết bằng IRI đầy đủ trong không gian tên
+\texttt{ex:} của bài, và đồ thị RDF như một tập các bộ ba}{bobardf}
+
+Phép ánh xạ từ KG của bài sang RDF (Đoạn mã~\ref{code:kg_base__KnowledgeGraph.to_rdf}) đi theo bốn bước:
+
+\begin{enumerate}
+  \item Mỗi lớp thành một \texttt{rdfs:Class}, quan hệ lớp cha thành \texttt{rdfs:subClassOf}.
+  \item Mỗi vị từ thành một \texttt{rdf:Property} kèm \texttt{rdfs:domain}, \texttt{rdfs:range}, nhãn tiếng Việt và
+        các tiên đề OWL \texttt{owl:SymmetricProperty}, \texttt{owl:TransitiveProperty}, \texttt{owl:inverseOf}.
+  \item Mỗi thực thể có bộ ba \texttt{rdf:type} trỏ tới lớp, \texttt{rdfs:label} và một bộ ba cho mỗi thuộc tính nút.
+  \item Mỗi cạnh thành một bộ ba; nếu cạnh có thuộc tính thì thêm một \texttt{rdf:Statement} mang
+        \texttt{rdf:subject}, \texttt{rdf:predicate}, \texttt{rdf:object} và từng thuộc tính.
+\end{enumerate}
+
+\maDai{kg_base__KnowledgeGraph.to_rdf}{Xuất KG sang RDF bằng rdflib, giữ thuộc tính cạnh bằng reification}
+
+Bảng~\ref{tab:kgstats} tổng hợp kích thước hai KG. Số bộ ba RDF lớn hơn nhiều số cạnh vì mỗi thực thể sinh thêm
+bộ ba kiểu và nhãn, mỗi cạnh có thuộc tính sinh thêm khối reification.
+
+\bang{tab_kg_stats}{Quy mô hai đồ thị tri thức của tiểu luận}{kgstats}
+
+\section{Bản thể học và biểu diễn tri thức hình thức}
+Theo định nghĩa kinh điển của Gruber, bản thể học là \emph{``một đặc tả tường minh của một khái niệm
+hóa''}~\cite{gruber1993ontology}: nó liệt kê các loại sự vật tồn tại trong một miền và các quan hệ được phép giữa
+chúng. Trong thực hành Web ngữ nghĩa, bản thể học được viết bằng RDFS và OWL~\cite{w3c2012owl} và gồm ba lớp
+tri thức:
+
+\begin{itemize}
+  \item \textbf{Phân cấp lớp}: \textsf{SafeFood} $\sqsubseteq$ \textsf{Food} $\sqsubseteq$ \textsf{Substance}
+        $\sqsubseteq$ \textsf{MedicalEntity}. Hình~\ref{fig:ontology} là cây lớp của \texttt{VietnamDiabetesKG}
+        với đúng \SL{kg/health/classes} lớp khai báo trong mã.
+  \item \textbf{Ràng buộc vị từ}: \textsf{TUONG\_TAC\_NGUY\_HIEM} có miền \textsf{Drug} và miền giá trị
+        \textsf{RiskSubstance}; \textsf{KHUYEN\_NGHI\_AN} nối \textsf{Disease} với \textsf{Food}.
+  \item \textbf{Tiên đề tính chất}: vị từ có thể đối xứng, bắc cầu hoặc là nghịch đảo của vị từ khác
+        (Hình~\ref{fig:tiende}).
+\end{itemize}
+
+\hinhtikz{t2_ontology}{Cây phân cấp lớp (\texttt{rdfs:subClassOf}) của bản thể học y tế: đúng
+\SL{kg/health/classes} lớp khai báo trong \texttt{health\_ontology()}}{ontology}
+
+\hinhtikz{t2_axioms}{Ba tiên đề tính chất của vị từ: bắc cầu, đối xứng, nghịch đảo; cạnh suy ra vẽ nét đứt}{tiende}
+
+\subsection{Suy diễn tiến trên RDF}
+Bản thể học không chỉ để kiểm tra mà còn để \textbf{suy ra} tri thức không được ghi tường minh. Hàm
+\texttt{rdfs\_closure} cài suy diễn tiến (forward chaining): áp lặp lại năm luật cho tới khi không sinh thêm bộ ba
+mới nào (điểm bất động). Với $\sqsubseteq$ là \texttt{rdfs:subClassOf} và \texttt{a} là \texttt{rdf:type}:
+\begin{align}
+  &(A \sqsubseteq B) \wedge (B \sqsubseteq C) \;\Rightarrow\; A \sqsubseteq C &&\text{(phân cấp bắc cầu)}\\
+  &(x\ \texttt{a}\ A) \wedge (A \sqsubseteq B) \;\Rightarrow\; x\ \texttt{a}\ B &&\text{(kế thừa kiểu)}\\
+  &p \text{ đối xứng} \wedge (x\, p\, y) \;\Rightarrow\; (y\, p\, x) &&\text{(đối xứng)}\\
+  &p \text{ bắc cầu} \wedge (x\, p\, y) \wedge (y\, p\, z) \;\Rightarrow\; (x\, p\, z) &&\text{(bắc cầu)}\\
+  &p \equiv q^{-1} \wedge (x\, p\, y) \;\Rightarrow\; (y\, q\, x) &&\text{(nghịch đảo)}
+\end{align}
+Năm luật này là tập con của ngữ nghĩa RDFS và OWL 2 RL đủ cho hai KG của bài. Luật \texttt{rdfs:domain} và
+\texttt{rdfs:range} (suy ra kiểu của chủ thể từ vị từ) cố ý không bật: ở đây domain và range được dùng như
+\emph{ràng buộc} để chặn dữ liệu sai, không phải để suy ra kiểu mới.
+
+\maDai{kg_base__rdfs_closure}{Suy diễn tiến năm luật RDFS/OWL tới điểm bất động}
+
+Trên đồ thị y tế, suy diễn thêm \SL{kg/health/inferred} bộ ba vào \SL{kg/health/rdf_triples} bộ ba gốc; trên
+đồ thị tài chính thêm \SL{kg/finance/inferred} bộ ba vào \SL{kg/finance/rdf_triples}. Hình~\ref{fig:suydien}
+minh họa trên một phần của \texttt{VietnamFinanceKG}: vị từ \textsf{THUOC\_VE} bắc cầu nên từ
+``FPT thuộc VN30'' và ``VN30 thuộc HOSE'' suy ra ``FPT thuộc HOSE''.
+
+\hinhtikz{t2_inference}{Suy diễn tiến trên \texttt{VietnamFinanceKG}: cạnh tường minh nét liền, bộ ba suy ra nét
+đứt đỏ}{suydien}
+
+\subsection{Truy vấn SPARQL}
+SPARQL là ngôn ngữ truy vấn chuẩn của RDF~\cite{w3c2013sparql}: một truy vấn là một \emph{mẫu đồ thị} chứa biến
+(\texttt{?thuoc}), và kết quả là mọi cách gán biến làm mẫu khớp với đồ thị. Bài chạy \SL{dem/sparql} truy vấn
+trên cả đồ thị gốc lẫn đồ thị đã suy diễn (Bảng~\ref{tab:sparql}). Truy vấn Q1 đọc mức độ tương tác qua khối
+reification; Q5 dùng đường thuộc tính \texttt{(p|q)+} để tìm mọi biến chịu tác động từ lãi suất Fed sau bất kỳ số
+bước nào.
+
+\maTruyVan{1}{Q1: thuốc tương tác nguy hiểm với rượu bia, đọc mức độ và hậu quả qua reification}
+\maTruyVan{5}{Q5: mọi biến chịu tác động trực tiếp hay gián tiếp của lãi suất Fed (đường thuộc tính)}
+\maTruyVan{2}{Q2: món ăn và chỉ số GI, truy vấn theo lớp cha \texttt{ex:Food}}
+
+\bang{tab_sparql}{Kết quả \SL{dem/sparql} truy vấn SPARQL trước và sau suy diễn}{sparql}
+
+Cột ``trước suy diễn'' cho thấy vai trò thực sự của bản thể học. Q2, Q4 và Q6 hỏi theo lớp cha (\textsf{Food},
+\textsf{Drug}, \textsf{Stock}) trong khi dữ liệu chỉ ghi lớp lá (\textsf{ModerateFood}, \textsf{Biguanide}\dots),
+nên trên đồ thị gốc chúng trả về rỗng; sau suy diễn kế thừa kiểu chúng trả về đầy đủ. Không có suy diễn, người
+viết truy vấn phải tự liệt kê mọi lớp con, và truy vấn hỏng mỗi khi bản thể học thêm một lớp mới.
+Hình~\ref{fig:kg_inference} tổng hợp hai hiệu ứng: số bộ ba tăng thêm và số dòng kết quả của từng truy vấn.
+
+\hinhpdf{kg_inference}{1.0}{Ảnh hưởng của suy diễn: số bộ ba RDF trước, sau suy diễn (trái) và số dòng kết quả
+của từng truy vấn SPARQL (phải)}{kg_inference}
+
+\subsection{Kiểm tra ràng buộc}\label{sec:rangbuoc}
+Để chứng minh ràng buộc domain/range thực sự hoạt động, kịch bản \texttt{build\_kgs.py} cố tình thêm
+\SL{dem/violations} bộ ba sai. Cả bốn đều bị từ chối với thông báo nêu đúng lớp mong đợi và lớp thực tế
+(Bảng~\ref{tab:vipham}). Đây là lớp phòng thủ đầu tiên chống lại dữ liệu bẩn, đặt ngay ở thời điểm nạp, trước
+khi một bộ ba sai kịp lan vào câu trả lời của tác tử.
+
+\bang{tab_violations}{Bốn bộ ba cố tình sai và thông báo của bộ kiểm tra ràng buộc}{vipham}
+
+\section{Xây KB và KG từ dữ liệu bảng}
+Không phải tri thức nào cũng có sẵn dạng văn bản. Bộ dữ liệu chẩn đoán đái tháo đường~\cite{mustafa2023diabetes}
+là một bảng CSV \SL{kg/tabular/diabetes/records} dòng; dữ liệu giá cổ phiếu cũng là bảng. Tiếp cận của bài
+tham khảo dungvt, đưa một bảng thành hai dạng tri thức song song (Hình~\ref{fig:kbpipeline}):
+
+\begin{itemize}
+  \item \textbf{KB văn bản}: mỗi dòng thành một câu mô tả, ví dụ ``Hồ sơ Person\_0: giới tính nữ, tuổi 80, tăng
+        huyết áp không, bệnh tim có\dots''. Dạng này đưa vào RAG được.
+  \item \textbf{KG bộ ba}: mỗi ô thành một bộ ba $(\textsf{Person\_0}, \textsf{has\_age}, 80)$. Dạng này truy vấn
+        chính xác theo điều kiện số được.
+\end{itemize}
+
+\hinhtikz{t2_kb_pipeline}{Xây KB và KG từ dữ liệu bảng: mỗi dòng CSV được văn bản hóa thành một tài liệu (KB) và
+tách thành các bộ ba (KG), phục vụ hai kiểu truy vấn khác nhau}{kbpipeline}
+
+\maNguon{kg_tabular__diabetes_documents}{Văn bản hóa mỗi hồ sơ thành một câu tiếng Việt}
+\maNguon{kg_tabular__diabetes_triples}{Tách mỗi hồ sơ thành các bộ ba thuộc tính}
+
+\bang{tab_tabular}{Chuyển bảng chẩn đoán đái tháo đường thành KB văn bản và KG}{tabular}
+
+Hai dạng tri thức trả lời hai loại câu hỏi khác nhau. Câu hỏi ``có bao nhiêu người trên 70 tuổi, tăng huyết áp,
+HbA1c từ 8,8 trở lên'' là một phép lọc trên thuộc tính số: KG lọc ba điều kiện, trả đúng
+\SL{kg/tabular/numeric_query/kg_hits} trên \SL{kg/tabular/numeric_query/truth} hồ sơ trong
+\SL{kg/tabular/numeric_query/kg_ms} ms. Tìm kiếm văn bản bằng TF-IDF trên 20.000 tài liệu mẫu chỉ đưa được
+\SL{kg/tabular/numeric_query/tfidf_top20_correct} hồ sơ đúng vào top-20 (Hình~\ref{fig:kg_tabular}), vì độ tương
+đồng từ vựng không hiểu phép so sánh ``$\ge 8{,}8$''. Bài học: RAG mạnh với câu hỏi diễn giải, KG mạnh với câu
+hỏi có điều kiện và số liệu; một hệ thống tốt cần cả hai.
+
+\hinhpdf{kg_tabular}{1.0}{Câu hỏi có điều kiện số trên dữ liệu bảng: truy vấn KG trả đúng toàn bộ, tìm văn bản
+TF-IDF gần như bỏ sót}{kg_tabular}
+
+\section{So sánh chi tiết: Graph Database và Vector Database}
+Hai loại kho dữ liệu chuyên dụng cho hệ thống dùng LLM là cơ sở dữ liệu đồ thị (Neo4j, GraphDB, Amazon
+Neptune) và cơ sở dữ liệu vector (FAISS, Milvus, Qdrant, Chroma). Chúng trả lời hai câu hỏi khác nhau
+(Hình~\ref{fig:graphvector}): Graph DB trả lời \emph{``cái gì nối với cái gì, bằng quan hệ gì''}; Vector DB trả
+lời \emph{``cái gì giống cái này nhất''}.
+
+\hinhtikz{t2_graph_vector}{Graph DB duyệt quan hệ tường minh giữa các thực thể; Vector DB tìm láng giềng gần nhất
+theo khoảng cách trong không gian nhúng nhiều chiều}{graphvector}
+
+\begin{table}[H]\centering
+\caption{Bảng đối chuẩn kỹ thuật Graph Database và Vector Database}\label{tab:graphvector}
+{\small\begin{tabular}{L{3.2cm}L{5.4cm}L{5.4cm}}
+\toprule
+Tiêu chí & Graph Database & Vector Database \\
+\midrule
+Đơn vị dữ liệu & nút, cạnh có nhãn, thuộc tính & vector dày $\mathbb{R}^d$ kèm metadata \\
+Mô hình truy vấn & khớp mẫu đồ thị (Cypher, SPARQL), duyệt đường & láng giềng gần nhất (k-NN, ANN) \\
+Chỉ mục & danh sách kề, chỉ mục theo nhãn & HNSW, IVF, lượng tử hóa PQ \\
+Câu hỏi đa bước & tự nhiên: mỗi bước là một bước duyệt & không có khái niệm bước \\
+Câu hỏi ngữ nghĩa mờ & kém: cần đúng tên thực thể & mạnh: hiểu diễn đạt khác nhau \\
+Điều kiện số, phép đếm & chính xác & không hỗ trợ trực tiếp \\
+Khả năng giải thích & đường đi và nguồn của từng cạnh & điểm tương đồng, khó giải thích \\
+Chi phí xây dựng & cao: cần trích xuất, chuẩn hóa thực thể & thấp: nhúng văn bản thô \\
+Cập nhật & thêm, sửa bộ ba cục bộ & nhúng lại đoạn văn đổi \\
+Vai trò trong bài & \texttt{VietnamDiabetesKG}, \texttt{VietnamFinanceKG} & chỉ mục e5 trên \SL{retrieval_grid/n_docs} tài liệu \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Hai loại kho không cạnh tranh mà bổ sung: Vector DB tìm \emph{đoạn văn} giải thích, Graph DB cung cấp
+\emph{quan hệ} chính xác và đường suy luận. GraphRAG ở Chương~\ref{chap:rag} và tác tử ở Chương~\ref{chap:agent}
+dùng cả hai cùng lúc.

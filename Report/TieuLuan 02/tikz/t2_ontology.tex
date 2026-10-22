@@ -1,0 +1,38 @@
+% Cây phân cấp lớp (rdfs:subClassOf) của ontology y tế: đúng 23 lớp khai báo trong health_ontology() của tl2/kg_health.py.
+% Các nút con cách nhau 0,7 cm (cao hơn một nút) để khối không chạm nhau; ô ràng buộc đặt ở góc trên-trái còn trống.
+\begin{tikzpicture}[font=\small,
+  c/.style={hop=#1, font=\scriptsize\bfseries, minimum width=2.45cm, minimum height=6.5mm, inner sep=2pt},
+  w/.style={minimum width=2.9cm},
+  e/.style={draw=cNavy!55, thick, -{Stealth[length=1.8mm]}, rounded corners=2pt}]
+  \newcommand{\nhanh}[2]{\draw[e] (#1.east) -- ++(0.32,0) |- (#2.west);}
+  \node[c=cNavy, minimum width=1.9cm] (thing) at (0,-4.6) {Thing};
+  \node[c=cSlate] (med) at (3.0,-4.6) {MedicalEntity};
+  \node[c=cSlate] (gl) at (3.0,-10.3) {Guideline};
+  \nhanh{thing}{med} \nhanh{thing}{gl}
+  % tầng 2
+  \foreach \n/\t/\c/\y in {dis/Disease/cRed/0, cond/Condition/cPink/-0.8, bio/Biomarker/cOrange/-1.6, rf/RiskFactor/cBrown/-2.4,
+                           drug/Drug/cBlue/-4.6, sub/Substance/cTeal/-7.8, life/Lifestyle/cGreen/-9.6} {
+    \node[c=\c] (\n) at (6.3,\y) {\t};
+    \nhanh{med}{\n}
+  }
+  % tầng 3
+  \node[c=cPink, w] (comp) at (9.7,-0.8) {Complication}; \nhanh{cond}{comp}
+  \foreach \n/\t/\y in {d1/Biguanide/-2.8, d2/Sulfonylurea/-3.52, d3/DPP4Inhibitor/-4.24, d4/SGLT2Inhibitor/-4.96,
+                        d5/GLP1Agonist/-5.68, d6/Insulin/-6.4} {
+    \node[c=cSky, w] (\n) at (9.7,\y) {\t};
+    \nhanh{drug}{\n}
+  }
+  \node[c=cTeal, w] (rs) at (9.7,-7.3) {RiskSubstance}; \nhanh{sub}{rs}
+  \node[c=cLime, w] (food) at (9.7,-8.3) {Food}; \nhanh{sub}{food}
+  % tầng 4
+  \foreach \n/\t/\c/\y in {f1/FoodGroup/cYellow/-7.25, f2/SafeFood/cGreen/-7.95, f3/ModerateFood/cOrange/-8.65, f4/RiskFood/cRed/-9.35} {
+    \node[c=\c, w] (\n) at (13.1,\y) {\t};
+    \nhanh{food}{\n}
+  }
+  % ghi chú suy diễn
+  \node[draw=cPurple, fill=cPurple!6, rounded corners=3pt, align=left, font=\scriptsize, anchor=north west, text width=7.0cm]
+    at (7.6,-10.2) {\textbf{Suy diễn kiểu theo lớp cha:} Metformin \texttt{a} Biguanide $\Rightarrow$ \texttt{a} Drug
+    $\Rightarrow$ \texttt{a} MedicalEntity; truy vấn ``mọi \texttt{Drug}'' trả cả 6 thuốc dù mỗi thuốc chỉ khai báo lớp con của nó};
+  \node[draw=cGreen, fill=cGreen!6, rounded corners=3pt, align=left, font=\scriptsize, anchor=north west, text width=4.6cm]
+    at (-1.0,0.35) {\textbf{Ràng buộc miền/giá trị}\\[1pt] \texttt{TUONG\_TAC\_NGUY\_HIEM}:\\ Drug $\to$ RiskSubstance\\ \texttt{KHUYEN\_NGHI\_AN}:\\ Disease $\to$ Food\\[1pt] \texttt{add\_fact} từ chối bộ ba sai lớp};
+\end{tikzpicture}

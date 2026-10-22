@@ -1,0 +1,20 @@
+% Hai kỹ thuật tối ưu tiền truy xuất bằng LLM cục bộ: HyDE (tìm bằng câu trả lời giả định) và Multi-Query (hợp nhất RRF).
+\begin{tikzpicture}[font=\small,
+  b/.style={hop=#1, text width=2.7cm, minimum height=1.0cm, font=\scriptsize},
+  ar/.style={-{Stealth[length=2.4mm]}, very thick, #1}]
+  \node[hop=cSlate, font=\small] (q) at (6.8,4.0) {$q$: ``Rượu ảnh hưởng thế nào khi dùng metformin?''};
+  % HyDE: cột trái, các khối cách nhau đủ cho ba dòng chữ
+  \node[b=cPurple] (h1) at (1.6,2.2) {\textbf{Qwen2.5} viết đoạn trả lời giả định $\tilde d$};
+  \node[b=cBlue] (h2) at (1.6,0.1) {$E_{\text{passage}}(\tilde d)$\\không gian ``đáp''};
+  \node[b=cIndigo] (h3) at (1.6,-1.9) {láng giềng gần\\của $\tilde d$};
+  \draw[ar=cPurple] (q.west) -| (h1.north); \draw[ar=cPurple] (h1) -- (h2); \draw[ar=cPurple] (h2) -- (h3);
+  \node[font=\scriptsize\bfseries, text=cPurple, anchor=east] at (1.45,3.45) {HyDE};
+  % Multi-Query
+  \foreach \i/\x in {1/5.4, 2/8.2, 3/11.0} \node[b=cOrange, text width=2.3cm] (m\i) at (\x,2.2) {biến thể $q_\i$};
+  \foreach \i/\x in {1/5.4, 2/8.2, 3/11.0} {\node[b=cBlue, text width=2.3cm] (r\i) at (\x,0.2) {top-$k$ của $q_\i$}; \draw[ar=cOrange] (m\i) -- (r\i);}
+  \foreach \i in {1,2,3} \draw[ar=cOrange] (q.south) -- (m\i.north);
+  \node[b=cGreen, text width=5.6cm] (rrf) at (8.2,-1.9) {RRF hợp nhất $\{q, q_1, q_2, q_3\}$};
+  \foreach \i in {1,2,3} \draw[ar=cGreen!60!black] (r\i) -- (rrf);
+  \node[font=\scriptsize\bfseries, text=cOrange!70!black, anchor=west] at (12.5,2.2) {Multi-Query};
+  \node[b=cRed, text width=3.0cm] (cost) at (13.6,-1.9) {mỗi câu: +1 lượt sinh LLM $\approx$ \SL{advanced/gen_s/hyde} s};
+\end{tikzpicture}

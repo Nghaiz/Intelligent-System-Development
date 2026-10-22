@@ -1,0 +1,32 @@
+% Ba đường nhân quả từ Lãi suất Fed tới Vàng SJC mà impact_paths() tìm được; dấu đường = tích dấu cạnh, ròng = Σ dấu/số bước.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm,
+  n/.style={hop=#1, minimum width=2.25cm, minimum height=8mm, font=\scriptsize\bfseries},
+  p/.style={-{Stealth[length=2.4mm]}, line width=1.6pt, cGreen!70!black},
+  m/.style={-{Stealth[length=2.4mm]}, line width=1.6pt, cRed!80!black}]
+  \node[n=cIndigo] (fed) at (0,0) {Lãi suất Fed};
+  \node[n=cIndigo] (dxy) at (3.4,1.9) {DXY};
+  \node[n=cYellow] (xau) at (6.8,0) {XAU/USD};
+  \node[n=cOrange] (usd) at (6.8,3.8) {USD/VND};
+  \node[n=cYellow] (vqd) at (10.2,1.9) {Vàng quy đổi};
+  \node[n=cYellow] (sjc) at (13.6,1.9) {Vàng SJC};
+  \draw[m] (fed) -- node[below, font=\scriptsize] {$-$} (xau);
+  \draw[p] (fed) -- node[above left, font=\scriptsize] {$+$} (dxy);
+  \draw[m] (dxy) -- node[below left, font=\scriptsize] {$-$} (xau);
+  \draw[p] (dxy) -- node[above left, font=\scriptsize] {$+$} (usd);
+  \draw[p] (xau) -- node[below right, font=\scriptsize] {$+$} (vqd);
+  \draw[p] (usd) -- node[above right, font=\scriptsize] {$+$} (vqd);
+  \draw[p] (vqd) -- node[above, font=\scriptsize] {$+$} (sjc);
+  % bảng đường
+  \node[draw=cNavy, fill=white, rounded corners=4pt, anchor=north west, font=\scriptsize, align=left, inner sep=5pt] (tab) at (-1.1,-1.2) {%
+    \begin{tabular}{@{}llrr@{}}
+      \textbf{Đường} & \textbf{Dấu} & \textbf{Bước} & \textbf{Đóng góp}\\\hline
+      Fed $\to$ XAU $\to$ quy đổi $\to$ SJC & $(-)$ & 3 & $-1/3$\\
+      Fed $\to$ DXY $\to$ XAU $\to$ quy đổi $\to$ SJC & $(-)$ & 4 & $-1/4$\\
+      Fed $\to$ DXY $\to$ USD/VND $\to$ quy đổi $\to$ SJC & $(+)$ & 4 & $+1/4$\\\hline
+      \multicolumn{3}{@{}l}{\textbf{Ròng} $\sum_\pi \mathrm{sign}(\pi)/|\pi|$} & $\mathbf{-1/3}$
+    \end{tabular}};
+  % kết luận nằm dưới bảng (đặt cạnh bảng sẽ che mất cột Đóng góp)
+  \node[hop=cRed, text width=15.2cm, font=\scriptsize, anchor=north west, align=left] at ([yshift=-0.35cm]tab.south west)
+    {\textbf{Kết luận của agent}: ``hỗn hợp: 1 kênh (+), 2 kênh (−), ròng (−)''. Fed tăng lãi suất kéo giá vàng thế giới xuống,
+     nhưng tỷ giá tăng bù một phần cho giá quy đổi; agent nói rõ cả hai kênh thay vì kết luận một chiều.};
+\end{tikzpicture}

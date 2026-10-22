@@ -1,0 +1,306 @@
+% =====================================================================
+%  CHƯƠNG 6 — TRIỂN KHAI HỆ THỐNG TÁC TỬ THÔNG MINH
+% =====================================================================
+\chapter{Triển khai hệ thống tác tử thông minh}\label{chap:agent}
+
+Hai chương trước dựng các thành phần riêng lẻ: KG y tế và MLP nguy cơ, KG tài chính và BiLSTM, cùng kho văn bản và
+bộ truy xuất của Chương~\ref{chap:rag}. Chương này ghép chúng thành một tác tử duy nhất nhận câu hỏi tiếng Việt tự
+do, tự quyết định miền và công cụ cần dùng, ghi lại toàn bộ vết suy luận, rồi viết câu trả lời có trích dẫn và tự
+kiểm chứng trước khi trả cho người dùng. Phần cuối chương đánh giá tác tử trên \SL{dem/agent_scen} kịch bản và so
+với chính LLM đó khi trả lời một mình.
+
+% ---------------------------------------------------------------------
+\section{Mô hình ReAct}\label{sec:react}
+\subsection{Suy luận đan xen hành động}
+ReAct~\cite{yao2023react} kết hợp hai dòng nghiên cứu: suy luận từng bước bằng chuỗi ý nghĩ~\cite{wei2022cot} và mô
+hình ngôn ngữ biết gọi công cụ~\cite{schick2023toolformer}. Thay vì trả lời ngay, tác tử lặp ba bước:
+\textbf{Thought} (nói ra mình cần biết gì), \textbf{Action} (gọi một công cụ với tham số cụ thể) và
+\textbf{Observation} (đọc kết quả công cụ trả về). Vết Thought -- Action -- Observation vừa là bộ nhớ làm việc của
+tác tử, vừa là bản giải trình cho người dùng: mỗi kết luận cuối cùng đều truy được về một quan sát cụ thể.
+
+\hinhtikz{t6_react}{Vòng lặp ReAct: Thought $\to$ Action $\to$ Observation lặp quanh bộ nhớ vết suy luận, kết thúc
+bằng bước tổng hợp và kiểm chứng}{t6_react}
+
+Đối với bài toán y tế và tài chính, ưu điểm quan trọng nhất của ReAct là \emph{tách tri thức khỏi mô hình ngôn
+ngữ}. LLM không cần nhớ ngưỡng eGFR của metformin hay hệ số 1,2057; nó chỉ cần đọc các con số đó trong quan sát. Điều
+này trực tiếp giảm hiện tượng ảo giác~\cite{ji2023hallucination}, vốn nguy hiểm nhất đúng ở hai miền này, như
+Mục~\ref{sec:agent-ketqua} sẽ cho thấy bằng ví dụ thật.
+
+\subsection{Bộ công cụ}
+Tác tử có \SL{dem/tools} công cụ thuộc bốn loại (Bảng~\ref{tab:agenttools}): học sâu (DL), đồ thị tri thức (KG),
+truy xuất văn bản (RAG) và tính toán xác định (CALC). Mỗi công cụ trả về hai thứ: một đối tượng quan sát có cấu trúc
+cho bộ lập kế hoạch và giao diện, và một danh sách bằng chứng dạng \texttt{(nguồn, văn bản)} để LLM trích dẫn. Nhãn
+nguồn ghi rõ loại và gốc của bằng chứng: \texttt{KG:f05-fpt}, \texttt{RAG:h03-ruou-bia}, \texttt{BiLSTM:FPT},
+\texttt{Dữ liệu:FPT}.
+
+\bang{tab_agent_tools}{Bảy công cụ của tác tử, số lần được gọi và độ trễ trung vị trên \SL{dem/agent_scen}
+kịch bản}{agenttools}
+
+\maNguon{agent__Tool}{Đặc tả một công cụ: tên, loại, mô tả và hàm thực thi}
+
+% ---------------------------------------------------------------------
+\section{Kiến trúc hệ thống}\label{sec:kientruc-agent}
+\subsection{Năm tầng}
+Hệ thống được tổ chức thành năm tầng (Hình~\ref{fig:t6_layers}). Tầng giao diện (Web App) chỉ gửi câu hỏi và hồ sơ
+qua HTTP. Tầng điều phối (\texttt{ReActAgent}) phân tích câu hỏi, lập kế hoạch và chạy vòng lặp. Tầng công cụ bọc các
+mô hình và đồ thị thành bảy hàm có cùng giao diện. Tầng tri thức gồm hai KG, kho văn bản đã chia đoạn và chỉ mục
+truy xuất. Tầng mô hình gồm MLP, BiLSTM, bộ nhúng e5, bộ xếp hạng lại bge và LLM Qwen2.5-1.5B~\cite{qwen2024qwen25},
+tất cả chạy cục bộ, không gọi dịch vụ ngoài.
+
+\hinhtikz{t6_layers}{Kiến trúc năm tầng của tác tử và lớp, hàm hiện thực tương ứng trong gói \texttt{tl2}}{t6_layers}
+
+\subsection{Luồng xử lý một câu hỏi}
+Hình~\ref{fig:t6_sequence} là biểu đồ tuần tự của một câu hỏi y tế có kèm hồ sơ xét nghiệm. Năm bước chính:
+
+\begin{enumerate}
+  \item \textbf{Liên kết thực thể}: \texttt{EntityLinker} (Chương~\ref{chap:rag}) quét câu hỏi bằng bí danh của mọi
+        thực thể trong hai KG, ưu tiên bí danh dài nhất và so khớp cả dạng bỏ dấu, nên ``tieu duong'' và ``tiểu
+        đường'' đều được nhận.
+  \item \textbf{Nhận miền}: miền là KG có nhiều thực thể được liên kết hơn; câu hỏi không liên kết được thực thể nào
+        mặc định là y tế.
+  \item \textbf{Lập kế hoạch}: chọn chuỗi công cụ theo loại thực thể và ý định (Mục~\ref{sec:laplkh}).
+  \item \textbf{Thực thi}: gọi lần lượt từng công cụ, mỗi lần ghi một cặp Thought -- Action và một Observation.
+  \item \textbf{Tổng hợp và kiểm chứng}: LLM viết câu trả lời từ bằng chứng; bộ kiểm chứng quyết định dùng bản của
+        LLM hay bản tổng hợp theo khuôn (Mục~\ref{sec:kiemchung-agent}).
+\end{enumerate}
+
+\hinhtikz{t6_sequence}{Biểu đồ tuần tự cho một câu hỏi y tế có hồ sơ xét nghiệm: trình duyệt, Flask, tác tử, các
+công cụ, LLM và bộ kiểm chứng}{t6_sequence}
+
+% ---------------------------------------------------------------------
+\section{Hiện thực tác tử}\label{sec:hienthuc-agent}
+\subsection{Bộ lập kế hoạch tất định}\label{sec:laplkh}
+Một quyết định thiết kế quan trọng là \emph{không} để LLM tự chọn công cụ. Với 1,5 tỉ tham số, Qwen2.5 sinh lời gọi
+công cụ không ổn định: sai tên, sai tham số hoặc bỏ qua công cụ cần thiết. Thay vào đó bộ lập kế hoạch dùng luật trên
+kết quả liên kết thực thể và từ khóa ý định (Đoạn mã~\ref{code:agent__ReActAgent.plan}):
+
+\begin{itemize}
+  \item \textbf{Y tế}: có chỉ số xét nghiệm (HbA1c, glucose, BMI, trích từ câu hỏi bằng biểu thức chính quy hoặc gửi
+        kèm từ giao diện) thì gọi \texttt{chan\_doan\_nguy\_co}; có thực thể y tế thì gọi \texttt{kg\_y\_te}.
+  \item \textbf{Tài chính}: có biến vĩ mô (tỷ giá, lãi suất, nghị định) thì gọi \texttt{kg\_tai\_chinh}; có mã cổ
+        phiếu thì gọi \texttt{du\_lieu\_thi\_truong}; hỏi mức giá vàng thì gọi \texttt{quy\_doi\_vang}; có từ khóa
+        xu hướng (``dự báo'', ``phiên tới'', ``nên mua'') thì gọi \texttt{du\_bao\_bilstm}.
+  \item \textbf{Luôn luôn}: kết thúc bằng \texttt{truy\_xuat\_rag} để có văn bản gốc làm căn cứ trích dẫn.
+\end{itemize}
+
+Đây là biến thể ``lập kế hoạch rồi thực thi'' của ReAct: chuỗi hành động được quyết định một lần từ đầu thay vì sau
+mỗi quan sát. Đổi lại tính linh hoạt, bộ lập kế hoạch đạt độ chính xác chọn công cụ gần tuyệt đối
+(Mục~\ref{sec:agent-ketqua}) và hoàn toàn tái lập được, điều cần thiết khi đánh giá.
+
+\maDai{agent__ReActAgent.plan}{Bộ lập kế hoạch: nhận miền từ thực thể liên kết, chọn chuỗi công cụ theo loại thực
+thể và ý định}
+
+\maNguon{agent__ReActAgent.parse_profile}{Trích hồ sơ xét nghiệm từ câu hỏi tiếng Việt tự do}
+
+\subsection{Vòng lặp và các công cụ}
+Hàm \texttt{run} thực thi kế hoạch, đo thời gian mỗi công cụ và ghi vết (Đoạn mã~\ref{code:agent__ReActAgent.run}).
+Công cụ phức tạp nhất là \texttt{kg\_tai\_chinh}: nó tách thực thể thành \emph{biến nguồn} (yếu tố vĩ mô, chính
+sách, sự kiện) và \emph{biến đích} (cổ phiếu, vàng, chỉ số), gọi \texttt{impact\_paths} cho mọi cặp và diễn đạt
+đường ngắn nhất thành một câu có kênh truyền dẫn và cơ chế (Đoạn mã~\ref{code:agent__ReActAgent._t_fkg}). Khi câu
+hỏi chỉ nêu biến nguồn, công cụ xét mặc định bốn cổ phiếu và vàng SJC.
+
+\maNguon{agent__ReActAgent.run}{Vòng lặp ReAct: mỗi bước một Thought, một Action đo thời gian và một Observation}
+
+\maNguon{agent__ReActAgent._t_fkg}{Công cụ \texttt{kg\_tai\_chinh}: suy luận đa bước cho mọi cặp nguồn -- đích và
+diễn đạt thành bằng chứng có nguồn}
+
+\subsection{Tổng hợp có căn cứ và bộ kiểm chứng}\label{sec:kiemchung-agent}
+Bằng chứng từ mọi công cụ được đánh số $[1], \dots, [n]$ và đưa vào lời nhắc của LLM cùng chỉ dẫn hệ thống: chỉ dùng
+thông tin trong bằng chứng, mỗi ý quan trọng phải kèm số hiệu, không bịa số liệu
+(Đoạn mã~\ref{code:llm__SYSTEM_GROUNDED}, \ref{code:llm__grounded_prompt}). Đây là cùng lời nhắc đã dùng cho
+GraphRAG ở Chương~\ref{chap:rag}, nên kết quả hai chương so sánh được với nhau. LLM sinh tham lam (greedy) để mọi lần
+chạy cho cùng một câu trả lời.
+
+\maNguon{llm__SYSTEM_GROUNDED}{Chỉ dẫn hệ thống cho LLM: chỉ dùng bằng chứng, trích dẫn [n], không bịa số liệu}
+
+\maNguon{llm__grounded_prompt}{Lời nhắc có căn cứ: bằng chứng đánh số, câu hỏi, yêu cầu trích dẫn}
+
+Mô hình nhỏ không phải lúc nào cũng tuân thủ chỉ dẫn, vì vậy câu trả lời đi qua bộ kiểm chứng trước khi tới người
+dùng (Hình~\ref{fig:t6_verifier}). Bộ kiểm chứng kiểm ba điều kiện:
+
+\begin{enumerate}
+  \item có ít nhất một trích dẫn $[n]$;
+  \item mọi trích dẫn trỏ tới bằng chứng có thật ($1 \le n \le$ số bằng chứng);
+  \item \emph{độ trung thực số học} không dưới 0,8, với
+        \begin{equation}\label{eq:faith}
+          \mathrm{Faith} = \frac{\left|\{\text{con số trong câu trả lời có trong bằng chứng hoặc câu hỏi}\}\right|}
+                                {\left|\{\text{con số trong câu trả lời}\}\right|}.
+        \end{equation}
+\end{enumerate}
+
+Con số được chuẩn hóa trước khi so (bỏ dấu ngăn nghìn và dấu thập phân, nên 1.234,5 và 1,234.5 là một), số một
+chữ số và số hiệu trích dẫn không tính. Con số người dùng tự nêu (liều 500 mg, HbA1c 7,3) được coi là có căn cứ, vì
+nhắc lại dữ kiện của câu hỏi không phải bịa. Không đạt một trong ba điều kiện, tác tử trả bản tổng hợp theo khuôn:
+liệt kê nguyên văn từng bằng chứng kèm số hiệu. Bản khuôn kém tự nhiên nhưng đúng theo cấu tạo, và vết suy luận ghi
+rõ lý do bản LLM bị từ chối.
+
+\hinhtikz{t6_verifier}{Bộ kiểm chứng: trích dẫn phải trỏ tới bằng chứng có thật và con số phải có trong bằng chứng;
+không đạt thì dùng bản tổng hợp theo khuôn}{t6_verifier}
+
+\maNguon{agent__ReActAgent.synthesize}{Tổng hợp: LLM viết từ bằng chứng, bộ kiểm chứng chọn bản LLM hoặc bản
+khuôn}
+
+\maNguon{agent__verify}{Bộ kiểm chứng: trích dẫn hợp lệ và độ trung thực số học~\eqref{eq:faith}}
+
+% ---------------------------------------------------------------------
+\section{Đánh giá tác tử}\label{sec:agent-ketqua}
+\subsection{Thiết kế thí nghiệm}
+Bộ đánh giá gồm \SL{dem/agent_scen} kịch bản, \SL{dem/agent_health} y tế và \SL{dem/agent_finance} tài chính, bao
+phủ mọi công cụ và các loại câu hỏi đã phân tích ở hai chương trước. Mỗi kịch bản có ba thứ được viết trước khi chạy:
+câu hỏi, \emph{tập công cụ kỳ vọng} và một danh sách \emph{dữ kiện bắt buộc}, mỗi dữ kiện là một nhóm cụm từ đồng
+nghĩa (chẳng hạn \{``tránh'', ``không nên'', ``không uống''\}). Các chỉ số:
+
+\begin{itemize}
+  \item \textbf{Precision và recall công cụ}: so tập công cụ đã gọi với tập kỳ vọng.
+  \item \textbf{Độ phủ dữ kiện}: tỉ lệ nhóm dữ kiện bắt buộc có ít nhất một cụm từ xuất hiện trong câu trả lời cuối
+        (so khớp không dấu), cùng hàm đã dùng cho GraphRAG.
+  \item \textbf{Trung thực số học}~\eqref{eq:faith} và \textbf{tỉ lệ bản LLM qua kiểm chứng}.
+  \item \textbf{Đối chứng ``chỉ LLM''}: cùng Qwen2.5-1.5B trả lời cùng câu hỏi, không có công cụ, với chỉ dẫn ``trả
+        lời ngắn gọn, chính xác''.
+\end{itemize}
+
+\subsection{Kết quả tổng hợp}
+\bang{tab_agent_agg}{Kết quả tổng hợp của tác tử theo miền}{agentagg}
+
+\hinhpdf{agent_eval}{1.0}{Các chỉ số của tác tử theo miền}{agent_eval}
+
+Bảng~\ref{tab:agentagg} và Hình~\ref{fig:agent_eval} cho ba kết luận. Thứ nhất, bộ lập kế hoạch tất định gọi đủ mọi
+công cụ cần thiết (recall \SL{agent/agg/all/tool_recall}) và nhận đúng miền ở mọi kịch bản. Precision tài chính dưới
+1 vì hai kịch bản (9 và 15) gọi thêm \texttt{quy\_doi\_vang} khi câu hỏi nhắc tới giá vàng mà tập kỳ vọng không có; lời gọi
+thừa này vô hại và thực ra bổ sung thông tin. Thứ hai, độ phủ dữ kiện của tác tử là \SL{agent/agg/all/coveragePct}\%,
+so với \SL{agent/agg/all/coverage_llm_onlyPct}\% khi LLM trả lời một mình: công cụ nâng độ phủ thêm
+\SL{dem/agent_cov_gainPct} điểm phần trăm. Thứ ba, và đáng bàn nhất, chỉ \SL{agent/agg/all/llm_passPct}\% bản nháp
+của LLM qua kiểm chứng.
+
+\bang{tab_agent_scen}{Kết quả từng kịch bản}{agentscen}
+
+\subsection{Vì sao LLM trả lời một mình là nguy hiểm}
+Độ phủ thấp của đối chứng ``chỉ LLM'' không chỉ là thiếu thông tin. Đọc từng câu trả lời cho thấy các lỗi có hậu quả
+thật:
+
+\begin{itemize}
+  \item Kịch bản 1, câu hỏi về bia khi đang dùng metformin: LLM trả lời ``Dùng Metformin không ảnh hưởng đến việc
+        uống bia'', bỏ qua hoàn toàn nguy cơ nhiễm toan lactic mà Quyết định 5481/QĐ-BYT cảnh báo.
+  \item Kịch bản 8, đái tháo đường kèm suy tim: LLM liệt kê đầu tiên nhóm thiazolidinedione (pioglitazone), là nhóm
+        thuốc gây giữ nước và \emph{chống chỉ định} ở người suy tim, và không nhắc tới nhóm SGLT2 được ưu tiên. Tác tử
+        trả lời đúng ``ưu tiên SGLT2 (empagliflozin)'' với một trích dẫn tới KG.
+  \item Kịch bản 10, giá vàng quy đổi hôm nay: LLM tự nhận thời điểm là ``tháng 10/2023'' và trả ``645 -- 650
+        USD/ounce, tương đương 21,89 -- 22,17 triệu đồng mỗi lượng 1 gram'', sai cả mức giá (giá thật
+        \SL{market/gold/last/xau} USD/ounce), cả đơn vị (lượng là 37,5 g). Mô hình không có cách nào biết giá hôm
+        nay; tác tử thì tính đúng \SL{market/gold/last/gold_vnd} triệu đồng/lượng từ dữ liệu mới nhất.
+  \item Kịch bản 13, lãi suất điều hành và VCB, VIC: LLM gọi VIC là ``ngân hàng thương mại''.
+\end{itemize}
+
+\hinhpdf{agent_vs_llm}{1.0}{Độ phủ dữ kiện theo từng kịch bản: tác tử có công cụ so với LLM trả lời một
+mình}{agent_vs_llm}
+
+Trung thực số học của đối chứng (\SL{agent/agg/all/faith_llm_only}) trông không thấp, nhưng phải đọc đúng cách: 11
+trên 16 câu trả lời chỉ LLM không có con số hai chữ số nào, và theo định nghĩa~\eqref{eq:faith} một câu trả lời
+không có con số được tính trung thực tuyệt đối. Khi LLM thật sự đưa ra con số, như ở kịch bản 10, tỉ lệ rơi xuống
+0,17. Đây là ví dụ cho thấy một chỉ số trung thực phải được đọc cùng độ phủ, không đọc riêng.
+
+\subsection{Vì sao bản nháp LLM bị từ chối}
+Trong \SL{dem/agent_scen} kịch bản, chỉ \SL{dem/agent_llm} bản nháp qua kiểm chứng (kịch bản 6 và 8, cả hai đều ngắn,
+một ý, một trích dẫn). \SL{dem/agent_nocite} bản nháp bị từ chối vì \emph{không có trích dẫn nào}, dù hầu hết trung
+thực về số liệu (chỉ một bản dưới 1,0) và nhiều bản đúng về nội dung. Một bản nháp còn lại (kịch bản 7) có ba trích dẫn nhưng một phần ba số con số
+không tìm thấy trong bằng chứng. Nguyên nhân chính vì vậy không phải LLM bịa số, mà là mô hình 1,5B tham số không
+tuân thủ yêu cầu định dạng ``kèm số hiệu [n]'' khi bằng chứng dài và nhiều nguồn.
+
+\begin{vetsuyluan}{Bản nháp của Qwen2.5-1.5B cho kịch bản 9 (bị từ chối vì không có trích dẫn)}
+\input{generated/llmdraft_finance}
+\end{vetsuyluan}
+
+Bản nháp trên minh họa thêm một giới hạn của bộ kiểm chứng: nó không có con số nào nên đạt trung thực số học tuyệt
+đối, nhưng câu ``giá vàng miếng SJC cũng tăng do giá quy đổi tăng nhanh hơn chi phí'' đã trộn cơ chế của FPT vào vàng,
+và câu cuối viện dẫn ``giá nguyên vật liệu, công nghệ, thị trường xuất khẩu'' không có trong bằng chứng nào. Kiểm
+chứng con số bắt được lỗi bịa số liệu, nhưng không bắt được lỗi trộn ngữ nghĩa; việc thiếu trích dẫn vô tình chặn
+được bản nháp này. Một bộ kiểm chứng mạnh hơn cần đối chiếu từng câu với bằng chứng được trích, chẳng hạn bằng mô
+hình suy diễn ngôn ngữ tự nhiên (NLI); Chương~\ref{chap:ketluan} bàn hướng này.
+
+\subsection{Ba kịch bản chưa đạt độ phủ đầy đủ}
+Ba kịch bản có độ phủ 0,50, mỗi kịch bản chỉ ra một giới hạn khác nhau:
+
+\begin{itemize}
+  \item \textbf{Kịch bản 4} (HbA1c 5,9\%): câu trả lời không có cụm ``tiền đái tháo đường''. KG đã có tri thức cần
+        thiết (cạnh \textsf{HbA1c\_Tien} $\xrightarrow{\textsf{TIEU\_CHUAN\_CHAN\_DOAN}}$ \textsf{Tien\_DTD} theo
+        Bảng~\ref{tab:chandoan}), nhưng công cụ \texttt{kg\_y\_te} chỉ tra theo thực thể có tên trong câu hỏi, không
+        đối chiếu chỉ số xét nghiệm của hồ sơ với ngưỡng chẩn đoán. Đây là một bước nối giữa tầng học sâu và tầng đồ
+        thị nên được bổ sung.
+  \item \textbf{Kịch bản 6} (suy thận nặng): bản LLM qua kiểm chứng, nói đúng ``không nên dùng metformin khi eGFR
+        $<$ 30'', nhưng dùng ``không nên'' thay cho ``chống chỉ định'', nên bị tính thiếu một dữ kiện. Đây là giới hạn
+        của độ phủ đo bằng so khớp cụm từ.
+  \item \textbf{Kịch bản 15} (Fed và tỷ giá): \textsf{USD\_VND} là \textsf{MacroFactor} nên bộ lập kế hoạch xếp nó vào
+        biến nguồn, không xét cặp Fed $\to$ USD/VND. Một biến có thể vừa là nguyên nhân vừa là kết quả; bộ lập kế
+        hoạch cần xét vai trò theo vị trí trong câu, không chỉ theo lớp của thực thể.
+\end{itemize}
+
+\subsection{Độ trễ}
+Tổng thời gian trung bình một câu hỏi là \SL{agent/agg/all/total_ms} ms, trong đó LLM chiếm phần lớn
+(\SL{agent/agg/all/llm_s} giây cho bước tổng hợp). Hình~\ref{fig:agent_tools} so sánh các công cụ: truy vấn KG và
+tính toán chưa tới 1 ms, MLP khoảng \SL{agent/agg/tool_ms/chan_doan_nguy_co} ms, BiLSTM với 200 mẫu MC Dropout khoảng
+\SL{agent/agg/tool_ms/du_bao_bilstm} ms, và truy xuất RAG khoảng \SL{agent/agg/tool_ms/truy_xuat_rag} ms vì phải
+nhúng câu hỏi và chạy bộ xếp hạng lại trên 30 ứng viên. Nếu bỏ LLM và chỉ dùng bản khuôn, tác tử trả lời trong
+chưa tới một giây.
+
+\hinhpdf{agent_tools}{1.0}{Số lần gọi và độ trễ trung vị của từng công cụ}{agent_tools}
+
+% ---------------------------------------------------------------------
+\section{Ứng dụng Web}\label{sec:webapp}
+\subsection{Kiến trúc triển khai}
+Web App gồm một máy chủ Flask và một trang HTML với JavaScript thuần, không dùng thư viện giao diện ngoài; đồ thị tri
+thức và biểu đồ giá được vẽ bằng SVG ngay trên trình duyệt. Máy chủ nạp tác tử một lần khi khởi động và cung cấp bốn
+API (Hình~\ref{fig:t6_arch}):
+
+\begin{itemize}
+  \item \texttt{POST /api/agent}: chạy tác tử, trả vết suy luận, bằng chứng, câu trả lời và kết quả kiểm chứng
+        (Đoạn mã~\ref{code:app__api_agent});
+  \item \texttt{GET /api/kg/<tên>}: trả đồ thị kèm tọa độ Kamada-Kawai tính sẵn ở máy chủ
+        (Đoạn mã~\ref{code:app__kg_payload});
+  \item \texttt{POST /api/rag}: chạy ba bộ truy xuất trên cùng câu hỏi để so sánh;
+  \item \texttt{GET /api/series/<mã>}: trả 250 phiên giá gần nhất cho biểu đồ.
+\end{itemize}
+
+\hinhtikz{t6_arch}{Kiến trúc triển khai: trình duyệt, máy chủ Flask với bốn API, tác tử và phân bổ CPU/GPU cho
+từng thành phần}{t6_arch}
+
+Mọi mô hình học sâu chạy trên GPU trong cùng tiến trình (Bảng~\ref{tab:moitruong}): LLM bf16, bộ nhúng e5 fp16, bộ
+xếp hạng lại bf16, MLP và BiLSTM; BM25, KG và các công cụ tính toán chạy trên CPU.
+
+\maNguon{app__api_agent}{API tác tử: nhận câu hỏi và hồ sơ tùy chọn, trả vết suy luận và câu trả lời đã kiểm
+chứng}
+
+\maNguon{app__kg_payload}{API đồ thị tri thức: bố cục Kamada-Kawai tính sẵn, cạnh diễn đạt thành câu kèm nguồn}
+
+\subsection{Giao diện}
+Trang có bốn thẻ: Trợ lý Y tế, Trợ lý Tài chính, Khám phá KG và Tra cứu RAG (Hình~\ref{fig:ui_overview}). Hai thẻ
+trợ lý có cùng bố cục: khung câu hỏi với các câu mẫu, khung vết suy luận tô màu theo loại bước, khung câu trả lời
+ghi rõ bản LLM hay bản khuôn cùng thời gian xử lý, và danh sách bằng chứng được trích. Thẻ y tế có thêm biểu mẫu hồ sơ
+xét nghiệm và đồng hồ nguy cơ; thẻ tài chính có biểu đồ giá 250 phiên. Ảnh chụp của hai thẻ trợ lý đã được trình bày
+ở Hình~\ref{fig:ui_health}, \ref{fig:ui_health_food}, \ref{fig:ui_finance} và~\ref{fig:ui_finance_forecast}.
+
+\anhUI{ui_overview}{Màn hình chính của Web App: bốn thẻ chức năng và trợ lý y tế với hồ sơ xét nghiệm}{ui_overview}
+
+Thẻ Khám phá KG (Hình~\ref{fig:ui_kg_health}) cho phép chọn một trong hai KG, nhấn vào nút để xem các cạnh vào ra
+kèm nguồn. Thẻ Tra cứu RAG (Hình~\ref{fig:ui_rag}) chạy BM25, Dense e5-base và Hybrid + Rerank trên cùng câu hỏi,
+hiển thị ba đoạn đứng đầu của mỗi bộ cùng điểm số và thời gian, để người dùng tự thấy kết quả của
+Chương~\ref{chap:rag}: BM25 nhạy với từ khóa, dense hiểu đồng nghĩa, và kết hợp có xếp hạng lại cho kết quả tốt
+nhất.
+
+\anhUI{ui_kg_health}{Thẻ Khám phá KG với \texttt{VietnamDiabetesKG}: nút tô theo lớp, cạnh nguy cơ màu đỏ,
+khung bên liệt kê các cạnh của nút đang chọn}{ui_kg_health}
+
+\anhUI{ui_rag}{Thẻ Tra cứu RAG: ba bộ truy xuất trên cùng một câu hỏi}{ui_rag}
+
+% ---------------------------------------------------------------------
+\section{Tổng kết chương}
+\begin{itemize}
+  \item Tác tử ReAct với bộ lập kế hoạch tất định gọi đủ công cụ ở mọi kịch bản và nâng độ phủ dữ kiện từ
+        \SL{agent/agg/all/coverage_llm_onlyPct}\% lên \SL{agent/agg/all/coveragePct}\% so với cùng LLM trả lời một
+        mình.
+  \item LLM trả lời một mình mắc lỗi nguy hiểm ở cả hai miền (khẳng định metformin không ảnh hưởng khi uống bia, đề
+        xuất thuốc chống chỉ định cho người suy tim); công cụ và trích dẫn loại bỏ được các lỗi này.
+  \item Bộ kiểm chứng từ chối phần lớn bản nháp vì thiếu trích dẫn; bản khuôn giữ cho câu trả lời luôn truy vết được,
+        nhưng kiểm chứng con số không bắt được lỗi trộn ngữ nghĩa.
+  \item Ba kịch bản thiếu dữ kiện chỉ ra ba hướng cải tiến cụ thể: luật tiền đái tháo đường trong KG, đo độ phủ theo
+        ngữ nghĩa, và lập kế hoạch theo vai trò của thực thể trong câu.
+\end{itemize}

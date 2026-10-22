@@ -1,0 +1,17 @@
+% Ba thế hệ RAG xếp tầng 3D: Naive -> Advanced (tối ưu tiền/hậu truy xuất) -> GraphRAG (đồ thị + cộng đồng).
+% Mô tả nằm ngay trên mặt trước của khối (chữ trắng) để hình không phải kéo dài sang phải.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  \foreach \i/\c/\t/\s in {0/cBlue/Naive RAG/{chia đoạn $\to$ embedding $\to$ top-$k$ $\to$ sinh},
+                          1/cOrange/Advanced RAG/{HyDE, Multi-Query $\cdot$ hybrid BM25 + dense $\cdot$ rerank cross-encoder},
+                          2/cPurple/GraphRAG/{thực thể + quan hệ $\cdot$ cộng đồng Louvain $\cdot$ tìm kiếm cục bộ / toàn cục}} {
+    \pgfmathsetmacro{\y}{2.5*\i}
+    \pgfmathsetmacro{\x}{1.2*\i}
+    \khoibaD{\x}{\y}{9.0}{1.75}{2.6}{\c}
+    \node[anchor=north west, text=white, font=\normalsize\bfseries] at (\x+0.2,\y+1.68) {\t};
+    \node[anchor=north west, text=white, font=\scriptsize, text width=8.5cm, align=left] at (\x+0.2,\y+1.08) {\s};
+  }
+  \draw[-{Stealth[length=5mm]}, line width=4pt, cGreen!70!black] (-0.9,0.2) -- (1.4,7.3)
+    node[midway, sloped, above, font=\scriptsize\bfseries, text=cGreen!40!black] {độ phủ ý, khả năng giải thích};
+  \draw[-{Stealth[length=5mm]}, line width=4pt, cRed!70] (6.6,-0.6) -- (9.6,-0.6)
+    node[right, font=\scriptsize\bfseries, text=cRed!70!black, align=left] {chi phí lập chỉ mục\\và độ trễ tăng};
+\end{tikzpicture}

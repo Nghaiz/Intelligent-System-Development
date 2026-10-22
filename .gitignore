@@ -109,3 +109,14 @@ Report/TieuLuan 01/_minted*/
 Report/TieuLuan 01/main.*
 !Report/TieuLuan 01/main.tex
 src/TieuLuan 01/models/ch3/*_vgg11.pt
+# ===== Tiểu luận 02 =====
+# Mô hình HuggingFace (e5, MiniLM, bge-reranker-v2-m3, Qwen2.5-1.5B; ~8 GB): tải lại bằng scripts/download_models.py
+src/TieuLuan 02/models/hf/
+# Báo cáo: các thư mục build.py tự sinh lại
+Report/TieuLuan 02/code/
+Report/TieuLuan 02/generated/
+Report/TieuLuan 02/tikzcache/
+Report/TieuLuan 02/_minted*/
+Report/TieuLuan 02/main.*
+!Report/TieuLuan 02/main.tex
+Report/TieuLuan 02/kiemtra.*

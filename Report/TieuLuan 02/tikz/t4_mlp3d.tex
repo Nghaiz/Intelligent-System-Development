@@ -1,0 +1,26 @@
+% Kiến trúc DiabetesMLP dạng khối 3D: 13 đặc trưng -> 128 -> 64 -> 1 logit, ReLU + BatchNorm + Dropout 0,2.
+% Khối đặt cách nhau đủ để mũi tên và nhãn Dropout nằm trong khe giữa mặt bên khối trước và mặt trước khối sau.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  \khoibaD{0}{0}{0.7}{2.6}{1.2}{cSlate}
+  \node[font=\scriptsize\bfseries, align=center] at (0.35,-0.55) {đầu vào\\13};
+  \khoibaD{2.5}{-1.4}{1.0}{5.4}{2.6}{cBlue}
+  \node[font=\scriptsize\bfseries, align=center] at (3.0,-1.95) {Linear 128\\BN · ReLU};
+  \khoibaD{6.3}{-0.6}{0.9}{3.8}{2.0}{cPurple}
+  \node[font=\scriptsize\bfseries, align=center] at (6.75,-1.15) {Linear 64\\BN · ReLU};
+  \khoibaD{9.55}{0.8}{0.6}{1.0}{0.8}{cRed}
+  \node[font=\scriptsize\bfseries, align=center] at (9.85,0.25) {logit\\1};
+  \foreach \a/\b in {1.45/2.4, 5.0/6.2, 8.4/9.45} \draw[mui] (\a,1.3) -- (\b,1.3);
+  \node[font=\scriptsize, text=cRed, rotate=90, anchor=west] at (5.6,1.6) {Dropout 0,2};
+  \node[font=\scriptsize, text=cRed, rotate=90, anchor=west] at (8.9,1.6) {Dropout 0,2};
+  % đầu ra
+  \node[cau=cOrange, minimum size=1.3cm, font=\scriptsize\bfseries] (sg) at (12.0,1.3) {$\sigma(\cdot)$};
+  \draw[mui] (10.7,1.3) -- (sg);
+  \node[hop=cGreen, text width=3.3cm, font=\scriptsize, anchor=west] at (13.0,1.3)
+    {$P(\text{ĐTĐ})$ so với ngưỡng $\tau=$ \SL{diabetes/mlp/threshold} (chọn tối đa F1 trên tập kiểm định)};
+  % hai ô chú thích ở hàng dưới
+  \node[draw=cSlate, fill=softgray, rounded corners=3pt, align=left, font=\scriptsize, anchor=north west, text width=8.4cm] at (-0.2,-2.8)
+    {\textbf{Huấn luyện trên GPU}: AdamW lr $10^{-3}$, lô 1024, BCE có \texttt{pos\_weight} $=n_0/n_1\approx 10{,}3$,
+     dừng sớm theo PR-AUC; \SL{diabetes/mlp/params} tham số, \SL{diabetes/mlp/epochs} epoch, \SL{diabetes/mlp/train_s} s.};
+  \node[draw=cTeal!70!black, fill=cTeal!8, rounded corners=3pt, align=left, font=\scriptsize, anchor=north west, text width=7.0cm] at (9.0,-2.8)
+    {\textbf{13 đặc trưng}: tuổi, BMI, HbA1c, glucose, giới, tăng huyết áp, bệnh tim, 6 cột one-hot hút thuốc};
+\end{tikzpicture}

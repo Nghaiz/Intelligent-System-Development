@@ -1,0 +1,29 @@
+% Biểu đồ tuần tự của một câu hỏi y tế có hồ sơ xét nghiệm: người dùng -> Flask -> agent -> công cụ -> LLM -> kiểm chứng.
+% Nhãn thông điệp có nền trắng nên đường đời (lifeline) nào chạy qua cũng không cắt chữ.
+\begin{tikzpicture}[font=\scriptsize, x=1cm, y=1cm,
+  life/.style={draw=#1!60!black, dashed, thick},
+  hd/.style={hop=#1, font=\scriptsize\bfseries, minimum width=2.1cm},
+  msg/.style={-{Stealth[length=2.2mm]}, thick, #1},
+  ret/.style={-{Stealth[length=2.2mm]}, thick, dashed, #1},
+  lab/.style={fill=white, inner sep=1pt, align=center}]
+  \foreach \x/\n/\c in {0/{Người dùng}/cSlate, 2.7/Flask/cOrange, 5.4/ReActAgent/cPurple, 9.2/{MLP}/cRed, 11.6/{KG y tế}/cTeal,
+                        14.0/{RAG}/cBlue, 16.4/{Qwen2.5}/cPink} {
+    \node[hd=\c] at (\x,0) {\n};
+    \draw[life=\c] (\x,-0.4) -- (\x,-12.0);
+  }
+  \draw[msg=cSlate] (0,-1.4) -- node[above, lab] {câu hỏi +\\HbA1c, glucose} (2.7,-1.4);
+  \draw[msg=cOrange] (2.7,-2.5) -- node[above, lab] {\texttt{run(question,}\\\texttt{profile)}} (5.4,-2.5);
+  \fill[cPurple!25] (5.25,-2.8) rectangle (5.55,-10.8);
+  \draw[msg=cPurple] (5.55,-3.0) to[out=0, in=0, looseness=2.5] node[right, lab, align=left] {liên kết thực thể\\lập kế hoạch} (5.55,-3.6);
+  \draw[msg=cPurple] (5.55,-4.4) -- node[above, lab] {\texttt{chan\_doan\_nguy\_co}} (9.2,-4.4);
+  \draw[ret=cRed] (9.2,-5.0) -- node[above, lab] {P(ĐTĐ), mức nguy cơ} (5.55,-5.0);
+  \draw[msg=cPurple] (5.55,-5.7) -- node[above, lab, pos=0.3] {\texttt{kg\_y\_te}} (11.6,-5.7);
+  \draw[ret=cTeal] (11.6,-6.3) -- node[above, lab, pos=0.65] {Metformin$\to$rượu: cao} (5.55,-6.3);
+  \draw[msg=cPurple] (5.55,-7.0) -- node[above, lab, pos=0.25] {\texttt{truy\_xuat\_rag}} (14.0,-7.0);
+  \draw[ret=cBlue] (14.0,-7.6) -- node[above, lab, pos=0.75] {3 đoạn + nguồn} (5.55,-7.6);
+  \draw[msg=cPurple] (5.55,-8.3) -- node[above, lab, pos=0.3] {prompt có bằng chứng [1..n]} (16.4,-8.3);
+  \draw[ret=cPink] (16.4,-8.9) -- node[above, lab, pos=0.75] {văn bản + trích dẫn} (5.55,-8.9);
+  \draw[msg=cPurple] (5.55,-9.4) to[out=0, in=0, looseness=2.5] node[right, lab] {\texttt{verify}} (5.55,-10.0);
+  \draw[ret=cPurple] (5.25,-10.6) -- node[above, lab] {answer, trace,\\evidence} (2.7,-10.6);
+  \draw[ret=cOrange] (2.7,-11.6) -- node[above, lab] {JSON $\to$\\giao diện} (0,-11.6);
+\end{tikzpicture}

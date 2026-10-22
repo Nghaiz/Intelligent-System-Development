@@ -1,0 +1,57 @@
+% Tổng quan hệ sinh thái tri thức đa miền: nguồn thô -> hai kho tri thức (KG, chỉ mục vector) -> Agent đa công cụ -> người dùng.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  % ---- lớp nền ba tầng
+  \fill[cSky!8, rounded corners=8pt] (-0.4,-0.6) rectangle (16.2,2.6);
+  \fill[cPurple!7, rounded corners=8pt] (-0.4,2.9) rectangle (16.2,6.3);
+  \fill[cOrange!9, rounded corners=8pt] (-0.4,6.6) rectangle (16.2,10.1);
+  \node[tieude, anchor=west, rotate=90] at (-0.05,0.0) {\footnotesize NGUỒN};
+  \node[tieude, anchor=west, rotate=90] at (-0.05,3.3) {\footnotesize TRI THỨC};
+  \node[tieude, anchor=west, rotate=90] at (-0.05,7.1) {\footnotesize SUY LUẬN};
+  % ---- tầng 1: nguồn dữ liệu thô (khối 3D)
+  \khoibaD{0.6}{0.0}{2.6}{1.5}{1.0}{cRed}
+  \node[text=white, font=\small\bfseries, align=center] at (1.9,0.75) {Phác đồ\\BYT 5481};
+  \khoibaD{3.8}{0.0}{2.6}{1.5}{1.0}{cGreen}
+  \node[text=white, font=\small\bfseries, align=center] at (5.1,0.75) {Nghị định\\24, 232};
+  \khoibaD{7.0}{0.0}{2.6}{1.5}{1.0}{cBlue}
+  \node[text=white, font=\small\bfseries, align=center] at (8.3,0.75) {17 tài liệu\\Markdown};
+  \khoibaD{10.2}{0.0}{2.6}{1.5}{1.0}{cTeal}
+  \node[text=white, font=\small\bfseries, align=center] at (11.5,0.75) {Giá OHLCV\\VN30, vàng};
+  \khoibaD{13.4}{0.0}{2.4}{1.5}{1.0}{cBrown}
+  \node[text=white, font=\small\bfseries, align=center] at (14.6,0.75) {96.128\\hồ sơ bệnh};
+  % ---- tầng 2: hai kho tri thức
+  \node[hop=cPurple, minimum width=6.8cm, minimum height=2.6cm, anchor=south west] (kg) at (0.6,3.3) {};
+  \node[tieude, anchor=north west] at (kg.north west) {\ Đồ thị tri thức (KG + ontology)};
+  \foreach \i/\x/\y/\c in {a/1.6/4.2/cRed, b/3.0/5.0/cBlue, c/4.4/4.1/cGreen, d/5.8/4.9/cOrange, e/6.6/3.9/cTeal, f/2.6/3.7/cPink}
+    \node[cau=\c, minimum size=5mm] (n\i) at (\x,\y) {};
+  \foreach \u/\v in {a/b, b/c, c/d, d/e, a/f, f/c, b/d}
+    \draw[-{Stealth[length=1.6mm]}, thick, cNavy!70] (n\u) -- (n\v);
+  \node[hop=cIndigo, minimum width=6.8cm, minimum height=2.6cm, anchor=south west] (vx) at (9.0,3.3) {};
+  \node[tieude, anchor=north west] at (vx.north west) {\ Chỉ mục vector + BM25};
+  % hình trụ cơ sở dữ liệu vector (đáy đặt cao hơn dòng chú thích bên dưới)
+  \foreach \x/\c in {10.3/cIndigo, 12.0/cSky, 13.7/cBlue} {
+    \fill[\c!55] (\x-0.55,4.0) rectangle (\x+0.55,5.1);
+    \fill[\c!80!black] (\x,4.0) ellipse (0.55 and 0.16);
+    \fill[\c!30] (\x,5.1) ellipse (0.55 and 0.16);
+    \draw[\c!60!black, thick] (\x-0.55,4.0) -- (\x-0.55,5.1) (\x+0.55,4.0) -- (\x+0.55,5.1);
+  }
+  \node[font=\scriptsize, text=cNavy] at (12.45,3.6) {e5-base 768 chiều · 101 đoạn · cha--con};
+  % ---- tầng 3: agent và người dùng
+  \node[hop=cOrange, minimum width=7.2cm, minimum height=2.8cm, anchor=south west] (ag) at (3.6,7.0) {};
+  \node[tieude, anchor=north] at (ag.north) {Tác tử ReAct đa công cụ};
+  \node[hop=cRed, font=\scriptsize\bfseries, minimum width=1.9cm] at (4.85,7.9) {MLP\\chẩn đoán};
+  \node[hop=cGreen, font=\scriptsize\bfseries, minimum width=1.9cm] at (7.2,7.9) {BiLSTM\\dự báo};
+  \node[hop=cPurple, font=\scriptsize\bfseries, minimum width=1.9cm] at (9.55,7.9) {Qwen2.5\\+ kiểm chứng};
+  \node[hop=cSlate, minimum width=3.6cm, minimum height=2.2cm, anchor=south west, align=center] (us) at (12.2,7.3)
+    {\textbf{Web App Flask}\\[2pt] trợ lý y tế\\trợ lý đầu tư};
+  \node[circle, fill=cNavy, minimum size=6mm, inner sep=0pt] (hd) at (1.6,8.9) {};
+  \fill[cNavy] (1.0,7.3) .. controls (1.0,8.3) and (2.2,8.3) .. (2.2,7.3) -- cycle;
+  \node[font=\scriptsize, align=center] at (1.6,7.05) {người dùng};
+  % ---- luồng
+  \foreach \x in {1.9,5.1} \draw[mui, cPurple] (\x,1.75) -- (\x,3.25);
+  \foreach \x in {8.3,11.5} \draw[mui, cIndigo] (\x,1.75) -- (\x,3.25);
+  \draw[mui, cBrown] (14.6,1.75) -- (14.6,3.25);
+  \draw[muiM=cPurple, line width=1.6pt] (kg.north) -- node[left, font=\scriptsize] {truy vấn đồ thị} (5.2,6.95);
+  \draw[muiM=cIndigo, line width=1.6pt] (vx.north) -- node[right, font=\scriptsize] {truy xuất} (9.4,6.95);
+  \draw[{Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, very thick, cNavy] (2.3,8.4) -- node[above, font=\scriptsize] {hỏi} (3.55,8.4);
+  \draw[{Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, very thick, cNavy] (10.85,8.4) -- node[above, font=\scriptsize] {JSON} (12.15,8.4);
+\end{tikzpicture}

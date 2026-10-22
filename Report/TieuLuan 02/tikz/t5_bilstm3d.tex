@@ -1,0 +1,32 @@
+% Bộ dự báo BiLSTM: cửa sổ 30 phiên × 7 đặc trưng -> 2 tầng BiLSTM 64 -> Linear -> lợi suất phiên kế; MC Dropout + nhiễu phần dư cho khoảng dự báo.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  % tensor đầu vào 3D
+  \foreach \k in {0,...,5} \khoibaD{0.0+0.18*\k}{0.0+0.1*\k}{0.42}{2.8}{0.5}{cTeal}
+  \node[font=\scriptsize\bfseries, align=center] at (0.9,-0.45) {cửa sổ $30 \times 7$};
+  % hai tầng BiLSTM: chuỗi ô theo thời gian, mũi tên hai chiều
+  \foreach \row/\y/\c in {1/1.0/cBlue, 2/2.8/cPurple} {
+    \foreach \t in {0,...,4} {
+      \node[hop=\c, minimum width=1.0cm, minimum height=0.9cm, font=\tiny\bfseries] (c\row\t) at (3.4+1.75*\t,\y) {LSTM};
+    }
+    \foreach \t [evaluate=\t as \n using int(\t+1)] in {0,...,3} {
+      \draw[-{Stealth[length=1.8mm]}, thick, cGreen!60!black] ([yshift=3pt]c\row\t.east) -- ([yshift=3pt]c\row\n.west);
+      \draw[-{Stealth[length=1.8mm]}, thick, cRed!70] ([yshift=-3pt]c\row\n.west) -- ([yshift=-3pt]c\row\t.east);
+    }
+    \node[font=\scriptsize\bfseries, text=\c!70!black, anchor=west] at (11.3,\y) {BiLSTM tầng \row\ (64 + 64)};
+  }
+  \foreach \t in {0,...,4} \draw[-{Stealth[length=1.8mm]}, thick, cSlate] (c1\t.north) -- (c2\t.south);
+  \draw[mui] (1.9,1.4) -- (c10.west);
+  % đầu ra: Dropout + Linear rồi lợi suất dự báo và khoảng dự báo
+  \node[hop=cOrange, font=\scriptsize\bfseries] (lin) at (5.0,4.9) {Dropout, Linear $128 \to 32 \to 1$};
+  \draw[mui] (c24.north) -- ++(0,0.45) -| (lin.south);
+  \node[hop=cRed, text width=6.6cm, font=\scriptsize, anchor=west] (out) at (8.4,4.9)
+    {$\hat r_{t+1}$ $\Rightarrow$ $\hat P_{t+1} = P_t\, e^{\hat r_{t+1}}$\\200 lượt MC Dropout $+\,\varepsilon$ $\Rightarrow$ khoảng 90\,\%};
+  \draw[mui] (lin) -- (out);
+  % chú giải màu mũi tên và danh sách đặc trưng
+  \draw[-{Stealth[length=1.8mm]}, thick, cGreen!60!black] (3.4,0.05) -- (4.2,0.05);
+  \node[font=\scriptsize, text=cGreen!50!black, anchor=west] at (4.3,0.05) {xuôi thời gian};
+  \draw[-{Stealth[length=1.8mm]}, thick, cRed!70] (8.5,0.05) -- (7.7,0.05);
+  \node[font=\scriptsize, text=cRed!70!black, anchor=west] at (8.6,0.05) {ngược thời gian};
+  \node[font=\scriptsize, align=left, anchor=north west, text width=15.6cm] at (-0.4,-0.85)
+    {Đặc trưng: lợi suất log mục tiêu, lợi suất USD/VND, XAU, DXY, VN30, độ lệch MA20, độ biến động 20 phiên.};
+\end{tikzpicture}

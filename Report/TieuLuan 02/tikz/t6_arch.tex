@@ -1,0 +1,32 @@
+% Triển khai: trình duyệt <-> Flask (4 API) <-> ReActAgent; phân bổ CPU/GPU cho từng thành phần.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm,
+  api/.style={hop=cSlate, font=\scriptsize\ttfamily, minimum width=3.6cm, anchor=west},
+  dev/.style={font=\tiny\bfseries, text=white, fill=#1, rounded corners=2pt, inner sep=2pt}]
+  % trình duyệt
+  \filldraw[draw=cNavy, fill=white, very thick, rounded corners=4pt] (0,0) rectangle (4.2,5.0);
+  \fill[cNavy] (0,4.4) [rounded corners=4pt] rectangle (4.2,5.0);
+  \foreach \x/\c in {0.3/cRed, 0.6/cYellow, 0.9/cGreen} \fill[\c] (\x,4.7) circle (0.09);
+  \node[text=white, font=\scriptsize\bfseries] at (2.5,4.7) {127.0.0.1:8092};
+  \foreach \y/\t/\c in {3.8/{Trợ lý y tế}/cRed, 3.05/{Trợ lý đầu tư}/cGreen, 2.3/{Đồ thị tri thức}/cPurple, 1.55/{So sánh RAG}/cBlue}
+    \node[hop=\c, font=\scriptsize\bfseries, minimum width=3.4cm] at (2.1,\y) {\t};
+  \node[font=\tiny, text=cSlate, align=center] at (2.1,0.55) {HTML + JS thuần,\\đồ thị vẽ bằng SVG};
+  % Flask
+  \node[hop=cOrange, minimum width=4.2cm, minimum height=5.0cm, anchor=south west] at (5.6,0) {};
+  \node[tieude, anchor=north] at (7.7,4.85) {Flask};
+  \foreach \y/\t in {3.6/{POST /api/agent}, 2.7/{GET /api/kg/<tên>}, 1.8/{POST /api/rag}, 0.9/{GET /api/series/<mã>}}
+    \node[api] at (5.8,\y) {\t};
+  \draw[{Stealth[length=3mm]}-{Stealth[length=3mm]}, line width=2pt, cNavy] (4.3,2.5) -- node[above, font=\scriptsize] {JSON} (5.5,2.5);
+  % agent và thành phần
+  \node[hop=cPurple, minimum width=7.1cm, minimum height=5.0cm, anchor=south west] at (10.7,0) {};
+  \node[tieude, anchor=north] at (14.25,4.85) {ReActAgent};
+  \foreach \y/\t/\d/\dc in {3.65/{Qwen2.5-1.5B (bf16)}/GPU/cRed, 3.0/{bge-reranker-v2-m3 (bf16)}/GPU/cRed,
+                           2.35/{e5-base (fp16)}/GPU/cRed, 1.7/{MLP chẩn đoán, BiLSTM}/CPU/cBlue,
+                           1.05/{2 KG NetworkX + RDF}/CPU/cBlue, 0.4/{BM25, chia đoạn, chuỗi giá}/CPU/cBlue} {
+    \node[anchor=west, font=\scriptsize] at (10.95,\y) {\t};
+    \node[dev=\dc, anchor=east] at (17.6,\y) {\d};
+  }
+  \draw[{Stealth[length=3mm]}-{Stealth[length=3mm]}, line width=2pt, cNavy] (9.9,2.5) -- (10.6,2.5);
+  \node[font=\scriptsize, text=cSlate, align=center, text width=16.8cm] at (8.9,-0.75)
+    {Một tiến trình giữ cả 3 mô hình trên GPU $\approx$ 8 GB commit (WDDM tính cả bộ nhớ GPU);
+     LLM nạp trước, reranker lưu sẵn bf16};
+\end{tikzpicture}

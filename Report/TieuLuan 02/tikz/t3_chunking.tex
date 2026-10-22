@@ -1,0 +1,33 @@
+% Năm chiến lược chia đoạn trên cùng một tài liệu: dải ngang là tài liệu, mỗi khối màu là một đoạn.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm,
+  ch/.style={draw=white, line width=1pt, fill=#1, rounded corners=1.5pt},
+  lab/.style={anchor=east, font=\scriptsize\bfseries, text width=3.0cm, align=right}]
+  % thước tài liệu: tiêu đề (đậm) và câu
+  \node[lab] at (-0.2,0.35) {Tài liệu gốc};
+  \foreach \x/\w/\c in {0/0.5/cNavy, 0.5/2.6/cSlate!35, 3.1/0.5/cNavy, 3.6/3.9/cSlate!35, 7.5/0.5/cNavy, 8.0/4.6/cSlate!35} \fill[\c] (\x,0) rectangle ++(\w,0.7);
+  \node[font=\tiny, text=white] at (0.25,0.35) {\#};\node[font=\tiny, text=white] at (3.35,0.35) {\#\#};\node[font=\tiny, text=white] at (7.75,0.35) {\#\#};
+  \foreach \x in {1.3,2.2,4.5,5.6,6.6,9.0,10.1,11.3} \draw[white, thick] (\x,0) -- (\x,0.7);
+  % 1 cố định
+  \node[lab] at (-0.2,-0.75) {Cố định 400 + chồng 60};
+  \foreach \i/\c in {0/cBlue,1/cSky,2/cBlue,3/cSky} \fill[ch=\c, opacity=0.8] ({\i*3.0},-1.1) rectangle ++(3.45,0.7);
+  \draw[cRed, line width=1.5pt] (5.6,-1.25) -- (5.6,-0.25) node[above, font=\tiny, text=cRed] {cắt giữa câu};
+  % 2 đệ quy
+  \node[lab] at (-0.2,-1.95) {Đệ quy \texttt{\textbackslash n\textbackslash n} $\to$ câu $\to$ từ};
+  \foreach \a/\b/\c in {0/2.2/cGreen, 2.2/4.5/cLime, 4.5/7.5/cGreen, 7.5/10.1/cLime, 10.1/12.6/cGreen} \fill[ch=\c] (\a,-2.3) rectangle (\b,-1.6);
+  % 3 theo cấu trúc
+  \node[lab] at (-0.2,-3.15) {Theo cấu trúc \#/\#\#/\#\#\#};
+  \foreach \a/\b/\c/\t in {0/3.1/cOrange/{\# Chẩn đoán}, 3.1/7.5/cYellow/{\#\# HbA1c}, 7.5/12.6/cOrange/{\#\# Glucose}} {
+    \fill[ch=\c] (\a,-3.5) rectangle (\b,-2.8); \node[font=\tiny] at ({(\a+\b)/2},-3.15) {\t};}
+  % 4 ngữ nghĩa
+  \node[lab] at (-0.2,-4.35) {Ngữ nghĩa (phân vị 80)};
+  \foreach \a/\b/\c in {0/4.5/cPurple, 4.5/6.6/cPink, 6.6/12.6/cPurple} \fill[ch=\c] (\a,-4.7) rectangle (\b,-4.0);
+  \foreach \x/\h in {1.3/0.15,2.2/0.2,4.5/0.62,5.6/0.25,6.6/0.55,9.0/0.18,10.1/0.22,11.3/0.12}
+    \fill[cRed!70] (\x-0.12,-4.0) rectangle (\x+0.12,{-4.0+0.6*\h});
+  \draw[dashed, cRed] (0,-3.76) -- (12.6,-3.76) node[right, font=\tiny, text=cRed] {ngưỡng};
+  % 5 cha-con
+  \node[lab] at (-0.2,-5.7) {Cha--con 900 / 220};
+  \foreach \a/\b in {0/3.1, 3.1/7.5, 7.5/12.6} \draw[cTeal!70!black, line width=1.4pt, rounded corners=2pt, fill=cTeal!12] (\a+0.03,-6.25) rectangle (\b-0.03,-5.15);
+  \foreach \a in {0.1,1.15,2.15, 3.2,4.3,5.4,6.45, 7.6,8.85,10.1,11.35} \fill[ch=cTeal] (\a,-6.1) rectangle ++(0.95,0.45);
+  \node[font=\tiny, text=cTeal!50!black] at (6.3,-5.38) {tìm trên đoạn con, trả về đoạn cha};
+  \draw[-{Stealth}, thick] (0,-6.55) -- (12.8,-6.55) node[right, font=\scriptsize] {ký tự};
+\end{tikzpicture}

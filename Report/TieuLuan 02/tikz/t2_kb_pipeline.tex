@@ -1,0 +1,26 @@
+% Xây KB và KG từ dữ liệu bảng (hướng dungvt): bảng CSV -> văn bản hoá (KB) và bộ ba (KG) -> hai kiểu truy vấn.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  % bảng CSV 3D, ô đủ rộng cho tiêu đề cột in đậm
+  \foreach \r in {0,...,4} \foreach \c in {0,...,3} {
+    \pgfmathsetmacro{\shade}{\r==0 ? 70 : 12+8*mod(\r,2)}
+    \filldraw[draw=cTeal!60!black, fill=cTeal!\shade] (\c*1.15,-\r*0.5) rectangle ++(1.15,0.5);
+  }
+  \foreach \c/\t in {0/age, 1/bmi, 2/HbA1c, 3/y}
+    \node[font=\scriptsize\bfseries, text=white, text height=1.6ex, text depth=0.4ex] at (\c*1.15+0.575,0.25) {\t};
+  \foreach \c/\t in {0/80, 1/{25,2}, 2/{6,6}, 3/0} \node[font=\scriptsize\ttfamily] at (\c*1.15+0.575,-0.25) {\t};
+  \node[tieude] at (2.3,1.1) {Bảng 96.128 dòng};
+  % nhánh KB
+  % mã (văn bản hoá, bộ ba) in cỡ \tiny để mỗi bộ ba nằm trọn một dòng của khối rộng 5,4 cm
+  \node[hop=cOrange, text width=5.4cm, align=left, font=\scriptsize, anchor=west] (kb) at (5.6,1.6)
+    {\textbf{KB văn bản hoá} (mỗi dòng một tài liệu)\\[1pt]{\tiny\ttfamily "Hồ sơ Person\_0: giới tính nữ, tuổi 80, BMI 25,19, HbA1c 6,6 \%, ..."}};
+  \node[hop=cPurple, text width=5.4cm, align=left, font=\scriptsize, anchor=west] (kgn) at (5.6,-1.9)
+    {\textbf{KG thuộc tính} (mỗi ô một bộ ba)\\[1pt]\tiny\ttfamily (Person\_0, hba1c, 6.6)\\\tiny\ttfamily (Person\_0, rdf:type, Patient)\\\tiny\ttfamily (Person\_0, HAS\_SMOKING, never)};
+  \draw[muiM=cOrange, line width=1.8pt] (4.7,-0.2) to[out=0, in=180] (kb.west);
+  \draw[muiM=cPurple, line width=1.8pt] (4.7,-1.2) to[out=0, in=180] (kgn.west);
+  % truy vấn
+  \node[hop=cRed, text width=3.8cm, font=\scriptsize, anchor=west] (q1) at (12.1,1.6) {TF-IDF top-20 cho ``HbA1c > 8 và BMI > 35''\\\textbf{2/20 đúng}};
+  \node[hop=cGreen, text width=3.8cm, font=\scriptsize, anchor=west] (q2) at (12.1,-1.9) {lọc thuộc tính trên đồ thị\\\textbf{125/125 đúng, 86 ms}};
+  \draw[mui] (kb.east) -- (q1.west);
+  \draw[mui] (kgn.east) -- (q2.west);
+  \node[font=\scriptsize, text=cSlate, align=center] at (8.0,-3.7) {văn bản hợp với câu hỏi diễn giải; con số và điều kiện so sánh cần cấu trúc};
+\end{tikzpicture}

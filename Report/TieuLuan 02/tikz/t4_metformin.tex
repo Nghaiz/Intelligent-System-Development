@@ -1,0 +1,31 @@
+% Cơ chế tương tác metformin - rượu: ethanol tiêu thụ NAD+ ở gan, ức chế tân tạo glucose từ lactat;
+% metformin cũng giảm tân tạo glucose -> lactat ứ đọng (nhiễm toan lactic, hiếm nhưng nguy kịch) và hạ glucose huyết.
+\begin{tikzpicture}[font=\small,
+  b/.style={hop=#1, text width=3.0cm, minimum height=1.05cm, font=\scriptsize},
+  ar/.style={-{Stealth[length=2.6mm]}, line width=1.6pt, #1}]
+  % gan: khối bo tròn lớn
+  \fill[cBrown!15, draw=cBrown!70!black, very thick, rounded corners=28pt] (-0.4,-3.2) rectangle (8.0,3.3);
+  \node[font=\normalsize\bfseries, text=cBrown!70!black] at (3.8,2.8) {Tế bào gan};
+  \node[b=cSlate] (eth) at (-2.4,1.2) {\textbf{Ethanol} (rượu, bia)};
+  \node[b=cBlue] (met) at (-2.4,-1.8) {\textbf{Metformin}\\(Biguanide)};
+  \node[b=cOrange] (adh) at (1.6,1.2) {ADH, ALDH oxy hoá ethanol};
+  \node[b=cRed] (nad) at (5.4,1.2) {NAD$^+$ $\to$ NADH\\tỉ lệ NADH/NAD$^+$ tăng vọt};
+  \node[b=cPurple] (gng) at (5.4,-1.2) {Tân tạo glucose từ lactat bị ức chế};
+  \node[b=cBlue] (mgn) at (1.6,-1.8) {giảm tân tạo glucose (cơ chế điều trị)};
+  \draw[ar=cSlate] (eth) -- (adh);
+  \draw[ar=cOrange] (adh) -- (nad);
+  \draw[ar=cRed] (nad) -- (gng);
+  \draw[ar=cBlue] (met) -- (mgn);
+  \draw[ar=cBlue] (mgn) -- (gng);
+  % hậu quả
+  \node[b=cRed, text width=3.9cm, font=\scriptsize\bfseries] (lac) at (10.6,0.9)
+    {Lactat ứ đọng\\$\Rightarrow$ \textcolor{cRed!70!black}{NHIỄM TOAN LACTIC}\\(hiếm, nguy kịch)};
+  \node[b=cOrange, text width=3.9cm, font=\scriptsize\bfseries] (hypo) at (10.6,-1.6) {Hạ glucose huyết đến 24 giờ sau uống};
+  \draw[ar=cRed] (gng.east) -- (lac.west);
+  \draw[ar=cOrange] (gng.east) -- (hypo.west);
+  % khuyến nghị
+  \node[draw=cGreen!60!black, fill=cGreen!8, rounded corners=4pt, text width=15.6cm, font=\scriptsize, anchor=north] at (4.3,-3.6)
+    {\textbf{Khuyến nghị đưa ra từ KG} (cạnh \texttt{TUONG\_TAC\_NGUY\_HIEM}, nguồn \texttt{h03-ruou-bia}): tránh uống quá mức và say rượu;
+     không uống khi đói; nếu có uống thì ăn kèm và theo dõi đường huyết. Đây là \emph{cảnh báo mức cao}, không phải chống chỉ định tuyệt đối
+     (tờ hướng dẫn metformin ghi ``tránh uống rượu quá mức''); với sulfonylurea và insulin, rượu làm tăng mạnh nguy cơ hạ glucose huyết.};
+\end{tikzpicture}

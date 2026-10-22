@@ -1,0 +1,403 @@
+% =====================================================================
+%  CHƯƠNG 3 — CÁC THẾ HỆ KIẾN TRÚC RAG
+% =====================================================================
+\chapter[Các thế hệ kiến trúc Retrieval-Augmented Generation]{Các thế hệ kiến trúc\\
+Retrieval-Augmented Generation}\label{chap:rag}
+
+RAG không phải một kiến trúc mà là một họ kiến trúc tiến hóa qua ba thế hệ~\cite{gao2023survey}
+(Hình~\ref{fig:thehe}). \textbf{Naive RAG} chia văn bản, nhúng, tìm top-$k$ rồi sinh. \textbf{Advanced RAG} thêm
+các bước tối ưu trước truy xuất (viết lại câu hỏi) và sau truy xuất (xếp lại, nén ngữ cảnh). \textbf{GraphRAG}
+thay đơn vị tri thức từ đoạn văn rời rạc sang đồ thị thực thể và cộng đồng, để trả lời được câu hỏi đa bước và
+câu hỏi tổng hợp. Chương này đi qua cả ba thế hệ, và với mỗi thế hệ đo trên chính kho tri thức của bài xem nó cải
+thiện được gì, tốn thêm bao nhiêu.
+
+\hinhtikz{t3_generations}{Ba thế hệ RAG xếp tầng: Naive RAG, Advanced RAG với tối ưu tiền và hậu truy xuất,
+GraphRAG với đồ thị thực thể và tóm tắt cộng đồng}{thehe}
+
+\section{Naive RAG và các điểm nghẽn}
+\subsection{Quy trình hoạt động của Naive RAG}
+Naive RAG có ba pha (Hình~\ref{fig:naive}). Pha \textbf{lập chỉ mục} chạy ngoại tuyến: tài liệu được chia thành
+đoạn (chunk), mỗi đoạn được mã hóa thành vector $\mathbf{d}_j = f(\text{đoạn}_j) \in \mathbb{R}^{768}$ và lưu vào
+chỉ mục. Pha \textbf{truy xuất} chạy khi có câu hỏi: câu hỏi được mã hóa thành $\mathbf{q} = f(\text{câu hỏi})$ và
+$k$ đoạn có độ tương đồng cosin lớn nhất được chọn:
+\begin{equation}
+  \operatorname{sim}(\mathbf{q}, \mathbf{d}_j) = \frac{\mathbf{q}^\top \mathbf{d}_j}{\lVert\mathbf{q}\rVert\,\lVert\mathbf{d}_j\rVert},
+  \qquad \mathcal{Z}_k(\mathbf{q}) = \operatorname*{arg\,top-}k_{j}\ \operatorname{sim}(\mathbf{q}, \mathbf{d}_j).
+\end{equation}
+Pha \textbf{tạo sinh} nối $k$ đoạn vào prompt theo khuôn ``BẰNG CHỨNG: [1]\dots[k] — CÂU HỎI — TRẢ LỜI'' và để LLM
+sinh câu trả lời.
+
+\hinhtikz{t3_naive}{Naive RAG ba pha: lập chỉ mục ngoại tuyến, truy xuất và tạo sinh trực tuyến, kèm ba điểm
+nghẽn chính}{naive}
+
+\subsection{Các điểm nghẽn của Naive RAG}
+Mỗi pha có một điểm nghẽn, và lỗi ở pha trước không pha sau nào sửa được:
+
+\begin{enumerate}
+  \item \textbf{Chia đoạn cắt rời ngữ cảnh.} Cửa sổ 400 ký tự có thể cắt giữa câu ``chống chỉ định khi eGFR
+        $< 30$''. Đoạn chứa nửa đầu không còn con số, đoạn chứa nửa sau không còn tên thuốc. Mục~\ref{sec:chunking}
+        đo hiện tượng này.
+  \item \textbf{Truy xuất trượt từ khóa hoặc trượt ngữ nghĩa.} Truy xuất dày hiểu ``tiểu đường'' gần nghĩa ``đái
+        tháo đường'' nhưng dễ bỏ qua một mã cụ thể như ``Nghị định 232''; truy xuất thưa thì ngược lại. Với cách
+        chia đoạn cố định và truy xuất dense thuần, chỉ \SL{retrieval_grid/grid/fixed/dense/hit@1Pct}\% câu hỏi có đoạn đúng ở vị trí
+        đầu.
+  \item \textbf{Câu hỏi đa bước không nằm trong đoạn nào.} ``Fed tăng lãi suất thì vàng SJC ra sao'' cần nối ít
+        nhất ba mẩu tri thức nằm ở ba tài liệu khác nhau; top-$k$ theo độ tương đồng với câu hỏi không bảo đảm lấy
+        đủ cả ba.
+\end{enumerate}
+
+\section{Thiết lập thực nghiệm truy xuất}\label{sec:thietlap}
+\subsection{Kho tri thức và bộ câu hỏi}
+Kho tri thức gồm \SL{retrieval_grid/n_docs} tài liệu Markdown, tám tài liệu y tế và chín tài liệu tài chính
+(Bảng~\ref{tab:corpus}). Mỗi tài liệu tổng hợp từ một văn bản gốc có số hiệu, viết lại bằng lời của tác giả và có
+cấu trúc tiêu đề hai cấp, mô phỏng cách một phác đồ hay một báo cáo phân tích được tổ chức trong thực tế.
+
+\bang{tab_corpus}{Kho tri thức \SL{retrieval_grid/n_docs} tài liệu của tiểu luận}{corpus}
+
+Bộ đánh giá có \SL{retrieval_grid/n_questions} câu hỏi (\SL{dem/qa_health} y tế, \SL{dem/qa_finance} tài chính).
+Mỗi câu hỏi đi kèm một \emph{chuỗi đáp án} nằm nguyên văn trong kho (Bảng~\ref{tab:qa}); câu hỏi được viết bằng
+cách diễn đạt khác với văn bản (``tiểu đường'' thay cho ``đái tháo đường'', ``uống bia'' thay cho ``rượu bia'') để
+không chấm điểm sự trùng từ đơn thuần.
+
+\bang{tab_qa_sample}{Trích bộ câu hỏi đánh giá truy xuất}{qa}
+
+\subsection{Độ đo}
+Một đoạn được coi là \textbf{liên quan} nếu nó chứa trọn chuỗi đáp án; định nghĩa này không cần gán nhãn tay và
+công bằng giữa các chiến lược chia đoạn, vì đoạn bị cắt ngang đáp án không được tính. Với $r$ là thứ hạng của đoạn
+liên quan đầu tiên trong danh sách trả về, ba độ đo được dùng (Hình~\ref{fig:dodo}):
+\begin{align}
+  \text{Hit@}k &= \mathbb{1}[r \le k], \qquad \text{MRR} = \frac{1}{|Q|}\sum_{q \in Q} \frac{1}{r_q},\\
+  \text{nDCG@}10 &= \frac{1}{\text{IDCG@}10}\sum_{i=1}^{10}\frac{\text{rel}_i}{\log_2(i+1)},
+\end{align}
+trong đó $\text{rel}_i \in \{0,1\}$ cho biết đoạn ở vị trí $i$ có liên quan không và IDCG là DCG của thứ tự lý
+tưởng. Hit@1 trả lời ``đoạn đầu tiên có đúng không'', câu hỏi quan trọng nhất khi chỉ đưa ít đoạn vào LLM; MRR
+phạt nhẹ khi đoạn đúng ở vị trí 2--3; nDCG thưởng việc đặt \emph{mọi} đoạn liên quan lên trên.
+
+\hinhtikz{t3_metrics}{Cách tính Hit@k, MRR và nDCG@10 trên một danh sách xếp hạng}{dodo}
+
+\maNguon{retrieval__rank_metrics}{Tính Hit@k, MRR và nDCG@10 cho một câu hỏi}
+
+\section{Các chiến lược phân mảnh (chunking)}\label{sec:chunking}
+\subsection{Bài toán đánh đổi: độ dài đoạn và khoảng chồng lấn}
+Chọn cỡ đoạn là chọn giữa hai loại lỗi. Đoạn \emph{ngắn} chính xác nhưng dễ cắt rời đáp án khỏi ngữ cảnh của nó;
+đoạn \emph{dài} giữ trọn ngữ cảnh nhưng vector của nó là trung bình của nhiều ý, nên khó khớp với một câu hỏi cụ
+thể, và mỗi đoạn đưa vào LLM tốn nhiều token hơn. Chồng lấn (overlap) $o$ giữa hai đoạn kề giảm xác suất cắt
+ngang câu: với cửa sổ $w$, bước trượt là $w-o$, số đoạn của tài liệu dài $L$ là $\lceil (L-o)/(w-o) \rceil$.
+
+Thí nghiệm quét bảy cỡ đoạn từ 120 tới 1300 ký tự (chia đệ quy, chồng lấn 15\%) cho thấy cả hai mặt của đánh đổi
+(Hình~\ref{fig:ret_sweep}, Bảng~\ref{tab:sweep}). Ở cỡ 120 ký tự, chỉ
+\SL{retrieval_sweep/0/intactPct}\% câu hỏi còn đoạn chứa trọn đáp án, và dense Hit@1 chỉ đạt
+\SL{retrieval_sweep/0/dense_hit@1Pct}\%. Tăng cỡ đoạn thì Hit@1 tăng, nhưng ngữ cảnh top-5 phình từ
+\SL{retrieval_sweep/0/ctx_tokens_top5} lên \SL{retrieval_sweep/6/ctx_tokens_top5} token. Lưu ý một hiệu ứng
+của cách chấm: ở cỡ 1300 ký tự kho chỉ còn \SL{retrieval_sweep/6/n_chunks} đoạn, gần với truy xuất cả tài liệu,
+nên tìm đúng ``đoạn'' dễ hơn nhiều; Hit@1 cao ở đó không có nghĩa LLM nhận được ngữ cảnh gọn. Vùng 400--900 ký
+tự là điểm cân bằng, và là cỡ được chọn cho các thí nghiệm sau.
+
+\hinhpdf{ret_sweep}{1.0}{Quét cỡ đoạn: tỉ lệ trúng tăng theo cỡ đoạn trong khi số ký tự ngữ cảnh top-5 tăng tuyến
+tính}{ret_sweep}
+
+\bang{tab_sweep}{Ảnh hưởng của cỡ đoạn tới truy xuất BM25 và dense}{sweep}
+
+\subsection{Năm chiến lược phân mảnh}
+Năm chiến lược được cài trong \texttt{tl2/chunking.py}, mọi chiến lược đều giữ vị trí ký tự gốc của đoạn để chấm
+điểm được (Hình~\ref{fig:chunking}):
+
+\begin{enumerate}
+  \item \textbf{Cố định (fixed-size)}: cửa sổ trượt 400 ký tự, chồng lấn 60, không quan tâm ranh giới câu.
+  \item \textbf{Đệ quy (recursive)}: thử cắt ở dấu phân cách cấp cao nhất (đoạn trống, xuống dòng, dấu chấm,
+        chấm phẩy, dấu phẩy, khoảng trắng) và chỉ xuống cấp thấp hơn khi mảnh vẫn quá dài; các mảnh nhỏ liền nhau
+        được gộp tới giới hạn.
+  \item \textbf{Theo cấu trúc (structure-aware)}: mỗi mục Markdown là một đoạn, gắn chuỗi tiêu đề làm ngữ cảnh
+        (``Thuốc điều trị > Metformin > Chống chỉ định''); mục quá 900 ký tự mới tách đệ quy bên trong.
+  \item \textbf{Ngữ nghĩa (semantic)}: nhúng từng câu, cắt khi khoảng cách cosin giữa hai câu liền nhau vượt phân
+        vị thứ 80 của chuỗi khoảng cách trong tài liệu.
+  \item \textbf{Cha -- con (parent-child, small-to-big)}: lập chỉ mục các đoạn con khoảng 220 ký tự để khớp chính
+        xác, nhưng trả cho LLM đoạn cha là cả mục (Hình~\ref{fig:chacon}).
+\end{enumerate}
+
+\hinhtikz{t3_chunking}{Năm chiến lược chia đoạn trên cùng một tài liệu: dải ngang là tài liệu, mỗi khối màu là
+một đoạn}{chunking}
+
+\hinhtikz{t3_parent_child}{Truy xuất cha -- con: khớp trên đoạn con nhỏ, đưa đoạn cha đủ ngữ cảnh cho LLM}{chacon}
+
+\maNguon{chunking___recursive_spans}{Lõi của chia đoạn đệ quy: cắt ở dấu phân cách cấp cao nhất có thể}
+\maNguon{chunking__semantic}{Chia đoạn ngữ nghĩa theo phân vị khoảng cách cosin giữa các câu liền nhau}
+\maNguon{chunking__parent_child}{Chia đoạn cha -- con: cha là mục, con là mảnh đệ quy nhỏ bên trong}
+
+Bảng~\ref{tab:chunkstats} và Hình~\ref{fig:ret_chunk_lengths} cho thấy hình dạng các đoạn sinh ra. Cố định cho độ
+dài gần như đều; theo cấu trúc dao động theo độ dài mục; ngữ nghĩa dao động mạnh nhất, có đoạn chỉ
+\SL{retrieval_grid/chunk_stats/semantic/min_len} ký tự (một dòng tiêu đề bị tách riêng) và có đoạn tới
+\SL{retrieval_grid/chunk_stats/semantic/max_len} ký tự. Chia cố định là chiến lược duy nhất làm mất đáp án: chỉ
+\SL{retrieval_grid/chunk_stats/fixed/intactPct}\% câu hỏi còn đoạn chứa trọn chuỗi đáp án.
+
+\bang{tab_chunk_stats}{Thống kê đoạn của năm chiến lược trên toàn kho}{chunkstats}
+
+\hinhpdf{ret_chunk_lengths}{1.0}{Phân bố độ dài đoạn của năm chiến lược}{ret_chunk_lengths}
+
+Hình~\ref{fig:ret_semantic} mở hộp chiến lược ngữ nghĩa trên tài liệu \texttt{h03-ruou-bia}: mỗi cột là khoảng
+cách giữa hai câu liền nhau, đường ngang là ngưỡng phân vị 80, cột đỏ là điểm cắt. Các điểm cắt rơi đúng vào chỗ
+văn bản chuyển chủ đề (từ cơ chế nhiễm toan lactic sang nguy cơ hạ glucose huyết), nhưng cũng có điểm cắt giữa
+một danh sách gạch đầu dòng vì các mục của danh sách ngắn và khác từ vựng.
+
+\hinhpdf{ret_semantic}{1.0}{Chia đoạn ngữ nghĩa: khoảng cách cosin giữa các câu liền nhau và điểm cắt}{ret_semantic}
+
+\subsection{Ý nghĩa của chunking trong dữ liệu y tế và tài chính Việt Nam}
+Văn bản y tế và tài chính có hai đặc điểm làm chunking quan trọng hơn văn bản thông thường. Thứ nhất, \emph{con
+số gắn chặt với ngữ cảnh}: ``$\ge 6{,}5\%$'' chỉ có nghĩa khi đi cùng ``HbA1c'' và ``tiêu chuẩn chẩn đoán''; một
+đoạn chứa con số nhưng mất chủ ngữ là một đoạn nguy hiểm. Thứ hai, \emph{tài liệu có cấu trúc chuẩn}: phác đồ Bộ
+Y tế, nghị định, báo cáo thường niên đều chia mục rõ ràng. Chiến lược theo cấu trúc khai thác đúng đặc điểm thứ
+hai để bảo vệ đặc điểm thứ nhất: tiêu đề mục được gắn vào đoạn, nên đoạn ``Chống chỉ định'' luôn biết nó thuộc
+mục ``Metformin''. Tiếng Việt còn có thêm một khó khăn: từ được ghép từ nhiều âm tiết cách nhau bởi khoảng trắng,
+nên cắt theo khoảng trắng có thể tách ``đái tháo'' khỏi ``đường''; chia đệ quy ưu tiên dấu câu trước khoảng trắng
+để tránh điều này.
+
+\section{Truy xuất: thưa, dày, lai và xếp lại}
+\subsection{Truy xuất thưa: TF-IDF và BM25}
+Truy xuất thưa biểu diễn văn bản bằng tần suất từ. BM25~\cite{robertson2009bm25} cho điểm tài liệu $d$ với câu hỏi
+$q$ gồm các từ $t$ bằng
+\begin{equation}
+  \operatorname{BM25}(q,d) = \sum_{t \in q} \operatorname{IDF}(t)\,
+  \frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1\left(1 - b + b\,\frac{|d|}{\operatorname{avgdl}}\right)},
+\end{equation}
+với $f(t,d)$ là tần suất từ, $|d|$ là độ dài đoạn, $k_1 = 1{,}5$ điều tiết bão hòa tần suất và $b = 0{,}75$ chuẩn
+hóa độ dài. Tách từ ở mức âm tiết viết thường, giữ số và đơn vị như ``mg'', ``dl''.
+
+\maNguon{retrieval__BM25Retriever}{Bộ truy xuất BM25 trên các âm tiết tiếng Việt}
+
+\subsection{Truy xuất dày: mô hình nhúng đa ngôn ngữ}
+Truy xuất dày~\cite{karpukhin2020dpr} dùng một bộ mã hóa Transformer ánh xạ câu hỏi và đoạn văn vào cùng một không
+gian vector. Bài dùng \texttt{multilingual-e5-base}~\cite{wang2024me5}, mô hình được huấn luyện tương phản trên dữ
+liệu đa ngôn ngữ, yêu cầu tiền tố \texttt{query:} cho câu hỏi và \texttt{passage:} cho đoạn văn. Đây là kiến trúc
+\textbf{bi-encoder}~\cite{reimers2019sbert}: câu hỏi và đoạn văn được mã hóa \emph{riêng}, nên vector đoạn văn tính trước một lần khi lập
+chỉ mục (Hình~\ref{fig:bicross}).
+
+\maNguon{retrieval__Embedder}{Bọc SentenceTransformer cho mô hình e5: tiền tố, chuẩn hóa L2, chạy GPU}
+
+So sánh ba mô hình nhúng (Bảng~\ref{tab:embed}, Hình~\ref{fig:ret_embedders}) cho thấy họ e5 vượt xa
+\texttt{paraphrase-multilingual-MiniLM}: Hit@1 \SL{retrieval_embed/e5-base/hit@1Pct}\% so với
+\SL{retrieval_embed/minilm/hit@1Pct}\%. Bản e5-small và e5-base có Hit@1 bằng nhau trên bộ câu hỏi này nhưng phân
+bổ khác theo miền: e5-base tốt hơn ở y tế, e5-small tốt hơn ở tài chính. Bài chọn e5-base vì y tế là miền đòi hỏi
+độ chính xác cao hơn.
+
+\bang{tab_embed}{So sánh ba mô hình nhúng đa ngôn ngữ (truy xuất dense, đoạn theo cấu trúc)}{embed}
+
+\hinhpdf{ret_embedders}{1.0}{Ba mô hình nhúng đa ngôn ngữ trên cùng bộ câu hỏi}{ret_embedders}
+
+Hình~\ref{fig:ret_pca} chiếu \SL{retrieval_grid/chunk_stats/structure/n_chunks} đoạn theo cấu trúc xuống hai
+chiều bằng PCA: đoạn y tế và đoạn tài chính tách thành hai vùng rõ rệt, và trong mỗi vùng các đoạn cùng tài liệu
+nằm gần nhau. Hai thành phần đầu chỉ giữ \SL{retrieval_viz/embedding_pca/var_ratio/0Pct}\% và
+\SL{retrieval_viz/embedding_pca/var_ratio/1Pct}\% phương sai, nhắc rằng không gian 768 chiều phức tạp hơn nhiều so
+với những gì một hình hai chiều thể hiện. Hình~\ref{fig:ret_simmatrix} là ma trận cosin giữa mười câu hỏi và các
+đoạn: ô sáng nhất mỗi hàng thường là đoạn đúng, nhưng khoảng cách giữa ô đúng và các ô kế bên nhỏ, lý do cần thêm
+bước xếp lại.
+
+\hinhpdf{ret_pca}{0.92}{Các đoạn trong không gian nhúng e5-base chiếu PCA hai chiều}{ret_pca}
+\hinhpdf{ret_simmatrix}{1.0}{Độ tương đồng cosin giữa câu hỏi và đoạn văn}{ret_simmatrix}
+
+\subsection{Truy xuất lai bằng Reciprocal Rank Fusion}
+BM25 và dense mắc lỗi ở những câu hỏi khác nhau, nên gộp chúng lại có lợi. Điểm số của hai bộ truy xuất không
+cùng thang đo (BM25 không giới hạn, cosin trong $[-1,1]$), nên thay vì cộng điểm, Reciprocal Rank Fusion
+(RRF)~\cite{cormack2009rrf} cộng nghịch đảo thứ hạng:
+\begin{equation}
+  \operatorname{RRF}(d) = \sum_{r \in \{\text{BM25},\ \text{dense}\}} \frac{1}{k + \operatorname{rank}_r(d)}, \qquad k = 60.
+\end{equation}
+Hằng số $k$ làm phẳng đóng góp của các vị trí đầu, để một đoạn đứng hạng 1 ở một bộ truy xuất nhưng hạng 50 ở bộ
+kia không áp đảo một đoạn đứng hạng 3 ở cả hai.
+
+\maNguon{retrieval__HybridRRF}{Truy xuất lai: hợp nhất thứ hạng BM25 và dense bằng RRF}
+
+\subsection{Xếp lại bằng cross-encoder}
+Bi-encoder nhanh nhưng không bao giờ nhìn câu hỏi và đoạn văn \emph{cùng lúc}. Cross-encoder~\cite{nogueira2019rerank}
+nối hai chuỗi thành một đầu vào và cho Transformer chú ý chéo giữa chúng, đầu ra là một điểm liên quan trực tiếp
+$s(q,d) = \sigma\bigl(\mathbf{w}^\top \mathrm{Enc}([q; d])_{\texttt{[CLS]}}\bigr)$ (Hình~\ref{fig:bicross}). Cái
+giá là phải chạy mô hình một lần cho \emph{mỗi} cặp, nên chỉ dùng được ở giai đoạn hai trên một tập ứng viên nhỏ.
+Bài dùng \texttt{bge-reranker-v2-m3}~\cite{chen2024bgem3}, xếp lại 30 ứng viên của truy xuất lai
+(Hình~\ref{fig:hybrid}).
+
+\hinhtikz{t3_bi_cross}{Bi-encoder mã hóa riêng câu hỏi và đoạn văn rồi so cosin; cross-encoder mã hóa chung cả cặp
+và cho điểm trực tiếp}{bicross}
+
+\hinhtikz{t3_hybrid}{Phễu truy xuất lai: BM25 và dense chạy song song, hợp nhất RRF, cross-encoder xếp lại 30 ứng
+viên và giữ top-$k$}{hybrid}
+
+\maNguon{retrieval__Reranker}{Cross-encoder bge-reranker-v2-m3 chạy bf16 trên GPU}
+
+\subsection{Kết quả: chiến lược chia đoạn $\times$ bộ truy xuất}
+Bảng~\ref{tab:gridhit1} và Hình~\ref{fig:ret_grid_hit1} là kết quả chính của chương: 25 tổ hợp chia đoạn và truy
+xuất trên \SL{retrieval_grid/n_questions} câu hỏi. Tổ hợp tốt nhất là \textbf{chia theo cấu trúc + truy xuất lai +
+xếp lại}, Hit@1 \SL{retrieval_grid/grid/structure/hybrid_rerank/hit@1Pct}\% và MRR
+\SL{retrieval_grid/grid/structure/hybrid_rerank/mrr}; tổ hợp Naive RAG (cố định + dense) chỉ đạt
+\SL{retrieval_grid/grid/fixed/dense/hit@1Pct}\%.
+
+\bang{tab_grid_hit1}{Hit@1 của 25 tổ hợp chiến lược chia đoạn và bộ truy xuất}{gridhit1}
+\hinhpdf{ret_grid_hit1}{1.0}{Bản đồ nhiệt Hit@1: chiến lược chia đoạn (hàng) $\times$ bộ truy xuất (cột)}{ret_grid_hit1}
+\bang{tab_grid_mrr}{MRR của 25 tổ hợp chiến lược chia đoạn và bộ truy xuất}{gridmrr}
+
+Ba quan sát rút ra từ lưới:
+\begin{itemize}
+  \item \textbf{Chiến lược chia đoạn quan trọng ngang với bộ truy xuất.} Cùng bộ hybrid + rerank, đổi từ chia cố
+        định sang chia theo cấu trúc nâng Hit@1 từ \SL{retrieval_grid/grid/fixed/hybrid_rerank/hit@1Pct}\% lên
+        \SL{retrieval_grid/grid/structure/hybrid_rerank/hit@1Pct}\%.
+  \item \textbf{Mỗi tầng của phễu đều có ích.} Với chia theo cấu trúc: BM25
+        \SL{retrieval_grid/grid/structure/bm25/hit@1Pct}\%, dense \SL{retrieval_grid/grid/structure/dense/hit@1Pct}\%,
+        lai \SL{retrieval_grid/grid/structure/hybrid/hit@1Pct}\%, lai + xếp lại
+        \SL{retrieval_grid/grid/structure/hybrid_rerank/hit@1Pct}\%.
+  \item \textbf{Cha -- con mạnh nhất khi không có reranker.} Khớp trên đoạn con nhỏ cho dense Hit@1
+        \SL{retrieval_grid/grid/parent_child/dense/hit@1Pct}\%, cao nhất cột dense; khi đã có reranker thì ưu thế
+        này thu hẹp.
+\end{itemize}
+
+Bảng~\ref{tab:retdetail} đi sâu vào chiến lược theo cấu trúc. Hình~\ref{fig:ret_hitk} là đường Hit@$k$: mọi bộ
+truy xuất đều tìm được đoạn đúng trong top-10 ở gần như mọi câu hỏi; khác biệt nằm ở \emph{thứ hạng}, đúng điều
+mà reranker cải thiện. Hình~\ref{fig:ret_domain} tách theo miền: câu hỏi y tế khó hơn tài chính với mọi bộ truy
+xuất, vì nhiều tài liệu y tế cùng nói về một bệnh và dùng chung từ vựng (metformin xuất hiện trong bốn tài liệu).
+
+\bang{tab_ret_detail}{Chi tiết năm bộ truy xuất trên đoạn chia theo cấu trúc}{retdetail}
+\hinhpdf{ret_hitk}{0.95}{Đường Hit@$k$ của năm bộ truy xuất}{ret_hitk}
+\hinhpdf{ret_domain}{0.95}{Hit@1 theo miền y tế và tài chính}{ret_domain}
+
+Chất lượng có giá. Hình~\ref{fig:ret_latency} đặt Hit@1 cạnh độ trễ: BM25 trả lời trong
+\SL{retrieval_grid/grid/structure/bm25/latency_ms} ms, dense trong \SL{retrieval_grid/grid/structure/dense/latency_ms}
+ms (gồm mã hóa câu hỏi trên GPU), còn hybrid + rerank mất \SL{retrieval_grid/grid/structure/hybrid_rerank/latency_ms}
+ms vì phải chạy cross-encoder 30 lần. Với một tác tử hội thoại, nửa giây là chấp nhận được; với tìm kiếm thời gian
+thực trên hàng triệu đoạn thì cần giảm số ứng viên hoặc dùng reranker nhỏ hơn.
+
+\hinhpdf{ret_latency}{0.95}{Chất lượng và độ trễ của 25 tổ hợp: xếp lại đắt hơn nhiều nhưng chính xác hơn}{ret_latency}
+
+\section{Advanced RAG: tối ưu đa chặng}
+Advanced RAG giữ khung truy xuất -- sinh của Naive RAG nhưng thêm bước tối ưu ở hai đầu:
+
+\begin{itemize}
+  \item \textbf{Tiền truy xuất} sửa \emph{câu hỏi}: viết lại câu hỏi cho rõ, tách câu hỏi phức thành câu hỏi con,
+        sinh nhiều cách hỏi (Multi-Query), hoặc sinh một câu trả lời giả định rồi dùng nó để tìm (HyDE).
+  \item \textbf{Truy xuất} cải tiến bằng chia đoạn tốt hơn, truy xuất lai, lọc theo metadata (miền, tài liệu).
+  \item \textbf{Hậu truy xuất} sửa \emph{ngữ cảnh}: xếp lại bằng cross-encoder, nén hoặc cắt bớt đoạn, sắp xếp lại
+        để thông tin quan trọng nằm ở đầu và cuối prompt.
+\end{itemize}
+
+Phần truy xuất lai và xếp lại đã được đo ở mục trước. Mục này đo hai kỹ thuật tiền truy xuất dùng LLM cục bộ
+(Hình~\ref{fig:hyde}).
+
+\textbf{HyDE} (Hypothetical Document Embeddings)~\cite{gao2023hyde} dựa trên nhận xét: câu hỏi và đoạn trả lời
+thường không giống nhau về hình thức, nhưng hai đoạn trả lời thì giống nhau. Thay vì nhúng câu hỏi $q$, HyDE cho
+LLM viết một đoạn trả lời giả định $\tilde{d} = \mathrm{LLM}(q)$ rồi tìm bằng $f(\tilde{d})$. Biến thể
+\emph{HyDE + câu hỏi} hợp nhất bằng RRF hai danh sách tìm bằng $f(q)$ và $f(\tilde d)$.
+\textbf{Multi-Query} cho LLM viết ba cách hỏi khác $q_1, q_2, q_3$, truy xuất cho từng câu và hợp nhất bốn danh
+sách bằng RRF.
+
+\hinhtikz{t3_hyde}{Hai kỹ thuật tối ưu tiền truy xuất bằng LLM cục bộ: HyDE tìm bằng câu trả lời giả định,
+Multi-Query hợp nhất nhiều cách hỏi bằng RRF}{hyde}
+
+\maNguon{run_advanced__rrf}{Hợp nhất nhiều danh sách xếp hạng bằng RRF trong thí nghiệm Advanced RAG}
+
+Kết quả (Bảng~\ref{tab:advanced}, Hình~\ref{fig:adv_rag}) là một kết quả âm có giá trị. Với Qwen2.5-1.5B, HyDE
+\emph{làm giảm} Hit@1 từ \SL{advanced/agg/dense/hit@1Pct}\% xuống \SL{advanced/agg/hyde/hit@1Pct}\%, thua dense gốc
+ở \SL{advanced/agg/hyde/losses_vs_dense} câu và chỉ thắng ở \SL{advanced/agg/hyde/wins_vs_dense} câu.
+Multi-Query giảm ít hơn (\SL{advanced/agg/multiquery/hit@1Pct}\%) nhưng vẫn giảm. Bảng~\ref{tab:hydeex} giải thích
+lý do: đoạn giả định của mô hình nhỏ chứa các chi tiết \emph{bịa}, ví dụ nói metformin cùng rượu gây ``tăng huyết
+áp'', và vector của chi tiết bịa kéo truy xuất về các đoạn sai. HyDE chỉ có lợi khi LLM sinh đoạn giả định đủ đúng
+để trông giống đoạn thật; với một mô hình 1,5 tỉ tham số trên miền chuyên sâu tiếng Việt, điều kiện đó không thỏa.
+Mỗi câu hỏi còn tốn thêm \SL{advanced/gen_s/hyde} s sinh văn bản. Vì vậy tác tử ở Chương~\ref{chap:agent} không
+dùng HyDE hay Multi-Query mà dùng truy xuất lai + xếp lại.
+
+\bang{tab_advanced}{Tối ưu tiền truy xuất bằng LLM so với truy xuất dense gốc}{advanced}
+\hinhpdf{adv_rag}{1.0}{Ảnh hưởng của HyDE và Multi-Query: Hit@1, MRR và số câu thắng, thua so với dense gốc}{adv_rag}
+\bang{tab_hyde_ex}{Ví dụ văn bản do Qwen2.5-1.5B sinh trong HyDE và Multi-Query}{hydeex}
+
+\section{GraphRAG: tổng hợp tri thức trên đồ thị}
+\subsection{Ý tưởng và quy trình}
+Advanced RAG vẫn coi tri thức là một tập đoạn văn rời rạc. GraphRAG~\cite{edge2024graphrag} thay đơn vị tri thức
+bằng \textbf{đồ thị thực thể}, rồi thêm một tầng trừu tượng là \textbf{cộng đồng}: nhóm thực thể liên kết chặt
+được tóm tắt trước thành một ``báo cáo cộng đồng''. Quy trình gồm bốn bước (Hình~\ref{fig:graphrag}):
+
+\begin{enumerate}
+  \item \textbf{Đồ thị thực thể}: ở bài báo gốc, LLM trích xuất thực thể và quan hệ từ văn bản; ở đây hai KG đã có
+        sẵn và được hợp nhất thành một đồ thị vô hướng có trọng số (cạnh nhiều quan hệ được cộng trọng số).
+  \item \textbf{Phát hiện cộng đồng}: thuật toán Louvain~\cite{blondel2008louvain} tìm phân hoạch $\{c_i\}$ cực đại
+        độ đo modularity
+        \begin{equation}
+          Q = \frac{1}{2m}\sum_{i,j}\Bigl(A_{ij} - \frac{k_i k_j}{2m}\Bigr)\delta(c_i, c_j),
+        \end{equation}
+        với $A_{ij}$ là trọng số cạnh, $k_i$ là bậc có trọng số, $m$ là tổng trọng số. $Q$ đo mật độ cạnh trong cộng
+        đồng vượt bao nhiêu so với một đồ thị ngẫu nhiên cùng dãy bậc.
+  \item \textbf{Báo cáo cộng đồng}: các bộ ba nằm trọn trong một cộng đồng được diễn đạt thành câu và LLM viết một
+        đoạn tóm tắt 3--4 câu.
+  \item \textbf{Tìm kiếm}: \emph{cục bộ} liên kết thực thể trong câu hỏi rồi lấy các bộ ba quanh chúng và đoạn
+        văn của tài liệu nguồn; \emph{toàn cục} xếp hạng các báo cáo cộng đồng theo độ tương đồng với câu hỏi.
+\end{enumerate}
+
+\hinhtikz{t3_graphrag}{Đường ống GraphRAG: đồ thị thực thể, cộng đồng Louvain, báo cáo cộng đồng do LLM viết,
+tìm kiếm cục bộ và toàn cục}{graphrag}
+
+Bước khó nhất trong thực tế là \textbf{liên kết thực thể}: nhận ra ``đang uống glucophage'' nói về
+\textsf{Metformin}. Bộ liên kết của bài (Đoạn mã~\ref{code:graphrag__EntityLinker}) bỏ dấu tiếng Việt, khớp nguyên
+từ với bảng bí danh và ưu tiên bí danh dài nhất trước, để ``gà rán'' không bị hiểu thành ``gà'' và một đoạn đã
+khớp không bị khớp lại.
+
+\maNguon{graphrag__EntityLinker}{Liên kết thực thể: khớp bí danh dài nhất trước, không dấu, nguyên từ}
+\maNguon{graphrag__summarize_communities}{Tóm tắt cộng đồng bằng LLM cục bộ từ các bộ ba nằm trong cộng đồng}
+\maDai{graphrag__GraphRAG}{Lớp \texttt{GraphRAG}: tìm kiếm cục bộ trên KG và tìm kiếm toàn cục trên báo cáo cộng đồng}
+
+\subsection{Cộng đồng tri thức}
+Louvain tìm được \SL{graphrag/n_comms} cộng đồng với modularity \SL{graphrag/modularity}
+(Hình~\ref{fig:grag_communities}, Bảng~\ref{tab:communities}). Không cộng đồng nào chứa thực thể của cả hai miền,
+đúng như mong đợi vì hai KG không có cạnh nối nhau. Các cộng đồng có nghĩa rõ ràng mà không cần ai gán nhãn: C0
+gom đái tháo đường típ 2 với tiêu chuẩn chẩn đoán, yếu tố nguy cơ, các món tinh bột và lối sống; C2 gom ba thuốc
+chính (metformin, insulin, gliclazide) với rượu bia, nhiễm toan lactic, hạ glucose huyết và các chống chỉ định,
+tức đúng phân hệ ``an toàn thuốc''; C6 là bộ ba empagliflozin -- suy tim -- bệnh thận mạn, đúng chỉ định ưu tiên
+của nhóm SGLT2. Bên tài chính, C1 là kênh tỷ giá -- lãi suất -- cổ phiếu và ngành, C3 là kênh vàng thế giới (Fed,
+DXY, XAU/USD), C4 là chính sách vàng miếng trong nước. LLM viết \SL{dem/comms} bản tóm tắt trong
+\SL{graphrag/summary_s} s.
+
+\hinhpdf{grag_communities}{1.0}{Các cộng đồng Louvain trên đồ thị hợp nhất hai KG; nhãn ghi kích thước và thực thể
+trung tâm, cạnh đứt nối hai cộng đồng khác nhau}{grag_communities}
+
+\bang{tab_communities}{Các cộng đồng tri thức và báo cáo cộng đồng}{communities}
+
+\subsection{So sánh bốn kiến trúc trên câu hỏi đa bước}
+Để đo đúng thế mạnh của GraphRAG, bài dùng một bộ \SL{dem/grag_q} câu hỏi đa bước riêng, mỗi câu kèm các nhóm từ
+khóa ứng với các dữ kiện bắt buộc phải có (ví dụ câu Fed -- vàng SJC cần cả kênh DXY, kênh XAU, kênh tỷ giá và
+phần bù trong nước). Bốn kiến trúc dùng cùng LLM và cùng prompt có trích dẫn, chỉ khác ngữ cảnh:
+Naive (cố định + dense, top-5), Advanced (cấu trúc + lai + xếp lại, top-5), GraphRAG cục bộ (bộ ba quanh thực thể
+liên kết + 3 đoạn văn của tài liệu nguồn) và GraphRAG cục bộ + toàn cục (thêm 2 báo cáo cộng đồng gần nhất).
+\textbf{Độ phủ ngữ cảnh} là tỉ lệ dữ kiện có mặt trong ngữ cảnh đưa vào LLM; \textbf{độ phủ câu trả lời} là tỉ lệ dữ
+kiện có trong câu trả lời cuối.
+
+\bang{tab_graphrag}{Bốn kiến trúc RAG trên \SL{dem/grag_q} câu hỏi đa bước}{graphrag}
+\hinhpdf{grag_coverage}{1.0}{Độ phủ dữ kiện trong ngữ cảnh và trong câu trả lời, cùng độ dài ngữ cảnh của bốn kiến
+trúc}{grag_coverage}
+
+GraphRAG cục bộ cho câu trả lời đầy đủ nhất: độ phủ câu trả lời \SL{graphrag/agg/graph_local/ans_covPct}\% so với
+\SL{graphrag/agg/naive/ans_covPct}\% của Naive và \SL{graphrag/agg/advanced/ans_covPct}\% của Advanced. Điều đáng
+chú ý là Advanced có độ phủ \emph{ngữ cảnh} cao nhất (\SL{graphrag/agg/advanced/ctx_covPct}\%) nhưng độ phủ câu
+trả lời thấp hơn GraphRAG: dữ kiện có trong năm đoạn văn dài, nhưng LLM nhỏ không gom đủ chúng lại. Bộ ba KG đã
+diễn đạt thành câu ngắn, mỗi câu một quan hệ, nên LLM dễ chép đúng vào câu trả lời hơn. Thêm báo cáo toàn cục đưa
+độ phủ ngữ cảnh lên \SL{graphrag/agg/graph_local_global/ctx_covPct}\% nhưng \emph{giảm} độ phủ câu trả lời xuống
+\SL{graphrag/agg/graph_local_global/ans_covPct}\%, vì ngữ cảnh dài thêm gần gấp rưỡi
+(\SL{graphrag/agg/graph_local_global/ctx_chars} ký tự) và mô hình nhỏ bị loãng sự chú ý. Tìm kiếm toàn cục hợp
+với câu hỏi tổng hợp kiểu ``chủ đề chính của kho là gì'', không phải câu hỏi đa bước có đáp án cụ thể.
+
+\bang{tab_grag_perq}{Độ phủ ngữ cảnh / câu trả lời theo từng câu hỏi đa bước}{gragperq}
+
+\section{Chiến lược lựa chọn kiến trúc trong hệ thống thực tế}
+Không có kiến trúc RAG tốt nhất cho mọi trường hợp. Bảng~\ref{tab:chonkientruc} tóm tắt hướng dẫn chọn rút ra từ
+các thí nghiệm của chương.
+
+\begin{table}[H]\centering
+\caption{Hướng dẫn chọn kiến trúc RAG theo loại câu hỏi và điều kiện triển khai}\label{tab:chonkientruc}
+{\small\begin{tabular}{L{4.4cm}L{4.4cm}L{5.4cm}}
+\toprule
+Tình huống & Kiến trúc nên dùng & Căn cứ trong bài \\
+\midrule
+Hỏi đáp tra cứu một dữ kiện & Advanced: cấu trúc + lai + xếp lại & Hit@1 cao nhất trên \SL{retrieval_grid/n_questions} câu \\
+Không có GPU, cần độ trễ thấp & BM25 hoặc lai không xếp lại & nhanh hơn reranker hàng trăm lần \\
+Câu hỏi đa bước, nhân quả & GraphRAG cục bộ & độ phủ câu trả lời cao nhất \\
+Câu hỏi tổng hợp toàn kho & GraphRAG toàn cục & báo cáo cộng đồng tóm tắt sẵn \\
+Câu hỏi có điều kiện số & truy vấn KG / SPARQL & TF-IDF bỏ sót gần hết (Mục 2.4) \\
+LLM nhỏ ($\le$ 2 tỉ tham số) & tránh HyDE, Multi-Query & cả hai làm giảm Hit@1 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Tác tử của bài kết hợp ba hàng của bảng: truy xuất lai + xếp lại cho đoạn văn, KG cho quan hệ và ràng buộc, tính
+toán trực tiếp cho số liệu thị trường, và để bộ lập kế hoạch chọn công cụ theo loại câu hỏi (Chương~\ref{chap:agent}).

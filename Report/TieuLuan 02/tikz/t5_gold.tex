@@ -1,0 +1,24 @@
+% Công thức giá vàng quy đổi dạng chồng khối 3D: XAU/USD × USD/VND × 1,2057 (oz -> lượng) + phần bù SJC.
+\begin{tikzpicture}[font=\normalsize, x=1.12cm, y=1.05cm]
+  \khoibaD{0}{0}{3.2}{2.0}{1.4}{cOrange}
+  \node[text=white, font=\normalsize\bfseries, align=center] at (1.6,1.0) {XAU/USD\\USD/oz};
+  \node[font=\LARGE\bfseries, text=cNavy] at (4.2,1.0) {$\times$};
+  \khoibaD{5.0}{0}{3.2}{2.0}{1.4}{cGreen}
+  \node[text=white, font=\normalsize\bfseries, align=center] at (6.6,1.0) {USD/VND\\VND/USD};
+  \node[font=\LARGE\bfseries, text=cNavy] at (9.2,1.0) {$\times$};
+  \khoibaD{10.0}{0}{2.8}{2.0}{1.4}{cPurple}
+  \node[text=white, font=\normalsize\bfseries, align=center] at (11.4,1.0) {1,2057\\oz/lượng};
+  \draw[decorate, decoration={brace, amplitude=8pt, mirror}, very thick, cNavy] (0,-0.25) -- (12.8,-0.25);
+  \node[hop=cRed, font=\normalsize\bfseries, minimum width=6.6cm] (q) at (5.6,-1.55) {Giá quy đổi (triệu đồng/lượng)};
+  \node[font=\LARGE\bfseries, text=cNavy] at (10.0,-1.55) {$+$};
+  \khoibaD{10.6}{-2.35}{3.2}{1.6}{1.0}{cBrown}
+  \node[text=white, font=\small\bfseries, align=center] at (12.2,-1.55) {phần bù SJC\\(NĐ 24, 232)};
+  \draw[mui] (5.6,-2.15) -- (5.6,-2.9);
+  \node[hop=cYellow, font=\normalsize\bfseries, minimum width=9cm] at (5.6,-3.45) {Giá vàng miếng SJC trong nước};
+  \node[draw=cSlate, fill=softgray, rounded corners=3pt, font=\small, anchor=north west, text width=15.4cm, align=left]
+    at (-0.2,-4.3)
+    {1 lượng $= 37{,}5$ g, 1 troy ounce $= 31{,}1035$ g $\Rightarrow 37{,}5/31{,}1035 = 1{,}2057$.\\
+     Ngày \SL{market/gold/last/date}: XAU \SL{market/gold/last/xau} USD/oz, USD/VND \SL{market/gold/last/usdvnd}
+     $\Rightarrow$ \textbf{\SL{market/gold/last/gold_vnd} triệu đồng/lượng} (chưa gồm thuế, phí và phần bù trong
+     nước). Công cụ \texttt{quy\_doi\_vang} của tác tử tính đúng công thức này.};
+\end{tikzpicture}

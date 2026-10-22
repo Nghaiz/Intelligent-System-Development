@@ -1,0 +1,23 @@
+% Phễu truy xuất lai: BM25 và dense chạy song song, hợp nhất RRF, cross-encoder xếp lại 30 ứng viên, giữ top-k.
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm,
+  note/.style={font=\scriptsize, text width=#1, draw=cSlate!60, fill=cSlate!5, rounded corners=3pt, inner sep=4pt, align=left}]
+  \node[hop=cSlate, font=\small] (q) at (6.5,6.2) {câu hỏi $q$};
+  \node[hop=cOrange, text width=3.4cm, font=\scriptsize] (bm) at (2.6,4.6) {\textbf{BM25} (từ khoá)\\khớp ``NĐ 232'', ``SGLT2''};
+  \node[hop=cBlue, text width=3.4cm, font=\scriptsize] (de) at (10.4,4.6) {\textbf{Dense e5-base}\\khớp đồng nghĩa, diễn đạt};
+  \draw[mui] (q) -- (bm); \draw[mui] (q) -- (de);
+  % phễu 3D: ba tầng thu hẹp dần
+  \foreach \y/\w/\c/\t in {3.0/6.4/cPurple/{Hợp nhất RRF}, 1.5/4.6/cRed/{Rerank 30 ứng viên}, 0.0/2.8/cGreen/{top-$k$}} {
+    \fill[\c!75!black] (6.5-\w/2,\y) -- (6.5+\w/2,\y) -- (6.5+\w/2-0.6,\y-0.9) -- (6.5-\w/2+0.6,\y-0.9) -- cycle;
+    \fill[\c!35] (6.5,\y) ellipse ({\w/2} and 0.28);
+    \draw[\c!60!black, thick] (6.5,\y) ellipse ({\w/2} and 0.28);
+    \node[font=\small\bfseries, text=white] at (6.5,\y-0.52) {\t};
+  }
+  \draw[muiM=cOrange, line width=1.8pt] (bm.south) -- (4.0,3.2);
+  \draw[muiM=cBlue, line width=1.8pt] (de.south) -- (9.0,3.2);
+  % chú thích hai bên phễu, đặt thấp hơn tầng trên cùng để không chạm mép phễu
+  \node[note=3.7cm, anchor=east] at (3.0,1.2)
+    {$s(d)=\sum_{r}\frac{1}{60+\mathrm{rank}_r(d)}$\\chỉ cần thứ hạng, không phải chuẩn hoá điểm của hai hệ};
+  \node[note=4.2cm, anchor=west] at (10.1,1.0)
+    {cross-encoder \texttt{bge-reranker-v2-m3} đọc chung cặp (câu hỏi, đoạn) qua mọi tầng attention: chậm nhưng chính xác};
+  \draw[mui] (6.5,-0.95) -- (6.5,-1.6) node[below, font=\small\bfseries] {ngữ cảnh cho LLM};
+\end{tikzpicture}
