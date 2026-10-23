@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1.15cm, y=1cm]
+  % lớp vào (15 đặc trưng, vẽ 6)
+  \foreach \i in {1,...,6}{\node[cau=cSky, minimum size=8mm] (a\i) at (0,3.6-\i*1.05) {};}
+  \node[font=\small] at (0,-4.25) {Vào (15)};
+  % ẩn 1 (128), ẩn 2 (64), ẩn 3 (32)
+  \foreach \i in {1,...,7}{\node[cau=cBlue, minimum size=8mm] (b\i) at (2.6,4.1-\i*1.05) {};}
+  \foreach \i in {1,...,6}{\node[cau=cPurple, minimum size=8mm] (c\i) at (5.2,3.6-\i*1.05) {};}
+  \foreach \i in {1,...,5}{\node[cau=cPink, minimum size=8mm] (d\i) at (7.8,3.1-\i*1.05) {};}
+  \node[cau=cRed, minimum size=11mm] (o) at (10.4,0) {$\sigma$};
+  \foreach \i in {1,...,6}{\foreach \j in {1,...,7}{\draw[cNavy!25] (a\i) -- (b\j);}}
+  \foreach \i in {1,...,7}{\foreach \j in {1,...,6}{\draw[cNavy!25] (b\i) -- (c\j);}}
+  \foreach \i in {1,...,6}{\foreach \j in {1,...,5}{\draw[cNavy!25] (c\i) -- (d\j);}}
+  \foreach \i in {1,...,5}{\draw[cNavy!40] (d\i) -- (o);}
+  \node[font=\small, align=center] at (2.6,-4.25) {Ẩn 1 (128)};
+  \node[font=\small, align=center] at (5.2,-4.25) {Ẩn 2 (64)};
+  \node[font=\small, align=center] at (7.8,-4.25) {Ẩn 3 (32)};
+  \node[font=\small, align=center] at (10.4,-1.0) {$p$};
+  % chú giải khối lớp
+  \foreach \x/\c in {2.6/cBlue,5.2/cPurple,7.8/cPink}{
+    \node[hop=\c, font=\small, minimum width=2.1cm, align=center] at (\x,4.6) {Linear\\BN · ReLU\\Dropout};}
+  \node[hop=cRed, font=\small, align=center] at (10.4,1.9) {Linear\\$\to$ logit};
+\end{tikzpicture}

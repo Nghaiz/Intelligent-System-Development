@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % bốn tầng xếp chồng 3D
+  \foreach \y/\c/\t in {0/cSlate/{Tầng dữ liệu: diabetes\_prediction\_dataset.csv \textbullet{} GoogleStock\_Dataset\_V2.csv \textbullet{} FINAL\_USO.csv},
+                        1.9/cTeal/{Tầng tri thức: tài liệu bản ghi + tổng hợp \textbullet{} bộ ba \textbullet{} NetworkX DiGraph \textbullet{} RDF},
+                        3.8/cBlue/{Tầng chỉ mục: TF-IDF (băm) \textbullet{} BM25 \textbullet{} e5-small / e5-base / MiniLM \textbullet{} liên kết thực thể},
+                        5.7/cPurple/{Tầng suy luận: RRF, bge-reranker \textbullet{} tác tử định tuyến \textbullet{} Qwen2.5-1.5B \textbullet{} kiểm chứng},
+                        7.6/cRed/{Tầng ứng dụng: serve\_ch5.predict \textbullet{} Web App Flask \textbullet{} chatbot web + mobile}}{
+    \fill[\c!85!black] (0,\y) -- (14.5,\y) -- (15.5,\y+0.6) -- (15.5,\y+1.6) -- (14.5,\y+1.0) -- cycle;
+    \shade[top color=\c!35, bottom color=\c!70] (0,\y) rectangle (14.5,\y+1.0);
+    \fill[\c!25] (0,\y+1.0) -- (14.5,\y+1.0) -- (15.5,\y+1.6) -- (1.0,\y+1.6) -- cycle;
+    \node[font=\small\bfseries, text=white, text width=14cm, align=center] at (7.25,\y+0.5) {\t};
+  }
+  \foreach \y in {1.0,2.9,4.8,6.7}\draw[mui, line width=2pt, white] (7.25,\y+0.65) -- (7.25,\y+0.95);
+\end{tikzpicture}

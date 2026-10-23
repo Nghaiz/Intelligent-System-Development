@@ -1,0 +1,1178 @@
+[
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 73 tuổi, BMI 27,32, HbA1c 3,5%, đường huyết 155 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P068148"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia000",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 78 tuổi, BMI 27,32, HbA1c 6,2%, đường huyết 160 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P018456"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia001",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 18 tuổi, BMI 22,19, HbA1c 4,0%, đường huyết 130 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P055240"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia002",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 45 tuổi, BMI 28,53, HbA1c 7,0%, đường huyết 260 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P091688"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia003",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 33 tuổi, BMI 27,74, HbA1c 6,0%, đường huyết 159 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P084115"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia004",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 47 tuổi, BMI 27,32, HbA1c 5,7%, đường huyết 280 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P005362"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia005",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 47 tuổi, BMI 37,42, HbA1c 8,8%, đường huyết 280 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P008749"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia006",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 65 tuổi, BMI 27,32, HbA1c 6,8%, đường huyết 300 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P073557"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia007",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 65 tuổi, BMI 27,32, HbA1c 9,0%, đường huyết 160 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P053643"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia008",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 64 tuổi, BMI 22,31, HbA1c 3,5%, đường huyết 155 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P012154"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia009",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 62 tuổi, BMI 27,07, HbA1c 6,8%, đường huyết 160 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P029222"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia010",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 25 tuổi, BMI 26,40, HbA1c 6,1%, đường huyết 80 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P076907"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia011",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 79 tuổi, BMI 30,21, HbA1c 4,5%, đường huyết 130 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P070896"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia012",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 28 tuổi, BMI 40,71, HbA1c 6,5%, đường huyết 300 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P063526"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia013",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 27 tuổi, BMI 23,22, HbA1c 3,5%, đường huyết 145 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P051268"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia014",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 44 tuổi, BMI 26,13, HbA1c 5,7%, đường huyết 240 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P018542"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia015",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 41 tuổi, BMI 23,01, HbA1c 5,0%, đường huyết 85 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P031857"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia016",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 74 tuổi, BMI 29,27, HbA1c 4,0%, đường huyết 140 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P069299"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia017",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 4 tuổi, BMI 18,05, HbA1c 6,5%, đường huyết 90 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P054939"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia018",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 7 tuổi, BMI 27,32, HbA1c 6,6%, đường huyết 100 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P025603"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia019",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 31 tuổi, BMI 46,81, HbA1c 6,1%, đường huyết 145 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P082261"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia020",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 80 tuổi, BMI 24,93, HbA1c 6,8%, đường huyết 126 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P033018"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia021",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 76 tuổi, BMI 26,62, HbA1c 8,2%, đường huyết 159 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P053543"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia022",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 48 tuổi, BMI 24,27, HbA1c 3,5%, đường huyết 90 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P087128"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia023",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 20 tuổi, BMI 20,14, HbA1c 6,6%, đường huyết 300 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P031912"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia024",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 57 tuổi, BMI 27,22, HbA1c 9,0%, đường huyết 160 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P035903"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia025",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 68 tuổi, BMI 24,74, HbA1c 7,0%, đường huyết 140 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P061639"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia026",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 32 tuổi, BMI 31,63, HbA1c 3,5%, đường huyết 155 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P066958"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia027",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 44 tuổi, BMI 27,32, HbA1c 5,8%, đường huyết 126 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P089408"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia028",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 34 tuổi, BMI 27,32, HbA1c 6,2%, đường huyết 158 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P040813"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia029",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 69 tuổi, BMI 27,08, HbA1c 6,1%, đường huyết 145 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P031013"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia030",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 55 tuổi, BMI 23,69, HbA1c 4,0%, đường huyết 155 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P001854"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia031",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 57 tuổi, BMI 31,30, HbA1c 8,2%, đường huyết 300 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P072899"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia032",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 28 tuổi, BMI 24,39, HbA1c 6,6%, đường huyết 100 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P083283"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia033",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 55 tuổi, BMI 25,51, HbA1c 6,6%, đường huyết 260 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P023912"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia034",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 62 tuổi, BMI 26,60, HbA1c 3,5%, đường huyết 126 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P050254"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia035",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nam 80 tuổi, BMI 27,76, HbA1c 6,2%, đường huyết 145 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P075668"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia036",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 75 tuổi, BMI 30,41, HbA1c 6,6%, đường huyết 145 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P044313"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia037",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 7 tuổi, BMI 16,12, HbA1c 4,8%, đường huyết 80 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P005097"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia038",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Bệnh nhân nữ 56 tuổi, BMI 44,94, HbA1c 6,8%, đường huyết 159 mg/dL có mắc tiểu đường không?",
+  "gold": [
+   "P087327"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia039",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 56 tuổi có chỉ số khối cơ thể 31,53, glucose máu 260, HbA1c đo được 5,8 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P088833"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia040",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 60 tuổi có chỉ số khối cơ thể 56,85, glucose máu 280, HbA1c đo được 6,8 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P032240"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia041",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 57 tuổi có chỉ số khối cơ thể 27,80, glucose máu 126, HbA1c đo được 6,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P007450"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia042",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 63 tuổi có chỉ số khối cơ thể 34,27, glucose máu 160, HbA1c đo được 7,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P019116"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia043",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 72 tuổi có chỉ số khối cơ thể 33,61, glucose máu 160, HbA1c đo được 5,7 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P059776"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia044",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 43 tuổi có chỉ số khối cơ thể 22,26, glucose máu 200, HbA1c đo được 4,8 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P035336"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia045",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 2 tuổi có chỉ số khối cơ thể 27,32, glucose máu 145, HbA1c đo được 6,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P023366"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia046",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 4 tuổi có chỉ số khối cơ thể 14,80, glucose máu 155, HbA1c đo được 6,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P065955"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia047",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 51 tuổi có chỉ số khối cơ thể 40,20, glucose máu 200, HbA1c đo được 3,5 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P052279"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia048",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 55 tuổi có chỉ số khối cơ thể 37,51, glucose máu 85, HbA1c đo được 5,8 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P092156"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia049",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 73 tuổi có chỉ số khối cơ thể 38,91, glucose máu 85, HbA1c đo được 6,6 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P049130"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia050",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 59 tuổi có chỉ số khối cơ thể 27,32, glucose máu 280, HbA1c đo được 9,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P024413"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia051",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 68 tuổi có chỉ số khối cơ thể 29,79, glucose máu 260, HbA1c đo được 8,8 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P022483"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia052",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 43 tuổi có chỉ số khối cơ thể 27,32, glucose máu 130, HbA1c đo được 6,6 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P000999"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia053",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 50 tuổi có chỉ số khối cơ thể 39,62, glucose máu 300, HbA1c đo được 5,8 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P034824"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia054",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 80 tuổi có chỉ số khối cơ thể 20,67, glucose máu 130, HbA1c đo được 7,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P064462"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia055",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 80 tuổi có chỉ số khối cơ thể 30,10, glucose máu 160, HbA1c đo được 5,7 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P094710"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia056",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 27 tuổi có chỉ số khối cơ thể 49,83, glucose máu 100, HbA1c đo được 5,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P025226"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia057",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một phụ nữ 65 tuổi có chỉ số khối cơ thể 33,28, glucose máu 130, HbA1c đo được 7,5 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P092794"
+  ],
+  "answer": 1,
+  "answer_type": "label",
+  "qid": "dia058",
+  "domain": "diabetes"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Một đàn ông 32 tuổi có chỉ số khối cơ thể 20,33, glucose máu 100, HbA1c đo được 4,0 phần trăm — người này có bị đái tháo đường không?",
+  "gold": [
+   "P044791"
+  ],
+  "answer": 0,
+  "answer_type": "label",
+  "qid": "dia059",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 40–59 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|40–59|1"
+  ],
+  "answer": 23.55907780979827,
+  "answer_type": "number",
+  "qid": "dia060",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 20–39 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|20–39|0"
+  ],
+  "answer": 1.9095669945076,
+  "answer_type": "number",
+  "qid": "dia061",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi từ 80 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|từ 80|1"
+  ],
+  "answer": 24.2296918767507,
+  "answer_type": "number",
+  "qid": "dia062",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi từ 80 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|từ 80|1"
+  ],
+  "answer": 31.79190751445087,
+  "answer_type": "number",
+  "qid": "dia063",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|60–79|1"
+  ],
+  "answer": 34.375,
+  "answer_type": "number",
+  "qid": "dia064",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 40–59 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|40–59|0"
+  ],
+  "answer": 7.307766927504365,
+  "answer_type": "number",
+  "qid": "dia065",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 40–59 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|40–59|0"
+  ],
+  "answer": 10.297659185049609,
+  "answer_type": "number",
+  "qid": "dia066",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 20–39 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|20–39|1"
+  ],
+  "answer": 16.94214876033058,
+  "answer_type": "number",
+  "qid": "dia067",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi dưới 20 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|dưới 20|0"
+  ],
+  "answer": 0.5064893953782843,
+  "answer_type": "number",
+  "qid": "dia068",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 20–39 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|20–39|1"
+  ],
+  "answer": 14.229249011857709,
+  "answer_type": "number",
+  "qid": "dia069",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|dưới 20|0"
+  ],
+  "answer": 0.6080939400293562,
+  "answer_type": "number",
+  "qid": "dia070",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi từ 80 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|từ 80|0"
+  ],
+  "answer": 20.0,
+  "answer_type": "number",
+  "qid": "dia071",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi từ 80 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|từ 80|0"
+  ],
+  "answer": 18.134937688010314,
+  "answer_type": "number",
+  "qid": "dia072",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 60–79 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|60–79|1"
+  ],
+  "answer": 31.420765027322407,
+  "answer_type": "number",
+  "qid": "dia073",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 20–39 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|20–39|0"
+  ],
+  "answer": 2.6690182245737804,
+  "answer_type": "number",
+  "qid": "dia074",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 60–79 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Female|60–79|0"
+  ],
+  "answer": 15.8070253445976,
+  "answer_type": "number",
+  "qid": "dia075",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 40–59 có tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|40–59|1"
+  ],
+  "answer": 26.575121163166397,
+  "answer_type": "number",
+  "qid": "dia076",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 không tăng huyết áp là bao nhiêu?",
+  "gold": [
+   "S-Male|60–79|0"
+  ],
+  "answer": 20.835177807289362,
+  "answer_type": "number",
+  "qid": "dia077",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số nam giới từ 80 tuổi bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Male|từ 80|1"
+  ],
+  "answer": 31.79190751445087,
+  "answer_type": "number",
+  "qid": "dia078",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số nam giới 60-79 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Male|60–79|0"
+  ],
+  "answer": 20.835177807289362,
+  "answer_type": "number",
+  "qid": "dia079",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số phụ nữ từ 80 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Female|từ 80|0"
+  ],
+  "answer": 18.134937688010314,
+  "answer_type": "number",
+  "qid": "dia080",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số nam giới dưới 20 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Male|dưới 20|0"
+  ],
+  "answer": 0.5064893953782843,
+  "answer_type": "number",
+  "qid": "dia081",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số nam giới 20-39 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Male|20–39|0"
+  ],
+  "answer": 2.6690182245737804,
+  "answer_type": "number",
+  "qid": "dia082",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số phụ nữ 60-79 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Female|60–79|0"
+  ],
+  "answer": 15.8070253445976,
+  "answer_type": "number",
+  "qid": "dia083",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số phụ nữ 20-39 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Female|20–39|0"
+  ],
+  "answer": 1.9095669945076,
+  "answer_type": "number",
+  "qid": "dia084",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số phụ nữ 40-59 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Female|40–59|0"
+  ],
+  "answer": 7.307766927504365,
+  "answer_type": "number",
+  "qid": "dia085",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số phụ nữ dưới 20 tuổi không bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Female|dưới 20|0"
+  ],
+  "answer": 0.6080939400293562,
+  "answer_type": "number",
+  "qid": "dia086",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "para",
+  "question": "Trong số phụ nữ 60-79 tuổi bị cao huyết áp, bao nhiêu phần trăm bị đái tháo đường?",
+  "gold": [
+   "S-Female|60–79|1"
+  ],
+  "answer": 31.420765027322407,
+  "answer_type": "number",
+  "qid": "dia087",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"chưa từng hút\" là bao nhiêu?",
+  "gold": [
+   "S-smoking_history=never"
+  ],
+  "answer": 9.70114541543113,
+  "answer_type": "number",
+  "qid": "dia088",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"từng hút\" là bao nhiêu?",
+  "gold": [
+   "S-smoking_history=ever"
+  ],
+  "answer": 11.805902951475739,
+  "answer_type": "number",
+  "qid": "dia089",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"đã bỏ thuốc\" là bao nhiêu?",
+  "gold": [
+   "S-smoking_history=former"
+  ],
+  "answer": 17.098612754059577,
+  "answer_type": "number",
+  "qid": "dia090",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"hiện không hút\" là bao nhiêu?",
+  "gold": [
+   "S-smoking_history=not current"
+  ],
+  "answer": 10.837128946128475,
+  "answer_type": "number",
+  "qid": "dia091",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"đang hút\" là bao nhiêu?",
+  "gold": [
+   "S-smoking_history=current"
+  ],
+  "answer": 10.307709035555073,
+  "answer_type": "number",
+  "qid": "dia092",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm HbA1c tiền tiểu đường là bao nhiêu?",
+  "gold": [
+   "S-hba1c_class=tiền tiểu đường"
+  ],
+  "answer": 8.303584896173763,
+  "answer_type": "number",
+  "qid": "dia093",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm BMI bình thường là bao nhiêu?",
+  "gold": [
+   "S-bmi_class=bình thường"
+  ],
+  "answer": 3.885987031700288,
+  "answer_type": "number",
+  "qid": "dia094",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"không có thông tin\" là bao nhiêu?",
+  "gold": [
+   "S-smoking_history=No Info"
+  ],
+  "answer": 4.393833429622647,
+  "answer_type": "number",
+  "qid": "dia095",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm BMI thiếu cân là bao nhiêu?",
+  "gold": [
+   "S-bmi_class=thiếu cân"
+  ],
+  "answer": 0.7537392533270522,
+  "answer_type": "number",
+  "qid": "dia096",
+  "domain": "diabetes"
+ },
+ {
+  "type": "group",
+  "style": "lex",
+  "question": "Tỷ lệ mắc tiểu đường trong nhóm BMI thừa cân là bao nhiêu?",
+  "gold": [
+   "S-bmi_class=thừa cân"
+  ],
+  "answer": 7.927571152515686,
+  "answer_type": "number",
+  "qid": "dia097",
+  "domain": "diabetes"
+ }
+]

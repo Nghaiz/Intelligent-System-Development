@@ -1,0 +1,15 @@
+\begin{tabular}{llrrr}
+\toprule
+Dữ liệu & \makecell[l]{Chuẩn hoá\\+ mô hình} & MAE & RMSE & R² \\
+\midrule
+AAPL & MinMax toàn cục + LSTM & 70{,}809 & 85{,}365 & \ensuremath{-}1{,}6044 \\
+ & MinMax toàn cục + GRU & 68{,}090 & 83{,}671 & \ensuremath{-}1{,}5020 \\
+ & Tương đối + LSTM & 1{,}542 & 2{,}259 & 0{,}9982 \\
+ & Tương đối + GRU & 1{,}541 & 2{,}257 & 0{,}9982 \\
+\midrule
+Vàng GLD & MinMax toàn cục + LSTM & 2{,}685 & 3{,}112 & 0{,}6338 \\
+ & MinMax toàn cục + GRU & 3{,}046 & 3{,}722 & 0{,}4762 \\
+ & Tương đối + LSTM & 0{,}552 & 0{,}738 & 0{,}9794 \\
+ & Tương đối + GRU & 0{,}562 & 0{,}751 & 0{,}9787 \\
+\bottomrule
+\end{tabular}

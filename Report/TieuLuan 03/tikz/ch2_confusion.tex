@@ -1,0 +1,18 @@
+\begin{tikzpicture}[cell/.style={minimum width=3.6cm, minimum height=2.2cm, align=center, font=\small, draw=white, line width=2pt}]
+  \node[cell, top color=cGreen!25, bottom color=cGreen!60] (tn) at (0,0) {\textbf{TN}\\thật âm\\(dự đoán đúng 0)};
+  \node[cell, top color=cOrange!25, bottom color=cOrange!65] (fp) at (3.6,0) {\textbf{FP}\\dương giả\\(báo động nhầm)};
+  \node[cell, top color=cRed!25, bottom color=cRed!65] (fn) at (0,-2.2) {\textbf{FN}\\âm giả\\(bỏ sót bệnh)};
+  \node[cell, top color=cBlue!25, bottom color=cBlue!65] (tp) at (3.6,-2.2) {\textbf{TP}\\thật dương\\(phát hiện đúng)};
+  \node[font=\small\bfseries, above=2pt of tn] {Dự đoán 0};
+  \node[font=\small\bfseries, above=2pt of fp] {Dự đoán 1};
+  \node[font=\small\bfseries, rotate=90, left=2pt of tn, anchor=south] {Thật 0};
+  \node[font=\small\bfseries, rotate=90, left=2pt of fn, anchor=south] {Thật 1};
+  \node[khoi, anchor=west, align=left, text width=8.4cm] at (6.2,0.75)
+    {$\text{Accuracy}=\dfrac{TP+TN}{TP+TN+FP+FN}$ \quad (tỷ lệ đúng)};
+  \node[khoiC, anchor=west, align=left, text width=8.4cm] at (6.2,-0.65)
+    {$\text{Precision}=\dfrac{TP}{TP+FP}$ \quad (độ tin của báo động)};
+  \node[khoiR, anchor=west, align=left, text width=8.4cm] at (6.2,-2.05)
+    {$\text{Recall}=\dfrac{TP}{TP+FN}$ \quad (tỷ lệ ca bệnh bắt được)};
+  \node[khoiP, anchor=west, align=left, text width=8.4cm] at (6.2,-3.45)
+    {$F_1=\dfrac{2\cdot P\cdot R}{P+R}$ \quad (trung bình điều hòa)};
+\end{tikzpicture}

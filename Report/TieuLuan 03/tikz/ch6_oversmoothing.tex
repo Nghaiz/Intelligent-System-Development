@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % bốn bức ảnh đồ thị: màu nút (biểu diễn) hoà lẫn dần khi số lớp tăng
+  \foreach \k/\mix/\lab [count=\p from 0] in {0/0/{$\ell=0$\\đặc trưng gốc}, 1/30/{$\ell=2$\\tách lớp tốt}, 2/65/{$\ell=4$\\bắt đầu hoà}, 3/92/{$\ell=8$\\gần như một màu}}{
+    \begin{scope}[xshift=\p*4.2cm]
+      \filldraw[draw=cSlate!50, fill=cSlate!4, rounded corners=5pt] (-0.2,-0.3) rectangle (3.6,3.5);
+      \foreach \n/\x/\y/\c in {a/0.5/2.8/cBlue, b/1.4/3.0/cBlue, c/0.3/1.8/cBlue, d/1.2/2.0/cBlue,
+                               e/2.4/1.6/cOrange, f/3.1/2.6/cOrange, g/3.2/0.9/cOrange, h/2.1/0.4/cOrange,
+                               i/0.9/0.6/cGreen, j/1.6/1.1/cGreen}
+        \coordinate (\n) at (\x,\y);
+      \foreach \u/\v in {a/b, a/c, b/d, c/d, d/e, e/f, e/g, f/g, g/h, h/j, i/j, c/i, d/j, e/j}
+        \draw[gray!55, thick] (\u) -- (\v);
+      \foreach \n/\c in {a/cBlue, b/cBlue, c/cBlue, d/cBlue, e/cOrange, f/cOrange, g/cOrange, h/cOrange, i/cGreen, j/cGreen}
+        \shade[ball color=\c!\the\numexpr100-\mix\relax!cPurple] (\n) circle (0.22);
+      \node[font=\small\bfseries, text=cNavy, align=center] at (1.7,-0.85) {\lab};
+    \end{scope}
+    \ifnum\p<3 \draw[muiM=cRed, line width=1.6pt] (\p*4.2+3.65,1.6) -- (\p*4.2+4.15,1.6); \fi
+  }
+  % đường MAD giảm
+  \draw[->, thick] (0,-3.0) -- (16.2,-3.0) node[below left, nhan] {số lớp truyền};
+  \draw[cRed, ultra thick] plot[smooth] coordinates {(0.5,-2.15) (4.5,-2.3) (8.7,-2.6) (12.9,-2.87) (15.8,-2.94)};
+  \node[font=\small, text=cRed, anchor=west] at (0.5,-1.8) {MAD (khoảng cách trung bình giữa biểu diễn nút) $\downarrow$};
+\end{tikzpicture}

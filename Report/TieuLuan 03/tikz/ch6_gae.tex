@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % đồ thị đầu vào với cạnh test bị che
+  \node[tieude] at (1.6,3.9) {Đồ thị huấn luyện};
+  \foreach \n/\x/\y in {a/0.3/2.9, b/1.6/3.2, c/0.6/1.5, d/2.0/1.9, e/3.0/2.9, f/2.8/0.6}
+    \node[cau=cBlue, minimum size=6mm] (\n) at (\x,\y) {};
+  \foreach \u/\v in {a/b, a/c, b/d, c/d, d/e, d/f} \draw[thick, cSlate] (\u) -- (\v);
+  \draw[cRed, thick, dashed] (b) -- (e) node[midway, above, font=\small, text=cRed] {che};
+  \draw[cRed, thick, dashed] (c) -- (f);
+  % encoder
+  \node[khoi, text width=2.2cm, minimum height=2.2cm] (enc) at (5.6,1.9) {Encoder\\GCN 2 lớp\\$Z=\text{GCN}(X,\hat A)$};
+  \draw[mui] (3.4,1.9) -- (enc);
+  % embedding Z 3D
+  \tensorbaD{7.5}{0.8}{0.9}{2.4}{0.9}{cPurple}{$Z\in\mathbb R^{N\times 64}$}
+  % decoder
+  \node[khoiC, text width=2.6cm, minimum height=2.2cm] (dec) at (11.4,1.9) {Decoder\\$p(u,v)=\sigma(z_u^{\top}z_v)$};
+  \draw[mui] (8.9,1.9) -- (dec);
+  % đầu ra
+  \node[khoiG, text width=3.0cm] (pos) at (15.0,3.0) {cạnh thật (dương)\\$p\to 1$};
+  \node[khoiR, text width=3.0cm] (neg) at (15.0,0.8) {cặp ngẫu nhiên (âm)\\$p\to 0$};
+  \draw[mui] (dec) -- (pos); \draw[mui] (dec) -- (neg);
+  \node[nhan, align=center] at (8.4,-0.9) {Hàm mất mát: entropy chéo nhị phân trên cạnh dương và mẫu âm; đánh giá AUC, AP trên cạnh bị che};
+\end{tikzpicture}

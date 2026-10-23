@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[tieude] at (1.6,5.6) {Danh sách trả về};
+  \foreach \r/\ok in {1/0, 2/1, 3/0, 4/0, 5/0}{
+    \pgfmathsetmacro{\cc}{\ok ? 1 : 0}
+    \ifnum\ok=1
+      \node[draw=cGreen!70!black, top color=cGreen!20, bottom color=cGreen!55, rounded corners=3pt, minimum width=3.2cm,
+            minimum height=7mm, font=\small] at (1.6,5.4-\r*0.95) {hạng \r: tài liệu đúng \checkmark};
+    \else
+      \node[draw=cSlate!70!black, top color=cSlate!8, bottom color=cSlate!25, rounded corners=3pt, minimum width=3.2cm,
+            minimum height=7mm, font=\small] at (1.6,5.4-\r*0.95) {hạng \r: sai};
+    \fi
+  }
+  \node[hop=cBlue, text width=4.8cm, font=\small] at (7.0,4.6) {\textbf{Recall@k}\\ $\dfrac{|\text{đúng} \cap \text{top-}k|}{|\text{đúng}|}$\\ ví dụ: R@1 = 0, R@3 = 1};
+  \node[hop=cOrange, text width=4.8cm, font=\small] at (7.0,1.5) {\textbf{MRR}\\ $\dfrac{1}{|Q|}\sum_q \dfrac{1}{\mathrm{rank}_q}$\\ ví dụ: $1/2 = 0{,}5$};
+  \node[hop=cPurple, text width=5.2cm, font=\small] at (12.6,3.0)
+   {\textbf{nDCG@10}\\ $\mathrm{DCG} = \sum_{i} \dfrac{\mathrm{rel}_i}{\log_2(i+1)}$,\\ $\mathrm{nDCG} = \mathrm{DCG}/\mathrm{IDCG}$\\ ví dụ: $\frac{1/\log_2 3}{1} \approx 0{,}631$};
+  \draw[mui] (3.3,3.5) -- (4.45,4.4); \draw[mui] (3.3,3.5) -- (4.45,1.7); \draw[mui] (9.5,3.0) -- (10.0,3.0);
+\end{tikzpicture}

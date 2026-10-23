@@ -1,0 +1,23 @@
+\begin{tabular}{L{2.6cm}L{11.0cm}c}
+\toprule
+Hệ thống & \makecell[l]{Câu trả lời\\(rút gọn)} & Chấm \\
+\midrule
+\multicolumn{3}{L{15.4cm}}{\textbf{Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là bao nhiêu?} (đáp án: 0{,}61)} \\
+LLM thuần & Rất tiếc, tôi không có thông tin cụ thể về tỷ lệ này. Tuy nhiên, theo các nghiên cứu gần đây, tỷ lệ mắc tiểu đường trong nhóm tuổi dưới 20 phụ thuộc nhiều vào các yếu tố như lối sống, chế độ ăn uống và di truyền. Để có thông ti... & \textcolor{cRed}{sai} \\
+Naive RAG & Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là 0,61\%. & \textcolor{cGreen}{đúng} \\
+Advanced RAG & Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là 0,00\%. & \textcolor{cRed}{sai} \\
+Tác tử chọn công cụ & Nhóm nữ, nhóm tuổi dưới 20, không tăng huyết áp có 9.538 hồ sơ; tỷ lệ mắc tiểu đường 0,61\%, HbA1c trung bình 5,41\%, đường huyết trung bình 133,0 mg/dL. & \textcolor{cGreen}{đúng} \\
+\midrule
+\multicolumn{3}{L{15.4cm}}{\textbf{Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 có tăng huyết áp là bao nhiêu?} (đáp án: 34{,}38)} \\
+LLM thuần & Theo các nghiên cứu gần đây, tỷ lệ mắc tiểu đường trong nhóm tuổi 60-79 với tiền sử tăng huyết áp thường cao hơn so với những người không có tiền sử này. Tuy nhiên, con số cụ thể có thể thay đổi tùy thuộc vào quốc gia, độ tuổi ... & \textcolor{cRed}{sai} \\
+Naive RAG & Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 có tăng huyết áp là 34,38\%. & \textcolor{cGreen}{đúng} \\
+Advanced RAG & Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 có tăng huyết áp là 34,38\%. Đây được thể hiện từ thông tin trong các hồ sơ P069928 và P080064, cả hai đều cho thấy tỷ lệ mắc tiểu đường là 34,38\% cho nhóm tuổi 60–79 có tăn... & \textcolor{cGreen}{đúng} \\
+Tác tử chọn công cụ & Nhóm nam, nhóm tuổi 60–79, có tăng huyết áp có 1.440 hồ sơ; tỷ lệ mắc tiểu đường 34,38\%, HbA1c trung bình 5,97\%, đường huyết trung bình 153,1 mg/dL. & \textcolor{cGreen}{đúng} \\
+\midrule
+\multicolumn{3}{L{15.4cm}}{\textbf{Một đàn ông 60 tuổi có chỉ số khối cơ thể 56,85, glucose máu 280, HbA1c đo được 6,8 phần trăm — người này có bị đái tháo đường không?} (đáp án: mắc)} \\
+LLM thuần & Theo chỉ số BMI (56,85) và HbA1c (6,8\%), người đàn ông này có nguy cơ cao mắc đái tháo đường. Tuy nhiên, chỉ số BMI không đủ để chẩn đoán đái tháo đường, nên cần kết hợp với các xét nghiệm khác như glucose máu và kiểm tra đường... & \textcolor{cGreen}{đúng} \\
+Naive RAG & Không đủ thông tin để trả lời chính xác. [1] cho thấy chỉ số BMI 19,85 (bình thường) và HbA1c 6,1\% (tiền tiểu đường), nhưng không cung cấp thông tin về glucose máu. [2] cho thấy chỉ số BMI 37,08 (béo phì) và HbA1c 6,6\% (ngưỡng ... & \textcolor{cRed}{sai} \\
+Advanced RAG & [Từ câu 1] Người này có chỉ số khối cơ thể 56,85, glucose máu 280, HbA1c đo được 6,8 phần trăm — người này có bị đái tháo đường không? [Trả lời]: Có, người này có bị đái tháo đường. & \textcolor{cGreen}{đúng} \\
+Tác tử chọn công cụ & Hồ sơ P032240: MẮC tiểu đường (HbA1c 6,8\%, đường huyết 280 mg/dL). & \textcolor{cGreen}{đúng} \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,35 @@
+\begin{tikzpicture}
+  % chia 70/15/15
+  \node[tieude, anchor=west] at (0,3.3) {(a) Hold-out: Train / Validation / Test (phân tầng)};
+  \fill[top color=cBlue!30, bottom color=cBlue!70, rounded corners=2pt, draw=cBlue!70!black] (0,2.0) rectangle (10.5,2.9);
+  \fill[top color=cOrange!30, bottom color=cOrange!75, draw=cOrange!70!black] (10.5,2.0) rectangle (12.75,2.9);
+  \fill[top color=cGreen!30, bottom color=cGreen!75, rounded corners=2pt, draw=cGreen!60!black] (12.75,2.0) rectangle (15,2.9);
+  \node[font=\small\bfseries, text=white] at (5.25,2.45) {Train 70\% — học tham số $\mathbf{w}$};
+  \node[font=\small\bfseries] at (11.62,2.45) {Val 15\%};
+  \node[font=\small\bfseries] at (13.87,2.45) {Test 15\%};
+  \draw[decorate, decoration={brace, mirror, amplitude=5pt}, thick] (10.5,1.9) -- (12.75,1.9)
+    coordinate[midway] (lv);
+  \node[font=\small, align=right, anchor=north east] at ([xshift=0.95cm, yshift=-0.3cm]lv) {chọn mô hình,\\ngưỡng, siêu tham số};
+  \draw[decorate, decoration={brace, mirror, amplitude=5pt}, thick] (12.75,1.9) -- (15,1.9)
+    coordinate[midway] (lt);
+  \node[font=\small, align=center, anchor=north] at ([yshift=-0.3cm]lt) {dùng đúng\\một lần};
+  % k-fold
+  \node[tieude, anchor=west] at (0,0.0) {(b) Kiểm định chéo 5-fold trên tập Train};
+  \foreach \r in {1,...,5}{
+    \pgfmathsetmacro{\yy}{-0.35-0.75*\r}
+    \node[font=\small, anchor=east] at (-0.1,\yy) {Lượt \r};
+    \foreach \c in {1,...,5}{
+      \pgfmathsetmacro{\xx}{(\c-1)*2.1}
+      \ifnum\c=\r
+        \filldraw[draw=cRed!70!black, top color=cRed!25, bottom color=cRed!65, rounded corners=2pt] (\xx,\yy-0.27) rectangle ++(2.0,0.55);
+        \node[font=\small\bfseries, text=white] at (\xx+1.0,\yy) {kiểm định};
+      \else
+        \filldraw[draw=cBlue!70!black, top color=cBlue!15, bottom color=cBlue!45, rounded corners=2pt] (\xx,\yy-0.27) rectangle ++(2.0,0.55);
+        \node[font=\small] at (\xx+1.0,\yy) {huấn luyện};
+      \fi
+    }
+    \node[font=\small, anchor=west] at (10.6,\yy) {$\Rightarrow s_{\r}$};
+  }
+  \draw[decorate, decoration={brace, amplitude=5pt}, thick] (11.65,-0.8) -- (11.65,-4.4);
+  \node[khoiP, anchor=west, align=center] at (12.0,-2.6) {$\bar{s} = \frac{1}{5}\sum_{i} s_i$\\$\pm$ độ lệch chuẩn};
+\end{tikzpicture}

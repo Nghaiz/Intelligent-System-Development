@@ -1,0 +1,22 @@
+\begin{vetsuyluan}{Vết tác tử -- PAL tự sửa sau khi mã chạy lỗi trong sandbox (câu 30, đáp án 109, hệ trả lời 109, 2 lượt gọi, 119{,}8 s)}
+\vetBuoc{cNavy}{CÂU HỎI}{Darrell and Allen's ages are in the ratio of 7:11. If their total age now is 162, calculate Allen's age 10 years from now.}
+\vetBuoc{cGreen}{PAL}{def calculate\_allens\_age(): total\_age = 162 ratio\_darrell = 7 ratio\_allen = 11 combined\_ratio = ratio\_darrell + ratio\_allen allen\_age = (ratio\_allen / combined\_ratio) * total\_age return int(allen\_age)}
+\vetBuoc{cOrange}{PYTHON}{lỗi: không có hàm solution()}
+\vetBuoc{cGreen}{PAL}{\texttt{\footnotesize def~solution():}\\
+\texttt{\footnotesize ~~~~\#~Given~ratio~of~Darrell's~to~Allen's~age}\\
+\texttt{\footnotesize ~~~~ratio\_darrell\_allen~=~[7,~11]}\\
+\texttt{\footnotesize ~~~~\#~Total~age~of~Darrell~and~Allen}\\
+\texttt{\footnotesize ~~~~total\_age~=~162}\\
+\texttt{\footnotesize ~~~~\#~Calculate~the~sum~of~the~ratio~parts}\\
+\texttt{\footnotesize ~~~~sum\_ratio\_parts~=~sum(ratio\_darrell\_allen)}\\
+\texttt{\footnotesize ~~~~\#~Calculate~Darrell's~age}\\
+\texttt{\footnotesize ~~~~darrell\_age~=~(ratio\_darrell\_allen[0]~/~sum\_ratio\_parts)~*~total\_age}\\
+\texttt{\footnotesize ~~~~\#~Calculate~Allen's~age}\\
+\texttt{\footnotesize ~~~~allen\_age~=~total\_age~-~darrell\_age}\\
+\texttt{\footnotesize ~~~~\#~Calculate~Allen's~age~10~years~from~now}\\
+\texttt{\footnotesize ~~~~allen\_age\_10\_years\_later~=~allen\_age~+~10}\\
+\texttt{\footnotesize ~~~~return~allen\_age\_10\_years\_later}\\
+\texttt{\footnotesize \#~Call~the~function~and~print~the~result}\\
+\texttt{\footnotesize print(solution())}}
+\vetBuoc{cOrange}{PYTHON}{kết quả = 109}
+\end{vetsuyluan}

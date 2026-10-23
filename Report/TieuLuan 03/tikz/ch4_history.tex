@@ -1,0 +1,21 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \shade[left color=cSky!60, right color=cPurple!70, rounded corners=4pt] (0,-0.18) rectangle (16,0.18);
+  \foreach \x/\yr/\txt/\col/\up in {
+      0.4/1982/{Mạng Hopfield}/cTeal/1,
+      1.9/1986/{Jordan network,\\ BPTT (Rumelhart)}/cGreen/-1,
+      3.4/1990/{Elman SRN}/cBlue/1,
+      4.9/1994/{Bengio: gradient\\ biến mất}/cRed/-1,
+      6.4/1997/{LSTM; BiRNN}/cOrange/1,
+      7.9/2000/{Cổng quên\\ (Gers)}/cYellow/-1,
+      9.4/2013/{RNN sâu cho\\ tiếng nói (Graves)}/cPink/1,
+      10.9/2014/{GRU, seq2seq}/cPurple/-1,
+      12.4/2015/{Attention\\ (Bahdanau)}/cIndigo/1,
+      13.9/2017/{Transformer}/cSlate/-1,
+      15.5/2023/{SSM / Mamba,\\ RWKV}/cNavy/1} {
+    \ifnum\up=1 \def\anch{south}\else\def\anch{north}\fi
+    \fill[\col, draw=white, thick] (\x,0) circle (0.24);
+    \draw[\col!80!black, thick] (\x,0.24*\up) -- (\x,1.15*\up);
+    \node[hop=\col, font=\scriptsize, align=center, anchor=\anch, text width=2.2cm]
+      at (\x,1.15*\up) {\textbf{\yr}\\ \txt};
+  }
+\end{tikzpicture}

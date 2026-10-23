@@ -1,0 +1,7 @@
+\begin{vetsuyluan}{Vết suy luận của tác tử -- Tiểu đường, ví dụ 3 (7{.}330 ms)}
+\vetBuoc{cSlate}{CÂU HỎI}{Những yếu tố nào liên quan mạnh nhất tới tỷ lệ mắc tiểu đường trong dữ liệu?}
+\vetBuoc{cPurple}{THOUGHT}{Không thấy ngày, giai đoạn, nhóm hay hồ sơ cụ thể → câu hỏi mở, dùng RAG lai + LLM tổng hợp.}
+\vetBuoc{cOrange}{ACTION}{rag\_search(``Những yếu tố nào liên quan mạnh nhất tới tỷ lệ mắc tiểu đườn…'', k=5) — RRF(BM25 + Dense (e5-small) + Graph) + Rerank \hfill{\footnotesize (923{,}0 ms)}}
+\vetBuoc{cTeal}{OBSERV.}{[1] S-glucose\_class=từ 200; [2] S-gender=Female; [3] S-gender=Male; [4] S-glucose\_class=126–199; [5] S-hba1c\_class=ngưỡng chẩn đoán}
+\vetBuoc{cGreen}{ANSWER}{Những yếu tố liên quan mạnh nhất tới tỷ lệ mắc tiểu đường trong dữ liệu là giới tính và độ tuổi. Theo thống kê, tỷ lệ mắc tiểu đường cao hơn ở nữ giới so với nam giới, với tỷ lệ 7,92\% so với 10,10\%. Độ tuổi cũng đóng vai trò quan trọng, với tuổi trung bình 47,9 tuổi cho nữ và 41,0 tuổi cho nam.}
+\end{vetsuyluan}

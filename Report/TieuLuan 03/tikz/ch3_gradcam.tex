@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm, every node/.style={font=\small}]
+  \khoibaD{0}{0}{0.3}{2.6}{2.6}{cSlate}
+  \node[align=center] at (0.9,-0.5) {Ảnh $x$};
+  \foreach \i in {0,...,7}{\pgfmathsetmacro{\xx}{2.3+\i*0.16}\khoibaD{\xx}{0.4}{0.16}{1.8}{1.8}{cBlue}}
+  \node[align=center] at (3.6,-0.5) {Bản đồ đặc trưng $A^k$\\tầng conv cuối};
+  \node[khoiC, text width=2.6cm] (head) at (7.8,2.6) {GAP $\to$ FC\\$\Rightarrow$ điểm lớp $y^c$};
+  \draw[mui] (4.9,2.0) -- (head.west);
+  \node[khoiR, text width=3.8cm] (g) at (7.8,-1.4) {$\alpha_k^c=\dfrac{1}{Z}\displaystyle\sum_{i,j}\dfrac{\partial y^c}{\partial A^k_{ij}}$\\(trung bình gradient)};
+  \draw[muiM=cRed] (head) -- node[right, align=left] {lan truyền\\ngược} (g);
+  \node[khoiG, text width=3.4cm] (cam) at (12.3,0.6) {$L^c=\mathrm{ReLU}\Big(\sum_k \alpha_k^c A^k\Big)$\\nội suy lên kích thước ảnh};
+  \draw[mui] (g.east) -- (cam.south west);
+  \draw[mui] (4.9,0.9) -- (cam.west);
+  \foreach \x in {0,...,5}{\foreach \y in {0,...,5}{
+    \pgfmathsetmacro{\h}{100*exp(-((\x-3.2)^2+(\y-2.6)^2)/4)}
+    \fill[red!\h!yellow] (14.6+\x*0.35,-0.4+\y*0.35) rectangle ++(0.35,0.35);}}
+  \node[align=center] at (15.65,-0.85) {vùng mô hình ``nhìn''};
+  \draw[mui] (cam.east) -- (14.5,0.6);
+\end{tikzpicture}

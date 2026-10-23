@@ -1,0 +1,27 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % bảng đơn hàng
+  \node[tieude] at (2.4,3.7) {\SL{ch4_eda/ecom/orders} đơn hàng (giao dịch)};
+  \foreach \r/\col in {0/cOrange,1/cOrange,2/cGreen,3/cGreen,4/cGreen,5/cBlue} {
+    \foreach \c in {0,...,5} {
+      \fill[\col!\the\numexpr 20+8*\c\relax, draw=white] (\c*0.8,2.4-\r*0.5) rectangle ++(0.8,0.5);
+    }
+  }
+  \node[font=\scriptsize, anchor=east] at (-0.1,2.65) {01/01};
+  \node[font=\scriptsize, anchor=east] at (-0.1,2.15) {01/01};
+  \node[font=\scriptsize, anchor=east] at (-0.1,1.65) {02/01};
+  \node[font=\scriptsize, anchor=east] at (-0.1,0.65) {02/01};
+  \node[font=\scriptsize, anchor=east] at (-0.1,0.15) {03/01};
+  \node[font=\small, align=center] at (2.4,-1.2) {Date, Total\_Amount, Quantity, Discount,\\ Session, Pages, Rating, Returning, ...};
+  % mũi tên groupby
+  \node[single arrow, fill=cPurple!70, draw=cPurple!60!black, minimum height=2.8cm, minimum width=1.4cm,
+        font=\small\bfseries, text=white, align=center] at (6.9,1.1) {groupby\\ Date};
+  % bảng ngày
+  \node[tieude] at (11.9,3.8) {\SL{ch4_eda/ecom/days} ngày × 9 đặc trưng};
+  \foreach \r/\col in {0/cOrange,1/cGreen,2/cBlue} {
+    \foreach \c in {0,...,8} {
+      \fill[\col!\the\numexpr 25+7*\c\relax, draw=white] (8.6+\c*0.75,2.4-\r*0.9) rectangle ++(0.75,0.9);
+    }
+  }
+  \node[font=\small, align=left, anchor=north west, text width=7cm] at (8.6,-0.4)
+    {sum: Total\_Amount, Transactions, Quantity, Discount\\ mean: Avg\_Unit\_Price, Avg\_Session, Avg\_Pages,\\ \phantom{mean: }Avg\_Rating, Returning\_Rate};
+\end{tikzpicture}

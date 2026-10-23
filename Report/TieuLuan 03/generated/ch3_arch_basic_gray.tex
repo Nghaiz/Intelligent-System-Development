@@ -1,0 +1,16 @@
+\begin{tabular}{llr}
+\toprule
+Tầng & \makecell[l]{Kích thước\\đầu ra} & \makecell[r]{Số tham\\số} \\
+\midrule
+Đầu vào & $28\times28\times1$ & 0 \\
+Conv $3{\times}3$, 32, pad 1 + ReLU & $28\times28\times32$ & 320 \\
+MaxPool $2{\times}2$ & $14\times14\times32$ & 0 \\
+Conv $3{\times}3$, 64, pad 1 + ReLU & $14\times14\times64$ & 18{.}496 \\
+MaxPool $2{\times}2$ & $7\times7\times64$ & 0 \\
+Flatten & $3{.}136$ & 0 \\
+Dense 128 + ReLU & 128 & 401{.}536 \\
+Dense $K$ + Softmax & 10 & 1{.}290 \\
+\midrule
+\textbf{Tổng} &  & \textbf{421{.}642} \\
+\bottomrule
+\end{tabular}

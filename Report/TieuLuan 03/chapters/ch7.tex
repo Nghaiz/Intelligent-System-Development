@@ -1,0 +1,544 @@
+% =====================================================================
+%  Chương 7 — Hệ đa tác tử (làn L6)
+% =====================================================================
+\chapter{Hệ đa tác tử (Multi-Agent Systems)}
+\label{chap:mas}
+
+Các chương trước xây dựng từng thành phần thông minh riêng lẻ: một mô hình phân loại, một mạng dự báo, một bộ truy xuất
+tri thức, một mô hình ngôn ngữ trả lời có căn cứ. Hệ thống thực tế thường cần \emph{nhiều} thành phần như vậy phối hợp:
+một thành phần lập kế hoạch, một thành phần tra cứu, một thành phần tính toán, một thành phần kiểm tra lại. Khi mỗi thành
+phần có vai trò, quyền hạn và trạng thái riêng, và chúng trao đổi với nhau bằng thông điệp, ta có một \textbf{hệ đa tác tử}.
+Chương này trình bày khái niệm tác tử, các mẫu tổ chức phối hợp, giao thức trao đổi, cách quản lý trạng thái và kiểm
+chứng, các tiêu chí đánh giá, rồi trả lời bằng thực nghiệm một câu hỏi thực dụng: \emph{với một mô hình ngôn ngữ nhỏ chạy
+cục bộ, tổ chức nhiều tác tử có thực sự giải toán tốt hơn một lời gọi duy nhất không, và phải trả giá bao nhiêu?}
+
+% ---------------------------------------------------------------------
+\section{Tác tử và sự phối hợp nhiều vai trò}
+\label{sec:mas-agent}
+
+Russell và Norvig định nghĩa \textbf{tác tử} (agent) là bất cứ thứ gì \emph{cảm nhận} môi trường qua cảm biến và
+\emph{tác động} lên môi trường qua cơ cấu chấp hành \cite{ch7:russell2021}. Wooldridge bổ sung các tính chất của tác
+tử thông minh: tự chủ (tự quyết hành động không cần con người can thiệp từng bước), phản ứng (đáp lại thay đổi của môi
+trường), chủ động (theo đuổi mục tiêu) và có khả năng xã hội (tương tác với tác tử khác) \cite{ch7:wooldridge2009}.
+Trong thế hệ hệ thống hiện nay, ``bộ não'' của tác tử thường là một mô hình ngôn ngữ lớn (LLM): nó đọc quan sát dưới dạng
+văn bản, suy luận, và chọn hành động như gọi công cụ, gửi thông điệp hoặc trả lời. Vòng lặp
+\emph{quan sát -- suy luận -- hành động -- ghi nhớ} (Hình~\ref{fig:ch7-loop}) lặp cho tới khi đạt điều kiện dừng.
+
+\hinhtikz{ch7_agent_loop}{Vòng lặp của một tác tử dựa trên LLM: quan sát, suy luận, hành động trên môi trường và cập
+nhật trạng thái}{ch7-loop}
+
+Mô hình ReAct \cite{ch7:yao2023react} (đã dùng ở Tiểu luận 02) là dạng đơn giản nhất của vòng lặp này: LLM xen kẽ các
+dòng \emph{Thought} (suy luận) và \emph{Action} (gọi công cụ), đọc \emph{Observation} rồi lặp lại. Một lời gọi LLM đơn
+lẻ chưa phải là tác tử nếu không có cơ chế quản lý hành động và trạng thái; tương tự, viết nhiều tên vai trò trong cùng
+một prompt chưa tạo ra nhiều tác tử độc lập. Một \textbf{hệ đa tác tử} (multi-agent system -- MAS) là hệ gồm nhiều tác tử
+tương tác, có thể hợp tác, cạnh tranh hay thương lượng. Chương này tập trung vào hệ \emph{hợp tác} giải một nhiệm vụ
+chung, trong đó mỗi tác tử phải được đặc tả rõ: nhận gì, được phép làm gì, lưu trạng thái nào, gửi gì cho ai
+(Bảng~\ref{tab:ch7-roles}).
+
+\begin{table}[H]\centering\caption{Các vai trò thường gặp trong hệ đa tác tử hợp tác}\label{tab:ch7-roles}
+{\small\begin{tabular}{L{2.6cm}L{3.8cm}L{4.0cm}L{4.0cm}}
+\toprule
+Vai trò & Đầu vào & Sản phẩm & Quyền công cụ \\
+\midrule
+Planner & yêu cầu, ràng buộc & danh sách bước có điều kiện hoàn tất & không \\
+Retriever & câu hỏi, thực thể & bằng chứng kèm ID nguồn & tìm kiếm, CSDL, KG \\
+Solver / Executor & nhiệm vụ, kế hoạch & kết quả có cấu trúc & chạy mã, gọi API \\
+Verifier / Critic & kết quả + bằng chứng & chấp nhận / lý do cần sửa & chạy lại phép kiểm \\
+Coordinator & trạng thái toàn bộ & chuyển bước, biểu quyết, dừng & điều phối \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Vì sao lại chia một nhiệm vụ cho nhiều tác tử? Có ba lý do có cơ sở:
+\begin{enumerate}
+  \item \textbf{Chuyên môn hoá}: mỗi vai trò có prompt, công cụ và bộ nhớ ngắn hơn, tập trung hơn; ngữ cảnh của một tác
+        tử không bị lấp đầy bởi chi tiết của tác tử khác.
+  \item \textbf{Đa dạng hoá lời giải}: các tác tử độc lập (khác prompt, khác phương pháp, khác nhiệt độ lấy mẫu) mắc lỗi
+        ít tương quan; tổng hợp nhiều lời giải giảm phương sai -- cùng nguyên lý với tổ hợp mô hình ở Chương~2
+        và self-consistency \cite{ch7:wang2023sc}.
+  \item \textbf{Kiểm chứng chéo}: một tác tử kiểm tra kết quả của tác tử khác thay vì tự kiểm tra chính mình; nghiên
+        cứu cho thấy LLM tự sửa lỗi suy luận của bản thân mà không có tín hiệu ngoài thường không hiệu quả
+        \cite{ch7:huang2024selfcorrect}.
+\end{enumerate}
+Mặt trái cũng rõ: nhiều vai trò hơn nghĩa là nhiều lượt gọi LLM, nhiều token, độ trễ cao hơn, và thêm một loại lỗi mới
+-- \emph{lỗi phối hợp} (hiểu sai thông điệp của nhau, vòng lặp không dứt, đồng thuận vào một đáp án sai). Phân tích
+hơn một nghìn vết chạy của các khung đa tác tử phổ biến, Cemri và cộng sự \cite{ch7:cemri2025} thấy phần lớn thất bại đến
+từ đặc tả vai trò và phối hợp giữa các tác tử chứ không phải từ năng lực của mô hình nền. Vì vậy quyết định dùng nhiều tác
+tử phải được biện minh bằng \emph{kết quả nhiệm vụ trên mỗi đơn vị chi phí}, không bằng số lượng thông điệp hệ thống tạo ra.
+
+% ---------------------------------------------------------------------
+\section{Kiến trúc điều phối}
+\label{sec:mas-patterns}
+
+Cách các tác tử được nối với nhau quyết định luồng thông tin, điểm nghẽn và chế độ hỏng. Bốn mẫu tổ chức cơ bản
+(Hình~\ref{fig:ch7-patterns}):
+
+\hinhtikz{ch7_patterns}{Bốn mẫu tổ chức hệ đa tác tử: điều phối -- thợ, đường ống, tranh luận và bảng đen chung}{ch7-patterns}
+
+\begin{itemize}
+  \item \textbf{Điều phối -- thợ} (orchestrator--worker, hub-and-spoke): một Coordinator nhận yêu cầu, giao việc cho các
+        thợ chuyên môn và tổng hợp kết quả. Dễ kiểm soát và ghi vết, nhưng Coordinator là điểm nghẽn và điểm hỏng đơn.
+        AutoGen \cite{ch7:wu2023autogen} hiện thực mẫu này qua ``group chat manager''.
+  \item \textbf{Đường ống} (pipeline / quy trình chuẩn): mỗi tác tử xử lý một công đoạn rồi chuyển tiếp, có thể có cạnh
+        ngược để sửa (Verifier trả về Solver). MetaGPT \cite{ch7:hong2024metagpt} mã hoá quy trình phát triển phần mềm
+        (product manager $\to$ architect $\to$ engineer $\to$ QA) theo cách này. Phù hợp khi quy trình đã biết trước.
+  \item \textbf{Tranh luận} (debate): nhiều tác tử đưa lời giải, đọc lời giải của nhau và phản biện qua vài vòng, cuối
+        cùng một giám khảo hoặc biểu quyết chốt đáp án. Du và cộng sự \cite{ch7:du2024debate} cho thấy tranh luận cải
+        thiện độ đúng sự kiện và suy luận toán của LLM lớn.
+  \item \textbf{Bảng đen chung} (blackboard): các tác tử không nhắn trực tiếp cho nhau mà đọc/ghi một kho trạng thái
+        chung; một bộ điều khiển chọn tác tử nào được kích hoạt khi bảng thay đổi. Kiến trúc này có từ hệ nhận dạng tiếng
+        nói Hearsay-II \cite{ch7:erman1980} và hợp với bài toán cần ghép nhiều mảnh tri thức không đồng bộ.
+\end{itemize}
+
+\begin{table}[H]\centering\caption{So sánh các mẫu điều phối}\label{tab:ch7-patterns}
+{\small\begin{tabular}{L{2.9cm}L{3.6cm}L{4.0cm}L{4.0cm}}
+\toprule
+Mẫu & Luồng thông tin & Ưu điểm & Rủi ro chính \\
+\midrule
+Điều phối -- thợ & hình sao qua Coordinator & dễ ghi vết, dễ thêm thợ & điểm nghẽn, Coordinator hiểu sai \\
+Đường ống & tuần tự, có vòng sửa & tái lập, dễ kiểm thử từng bước & lỗi sớm lan xuống cuối \\
+Tranh luận & toàn đồ thị giữa các bên & đa dạng lời giải, tự phát hiện lỗi & tốn token, đồng thuận vào đáp án sai \\
+Bảng đen & qua kho trạng thái & không đồng bộ, mở rộng tốt & xung đột ghi, khó suy luận về thứ tự \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Hệ thực nghiệm ở mục~\ref{sec:mas-exp} kết hợp hai mẫu: \emph{đường ống} Planner $\to$ Solver $\to$ Verifier, trong đó
+bước Solver gồm hai tác tử độc lập (một viết chương trình, một suy luận bằng lời), và khi chúng bất đồng thì chuyển sang
+một vòng \emph{phân xử} kiểu tranh luận có biểu quyết.
+
+% ---------------------------------------------------------------------
+\section{Giao thức trao đổi}
+\label{sec:mas-protocols}
+
+Tác tử phối hợp được nhờ \emph{thông điệp}. Trong một tiến trình, thông điệp chỉ là một đối tượng (vai trò, nội dung,
+siêu dữ liệu) nối vào lịch sử hội thoại. Khi tác tử chạy ở các tiến trình, máy chủ hoặc tổ chức khác nhau, cần giao thức
+chuẩn. Hai giao thức mở đang được dùng rộng rãi giải quyết hai mối nối khác nhau (Hình~\ref{fig:ch7-protocols}):
+\begin{itemize}
+  \item \textbf{Model Context Protocol} (MCP) \cite{ch7:mcp2024} chuẩn hoá mối nối \emph{tác tử -- công cụ/dữ liệu}: một
+        máy chủ MCP công bố danh sách công cụ (tên, mô tả, lược đồ JSON tham số), tài nguyên và mẫu prompt; tác tử (MCP
+        client) liệt kê rồi gọi chúng qua JSON-RPC. Một công cụ viết một lần dùng được cho mọi tác tử hỗ trợ MCP.
+  \item \textbf{Agent2Agent} (A2A) \cite{ch7:a2a2025} chuẩn hoá mối nối \emph{tác tử -- tác tử}: mỗi tác tử công bố một
+        ``Agent Card'' mô tả kỹ năng và điểm truy cập; tác tử khác gửi \emph{task}, theo dõi trạng thái và nhận
+        \emph{artifact} kết quả. A2A cho phép tác tử ``mờ'' (không lộ prompt, bộ nhớ, công cụ bên trong) vẫn hợp tác được.
+\end{itemize}
+
+\hinhtikz{ch7_protocols}{Hai giao thức bổ sung cho nhau: MCP nối tác tử với công cụ và dữ liệu, A2A nối tác tử với tác tử}{ch7-protocols}
+
+Dù dùng giao thức nào, một thông điệp tốt giữa các tác tử nên có \emph{cấu trúc} (trường rõ ràng thay vì văn bản tự do),
+mang \emph{nguồn gốc} (tác tử nào, lượt nào, dựa trên bằng chứng nào) và có \emph{điều kiện hoàn tất} kiểm tra được.
+Thông điệp tự do giữa hai LLM là nguồn lỗi phối hợp lớn nhất: tác tử nhận có thể hiểu sai đơn vị, bỏ sót ràng buộc,
+hoặc tin nhầm một con số do tác tử khác ``bịa''. Trong thực nghiệm, kết quả của Solver-PAL là một \emph{giá trị số} do
+trình thông dịch Python trả về, không phải một câu văn do LLM viết -- đây là một cách đơn giản để thông điệp trở nên
+kiểm chứng được.
+
+% ---------------------------------------------------------------------
+\section{Quản lý trạng thái và kiểm chứng}
+\label{sec:mas-state}
+
+Hệ đa tác tử phải trả lời ba câu hỏi về trạng thái: \emph{ai} giữ trạng thái (từng tác tử, Coordinator, hay một bảng đen
+chung), \emph{cái gì} được lưu (lịch sử đầy đủ hay tóm tắt, kết quả trung gian, quyết định đã chốt), và \emph{bao lâu}
+(một lượt, một phiên, hay bộ nhớ dài hạn). Các nguyên tắc thiết kế rút ra từ thực tiễn:
+\begin{itemize}
+  \item \textbf{Vết đầy đủ, có thứ tự}: mọi lượt gọi LLM và công cụ được ghi lại (vai trò, đầu vào, đầu ra, token, thời
+        gian). Thiếu vết thì không thể đánh giá, gỡ lỗi hay quy trách nhiệm. Lớp \texttt{Trace} ở
+        Đoạn mã~\ref{code:ch7_agents__Trace} làm việc này.
+  \item \textbf{Cổng kiểm chứng tất định}: ở đâu kiểm tra được bằng chương trình (chạy lại phép tính, so khớp kiểu dữ
+        liệu, kiểm tra đơn vị) thì dùng chương trình, không dùng LLM. LLM-Verifier chỉ dùng cho phần không kiểm tra tự
+        động được.
+  \item \textbf{Giới hạn vòng lặp và ngân sách}: số lượt sửa tối đa, số token tối đa, thời gian tối đa; khi vượt thì
+        dừng và báo ``không tìm được đáp án'' thay vì trả một đáp án đoán.
+  \item \textbf{Quyền tối thiểu cho công cụ}: tác tử chạy mã chỉ được làm đúng việc đó, trong hộp cát không mạng, không
+        đọc tệp ngoài thư mục tạm, có giới hạn thời gian (mục~\ref{sec:mas-exp-design}).
+\end{itemize}
+Phương pháp Reflexion \cite{ch7:shinn2023} cho thấy một tác tử có thể cải thiện qua nhiều lượt khi nhận \emph{tín hiệu
+ngoài} (kết quả kiểm thử, lỗi thực thi) và ghi bài học vào bộ nhớ; khi tín hiệu duy nhất là chính LLM tự nhận xét, mức
+cải thiện giảm mạnh \cite{ch7:huang2024selfcorrect}. Thực nghiệm của chương áp dụng đúng nguyên lý này: lỗi thực thi
+Python là tín hiệu ngoài được gửi lại cho Solver để sửa mã.
+
+% ---------------------------------------------------------------------
+\section{Đánh giá hệ đa tác tử}
+\label{sec:mas-eval}
+
+Độ đúng chỉ là một chiều. Một hệ đa tác tử chỉ đáng dùng khi phần cải thiện độ đúng bù được chi phí tăng thêm
+(Hình~\ref{fig:ch7-eval}). Các chỉ số dùng trong thực nghiệm:
+\begin{itemize}
+  \item \textbf{Độ chính xác} (accuracy): tỷ lệ câu có đáp án số khớp đáp án vàng (sai số tuyệt đối $<10^{-4}$).
+  \item \textbf{Số lượt gọi LLM} và \textbf{token} vào/ra mỗi câu: đại diện cho chi phí tính toán (với API trả phí, đây
+        chính là tiền).
+  \item \textbf{Độ trễ}: tổng thời gian sinh của LLM và thời gian chạy công cụ cho một câu.
+  \item \textbf{Phân loại lỗi}: \emph{không có đáp án} (không trích được số, mã lỗi), \emph{lỗi số học} (một phép tính
+        trong vết bị tính sai), \emph{lỗi suy luận} (hiểu sai đề, sai thứ tự bước), và riêng với hệ đa tác tử là
+        \emph{lỗi phối hợp} -- có ít nhất một tác tử đã ra đáp án đúng nhưng cơ chế tổng hợp lại chọn sai.
+  \item \textbf{Chi phí cho mỗi câu đúng thêm}: số lượt gọi (hoặc giây) phát sinh trên mỗi câu được sửa đúng so với hệ
+        nền -- thước đo trực tiếp cho câu hỏi ``có đáng không''.
+\end{itemize}
+
+\hinhtikz{ch7_eval}{Các chiều đánh giá một hệ đa tác tử, từ độ đúng nhiệm vụ ở đáy đến an toàn ở đỉnh}{ch7-eval}
+
+% ---------------------------------------------------------------------
+\section{Rủi ro và giới hạn}
+\label{sec:mas-risk}
+
+\begin{table}[H]\centering\caption{Rủi ro của hệ đa tác tử và biện pháp giảm thiểu}\label{tab:ch7-risk}
+{\small\begin{tabular}{L{3.6cm}L{5.0cm}L{5.8cm}}
+\toprule
+Rủi ro & Biểu hiện & Biện pháp \\
+\midrule
+Lỗi lan truyền & kế hoạch sai của Planner dẫn mọi Solver đi sai & Solver độc lập không phụ thuộc kế hoạch; Verifier đối chiếu đề gốc \\
+Đồng thuận sai & nhiều tác tử cùng một LLM mắc cùng lỗi & đa dạng phương pháp (mã vs lời), kiểm chứng bằng công cụ \\
+Vòng lặp vô hạn & tác tử sửa đi sửa lại không hội tụ & giới hạn số lượt, ngân sách token \\
+Chi phí bùng nổ & mỗi câu tốn gấp nhiều lần & chỉ gọi tác tử phụ khi bất đồng (cổng đồng thuận) \\
+Thực thi mã nguy hiểm & mã sinh ra đọc tệp, gọi mạng, treo máy & hộp cát: tiến trình riêng, chặn import, timeout \\
+Tiêm lệnh (prompt injection) & dữ liệu ngoài chứa chỉ thị độc & tách dữ liệu khỏi chỉ thị, quyền tối thiểu \\
+Mơ hồ trách nhiệm & không rõ tác tử nào gây lỗi & vết đầy đủ theo vai trò, ID lượt \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Bộ phân loại lỗi MAST \cite{ch7:cemri2025}, xây dựng từ vết chạy của các khung đa tác tử phổ biến, cho thấy phần lớn
+thất bại không đến từ năng lực của từng mô hình mà từ \emph{đặc tả} (vai trò chồng chéo, điều kiện dừng mơ hồ),
+\emph{lệch hướng giữa các tác tử} (bỏ qua thông tin của nhau, tranh luận không hội tụ) và \emph{kiểm chứng yếu} (kết thúc
+sớm, kiểm tra hời hợt). Ba nhóm này là danh sách kiểm tra khi thiết kế hệ ở mục tiếp theo: vai trò được viết rõ trong
+lời nhắc hệ thống, điều kiện dừng là tất định (đồng thuận hoặc đã biểu quyết), và kiểm chứng dựa trên kết quả chạy mã.
+
+% =====================================================================
+\section{Thực nghiệm: đa tác tử giải toán lời văn GSM8K}
+\label{sec:mas-exp}
+
+\subsection{Bài toán, dữ liệu và câu hỏi nghiên cứu}
+
+GSM8K \cite{ch7:cobbe2021} gồm 8.500 bài toán lời văn bậc tiểu học do con người viết; mỗi bài cần từ 2 đến 8 phép tính
+cộng, trừ, nhân, chia, đáp án là một số. Bài toán ``dễ'' với con người nhưng là phép thử điển hình cho suy luận nhiều bước
+của LLM: chỉ một phép tính sai hoặc một bước hiểu nhầm là sai cả câu. Thực nghiệm lấy một tập con cố định
+\SL{ch7_gsm8k/n} câu của tập test (rút ngẫu nhiên với hạt giống 42, Đoạn mã~\ref{code:ch7_agents__load_gsm8k}); đáp án
+vàng là con số sau ký hiệu \texttt{\#\#\#\#} trong lời giải mẫu. Một câu được chấm đúng khi số cuối cùng trích từ câu trả
+lời khớp đáp án vàng với sai số tuyệt đối nhỏ hơn $10^{-4}$ (Đoạn mã~\ref{code:ch7_agents__to_number}).
+
+\maNguon{ch7_agents__load_gsm8k}{Tập con cố định của GSM8K test và đáp án vàng}
+\maNguon{ch7_agents__to_number}{Trích số cuối cùng trong câu trả lời (bỏ dấu phẩy ngăn nghìn, ký hiệu đô la)}
+
+Mô hình ngôn ngữ duy nhất của mọi hệ là Qwen2.5-1.5B-Instruct \cite{ch7:qwen2024} -- cùng mô hình đã dùng ở Chương~5 --
+chạy \emph{cục bộ} trên GPU RTX~4060 (bf16), giải mã tham lam (greedy) để mọi lần chạy cho cùng kết quả. Không dùng API
+LLM bên ngoài. Chọn một mô hình nhỏ là có chủ ý: với mô hình lớn, GSM8K gần như đã bão hoà và khác biệt giữa các cách tổ
+chức bị che khuất; với mô hình 1,5 tỷ tham số, mỗi câu trả lời đều ``mong manh'', nên tác dụng (hay tác hại) của việc
+thêm tác tử hiện ra rõ. Ba câu hỏi nghiên cứu:
+\begin{enumerate}
+  \item[\textbf{Q1.}] Suy luận từng bước và dùng công cụ Python cải thiện độ đúng bao nhiêu so với trả lời trực tiếp?
+  \item[\textbf{Q2.}] Hệ đa tác tử (Planner, hai Solver độc lập, Verifier, biểu quyết) có tốt hơn tác tử đơn tốt nhất
+        không, và lỗi còn lại thuộc loại nào?
+  \item[\textbf{Q3.}] Phần cải thiện (nếu có) phải trả bằng bao nhiêu lượt gọi, token và thời gian?
+\end{enumerate}
+
+\subsection{Thiết kế bốn hệ}
+\label{sec:mas-exp-design}
+
+Bốn hệ được so sánh trên đúng cùng tập câu hỏi, cùng LLM, cùng cách chấm (Hình~\ref{fig:ch7-systems}):
+\begin{description}
+  \item[Trực tiếp (direct)] một lượt gọi, lời nhắc hệ thống yêu cầu chỉ in ra con số -- mốc dưới, đo những gì mô hình
+        ``nhớ'' hoặc đoán được mà không suy luận ra giấy.
+  \item[CoT] một tác tử suy luận từng bước \cite{ch7:wei2022}, kết thúc bằng câu ``The answer is N.''.
+  \item[PAL + Python] một tác tử viết hàm \texttt{solution()} bằng Python \cite{ch7:gao2023pal}; công cụ thực thi trong
+        hộp cát trả về giá trị. Nếu mã lỗi, thông báo lỗi được gửi lại để tác tử sửa đúng một lần.
+  \item[Đa tác tử (multi)] Planner lập kế hoạch; Solver-PAL viết mã theo kế hoạch, Solver-CoT giải bằng lời một cách độc
+        lập; nếu hai đáp án khớp, Verifier chấp nhận ngay (cổng đồng thuận, 3 lượt gọi); nếu không, Verifier đọc cả hai
+        lời giải để phân xử, một Solver-PAL thứ hai lấy mẫu ở nhiệt độ 0,7, rồi Coordinator biểu quyết đa số trên bốn
+        đáp án (hoà phiếu thì tin Verifier) -- ý tưởng gần với self-consistency \cite{ch7:wang2023sc} và tranh luận đa
+        tác tử \cite{ch7:du2024debate}.
+\end{description}
+
+\hinhtikz{ch7_systems}{Bốn hệ được so sánh, từ một lượt gọi đến một nhóm năm vai trò có cổng đồng thuận}{ch7-systems}
+
+\hinhtikz{ch7_system_3d}{Kiến trúc hệ đa tác tử theo ba tầng: hạ tầng (GPU, LLM), tác tử và điều phối; bên phải là
+công cụ hộp cát và dữ liệu}{ch7-system-3d}
+
+Thiết kế này áp dụng các nguyên tắc ở mục~\ref{sec:mas-state}. Hai Solver dùng hai \emph{phương pháp khác nhau} (chương
+trình và lời văn) chứ không chỉ hai lần gọi giống hệt nhau, để lỗi của chúng ít tương quan hơn -- hai lần gọi tham lam
+cùng một lời nhắc sẽ cho cùng một đáp án và đồng thuận là vô nghĩa. Cổng đồng thuận là một kiểm tra \emph{tất định} (so
+khớp hai số), nên phần lớn câu chỉ tốn 3 lượt gọi; vòng phân xử đắt hơn chỉ chạy khi thực sự có mâu thuẫn. Mọi thông
+điệp giữa tác tử là văn bản kèm vai trò, được ghi vào một \texttt{Trace} chung (Đoạn mã~\ref{code:ch7_agents__Trace}).
+
+\maNguon{ch7_agents__Trace}{Vết dùng chung: mọi bước được ghi kèm vai trò, cùng bộ đếm lượt gọi, token và thời gian}
+\maNguon{ch7_agents__Agent}{Một tác tử là một vai trò (lời nhắc hệ thống) trên LLM dùng chung; mỗi lần \texttt{act} là
+một lượt gọi được ghi vết}
+
+Lời nhắc hệ thống của từng vai trò được giữ ngắn, viết bằng tiếng Anh (ngôn ngữ của đề bài), và mỗi lời nhắc nói rõ
+\emph{định dạng đầu ra} mà bước sau cần: con số, câu ``The answer is N.'', hay một khối mã có hàm \texttt{solution()}.
+Planner bị cấm tính đáp án cuối để không ``mớm'' một con số sai cho Solver.
+
+\maNguon{ch7_agents__SYS_COT}{Lời nhắc hệ thống của tác tử CoT}
+\maNguon{ch7_agents__SYS_PAL}{Lời nhắc hệ thống của tác tử PAL}
+\maNguon{ch7_agents__SYS_PLANNER}{Lời nhắc của Planner: liệt kê đại lượng và các bước, không tính kết quả}
+\maNguon{ch7_agents__SYS_CRITIC}{Lời nhắc của Verifier khi hai Solver bất đồng}
+\maNguon{ch7_agents__PAL_SHOT}{Ví dụ mẫu (one-shot) gửi kèm mọi lượt gọi PAL}
+
+\subsubsection{Tác tử PAL và công cụ thực thi trong hộp cát}
+
+Hình~\ref{fig:ch7-pal} mô tả vòng PAL: LLM sinh mã, công cụ chạy mã, kết quả (hoặc lỗi) quay lại. Mã do LLM sinh là
+\emph{mã không tin cậy}, nên công cụ được thiết kế theo quyền tối thiểu: mỗi lần chạy là một tiến trình Python con riêng
+ở chế độ cô lập (\texttt{-I}, bỏ qua biến môi trường và thư mục người dùng), thư mục làm việc là một thư mục tạm bị xoá
+sau khi chạy, biến môi trường gần như rỗng, giới hạn 5 giây; đoạn mở đầu (prelude) thay hàm \texttt{import} bằng bản chỉ
+cho phép sáu thư viện tính toán và xoá \texttt{open}, \texttt{eval}, \texttt{exec}, \texttt{compile}, \texttt{input}. Mã
+không thể đọc tệp, mở socket (\texttt{socket} không nằm trong danh sách) hay chạy mãi.
+
+\hinhtikz{ch7_pal}{Vòng PAL: tác tử sinh chương trình, hộp cát thực thi, lỗi được phản hồi để tác tử tự sửa}{ch7-pal}
+
+\maNguon{ch7_agents__SANDBOX_PRELUDE}{Đoạn mở đầu của hộp cát: danh sách trắng thư viện và xoá các hàm nguy hiểm}
+\maNguon{ch7_agents__run_python}{Công cụ \texttt{python}: chạy mã không tin cậy trong tiến trình con cô lập, có thời hạn}
+\maNguon{ch7_agents__extract_code}{Lấy khối mã Python đầu tiên trong câu trả lời của LLM}
+\maNguon{ch7_agents__pal_once}{Tác tử PAL: sinh mã, gọi công cụ, gửi lỗi thực thi lại để tự sửa (tín hiệu ngoài)}
+
+Điểm mấu chốt của \texttt{pal\_once} là phản hồi được gửi lại cho tác tử là \emph{thông báo lỗi thật} từ trình thông
+dịch (ví dụ \texttt{NameError}, \texttt{ZeroDivisionError}, ``module not allowed''), không phải một nhận xét do LLM tự
+viết -- đúng loại tín hiệu ngoài mà Reflexion cần \cite{ch7:shinn2023}.
+
+\subsubsection{Ba hệ còn lại và cơ chế phối hợp}
+
+\maNguon{ch7_agents__solve_direct}{Hệ trực tiếp: một lượt gọi, chỉ in con số}
+\maNguon{ch7_agents__solve_cot}{Hệ CoT: một tác tử suy luận từng bước}
+\maDai{ch7_agents__solve_multi}{Hệ đa tác tử: Planner, hai Solver độc lập, cổng đồng thuận, Verifier phân xử và
+biểu quyết đa số}
+
+Hình~\ref{fig:ch7-message-flow} là sơ đồ trình tự các thông điệp của một câu ở nhánh bất đồng. Nhánh đồng thuận dừng ngay
+sau bước so khớp, nên chi phí trung bình của hệ phụ thuộc trực tiếp vào tỷ lệ câu mà hai Solver đồng ý với nhau.
+
+\hinhtikz{ch7_message_flow}{Trình tự thông điệp của hệ đa tác tử ở nhánh bất đồng: kế hoạch, hai lời giải độc lập, phân
+xử, mẫu bổ sung và biểu quyết}{ch7-message-flow}
+
+\subsubsection{Chấm điểm và phân loại lỗi}
+
+Mỗi câu của mỗi hệ được ghi thành một dòng JSON gồm đáp án, đúng/sai, số lượt gọi, token vào/ra, thời gian và toàn bộ
+vết (Đoạn mã~\ref{code:ch7_agents__run_question}). Câu sai được phân loại tự động
+(Đoạn mã~\ref{code:ch7_agents__classify_error}): \emph{không ra số} khi không trích được số hoặc mã không chạy;
+\emph{sai số học} khi trong vết có một biểu thức dạng $a \circ b = c$ mà $c$ sai; \emph{lỗi phối hợp} (chỉ hệ đa tác tử)
+khi có ít nhất một tác tử con đã đưa ra đúng đáp án vàng nhưng bước tổng hợp chọn khác; còn lại là \emph{sai lập luận}.
+Khoảng tin cậy 95\,\% của độ chính xác được ước lượng bằng bootstrap trên các câu hỏi
+(Đoạn mã~\ref{code:ch7_eval__bootstrap_ci}).
+
+\maNguon{ch7_agents__classify_error}{Phân loại lỗi một câu sai}
+\maNguon{ch7_agents__run_question}{Chạy một hệ trên một câu và ghi lại kết quả cùng vết}
+\maNguon{ch7_eval__bootstrap_ci}{Khoảng tin cậy 95\,\% của accuracy bằng bootstrap}
+
+\subsubsection{Chạy LLM cục bộ trên máy dùng chung}
+
+Thực nghiệm chạy song song với các làn huấn luyện của những chương khác trên cùng một máy (một GPU 8\,GB, bộ nhớ ảo của
+Windows có hạn). Hai sự cố thực tế đã định hình mã chạy. Thứ nhất, cách nạp mặc định của thư viện ánh xạ tệp
+\texttt{safetensors} vào bộ nhớ; khi bộ nhớ commit của Windows gần cạn, tiến trình bị lỗi ``paging file too small'' hoặc
+dừng đột ngột ngay lúc nạp. Bộ nạp tiết kiệm bộ nhớ dựng mô hình trên thiết bị \texttt{meta} (không cấp phát), đọc từng
+tensor rồi chuyển thẳng lên GPU (Đoạn mã~\ref{code:ch7_llm__load_lowmem}). Thứ hai, GPU được chia sẻ: trên Windows, khi
+VRAM không đủ, trình điều khiển có thể đặt trọng số sang bộ nhớ chia sẻ của hệ thống, và khi một tiến trình khác chạy
+kernel liên tục, mỗi bước sinh token -- vốn gồm hàng trăm kernel nhỏ -- phải chờ lượt trên GPU. Cả hai đều không báo lỗi,
+chỉ làm tốc độ sinh giảm mạnh, nên mã chờ đủ VRAM trống trước khi nạp (Đoạn mã~\ref{code:ch7_run__wait_for_vram}), ghi
+từng câu ngay sau khi chấm để lần chạy sau tiếp tục từ chỗ dừng, và thời gian trong mục kết quả phải được đọc như số đo
+\emph{tương đối} giữa các hệ trên cùng điều kiện máy, không phải độ trễ tuyệt đối của mô hình.
+
+\maDai{ch7_llm__load_lowmem}{Nạp Qwen2.5-1.5B tiết kiệm bộ nhớ: dựng trên thiết bị meta rồi gán trọng số đọc từng tensor}
+\maNguon{ch7_run__wait_for_vram}{Chờ đủ VRAM trống trước khi nạp, tránh trọng số rơi sang bộ nhớ chia sẻ}
+\maNguon{ch7_run__run_system}{Chạy một hệ trên toàn bộ câu hỏi, ghi từng dòng kết quả và tiếp tục được khi bị ngắt}
+
+% ---------------------------------------------------------------------
+\section{Kết quả thực nghiệm}
+\label{sec:mas-results}
+
+\begin{luuy}{Cỡ mẫu}
+LLM chạy trên một GPU dùng chung với các làn huấn luyện khác; tốc độ sinh thực tế chỉ khoảng
+\SL{ch7_gsm8k/systems/cot/tok_per_s} token/giây, nên một câu của hệ đa tác tử mất nhiều phút, và lượt chạy phải nhường
+GPU cho thực nghiệm của chương khác. Do đó số câu mỗi hệ đã chạy khác nhau: trả lời trực tiếp \SL{ch7_gsm8k/full/direct/n}
+câu, CoT \SL{ch7_gsm8k/full/cot/n} câu, PAL \SL{ch7_gsm8k/full/pal/n} câu và hệ đa tác tử \SL{ch7_gsm8k/full/multi/n}
+câu. Để so sánh công bằng, mọi bảng và hình dưới đây dùng \emph{tập chung} gồm \SL{ch7_gsm8k/n} câu mà cả bốn hệ đều đã
+chạy -- mọi so sánh đều là so sánh cặp trên cùng một tập câu. Khoảng tin cậy bootstrap ở Bảng~\ref{tab:ch7-main} cho thấy
+độ bất định tương ứng; các chênh lệch nhỏ hơn bề rộng khoảng này không nên được diễn giải như khác biệt thật.
+\end{luuy}
+
+\begin{table}[H]
+\centering
+\caption{Số câu đã chạy và độ chính xác của từng hệ trên toàn bộ số câu đó (tham khảo; so sánh chính dùng tập chung)}
+\label{tab:ch7-full}
+\begin{tabular}{lrr}
+\toprule
+Hệ & Số câu đã chạy & Accuracy (\%) \\
+\midrule
+Trả lời trực tiếp & \SL{ch7_gsm8k/full/direct/n} & \SL{ch7_gsm8k/full/direct/accPct} \\
+CoT & \SL{ch7_gsm8k/full/cot/n} & \SL{ch7_gsm8k/full/cot/accPct} \\
+PAL & \SL{ch7_gsm8k/full/pal/n} & \SL{ch7_gsm8k/full/pal/accPct} \\
+Đa tác tử & \SL{ch7_gsm8k/full/multi/n} & \SL{ch7_gsm8k/full/multi/accPct} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Độ chính xác và chi phí}
+
+\bang{ch7_main}{Độ chính xác, khoảng tin cậy 95\,\% và chi phí trung bình mỗi câu của bốn hệ trên GSM8K}{ch7-main}
+
+\hinhpdf{ch7_acc}{1}{Độ chính xác của bốn hệ; thanh lỗi là khoảng tin cậy 95\,\% bootstrap}{ch7-acc}
+
+\textbf{Q1 -- suy luận và công cụ.} Trả lời trực tiếp chỉ đúng \SL{ch7_gsm8k/systems/direct/accPct}\,\%: mô hình 1,5 tỷ
+tham số không ``nhẩm'' được bài toán nhiều bước trong một con số. Cho phép suy luận từng bước nâng độ chính xác lên
+\SL{ch7_gsm8k/systems/cot/accPct}\,\% (chênh lệch \SL{ch7_gsm8k/cot_vs_directPct} điểm) -- bước nhảy lớn nhất của toàn bộ
+thực nghiệm, với chi phí chỉ là token sinh thêm trong \emph{một} lượt gọi. PAL đạt \SL{ch7_gsm8k/systems/pal/accPct}\,\%
+(so với CoT: \SL{ch7_gsm8k/pal_vs_cotPct} điểm). Giao phép tính cho Python loại bỏ lỗi số học, nhưng với mô hình nhỏ, viết
+một chương trình đúng định dạng là một kỹ năng riêng: ở lượt đầu, \SL{ch7_gsm8k/multi/first_nofunc_palPct}\,\% câu của
+PAL không có hàm \texttt{solution()} và phải nhờ vòng tự sửa (Hình~\ref{fig:ch7-tool}).
+
+\textbf{Q2 -- đa tác tử.} Hệ đa tác tử đạt \SL{ch7_gsm8k/systems/multi/accPct}\,\%, chênh lệch so với CoT là
+\SL{ch7_gsm8k/vs_cot/gainPct} điểm và so với PAL là \SL{ch7_gsm8k/vs_pal/gainPct} điểm. Bảng~\ref{tab:ch7-vs} tách con số
+ròng thành hai chiều: so với PAL, hệ đa tác tử sửa đúng \SL{ch7_gsm8k/vs_pal/fixed} câu PAL sai nhưng làm hỏng
+\SL{ch7_gsm8k/vs_pal/broken} câu PAL đúng; so với CoT là \SL{ch7_gsm8k/vs_cot/fixed} câu sửa đúng và
+\SL{ch7_gsm8k/vs_cot/broken} câu làm hỏng. Như vậy trên tập này, hệ đa tác tử \emph{không} vượt được tác tử CoT đơn lẻ:
+nó chỉ hơn PAL -- Solver yếu hơn trong hai Solver của chính nó -- một khoảng nằm gọn trong khoảng tin cậy, và kém CoT vì
+làm hỏng nhiều câu hơn số câu sửa được. Các mục sau truy nguyên vì sao: giá trị của kiểm chứng chéo là có thật ở nhánh
+đồng thuận, nhưng nhánh bất đồng (\SL{ch7_gsm8k/multi/disagree_n} trên \SL{ch7_gsm8k/n} câu) được phân xử bởi chính LLM
+nhỏ, và Solver-PAL trong hệ bị kế hoạch của Planner kéo lệch khỏi định dạng mã. Với cỡ mẫu này, chênh lệch giữa ba hệ có
+suy luận đều nhỏ hơn bề rộng khoảng tin cậy; điều rút ra được chắc chắn là \emph{cơ chế} tác động, chưa phải độ lớn của nó.
+
+\bang{ch7_vs}{Hệ đa tác tử so với hai tác tử đơn: số câu sửa đúng, làm hỏng và chi phí phụ trội}{ch7-vs}
+
+\textbf{Q3 -- chi phí.} Mỗi câu, hệ đa tác tử dùng trung bình \SL{ch7_gsm8k/systems/multi/calls} lượt gọi LLM và
+\SL{ch7_gsm8k/systems/multi/tokens} token, so với \SL{ch7_gsm8k/systems/cot/calls} lượt và
+\SL{ch7_gsm8k/systems/cot/tokens} token của CoT; thời gian mỗi câu gấp \SL{ch7_gsm8k/vs_cot/seconds_ratio} lần CoT
+(Hình~\ref{fig:ch7-cost}). Riêng con số thời gian cần đọc thận trọng: hệ đa tác tử chạy vào lúc máy dùng chung bớt tải
+hơn (tốc độ sinh \SL{ch7_gsm8k/systems/multi/tok_per_s} so với \SL{ch7_gsm8k/systems/cot/tok_per_s} token/giây khi chạy
+CoT), nên tỷ số thời gian đánh giá thấp chi phí thật; số lượt gọi và số token là thước đo chi phí đáng tin hơn.
+Hình~\ref{fig:ch7-pareto} đặt bốn hệ lên mặt phẳng chi phí -- độ chính xác: một hệ chỉ đáng dùng nếu nằm trên biên
+Pareto, tức là không có hệ nào vừa rẻ hơn vừa đúng hơn. Ở đây CoT nằm trên biên, còn hệ đa tác tử tốn nhiều token hơn mà
+không đúng hơn.
+
+\hinhpdf{ch7_cost}{1}{Chi phí trung bình mỗi câu: số lượt gọi LLM, số token (vào + ra) và thời gian}{ch7-cost}
+\hinhpdf{ch7_pareto}{1}{Đánh đổi giữa chi phí (token mỗi câu, thang log) và độ chính xác; kích thước điểm tỷ lệ với số
+lượt gọi}{ch7-pareto}
+\hinhpdf{ch7_latency}{1}{Phân bố thời gian trả lời một câu của từng hệ (thang log)}{ch7-latency}
+\hinhpdf{ch7_tokens}{1}{Phân bố số token sinh ra mỗi câu}{ch7-tokens}
+\hinhpdf{ch7_calls}{1}{Phân bố số lượt gọi LLM mỗi câu}{ch7-calls}
+
+Phân bố thời gian (Hình~\ref{fig:ch7-latency}) của hệ đa tác tử trải rộng nhất. Câu ở nhánh bất đồng cần trung bình
+\SL{ch7_gsm8k/multi/disagree_calls} lượt gọi, so với \SL{ch7_gsm8k/multi/agree_calls} lượt ở nhánh đồng thuận (thêm
+Verifier và một mẫu PAL nữa), và mất \SL{ch7_gsm8k/multi/disagree_seconds} giây so với \SL{ch7_gsm8k/multi/agree_seconds}
+giây; chênh lệch thời gian nhỏ hơn chênh lệch lượt gọi vì tốc độ sinh của máy dùng chung dao động trong lúc chạy. Về số
+lượt gọi (Hình~\ref{fig:ch7-calls}): mọi lượt vượt quá một của PAL đều đến từ vòng tự sửa mã; với hệ đa tác tử, phần lớn
+lượt gọi đến từ chính thiết kế phối hợp (ba lượt khi đồng thuận, năm lượt khi bất đồng), còn vòng tự sửa của Solver-PAL
+cộng thêm trung bình \SL{ch7_gsm8k/multi/repair_calls} lượt mỗi câu.
+
+\subsection{Cổng đồng thuận}
+
+\hinhpdf{ch7_gate}{1}{Cổng đồng thuận của hệ đa tác tử: tỷ lệ câu hai Solver khớp nhau (trái) và độ chính xác ở từng nhánh,
+của cả hệ, và cận trên oracle (phải)}{ch7-gate}
+
+Hai Solver độc lập đồng ý với nhau ở \SL{ch7_gsm8k/multi/agree_sharePct}\,\% số câu
+(\SL{ch7_gsm8k/multi/agree_n} câu) và độ chính xác của nhánh này là \SL{ch7_gsm8k/multi/agree_accPct}\,\%
+(Hình~\ref{fig:ch7-gate}): khi hai phương pháp khác nhau (chương trình và lời văn) cho cùng một con số, con số đó đáng tin
+hơn hẳn mỗi phương pháp riêng lẻ -- đây là giá trị cốt lõi của kiểm chứng chéo. Ở \SL{ch7_gsm8k/multi/disagree_n} câu bất
+đồng, Verifier và biểu quyết chỉ đạt \SL{ch7_gsm8k/multi/disagree_accPct}\,\%. Cận trên ``oracle'' -- tỷ lệ câu mà
+\emph{ít nhất một} tác tử con đã có đáp án đúng -- là \SL{ch7_gsm8k/multi/oracle_accPct}\,\%; khoảng cách giữa con số này
+và độ chính xác của cả hệ chính là phần mà cơ chế tổng hợp để lọt. Với một LLM 1,5 tỷ tham số làm Verifier, việc chọn
+đúng giữa hai lời giải mâu thuẫn khó gần như việc tự giải bài toán, đúng như nhận định rằng LLM khó tự sửa lỗi suy luận
+khi không có tín hiệu ngoài \cite{ch7:huang2024selfcorrect}.
+
+Cổng đồng thuận cũng là thước đo \emph{độ tin cậy} miễn phí: hệ có thể báo kèm đáp án mức tin ``cao'' (hai Solver khớp)
+hay ``thấp'' (phải phân xử). Trong ứng dụng thật, câu mức thấp nên được chuyển cho người kiểm tra -- một cách dùng đa tác
+tử thường có lợi hơn cả việc cố nâng độ chính xác trung bình.
+
+\subsection{Phân tích lỗi}
+
+\bang{ch7_errors}{Phân loại câu sai của từng hệ}{ch7-errors}
+\hinhpdf{ch7_errors}{1}{Cơ cấu lỗi của bốn hệ}{ch7-errors}
+
+Cơ cấu lỗi (Bảng~\ref{tab:ch7-errors}, Hình~\ref{fig:ch7-errors}) khác nhau rõ giữa các hệ. Hệ trực tiếp sai gần như hoàn
+toàn do lập luận -- nó không có bước nào để sai số học. CoT có \SL{ch7_gsm8k/systems/cot/errors/arithmetic} câu sai số học
+(một phép tính viết sai kết quả trong lời giải), loại lỗi mà PAL loại bỏ được nhờ trình thông dịch; đổi lại, PAL có
+\SL{ch7_gsm8k/systems/pal/errors/no_answer} câu \emph{không ra số} khi mã vẫn không chạy được sau lượt sửa, và phần lớn câu
+sai của PAL vẫn là lỗi lập luận -- chương trình chạy đúng nhưng mô hình hoá sai bài toán. Hệ đa tác tử có \SL{ch7_gsm8k/systems/multi/errors/coordination}
+câu \emph{lỗi phối hợp}: đáp án đúng đã xuất hiện ở một tác tử con nhưng bị biểu quyết hoặc Verifier gạt đi -- loại lỗi chỉ
+tồn tại khi có nhiều tác tử.
+
+\hinhpdf{ch7_tool}{1}{Kết quả các lần chạy mã trong hộp cát của PAL và hệ đa tác tử}{ch7-tool}
+
+Hình~\ref{fig:ch7-tool} phân loại mọi lần gọi công cụ Python. Một phát hiện về phối hợp đáng chú ý: ở hệ đa tác tử, lượt
+đầu của Solver-PAL thiếu hàm \texttt{solution()} ở \SL{ch7_gsm8k/multi/first_nofunc_multiPct}\,\% số câu, so với
+\SL{ch7_gsm8k/multi/first_nofunc_palPct}\,\% của PAL đơn lẻ. Đọc vết cho thấy nguyên nhân: Planner, dù được dặn ``không
+tính đáp án'', vẫn thường viết lời giải đầy đủ với tên bước riêng, và Solver-PAL đặt tên hàm theo kế hoạch (ví dụ
+\texttt{calculate\_bolts}) thay vì theo quy ước \texttt{solution()} trong lời nhắc hệ thống. Thông tin thêm từ tác tử khác
+đã \emph{lấn át} đặc tả định dạng -- đúng loại lỗi ``đặc tả và lệch hướng giữa tác tử'' mà MAST mô tả
+\cite{ch7:cemri2025}. Vòng tự sửa bằng thông báo lỗi thật cứu được \SL{ch7_gsm8k/multi/rescued_multiPct}\,\% các trường
+hợp này ở hệ đa tác tử (PAL đơn lẻ: \SL{ch7_gsm8k/multi/rescued_palPct}\,\%), nhưng mỗi lần cứu tốn thêm một lượt gọi.
+
+\hinhpdf{ch7_only_correct}{0.8}{Số câu đúng ở hệ hàng nhưng sai ở hệ cột: mức độ bổ sung cho nhau giữa các hệ}{ch7-only}
+\hinhpdf{ch7_difficulty}{1}{Độ chính xác theo độ khó (số phép tính trong lời giải mẫu)}{ch7-difficulty}
+
+Ma trận ``đúng ở hệ này, sai ở hệ kia'' (Hình~\ref{fig:ch7-only}) cho thấy CoT và PAL bổ sung cho nhau: mỗi hệ đúng một
+số câu mà hệ kia sai, nên kết hợp hai hệ (như hệ đa tác tử làm) có tiềm năng -- vấn đề nằm ở khâu chọn. Theo độ khó
+(Hình~\ref{fig:ch7-difficulty}, Bảng~\ref{tab:ch7-difficulty}), trả lời trực tiếp và CoT giảm dần khi bài cần nhiều phép
+tính hơn, còn PAL và hệ đa tác tử dao động ở các nhóm giữa rồi giảm mạnh ở nhóm khó nhất. Hai nhóm khó chỉ có vài câu mỗi
+nhóm, nên đây là xu hướng định tính hơn là số đo chính xác.
+
+\bang{ch7_difficulty}{Độ chính xác (\%) theo độ khó của bài toán}{ch7-difficulty}
+\hinhpdf{ch7_running}{1}{Độ chính xác luỹ kế theo số câu đã chấm: con số ổn định dần khi mẫu lớn lên}{ch7-running}
+
+\subsection{Vết suy luận mẫu}
+
+Vết đầy đủ cho phép kiểm tra \emph{cách} hệ đi đến đáp án. Bảng~\ref{tab:ch7-answers} đặt đáp án của bốn hệ cạnh nhau cho
+vài câu mà các hệ cho kết quả khác nhau; các hộp vết dưới đây được chọn tự động từ dữ liệu chạy.
+
+Hộp vết thứ nhất là một câu ở nhánh đồng thuận: Solver-PAL và Solver-CoT cho cùng một số nên hệ chốt ngay, không cần
+phân xử. Hộp thứ hai là câu bất đồng mà PAL đơn lẻ trả lời sai nhưng hệ đa tác tử vẫn chọn đúng sau phân xử. Hộp thứ ba
+là một lỗi phối hợp điển hình: Solver-PAL (sau một lần tự sửa) đã tính đúng, nhưng Solver-CoT và Verifier cùng ra một số
+sai, mẫu PAL thứ hai lại thiếu hàm \texttt{solution()}, nên biểu quyết đa số chọn đáp án sai -- hai phiếu sai tương quan
+thắng một phiếu đúng. Hộp cuối là PAL đơn lẻ tự sửa: lần chạy đầu báo lỗi, thông báo lỗi được đưa lại cho mô hình và lần
+chạy sau cho kết quả đúng.
+
+\input{generated/ch7_trace_agree_ok}
+
+\bang{ch7_answers}{Đáp án của bốn hệ cho một số câu mà các hệ bất đồng}{ch7-answers}
+
+\input{generated/ch7_trace_disagree_ok}
+\input{generated/ch7_trace_coordination}
+\input{generated/ch7_trace_pal_fix}
+
+% ---------------------------------------------------------------------
+\section{Triển khai hệ đa tác tử lên Web App}
+\label{sec:mas-deploy}
+
+Bốn hệ được đưa vào Web App chung của tiểu luận qua mô-đun \texttt{tl3/serve\_ch7.py}. \texttt{SPECS} khai báo một trải
+nghiệm kiểu ``chat'': ô nhập bài toán (mặc định là bài đầu tiên của GSM8K test) và ô chọn hệ giải (\texttt{multi},
+\texttt{pal}, \texttt{cot}, \texttt{direct}). Hàm \texttt{predict} gọi đúng hàm \texttt{solve\_*} đã dùng trong thực
+nghiệm, rồi trả về đáp án, toàn bộ vết theo vai trò (mỗi bước là một cặp \emph{vai trò -- nội dung}, gồm cả kết quả công
+cụ Python), danh sách công cụ và số lượt gọi, token. LLM được nạp lười bằng bộ nạp tiết kiệm bộ nhớ ở lần gọi đầu và giữ
+trong bộ nhớ cho các lần sau. Giao diện hiển thị vết theo đúng thứ tự Planner $\to$ Solver $\to$ Python $\to$ Verifier
+$\to$ Coordinator, nên người dùng thấy được \emph{vì sao} hệ chọn đáp án, không chỉ đáp án.
+
+\maNguon{serve_ch7__SPECS}{Khai báo trải nghiệm \texttt{ch7\_math} cho Web App}
+\maNguon{serve_ch7__predict}{Hàm suy luận: bài toán $\to$ đáp án, vết từng tác tử, công cụ đã dùng}
+
+\anhUI{ch7_math_web}{Hệ đa tác tử giải bài toán lời văn trên Web App (desktop): đáp án, vết từng vai trò và công cụ}{ch7-ui-web}
+\anhMobile{ch7_math_mobile}{Hệ đa tác tử trên khung điện thoại 390 px: đáp án và vết suy luận xếp dọc}{ch7-ui-mobile}
+
+\begin{luuy}{Giới hạn sử dụng}
+Mã do LLM sinh luôn chạy trong hộp cát (tiến trình riêng, không mạng, không đọc tệp, giới hạn thời gian). Mô hình 1,5 tỷ
+tham số vẫn sai một phần đáng kể các bài toán; vết suy luận giúp kiểm tra lại, không thay cho việc kiểm tra.
+\end{luuy}
+
+% ---------------------------------------------------------------------
+\section{Kết luận chương}
+
+Chương này đi từ khái niệm tác tử, các mẫu kiến trúc và giao thức phối hợp tới một thực nghiệm có kiểm soát: bốn hệ dùng
+chung một LLM cục bộ 1,5 tỷ tham số và cùng tập câu GSM8K, chỉ khác nhau ở cách tổ chức suy luận. Trên
+\SL{ch7_gsm8k/n} câu chung:
+\begin{itemize}
+\item \textbf{Suy luận từng bước là đòn bẩy lớn nhất:} CoT nâng độ chính xác từ
+\SL{ch7_gsm8k/systems/direct/accPct}\,\% lên \SL{ch7_gsm8k/systems/cot/accPct}\,\% chỉ với một lượt gọi.
+\item \textbf{Công cụ không tự động tốt hơn:} PAL loại bỏ lỗi số học nhưng chỉ đạt \SL{ch7_gsm8k/systems/pal/accPct}\,\%,
+vì mô hình nhỏ phải viết đúng cả chương trình lẫn định dạng.
+\item \textbf{Đa tác tử không vượt tác tử đơn tốt nhất:} hệ đa tác tử đạt \SL{ch7_gsm8k/systems/multi/accPct}\,\% với
+\SL{ch7_gsm8k/systems/multi/calls} lượt gọi và \SL{ch7_gsm8k/systems/multi/tokens} token mỗi câu; nó hơn PAL nhưng kém CoT,
+và mọi chênh lệch đều nằm trong khoảng tin cậy.
+\item \textbf{Giá trị thật của đa tác tử là tín hiệu tin cậy:} khi hai Solver khớp nhau
+(\SL{ch7_gsm8k/multi/agree_sharePct}\,\% số câu), độ chính xác đạt \SL{ch7_gsm8k/multi/agree_accPct}\,\%; nhánh bất đồng
+chỉ đạt \SL{ch7_gsm8k/multi/disagree_accPct}\,\% dù cận trên oracle là \SL{ch7_gsm8k/multi/oracle_accPct}\,\%.
+\item \textbf{Phối hợp sinh ra lỗi mới:} kế hoạch của Planner lấn át đặc tả định dạng của Solver-PAL
+(\SL{ch7_gsm8k/multi/first_nofunc_multiPct}\,\% lượt chạy đầu thiếu \texttt{solution()}), và
+\SL{ch7_gsm8k/systems/multi/errors/coordination} câu sai vì khâu tổng hợp gạt đi đáp án đúng đã có trong vết.
+\end{itemize}
+Bài học thiết kế: với mô hình nhỏ, hãy bắt đầu từ tác tử đơn mạnh nhất (ở đây là CoT); chỉ thêm tác tử khi có một tín hiệu
+kiểm chứng \emph{bên ngoài} đáng tin (trình thông dịch, bộ kiểm thử, người duyệt); và dùng sự bất đồng giữa các tác tử để
+chuyển câu khó cho người kiểm tra thay vì để chính LLM yếu tự phân xử. Giới hạn của chương: cỡ mẫu nhỏ do tài nguyên tính
+toán dùng chung, và chỉ thử một LLM. Dùng một mô hình lớn hơn làm Verifier, hoặc cho Verifier chạy lại cả hai chương trình
+thay vì đọc lời văn, là hướng mở rộng tự nhiên.

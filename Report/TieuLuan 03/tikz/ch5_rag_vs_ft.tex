@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \fill[cBlue!6] (0,0) rectangle (6,5); \fill[cGreen!8] (6,0) rectangle (12,5);
+  \fill[cOrange!8] (0,5) rectangle (6,10); \fill[cPurple!8] (6,5) rectangle (12,10);
+  \draw[-{Stealth[length=3mm]}, very thick] (0,0) -- (12.5,0) node[below left, font=\small, align=right] {nhu cầu tri thức ngoài / cập nhật $\to$};
+  \draw[-{Stealth[length=3mm]}, very thick] (0,0) -- (0,10.5) node[above, font=\small, align=center] {nhu cầu thay đổi hành vi, văn phong $\uparrow$};
+  \node[hop=cSlate, text width=4.6cm, font=\small] at (3,2.5) {\textbf{Prompt engineering}\\ ít tri thức mới, ít thay đổi hành vi};
+  \node[hop=cGreen, text width=4.6cm, font=\small] at (9,2.9) {\textbf{RAG}\\ tri thức thay đổi thường xuyên, cần trích nguồn, cập nhật không huấn luyện lại};
+  \node[hop=cOrange, text width=4.6cm, font=\small] at (3,7.5) {\textbf{Fine-tuning}\\ học định dạng, giọng điệu, kỹ năng miền ổn định};
+  \node[hop=cPurple, text width=4.6cm, font=\small] at (9,7.5) {\textbf{RAG + fine-tuning}\\ vừa cần tri thức mới vừa cần hành vi chuyên biệt (RAFT)};
+  \node[cau=cRed, minimum size=9mm] at (11.2,0.65) {\scriptsize TL};
+  \node[nhan, anchor=east] at (10.6,0.65) {hệ thống chương này};
+\end{tikzpicture}

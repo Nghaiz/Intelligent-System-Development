@@ -1,0 +1,38 @@
+\begin{tikzpicture}[x=0.8cm,y=0.8cm]
+  \def\inp{{{1,0,2,3,1,0},{0,1,3,1,0,2},{2,1,0,1,3,1},{1,3,1,0,2,0},{0,2,1,3,1,1},{1,0,2,1,0,3}}}
+  \def\ker{{{1,0,-1},{1,0,-1},{1,0,-1}}}
+  % đầu vào 6x6
+  \node[tieude] at (3,6.8) {Đầu vào $X$ ($6\times6$)};
+  \foreach \r in {0,...,5}{\foreach \c in {0,...,5}{
+    \pgfmathtruncatemacro{\vi}{\inp[\r][\c]}
+    \ifnum\r<3 \ifnum\c>0 \ifnum\c<4 \fill[cOrange!45] (\c,5-\r) rectangle ++(1,1); \fi\fi\fi
+    \draw[gray!60] (\c,5-\r) rectangle ++(1,1);
+    \node[font=\normalsize] at (\c+0.5,5.5-\r) {\vi};}}
+  \draw[very thick, cOrange!85!black, rounded corners=1pt] (1,3) rectangle (4,6);
+  % kernel
+  \node[tieude] at (9.3,6.8) {Kernel $K$};
+  \foreach \r in {0,...,2}{\foreach \c in {0,...,2}{
+    \pgfmathtruncatemacro{\v}{\ker[\r][\c]}
+    \filldraw[fill=cBlue!20, draw=cBlue!70!black] (7.8+\c,3+2-\r) rectangle ++(1,1);
+    \node[font=\normalsize\bfseries] at (8.3+\c,3.5+2-\r) {\v};}}
+  \node[font=\Large] at (6.9,4.5) {$\ast$};
+  \node[font=\Large] at (11.7,4.5) {$=$};
+  % đầu ra 4x4 (giá trị thật)
+  \node[tieude] at (15.0,6.8) {Feature map ($4\times4$)};
+  \foreach \r in {0,...,3}{\foreach \c in {0,...,3}{
+    \pgfmathsetmacro{\s}{0}
+    \foreach \i in {0,1,2}{\foreach \j in {0,1,2}{
+      \pgfmathparse{\s+\inp[\r+\i][\c+\j]*\ker[\i][\j]}\xdef\s{\pgfmathresult}}}
+    \pgfmathtruncatemacro{\o}{\s}
+    \ifnum\r=0\ifnum\c=1 \fill[cGreen!45] (13+\c,5-\r) rectangle ++(1,1);\fi\fi
+    \draw[gray!60] (13+\c,5-\r) rectangle ++(1,1);
+    \node[font=\normalsize] at (13.5+\c,5.5-\r) {\o};}}
+  \draw[very thick, cGreen!70!black] (14,5) rectangle (15,6);
+  \draw[->, very thick, cOrange!85!black] (4,6.05) .. controls (8,7.6) and (12,7.4) .. (14.3,6.05);
+  % công thức
+  \node[draw=cSlate, rounded corners=3pt, fill=softgray, align=left, font=\small, text width=15.2cm, anchor=north]
+     at (8.5,-0.4) {%
+    Ô xanh lá: $\sum_{i,j} X_{i,\,1+j}\,K_{i,j} = (0\cdot1+2\cdot0+3\cdot(-1)) + (1\cdot1+3\cdot0+1\cdot(-1)) + (1\cdot1+0\cdot0+1\cdot(-1)) = -3$.\\[2pt]
+    Tổng quát: $Z_{u,v} = b + \sum_{c=1}^{C}\sum_{i=0}^{k-1}\sum_{j=0}^{k-1} X_{c,\,us+i,\,vs+j}\, K_{c,i,j}$, \quad
+    kích thước đầu ra $\lfloor (H+2p-k)/s \rfloor + 1$.};
+\end{tikzpicture}

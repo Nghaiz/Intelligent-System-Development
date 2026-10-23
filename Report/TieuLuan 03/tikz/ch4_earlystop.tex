@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+  \begin{axis}[a06, width=13cm, height=6.5cm, xlabel={epoch}, ylabel={MSE}, ymin=0, ymax=1.05, xmin=0, xmax=60,
+               legend pos=north east, legend style={font=\small}]
+    \addplot[m1, domain=1:60, samples=80] {0.08+0.9*exp(-x/9)};
+    \addlegendentry{train loss}
+    \addplot[mTwo, very thick, domain=1:60, samples=80] {0.22+0.75*exp(-x/8)+0.0035*max(0,x-22)^1.35/10};
+    \addlegendentry{validation loss}
+    \draw[cRed, very thick, dashed] (axis cs:22,0) -- (axis cs:22,1.0);
+    \fill[cRed] (axis cs:22,0.302) circle (3pt);
+    % nhãn nằm giữa đường validation (≈0,27) và nhãn kiên nhẫn, không chạm hai đường loss
+    \node[font=\small, text=cRed, anchor=west, align=left] at (axis cs:22.6,0.49) {epoch tốt nhất\\(khôi phục trọng số)};
+    \fill[gray, opacity=0.12] (axis cs:22,0) rectangle (axis cs:37,1.05);
+    \node[font=\small, align=center] at (axis cs:29.5,0.77) {kiên nhẫn\\ (patience = 15)};
+    \node[font=\small, text=cRed!70!black, align=center] at (axis cs:50.5,0.62) {quá khớp:\\ train giảm, val tăng};
+  \end{axis}
+\end{tikzpicture}

@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % vòng đời xây dựng KG trên một vòng tròn
+  \foreach \a/\c/\t [count=\i] in {90/cBlue/{Thu thập\\nguồn}, 30/cTeal/{Trích xuất\\thực thể, quan hệ},
+        -30/cGreen/{Liên kết\\thực thể}, -90/cOrange/{Hợp nhất,\\chuẩn hoá}, -150/cRed/{Kiểm chứng\\chất lượng},
+        150/cPurple/{Suy luận,\\hoàn thiện}}{
+    \node[cau=\c, minimum size=24mm, font=\small\bfseries, align=center] (s\i) at (\a:4.1) {\t};
+  }
+  \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6,6/1}\draw[mui, line width=2pt] (s\i) to[bend left=18] (s\j);
+  \node[hop=cSlate, text width=3.4cm, font=\small] at (0,0) {\textbf{Con người tuyển chọn}\\ (Cyc, WordNet) \\[3pt] \textbf{Máy tự động}\\ (NELL, Knowledge Vault)\\[3pt] \textbf{Lai} (Wikidata)};
+  \node[hop=cYellow, text width=4.2cm, font=\small] at (9.8,1.6) {\textbf{Chương này:} dữ liệu bảng có cấu trúc $\Rightarrow$ ánh xạ cột $\to$ quan hệ theo luật, định danh ổn định, không cần trích xuất NLP};
+  \node[hop=cYellow, text width=4.2cm, font=\small] at (9.8,-1.8) {\textbf{Liên kết thực thể:} ngày, tháng, nhóm tuổi, mã hồ sơ trong câu hỏi $\to$ nút KG (luật + biểu thức chính quy)};
+\end{tikzpicture}

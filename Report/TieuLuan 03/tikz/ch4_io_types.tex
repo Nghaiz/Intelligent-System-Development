@@ -1,0 +1,45 @@
+\begin{tikzpicture}[x=1cm,y=1cm,
+    xin/.style={rectangle, rounded corners=2pt, fill=cOrange!70, draw=cOrange!60!black, minimum size=5.5mm},
+    hid/.style={rectangle, rounded corners=2pt, fill=cGreen!60, draw=cGreen!50!black, minimum size=5.5mm},
+    yout/.style={rectangle, rounded corners=2pt, fill=cPurple!60, draw=cPurple!50!black, minimum size=5.5mm},
+    a/.style={-{Stealth[length=1.8mm]}, thick, black!70}]
+  % 1 one-to-one
+  \begin{scope}[shift={(0,0)}]
+    \node[xin] (i) at (0,0) {}; \node[hid] (h) at (0,1) {}; \node[yout] (o) at (0,2) {};
+    \draw[a] (i)--(h); \draw[a] (h)--(o);
+    \node[font=\small\bfseries, align=center, text width=3cm, anchor=north] at (0,-0.5) {one-to-one\\[-2pt]\footnotesize mạng thường};
+  \end{scope}
+  % 2 one-to-many
+  \begin{scope}[shift={(2.2,0)}]
+    \node[xin] (i) at (0,0) {};
+    \foreach \k in {0,1,2} {\node[hid] (h\k) at (\k*0.9,1) {}; \node[yout] (o\k) at (\k*0.9,2) {}; \draw[a] (h\k)--(o\k);}
+    \draw[a] (i)--(h0); \draw[a,cRed] (h0)--(h1); \draw[a,cRed] (h1)--(h2);
+    \node[font=\small\bfseries, align=center, text width=3cm, anchor=north] at (0.9,-0.5) {one-to-many\\[-2pt]\footnotesize sinh chú thích ảnh};
+  \end{scope}
+  % 3 many-to-one
+  \begin{scope}[shift={(5.8,0)}]
+    \foreach \k in {0,1,2} {\node[xin] (i\k) at (\k*0.9,0) {}; \node[hid] (h\k) at (\k*0.9,1) {}; \draw[a] (i\k)--(h\k);}
+    \node[yout] (o) at (1.8,2) {};
+    \draw[a,cRed] (h0)--(h1); \draw[a,cRed] (h1)--(h2); \draw[a] (h2)--(o);
+    \node[font=\small\bfseries, align=center, text width=3cm, anchor=north, text=cRed!80!black] at (0.9,-0.5) {many-to-one\\[-2pt]\footnotesize dự báo bước kế\\[-2pt]\footnotesize (chương này)};
+    \begin{scope}[on background layer]\node[vung=cRed, fit=(i0)(o)] {};\end{scope}
+  \end{scope}
+  % 4 many-to-many đồng bộ
+  \begin{scope}[shift={(9.4,0)}]
+    \foreach \k in {0,1,2} {\node[xin] (i\k) at (\k*0.9,0) {}; \node[hid] (h\k) at (\k*0.9,1) {};
+      \node[yout] (o\k) at (\k*0.9,2) {}; \draw[a] (i\k)--(h\k); \draw[a] (h\k)--(o\k);}
+    \draw[a,cRed] (h0)--(h1); \draw[a,cRed] (h1)--(h2);
+    \node[font=\small\bfseries, align=center, text width=3cm, anchor=north] at (0.9,-0.5) {many-to-many\\[-2pt]\footnotesize gán nhãn từng bước};
+  \end{scope}
+  % 5 seq2seq bất đồng bộ
+  \begin{scope}[shift={(13.0,0)}]
+    \foreach \k in {0,1} {\node[xin] (i\k) at (\k*0.8,0) {}; \node[hid] (h\k) at (\k*0.8,1) {}; \draw[a] (i\k)--(h\k);}
+    \foreach \k in {2,3} {\node[hid,fill=cTeal!60] (h\k) at (\k*0.8,1) {}; \node[yout] (o\k) at (\k*0.8,2) {}; \draw[a] (h\k)--(o\k);}
+    \draw[a,cRed] (h0)--(h1); \draw[a,cRed] (h1)--(h2); \draw[a,cRed] (h2)--(h3);
+    \node[font=\small\bfseries, align=center, text width=3cm, anchor=north] at (1.2,-0.5) {seq2seq\\[-2pt]\footnotesize dịch máy};
+  \end{scope}
+  % chú giải
+  \node[xin, label={[font=\small]right:đầu vào $x_t$}] at (3,-3.0) {};
+  \node[hid, label={[font=\small]right:trạng thái ẩn $h_t$}] at (6.4,-3.0) {};
+  \node[yout, label={[font=\small]right:đầu ra $y_t$}] at (10.2,-3.0) {};
+\end{tikzpicture}

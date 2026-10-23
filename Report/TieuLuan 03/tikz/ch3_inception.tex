@@ -1,0 +1,18 @@
+\begin{tikzpicture}[node distance=1.0cm]
+  \node[khoiX, minimum width=12cm, minimum height=10mm] (in) at (0,0) {Tầng trước ($28{\times}28{\times}192$)};
+  \node[khoi, minimum width=2.6cm] (a1) at (-4.8,-2.2) {Conv $1{\times}1$\\64};
+  \node[khoiT, minimum width=2.6cm] (b1) at (-1.6,-2.2) {Conv $1{\times}1$\\96};
+  \node[khoiT, minimum width=2.6cm] (c1) at (1.6,-2.2) {Conv $1{\times}1$\\16};
+  \node[khoiP, minimum width=2.6cm] (d1) at (4.8,-2.2) {MaxPool $3{\times}3$\\bước 1};
+  \node[khoiC, minimum width=2.6cm] (b2) at (-1.6,-4.4) {Conv $3{\times}3$\\128};
+  \node[khoiR, minimum width=2.6cm] (c2) at (1.6,-4.4) {Conv $5{\times}5$\\32};
+  \node[khoiT, minimum width=2.6cm] (d2) at (4.8,-4.4) {Conv $1{\times}1$\\32};
+  \node[khoiG, minimum width=12cm, minimum height=10mm] (cat) at (0,-6.6) {Ghép theo kênh (concat): $28{\times}28{\times}(64+128+32+32)=28{\times}28{\times}256$};
+  \foreach \t in {a1,b1,c1,d1}{\draw[mui] (in.south -| \t) -- (\t);}
+  \draw[mui] (b1) -- (b2); \draw[mui] (c1) -- (c2); \draw[mui] (d1) -- (d2);
+  \draw[mui] (a1) -- (cat.north -| a1);
+  \foreach \t in {b2,c2,d2}{\draw[mui] (\t) -- (cat.north -| \t);}
+  \node[font=\small, text=cTeal!70!black, align=center] at (0,-1.1) {nhánh song song, nhiều cỡ trường tiếp nhận};
+  \node[draw=cSlate, fill=softgray, rounded corners=3pt, font=\small, text width=12cm, align=center] at (0,-8.1)
+   {Conv $1{\times}1$ ``thắt cổ chai'' giảm số kênh trước $3{\times}3$ và $5{\times}5$, cắt mạnh chi phí tính toán (GoogLeNet, 2014).};
+\end{tikzpicture}

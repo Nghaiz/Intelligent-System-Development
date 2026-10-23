@@ -1,0 +1,1009 @@
+% =====================================================================
+%  Chương 4 — Mạng nơ-ron hồi quy (RNN)
+%  Số liệu: \SL{ch4_*} từ src/TieuLuan 03/outputs/metrics/ch4_*.json; mã: \maNguon từ tl3/ch4_*, scripts/ch4_*.
+% =====================================================================
+\chapter{Mạng nơ-ron hồi quy (Recurrent Neural Networks -- RNN)}
+\label{chap:rnn}
+
+Chương~3 cho thấy mạng tích chập khai thác cấu trúc \emph{không gian} của ảnh. Chương này chuyển sang dữ liệu có
+cấu trúc \emph{thời gian}: doanh thu từng ngày, giá cổ phiếu từng phiên, giá vàng, câu văn, tín hiệu tiếng nói. Ở các
+dữ liệu đó thứ tự là một phần của thông tin, và giá trị hôm nay chỉ có nghĩa khi đặt cạnh những gì đã xảy ra trước nó.
+Phần lý thuyết (mục~\ref{sec:rnn-khainiem}–\ref{sec:rnn-sieuthamso}) đi từ khái niệm, lịch sử, công thức của RNN đơn
+giản đến lan truyền ngược qua thời gian, hiện tượng gradient biến mất, các kiến trúc có cổng LSTM và GRU, rồi toàn bộ
+quy trình dự báo chuỗi thời gian. Mục~\ref{sec:rnn-scratch} cài đặt RNN từ đầu bằng NumPy và kiểm tra gradient bằng sai
+phân số. Ba thực nghiệm (mục~\ref{sec:rnn-tn1}–\ref{sec:rnn-tn3}) dự báo doanh thu thương mại điện tử, giá cổ phiếu
+AAPL và giá quỹ vàng GLD bằng SimpleRNN, LSTM, GRU và BiLSTM trên cả PyTorch lẫn Keras; mỗi thực nghiệm kết thúc bằng
+phần triển khai thành ứng dụng web.
+
+% =====================================================================
+\section{Khái niệm về RNN}
+\label{sec:rnn-khainiem}
+
+\begin{dinhnghia}{Định nghĩa}
+Mạng nơ-ron hồi quy (recurrent neural network, RNN) là mạng nơ-ron xử lý một chuỗi $x_1, x_2, \dots, x_T$ \emph{lần
+lượt từng phần tử}, đồng thời duy trì một \emph{trạng thái ẩn} (hidden state) $h_t$ tóm tắt những gì mạng đã đọc tới
+bước $t$. Ở mỗi bước, trạng thái mới được tính từ đầu vào hiện tại và trạng thái cũ bằng \emph{cùng một} hàm có tham
+số dùng chung:
+\[ h_t = f_\theta(h_{t-1}, x_t), \qquad \hat y_t = g_\theta(h_t). \]
+\end{dinhnghia}
+
+Khác với mạng truyền thẳng (feed-forward) coi mỗi mẫu là một vector cố định, RNN có một vòng phản hồi: đầu ra của
+nơ-ron ẩn ở bước trước được đưa trở lại làm đầu vào ở bước sau. Nhờ vòng phản hồi, RNN có ba tính chất mà mạng truyền
+thẳng không có:
+\begin{itemize}
+  \item \textbf{Nhận chuỗi độ dài bất kỳ.} Số tham số không phụ thuộc $T$ vì cùng một bộ trọng số được áp dụng ở mọi bước.
+  \item \textbf{Có bộ nhớ.} $h_t$ là hàm của toàn bộ $x_1,\dots,x_t$, nên quyết định ở bước $t$ có thể dựa vào thông tin
+        xuất hiện rất lâu trước đó (ít nhất về nguyên tắc).
+  \item \textbf{Bất biến theo dịch chuyển thời gian.} Một mẫu hình (ví dụ ``giá tăng ba phiên liên tiếp'') được nhận
+        ra bằng cùng một phép tính dù nó xảy ra ở đầu hay cuối chuỗi, tương tự như tích chập dùng chung bộ lọc trên
+        mọi vị trí của ảnh.
+\end{itemize}
+Có thể xem RNN là một \emph{hệ động lực rời rạc} có đầu vào: $h_t$ là trạng thái, $x_t$ là tín hiệu điều khiển, và
+mạng học chính hàm chuyển trạng thái $f_\theta$ từ dữ liệu \cite{ch4:goodfellow2016}.
+
+% =====================================================================
+\section{Lịch sử phát triển của RNN}
+\label{sec:rnn-lichsu}
+
+\hinhtikz{ch4_history}{Các mốc chính trong lịch sử mạng hồi quy, từ mạng Hopfield (1982) đến các mô hình không gian
+trạng thái chọn lọc (2023).}{ch4-history}
+
+Lịch sử RNN gắn với câu hỏi làm sao để mạng nơ-ron có trí nhớ (Hình~\ref{fig:ch4-history}):
+\begin{itemize}
+  \item \textbf{1982 -- Mạng Hopfield} \cite{ch4:hopfield1982}: mạng hồi tiếp toàn phần dùng như bộ nhớ liên tưởng,
+        hội tụ về các điểm cực tiểu năng lượng. Đây chưa phải mô hình chuỗi nhưng đặt nền cho ý tưởng trạng thái lưu
+        thông tin qua phản hồi.
+  \item \textbf{1986 -- Mạng Jordan và lan truyền ngược}: Jordan \cite{ch4:jordan1986} đưa đầu ra trở lại làm ngữ cảnh;
+        cùng năm, Rumelhart, Hinton và Williams phổ biến lan truyền ngược \cite{ch4:rumelhart1986}, kèm cách ``mở''
+        mạng hồi tiếp theo thời gian để huấn luyện.
+  \item \textbf{1990 -- Mạng Elman (Simple Recurrent Network)} \cite{ch4:elman1990}: trạng thái ẩn được sao chép thành
+        ``đơn vị ngữ cảnh'' cho bước sau; đây chính là SimpleRNN dùng trong chương này. Cùng năm, Werbos hệ thống hoá
+        BPTT \cite{ch4:werbos1990}.
+  \item \textbf{1994 -- Phát hiện gradient biến mất}: Bengio, Simard và Frasconi \cite{ch4:bengio1994} chứng minh huấn
+        luyện bằng gradient không học được phụ thuộc dài hạn một cách ổn định.
+  \item \textbf{1997 -- LSTM và RNN hai chiều}: Hochreiter và Schmidhuber đề xuất LSTM với ``băng chuyền lỗi không
+        đổi'' \cite{ch4:hochreiter1997}; Schuster và Paliwal đề xuất BiRNN \cite{ch4:schuster1997}. Năm 2000, Gers và
+        cộng sự thêm cổng quên \cite{ch4:gers2000}, cho ra LSTM như ngày nay.
+  \item \textbf{2013--2015 -- Thời kỳ hoàng kim}: RNN sâu đạt kỷ lục nhận dạng tiếng nói \cite{ch4:graves2013}; GRU
+        \cite{ch4:cho2014} và kiến trúc seq2seq \cite{ch4:sutskever2014} đưa dịch máy nơ-ron vào thực tế; cơ chế chú ý
+        (attention) \cite{ch4:bahdanau2015} gỡ nút thắt vector ngữ cảnh cố định.
+  \item \textbf{2017 -- Transformer} \cite{ch4:vaswani2017}: bỏ hẳn hồi tiếp, chỉ dùng attention nên huấn luyện song song
+        được; Transformer thay RNN ở hầu hết bài toán ngôn ngữ quy mô lớn.
+  \item \textbf{2023 -- Hồi tiếp trở lại}: các mô hình không gian trạng thái chọn lọc như Mamba \cite{ch4:gu2023} và
+        RWKV kết hợp suy luận tuyến tính theo độ dài chuỗi của RNN với khả năng huấn luyện song song, cho thấy ý tưởng
+        trạng thái hồi tiếp vẫn còn giá trị.
+\end{itemize}
+
+% =====================================================================
+\section{Cấu trúc và nguyên lý hoạt động của RNN}
+\label{sec:rnn-cautruc}
+
+\subsection{Cấu trúc của RNN}
+
+RNN Elman gồm ba nhóm trọng số: $W_{xh}\in\mathbb{R}^{H\times F}$ nối đầu vào với lớp ẩn, $W_{hh}\in\mathbb{R}^{H\times H}$
+nối lớp ẩn với chính nó ở bước trước, và $W_{hy}\in\mathbb{R}^{O\times H}$ nối lớp ẩn với đầu ra. Với $F$ đặc trưng
+đầu vào, $H$ đơn vị ẩn và $O$ đầu ra:
+\begin{align}
+  a_t &= W_{xh}\,x_t + W_{hh}\,h_{t-1} + b_h, \label{eq:rnn-a}\\
+  h_t &= \tanh(a_t), \label{eq:rnn-h}\\
+  \hat y_t &= W_{hy}\,h_t + b_y. \label{eq:rnn-y}
+\end{align}
+Số tham số của lớp hồi tiếp là $H(F+H+1)$, không phụ thuộc độ dài chuỗi. Hình~\ref{fig:ch4-unfold} vẽ cùng một mạng
+ở hai dạng: dạng gập với vòng phản hồi $W_{hh}$, và dạng \emph{mở theo thời gian} (unfold) trong đó mỗi bước là một
+bản sao của cùng một ô. Dạng mở biến RNN thành một mạng truyền thẳng rất sâu (sâu $T$ tầng) có trọng số dùng chung,
+và đó là cách huấn luyện nó.
+
+\hinhtikz{ch4_unfold}{RNN ở dạng gập (trái) và dạng mở theo thời gian (phải): mọi bước dùng chung $W_{xh}$, $W_{hh}$,
+$W_{hy}$.}{ch4-unfold}
+
+\hinhtikz{ch4_cell}{Bên trong một ô SimpleRNN: hai phép nhân ma trận, cộng bias, hàm $\tanh$.}{ch4-cell}
+
+\subsection{Nguyên lý hoạt động}
+\label{sec:rnn-nguyenly}
+
+Hình~\ref{fig:ch4-cell} cho thấy ở mỗi bước, ô RNN thực hiện bốn thao tác: (1) chiếu đầu vào $x_t$ vào không gian ẩn
+bằng $W_{xh}$; (2) chiếu trạng thái cũ $h_{t-1}$ bằng $W_{hh}$; (3) cộng hai kết quả với bias thành tổng kích hoạt
+$a_t$; (4) nén $a_t$ vào khoảng $(-1,1)$ bằng $\tanh$ để được $h_t$. Trạng thái $h_t$ vừa là ``bộ nhớ'' chuyển cho bước
+sau, vừa là biểu diễn để lớp đầu ra dự báo. Trạng thái ban đầu thường đặt $h_0=\mathbf 0$. Với bài toán dự báo
+many-to-one của chương này, chỉ trạng thái cuối $h_T$ được đưa qua lớp tuyến tính để sinh một giá trị.
+
+\subsection{Ưu điểm}
+\begin{itemize}
+  \item Xử lý chuỗi độ dài thay đổi với số tham số cố định; mô hình gọn (SimpleRNN 64 đơn vị cho AAPL chỉ có
+        \SL{ch4_aapl_torch/rnn/params} tham số).
+  \item Chia sẻ tham số theo thời gian giúp tổng quát hoá: mẫu hình học ở đoạn này dùng được ở đoạn khác.
+  \item Suy luận trực tuyến (streaming): mỗi bước chỉ cần $h_{t-1}$ và $x_t$, chi phí $O(1)$ theo độ dài lịch sử, phù
+        hợp cảm biến, tài chính tần suất cao.
+  \item Mô hình hoá tự nhiên tính nhân quả: $h_t$ chỉ phụ thuộc quá khứ.
+\end{itemize}
+
+\subsection{Nhược điểm}
+\begin{itemize}
+  \item \textbf{Phụ thuộc dài hạn khó học} do gradient biến mất hoặc bùng nổ (mục~\ref{sec:rnn-vanish}).
+  \item \textbf{Tuần tự, khó song song}: bước $t$ phải đợi bước $t-1$, nên huấn luyện trên GPU kém hiệu quả hơn CNN
+        hay Transformer với chuỗi dài.
+  \item \textbf{Nút thắt thông tin}: toàn bộ lịch sử bị nén vào vector $h_t$ kích thước cố định.
+  \item Nhạy với khởi tạo, learning rate và chuẩn hoá dữ liệu; dễ quá khớp trên chuỗi ngắn.
+\end{itemize}
+
+\subsection{Ứng dụng}
+RNN và các biến thể từng là kiến trúc chủ đạo cho: nhận dạng tiếng nói và chữ viết tay \cite{ch4:graves2013}; dịch
+máy và tóm tắt văn bản (seq2seq) \cite{ch4:sutskever2014}; mô hình ngôn ngữ, gõ dự đoán trên bàn phím điện thoại;
+phân tích cảm xúc; dự báo chuỗi thời gian (nhu cầu điện, doanh số, giá tài sản, lưu lượng giao thông); phát hiện bất
+thường trong log và cảm biến IoT; sinh nhạc, sinh chuỗi hoạt động của người dùng. Trong chương này RNN được dùng cho
+bài toán dự báo chuỗi thời gian đa biến.
+
+% =====================================================================
+\section{Biểu diễn dữ liệu chuỗi thời gian}
+\label{sec:rnn-bieudien}
+
+Một chuỗi thời gian đa biến là ma trận $\mathbf{S}\in\mathbb{R}^{N\times F}$: $N$ bước thời gian (ngày, phiên),
+mỗi bước $F$ đặc trưng. Để huấn luyện theo lô, ta cắt $\mathbf S$ thành các cửa sổ độ dài $T$ và xếp thành tensor ba
+chiều (Hình~\ref{fig:ch4-tensor}). Bảng~\ref{tab:ch4-repr} tóm tắt quy ước dùng trong chương.
+
+\hinhtikz{ch4_tensor}{Tensor đầu vào của RNN: lô $B$ cửa sổ, mỗi cửa sổ $T$ bước, mỗi bước $F$ đặc trưng.}{ch4-tensor}
+
+\begin{table}[H]\centering\caption{Quy ước biểu diễn chuỗi trong chương}\label{tab:ch4-repr}
+\small
+\begin{tabular}{L{3.6cm}L{4.2cm}L{6.2cm}}
+\toprule
+Ký hiệu & Kích thước & Ý nghĩa \\
+\midrule
+$x_t$ & $(F,)$ & Vector đặc trưng tại bước $t$ (ví dụ open, high, low, close, adjclose, volume) \\
+$X_i$ & $(T, F)$ & Một cửa sổ $T=30$ bước liên tiếp \\
+$\mathbf X$ & $(B, T, F)$ & Một lô cửa sổ đưa vào mạng; e-commerce dùng $(\cdot,30,9)$, AAPL $(\cdot,30,6)$, vàng $(\cdot,30,13)$ \\
+$y_i$ & vô hướng & Giá trị cần dự báo ở bước ngay sau cửa sổ: Total\_Amount hoặc close \\
+$h_t$ & $(H,)$ & Trạng thái ẩn, $H=64$ trong mọi thực nghiệm \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Hàm kích hoạt trong RNN}
+\label{sec:rnn-kichhoat}
+
+Hàm $\tanh$ là lựa chọn mặc định cho trạng thái ẩn vì đầu ra nằm trong $(-1,1)$, đối xứng quanh 0 và bão hoà nên
+chặn được trạng thái khỏi phình to qua nhiều bước. Sigmoid có đầu ra $(0,1)$ nên phù hợp làm ``van'' (cổng) trong
+LSTM/GRU: giá trị 0 là đóng, 1 là mở. ReLU ít được dùng làm kích hoạt trạng thái của RNN truyền thống vì không bị chặn
+trên; mục~\ref{sec:rnn-vanish} cho thấy RNN-ReLU với bán kính phổ $\rho(W_{hh})>1$ làm gradient bùng nổ hàng chục triệu
+lần.
+
+\begin{table}[H]\centering\caption{Các hàm kích hoạt thường gặp trong RNN}\label{tab:ch4-act}
+\small
+\begin{tabular}{L{2.2cm}L{4.3cm}L{3.2cm}L{4.5cm}}
+\toprule
+Hàm & Công thức & Đạo hàm & Vai trò trong RNN \\
+\midrule
+Sigmoid & $\sigma(x)=\dfrac{1}{1+e^{-x}}$ & $\sigma(1-\sigma)\le\tfrac14$ & Cổng quên/vào/ra của LSTM, GRU \\[6pt]
+tanh & $\tanh x=\dfrac{e^{x}-e^{-x}}{e^{x}+e^{-x}}$ & $1-\tanh^2 x\le 1$ & Trạng thái ẩn, ứng viên cell \\[6pt]
+ReLU & $\max(0,x)$ & $\mathbf{1}[x>0]$ & Ít dùng cho trạng thái (dễ bùng nổ) \\[6pt]
+Softmax & $\dfrac{e^{x_i}}{\sum_j e^{x_j}}$ & $p_i(\delta_{ij}-p_j)$ & Đầu ra phân loại, trọng số attention \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{RNN xử lý chuỗi như thế nào?}
+\label{sec:rnn-xuly}
+
+Với một cửa sổ $X=[x_1,\dots,x_T]$, lan truyền xuôi gồm các bước:
+\begin{enumerate}
+  \item Khởi tạo $h_0=\mathbf 0$.
+  \item Với $t=1$: tính $h_1=\tanh(W_{xh}x_1+W_{hh}h_0+b_h)$.
+  \item Chuyển $h_1$ sang bước 2, kết hợp với $x_2$ để tạo $h_2$; lặp tới $t=T$.
+  \item Many-to-one: dùng $h_T$ để dự báo $\hat y=W_{hy}h_T+b_y$. Many-to-many: dùng mọi $h_t$.
+  \item Tính mất mát, lan truyền ngược qua toàn bộ $T$ bước (BPTT) và cập nhật trọng số.
+\end{enumerate}
+Đoạn mã~\ref{code:ch4_scratch__RNNScratch.forward} ở mục~\ref{sec:rnn-scratch} cài đặt đúng năm bước này bằng NumPy
+trong chưa đầy mười dòng.
+
+% =====================================================================
+\section{Các kiểu bài toán RNN theo quan hệ input--output}
+\label{sec:rnn-iotypes}
+
+\hinhtikz{ch4_io_types}{Năm kiểu quan hệ đầu vào -- đầu ra của mạng hồi quy; ba thực nghiệm trong chương thuộc kiểu
+many-to-one (khung đỏ).}{ch4-io}
+
+\begin{table}[H]\centering\caption{Các kiểu bài toán RNN}\label{tab:ch4-io}
+\small
+\begin{tabular}{L{3.4cm}L{5.2cm}L{5.6cm}}
+\toprule
+Kiểu & Mô tả & Ví dụ \\
+\midrule
+One-to-one & Một vào, một ra; thực chất là mạng thường & Phân loại ảnh đơn \\
+One-to-many & Một vào, sinh chuỗi ra & Sinh chú thích ảnh, sinh nhạc từ một nốt \\
+Many-to-one & Đọc cả chuỗi, ra một giá trị & Dự báo doanh thu/giá ngày kế tiếp, phân loại cảm xúc \\
+Many-to-many đồng bộ & Mỗi bước vào có một bước ra & Gán nhãn từ loại, phát hiện bất thường từng thời điểm \\
+Many-to-many bất đồng bộ & Encoder đọc hết rồi decoder sinh chuỗi độ dài khác & Dịch máy, dự báo nhiều bước trực tiếp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{BPTT -- Backpropagation Through Time}
+\label{sec:rnn-bptt}
+
+Huấn luyện RNN bằng cách mở mạng theo thời gian (Hình~\ref{fig:ch4-unfold}) rồi áp dụng lan truyền ngược trên đồ thị
+tính toán đã mở. Với tổng mất mát $L=\sum_t L_t$ và ký hiệu $\delta_t=\partial L/\partial h_t$, quy tắc chuỗi cho:
+\begin{align}
+  \delta_T &= W_{hy}^\top\,\frac{\partial L_T}{\partial \hat y_T}, \\
+  \delta_{t-1} &= \underbrace{W_{hh}^\top\,\mathrm{diag}\!\big(1-h_t^2\big)}_{(\partial h_t/\partial h_{t-1})^\top}\,\delta_t
+                 \;+\; W_{hy}^\top\frac{\partial L_{t-1}}{\partial\hat y_{t-1}}, \label{eq:bptt-delta}\\
+  \frac{\partial L}{\partial W_{hh}} &= \sum_{t=1}^{T}\Big[(1-h_t^2)\odot\delta_t\Big]\,h_{t-1}^\top, \qquad
+  \frac{\partial L}{\partial W_{xh}} = \sum_{t=1}^{T}\Big[(1-h_t^2)\odot\delta_t\Big]\,x_t^\top. \label{eq:bptt-w}
+\end{align}
+Hai điểm then chốt: (i) vì trọng số dùng chung, gradient của $W_{hh}$ là \emph{tổng} đóng góp từ mọi bước; (ii) tín
+hiệu lỗi từ bước $T$ về bước $t$ phải đi qua tích của $T-t$ ma trận Jacobian
+\begin{equation}
+  \frac{\partial h_T}{\partial h_t}=\prod_{k=t+1}^{T}\frac{\partial h_k}{\partial h_{k-1}}
+  =\prod_{k=t+1}^{T}\mathrm{diag}\big(1-h_k^2\big)\,W_{hh}. \label{eq:jacobian}
+\end{equation}
+Trong thực tế, chuỗi rất dài được cắt thành đoạn (truncated BPTT); ở chương này mỗi cửa sổ chỉ 30 bước nên BPTT đầy
+đủ được dùng.
+
+\hinhtikz{ch4_bptt}{Lan truyền ngược qua thời gian: lỗi từ mỗi $L_t$ đi ngược về các bước trước qua chuỗi Jacobian
+$\partial h_t/\partial h_{t-1}$ (mũi tên đỏ).}{ch4-bptt}
+
+% =====================================================================
+\section{Vanishing gradient và exploding gradient}
+\label{sec:rnn-vanish}
+
+Lấy chuẩn hai vế của~\eqref{eq:jacobian}: vì $|1-h_k^2|\le1$,
+\begin{equation}
+  \Big\|\frac{\partial h_T}{\partial h_t}\Big\| \le \prod_{k=t+1}^{T}\big\|\mathrm{diag}(1-h_k^2)\big\|\,\|W_{hh}\|
+  \le \|W_{hh}\|^{\,T-t}.
+\end{equation}
+Nếu giá trị kỳ dị lớn nhất của $W_{hh}$ nhỏ hơn 1 (hoặc $\tanh$ bão hoà), tích co theo cấp số nhân và
+\textbf{gradient biến mất}: bước xa không còn ảnh hưởng tới cập nhật, mạng ``quên'' phụ thuộc dài hạn. Ngược lại, nếu
+bán kính phổ $\rho(W_{hh})>1$ và kích hoạt không bão hoà, tích phình to và \textbf{gradient bùng nổ}: loss nhảy vọt,
+trọng số thành NaN \cite{ch4:bengio1994,ch4:pascanu2013}.
+
+\hinhtikz{ch4_vanish}{Trực giác về gradient biến mất (trái) và bùng nổ (phải): độ lớn gradient theo số bước lan truyền
+ngược, cùng các giải pháp tương ứng.}{ch4-vanish}
+
+\paragraph{Đo trực tiếp.} Để thấy hiện tượng bằng số, thí nghiệm \texttt{gradient\_flow}
+(Đoạn mã~\ref{code:ch4_extras__gradient_flow}) cho chuỗi ngẫu nhiên 100 bước qua RNN, LSTM, GRU khởi tạo ngẫu nhiên
+(ẩn 64, trung bình 20 lần khởi tạo) và đo $\|\partial h_T/\partial x_t\|$ theo khoảng cách $T-t$.
+
+\maDai{ch4_extras__gradient_flow}{Đo chuẩn gradient $\|\partial h_T/\partial x_t\|$ theo khoảng cách thời gian bằng
+autograd của PyTorch}
+
+\hinhpdf{ch4_gradflow}{1}{Chuẩn gradient theo khoảng cách thời gian (thang log). Trái: khởi tạo mặc định của PyTorch và
+LSTM có bias cổng quên bằng 3. Phải: RNN-ReLU khi đặt bán kính phổ của $W_{hh}$.}{ch4-gradflow}
+\bang{ch4_gradflow}{Chuẩn $\|\partial h_T/\partial x_t\|$ tại một số khoảng cách $T-t$}{ch4-gradflow}
+
+\nhanxet{Với SimpleRNN, gradient từ bước cách 50 bước chỉ còn \SL{ch4_extras/gradient/summary/rnn/k50} và tới 99
+bước còn \SL{ch4_extras/gradient/summary/rnn/k99}: thực tế bằng 0. Đáng chú ý, LSTM và GRU \emph{lúc khởi tạo} cũng suy
+giảm gần như vậy (\SL{ch4_extras/gradient/summary/lstm/k50} ở 50 bước), vì bias cổng quên bằng 0 làm
+$f_t=\sigma(\cdot)\approx0{,}5$ và cell state mất một nửa mỗi bước. Chỉ cần đặt bias cổng quên bằng 3
+($f_t\approx0{,}95$), chuẩn gradient sau 50 bước vẫn là \SL{ch4_extras/gradient/summary/lstm_fb3/k50} và sau 99 bước
+là \SL{ch4_extras/gradient/summary/lstm_fb3/k99}: lớn hơn SimpleRNN khoảng $10^{20}$ lần. Lợi thế của LSTM vì vậy
+không tự có, mà đến từ việc cổng quên \emph{học được} (hoặc được khởi tạo) giá trị gần 1 \cite{ch4:gers2000}. Bên
+phải, RNN-ReLU với $\rho=1{,}5$ cho gradient tăng tới \SL{ch4_extras/gradient/summary/lin_rho1.5/k99} sau 99 bước:
+đúng dạng bùng nổ cấp số nhân $\rho^{T-t}$.}
+
+\begin{table}[H]\centering\caption{Hai vấn đề gradient của RNN và giải pháp}\label{tab:ch4-vanish}
+\small
+\begin{tabular}{L{2.4cm}L{3.8cm}L{3.3cm}L{4.7cm}}
+\toprule
+Vấn đề & Cơ chế & Hậu quả & Giải pháp thường gặp \\
+\midrule
+Gradient biến mất & Tích nhiều Jacobian có chuẩn $<1$ & Không học được phụ thuộc dài hạn & LSTM/GRU, bias cổng quên dương, khởi tạo trực giao, skip connection \\
+Gradient bùng nổ & Tích nhiều Jacobian có chuẩn $>1$ & Loss dao động, NaN & Cắt chuẩn gradient (clipping), learning rate nhỏ, kích hoạt bão hoà \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Cắt chuẩn gradient (gradient clipping) \cite{ch4:pascanu2013} giới hạn độ dài vector gradient mà không đổi hướng:
+$g\leftarrow g\cdot\min\!\big(1, c/\|g\|\big)$. Mọi mô hình của chương dùng $c=1$
+(\texttt{clip\_grad\_norm\_} trong PyTorch, \texttt{clipnorm=1.0} trong Keras).
+
+% =====================================================================
+\section{LSTM -- Long Short-Term Memory}
+\label{sec:rnn-lstm}
+
+LSTM \cite{ch4:hochreiter1997,ch4:gers2000} thêm một \emph{cell state} $c_t$ làm bộ nhớ dài hạn, chạy dọc theo chuỗi
+như một băng chuyền và chỉ bị sửa đổi bằng phép nhân với cổng và phép cộng (Hình~\ref{fig:ch4-lstm}). Ba cổng sigmoid
+điều khiển dòng thông tin:
+\begin{align}
+  f_t &= \sigma\big(W_f[h_{t-1},x_t]+b_f\big) && \text{cổng quên: giữ bao nhiêu của } c_{t-1}\\
+  i_t &= \sigma\big(W_i[h_{t-1},x_t]+b_i\big) && \text{cổng vào: ghi bao nhiêu thông tin mới}\\
+  \tilde c_t &= \tanh\big(W_c[h_{t-1},x_t]+b_c\big) && \text{nội dung ứng viên}\\
+  c_t &= f_t\odot c_{t-1} + i_t\odot\tilde c_t && \text{cập nhật cộng tính}\\
+  o_t &= \sigma\big(W_o[h_{t-1},x_t]+b_o\big) && \text{cổng ra}\\
+  h_t &= o_t\odot\tanh(c_t).
+\end{align}
+Điểm mấu chốt là đạo hàm theo đường cell state: $\partial c_t/\partial c_{t-1}=\mathrm{diag}(f_t)$ (bỏ qua các đường
+gián tiếp). Khi $f_t\approx1$, gradient đi qua nhiều bước gần như nguyên vẹn, đúng như số đo ở
+Bảng~\ref{tab:ch4-gradflow}. Số tham số là $4H(F+H+1)$, gấp bốn SimpleRNN; với AAPL ($F=6$, $H=64$) bản PyTorch có
+\SL{ch4_aapl_torch/lstm/params} tham số (tính cả lớp đầu ra).
+
+\hinhtikz{ch4_lstm}{Ô LSTM: đường cell state $c_t$ (xanh đậm) chỉ chịu phép nhân với cổng quên và phép cộng; ba cổng
+sigmoid (đỏ, xanh lá, tím) và ứng viên $\tanh$ (xanh dương).}{ch4-lstm}
+
+% =====================================================================
+\section{GRU -- Gated Recurrent Unit}
+\label{sec:rnn-gru}
+
+GRU \cite{ch4:cho2014} gộp cell state vào trạng thái ẩn và chỉ dùng hai cổng (Hình~\ref{fig:ch4-gru}):
+\begin{align}
+  z_t &= \sigma\big(W_z[h_{t-1},x_t]+b_z\big) && \text{cổng cập nhật}\\
+  r_t &= \sigma\big(W_r[h_{t-1},x_t]+b_r\big) && \text{cổng đặt lại}\\
+  \tilde h_t &= \tanh\big(W_h[r_t\odot h_{t-1},x_t]+b_h\big) && \text{trạng thái ứng viên}\\
+  h_t &= (1-z_t)\odot h_{t-1} + z_t\odot\tilde h_t. && \text{nội suy giữa cũ và mới}
+\end{align}
+Cổng cập nhật $z_t$ đóng vai trò của cả cổng quên và cổng vào của LSTM (ràng buộc tổng bằng 1), cổng đặt lại $r_t$
+quyết định trạng thái cũ ảnh hưởng bao nhiêu tới ứng viên. Số tham số $3H(F+H+1)$; với AAPL là
+\SL{ch4_aapl_torch/gru/params}.
+
+\hinhtikz{ch4_gru}{Ô GRU với cổng đặt lại $r_t$, cổng cập nhật $z_t$ và phép nội suy
+$h_t=(1-z_t)h_{t-1}+z_t\tilde h_t$.}{ch4-gru}
+
+% =====================================================================
+\section{So sánh Simple RNN, LSTM và GRU}
+\label{sec:rnn-sosanh}
+
+\begin{table}[H]\centering\caption{So sánh ba kiến trúc hồi tiếp cơ bản}\label{tab:ch4-cmp}
+\small
+\begin{tabular}{L{3.2cm}L{3.5cm}L{3.8cm}L{3.5cm}}
+\toprule
+Đặc điểm & SimpleRNN & LSTM & GRU \\
+\midrule
+Bộ nhớ & Trạng thái ẩn $h_t$ & $h_t$ và cell state $c_t$ & Trạng thái ẩn $h_t$ \\
+Cổng & Không & Quên, vào, ra & Cập nhật, đặt lại \\
+Số tham số lớp & $H(F+H+1)$ & $4H(F+H+1)$ & $3H(F+H+1)$ \\
+Phụ thuộc dài hạn & Kém & Tốt & Tốt \\
+Chi phí tính & Thấp & Cao nhất & Trung bình \\
+Vai trò & Baseline, minh hoạ cơ chế & Bộ nhớ dài, mặc định an toàn & Cân bằng chất lượng/chi phí \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Chung \& cộng sự \cite{ch4:chung2014} cho thấy LSTM và GRU vượt xa SimpleRNN trên dữ liệu có phụ thuộc dài, nhưng
+giữa LSTM và GRU không có kẻ thắng tuyệt đối. Các thực nghiệm dưới đây kiểm tra điều đó trên chuỗi tài chính và kinh
+doanh, nơi phụ thuộc dài hạn có thể không tồn tại.
+
+% =====================================================================
+\section{Các biến thể và mở rộng quan trọng của RNN}
+\label{sec:rnn-bienthe}
+
+\paragraph{RNN hai chiều (Bidirectional RNN).} Hai RNN độc lập đọc chuỗi theo hai chiều; trạng thái mỗi bước là ghép
+$[\overrightarrow h_t;\overleftarrow h_t]$ \cite{ch4:schuster1997}. Phù hợp khi đã có toàn bộ chuỗi (gán nhãn, phân
+loại văn bản). Trong dự báo, BiLSTM chỉ được phép đọc hai chiều \emph{bên trong cửa sổ quá khứ}, như cách dùng ở
+chương này (Hình~\ref{fig:ch4-birnn}).
+
+\hinhtikz{ch4_birnn}{RNN hai chiều: chiều xuôi (xanh) và chiều ngược (hồng) được ghép ở mỗi bước.}{ch4-birnn}
+
+\paragraph{RNN sâu (stacked).} Xếp nhiều tầng hồi tiếp, đầu ra tầng dưới là đầu vào tầng trên (Hình~\ref{fig:ch4-deep});
+tầng cao biểu diễn trừu tượng hơn, đổi lại nhiều tham số và dễ quá khớp \cite{ch4:graves2013}.
+
+\hinhtikz{ch4_deep}{RNN sâu ba tầng; mỗi khối 3D là một ô hồi tiếp tại một bước thời gian.}{ch4-deep}
+
+\paragraph{Encoder--decoder và attention.} Bộ mã hoá đọc chuỗi vào thành các trạng thái $e_1..e_n$; bộ giải mã sinh
+chuỗi ra. Bản gốc chỉ truyền $e_n$ \cite{ch4:sutskever2014}, tạo nút thắt; attention \cite{ch4:bahdanau2015} cho mỗi
+bước giải mã một vector ngữ cảnh riêng $c_j=\sum_i\alpha_{ji}e_i$ với trọng số
+$\alpha_{ji}=\mathrm{softmax}_i(\mathrm{score}(s_{j-1},e_i))$ (Hình~\ref{fig:ch4-seq2seq}). Đây là tiền thân trực tiếp
+của Transformer \cite{ch4:vaswani2017}.
+
+\hinhtikz{ch4_seq2seq}{Kiến trúc seq2seq với attention: độ dày mũi tên cam tỉ lệ với trọng số chú ý $\alpha$.}{ch4-seq2seq}
+
+\paragraph{Các biến thể khác.} \emph{Stateful RNN} giữ trạng thái giữa các lô liên tiếp; \emph{CNN + RNN} dùng tích
+chập 1D trích mẫu cục bộ trước khi RNN mô hình hoá thời gian; \emph{peephole LSTM} cho cổng nhìn trực tiếp $c_{t-1}$;
+\emph{mô hình không gian trạng thái} (S4, Mamba \cite{ch4:gu2023}) là hồi tiếp tuyến tính có thể tính song song bằng
+phép quét (scan).
+
+% =====================================================================
+\section{RNN trong bài toán time-series forecasting}
+\label{sec:rnn-forecast}
+
+Dự báo chuỗi thời gian bằng RNN theo quy trình ở Hình~\ref{fig:ch4-pipeline}: nạp dữ liệu, gộp về bước thời gian
+mong muốn, khảo sát, chia theo thời gian, chuẩn hoá bằng thống kê của tập train, cắt cửa sổ, huấn luyện, đổi dự báo
+về đơn vị gốc, so với baseline và triển khai. Có ba chiến lược dự báo nhiều bước \cite{ch4:hyndman2021}:
+\begin{itemize}
+  \item \textbf{Một bước (one-step)}: dự báo $t+1$ từ lịch sử tới $t$; đây là chế độ đánh giá chính của chương.
+  \item \textbf{Đệ quy (recursive)}: dùng dự báo bước $t+1$ làm đầu vào để dự báo $t+2$, \dots
+        (Hình~\ref{fig:ch4-recursive}); một mô hình duy nhất, nhưng sai số tích luỹ theo tầm dự báo. Ứng dụng web dùng
+        cách này (mục~\ref{sec:rnn-horizon}).
+  \item \textbf{Trực tiếp (direct) hoặc seq2seq}: một mô hình (hoặc một đầu ra) cho mỗi tầm $h$.
+\end{itemize}
+
+\hinhtikz{ch4_pipeline}{Quy trình dự báo chuỗi thời gian dùng chung cho ba thực nghiệm.}{ch4-pipeline}
+\hinhtikz{ch4_recursive}{Dự báo đệ quy: giá trị vừa dự báo (đỏ) được nối vào cuối cửa sổ để dự báo bước tiếp
+theo.}{ch4-recursive}
+
+% =====================================================================
+\section{Sliding window / sequence generation}
+\label{sec:rnn-window}
+
+Với cửa sổ $w$, mẫu thứ $i$ là $X_i=[x_{i-w},\dots,x_{i-1}]$ và mục tiêu $y_i$ là giá trị tại bước $i$
+(Hình~\ref{fig:ch4-window}). $N$ quan sát cho $N-w$ mẫu; cửa sổ trượt bước 1 nên các mẫu kề nhau chồng lên nhau $w-1$
+bước, vì vậy \emph{không được xáo trộn rồi chia tập} (cửa sổ test sẽ trùng gần hết với cửa sổ train).
+
+\hinhtikz{ch4_window}{Cửa sổ trượt: mỗi khung màu là một mẫu đầu vào, ô đỏ là giá trị cần dự báo.}{ch4-window}
+\maNguon{ch4_data__make_windows}{Tạo cửa sổ trượt many-to-one}
+
+% =====================================================================
+\section{Chuẩn hóa dữ liệu}
+\label{sec:rnn-chuanhoa}
+
+Các đặc trưng có thang đo rất khác nhau (giá vài trăm USD, khối lượng hàng trăm triệu cổ phiếu), nên phải đưa về cùng
+thang trước khi vào mạng. Hai phép phổ biến là Min--Max $x'=(x-x_{\min})/(x_{\max}-x_{\min})$ và z-score
+$x'=(x-\mu)/\sigma$. Nguyên tắc bắt buộc: \textbf{thống kê chuẩn hoá chỉ được ước lượng trên tập train}, rồi dùng lại
+cho validation và test; fit trên toàn bộ dữ liệu là rò rỉ tương lai.
+
+Với chuỗi giá có xu hướng mạnh, còn một cạm bẫy thứ hai: giá trong tập test có thể vượt xa vùng giá của tập train.
+AAPL đóng cửa ở \SL{ch4_eda/aapl/close_first} USD năm 1980 và \SL{ch4_eda/aapl/close_last} USD năm 2024 (gấp
+\SL{ch4_eda/aapl/growth_x} lần). Nếu chuẩn hoá Min--Max toàn cục theo train, giá test ánh xạ ra ngoài $[0,1]$, mạng
+chưa từng thấy vùng đó và đầu ra ``kẹt trần'' quanh mức cao nhất của train. Đây là nguyên nhân bài mẫu thu được $R^2$
+âm cho mọi mô hình trên AAPL. Chương này dùng \textbf{chuẩn hoá tương đối theo cửa sổ} cho dữ liệu giá
+(Hình~\ref{fig:ch4-relnorm}): mỗi cột giá được lấy $\log(x_{t-k}/x_t)$ so với bước cuối của chính cửa sổ, và mục tiêu là
+log-lợi suất $r_{t+1}=\log(P_{t+1}/P_t)$. Sau khi dự báo $\hat r$, giá được khôi phục bằng
+$\hat P_{t+1}=P_t\,e^{\hat r}$. Mục~\ref{sec:rnn-ablation} kiểm chứng định lượng sự khác biệt.
+
+\hinhtikz{ch4_relnorm}{Min--Max toàn cục làm dự báo kẹt ở mức trần của train (trái); chuẩn hoá tương đối đưa mọi cửa
+sổ về cùng thang (phải).}{ch4-relnorm}
+
+% =====================================================================
+\section{Chia train / validation / test cho chuỗi thời gian}
+\label{sec:rnn-split}
+
+Dữ liệu i.i.d.\ có thể chia ngẫu nhiên, nhưng chuỗi thời gian phải chia theo mốc thời gian: train ở trước, validation
+ở giữa, test ở cuối (Hình~\ref{fig:ch4-split}), mô phỏng đúng tình huống ``dùng quá khứ dự báo tương lai''. Mọi thực
+nghiệm dùng tỉ lệ 70/15/15 trên tập cửa sổ; validation dùng cho dừng sớm và chọn mô hình, test chỉ dùng một lần để
+báo cáo.
+
+\hinhtikz{ch4_split}{Chia dữ liệu theo thời gian và nguyên tắc fit bộ chuẩn hoá chỉ trên train.}{ch4-split}
+\maNguon{ch4_data__time_split}{Chỉ số cắt train/validation/test theo thứ tự thời gian}
+
+% =====================================================================
+\section{Hàm mất mát và tối ưu}
+\label{sec:rnn-loss}
+
+Bài toán dự báo là hồi quy, nên dùng sai số bình phương trung bình
+\[ \mathcal L_{\text{MSE}}=\frac1n\sum_{i=1}^n\big(y_i-\hat y_i\big)^2 \]
+trên mục tiêu đã chuẩn hoá. Tối ưu bằng Adam \cite{ch4:kingma2015}, kết hợp động lượng và tốc độ học thích nghi theo
+từng tham số:
+\begin{align*}
+  m_t&=\beta_1 m_{t-1}+(1-\beta_1)g_t,\quad v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2,\\
+  \hat m_t&=\frac{m_t}{1-\beta_1^t},\quad \hat v_t=\frac{v_t}{1-\beta_2^t},\quad
+  \theta_t=\theta_{t-1}-\eta\,\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon},
+\end{align*}
+với $\eta=10^{-3}$, $\beta_1=0{,}9$, $\beta_2=0{,}999$. Tốc độ học được giảm một nửa khi validation loss không cải
+thiện sau 6 epoch (ReduceLROnPlateau).
+
+% =====================================================================
+\section{Đánh giá mô hình forecasting}
+\label{sec:rnn-metrics}
+
+\begin{table}[H]\centering\caption{Các chỉ số đánh giá dự báo (tính trên đơn vị gốc)}\label{tab:ch4-metric}
+\small
+\begin{tabular}{L{2.6cm}L{5.4cm}L{6.2cm}}
+\toprule
+Chỉ số & Công thức & Cách đọc \\
+\midrule
+MAE & $\frac1n\sum|y_i-\hat y_i|$ & Sai số trung bình, cùng đơn vị mục tiêu; bền với ngoại lai \\[4pt]
+RMSE & $\sqrt{\frac1n\sum(y_i-\hat y_i)^2}$ & Phạt nặng sai số lớn; cùng đơn vị \\[4pt]
+MAPE & $\frac{100}{n}\sum\big|\frac{y_i-\hat y_i}{y_i}\big|$ & Phần trăm; không ổn định khi $y$ gần 0 \\[4pt]
+$R^2$ & $1-\frac{\sum(y_i-\hat y_i)^2}{\sum(y_i-\bar y)^2}$ & 1 là hoàn hảo; âm nghĩa là kém hơn đoán trung bình \\[4pt]
+Đúng hướng & $\frac1n\sum\mathbf{1}\big[\mathrm{sgn}(\hat y_i-y_{i-1})=\mathrm{sgn}(y_i-y_{i-1})\big]$ & Tỉ lệ đoán đúng chiều tăng/giảm; 50\% là ngẫu nhiên \\[4pt]
+RMSE / naive & $\mathrm{RMSE}_{\text{mô hình}}/\mathrm{RMSE}_{\hat y_i=y_{i-1}}$ & $<1$ mới thực sự có kỹ năng dự báo \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{luuy}{Vì sao phải so với dự báo ngây thơ}
+Với giá tài sản, $R^2$ trên mức giá gần như luôn rất cao (giá hôm nay đã giải thích gần hết giá ngày mai), nên $R^2$
+cao \emph{không} chứng minh mô hình giỏi. Thước đo trung thực là so với \textbf{dự báo ngây thơ} (naive, persistence)
+$\hat y_{t+1}=y_t$; mô hình chỉ có giá trị nếu RMSE của nó nhỏ hơn RMSE naive. Cách đọc này bám theo lời khuyên ``đọc
+biểu đồ dự báo, không chỉ đọc bảng'' của các bài tham khảo: một đường dự báo bám sát thực tế nhưng trễ một phiên chính
+là dự báo naive.
+\end{luuy}
+
+\maNguon{ch4_metrics__forecast_metrics}{Tính MAE, RMSE, MAPE, $R^2$ và độ chính xác hướng}
+
+% =====================================================================
+\section{Overfitting, regularization và early stopping}
+\label{sec:rnn-overfit}
+
+Quá khớp xảy ra khi mô hình học thuộc nhiễu của train. Với RNN trên chuỗi ngắn (e-commerce chỉ có
+\SL{ch4_eda/ecom/days} ngày), nguy cơ rất cao. Các biện pháp dùng trong chương: Dropout 0,2 trước lớp đầu ra
+\cite{ch4:srivastava2014}; dừng sớm (early stopping) với kiên nhẫn 15 epoch theo validation loss và khôi phục trọng số
+tốt nhất (Hình~\ref{fig:ch4-earlystop}); giảm tốc độ học khi chững lại; cắt chuẩn gradient. Các lựa chọn khác gồm
+recurrent dropout, weight decay và tăng dữ liệu bằng nhiều chuỗi.
+
+\hinhtikz{ch4_earlystop}{Dừng sớm: validation loss đạt cực tiểu rồi tăng khi mô hình bắt đầu quá khớp; trọng số tại
+epoch tốt nhất được khôi phục.}{ch4-earlystop}
+
+% =====================================================================
+\section{Hyperparameter quan trọng của RNN}
+\label{sec:rnn-sieuthamso}
+
+\begin{table}[H]\centering\caption{Siêu tham số chính và giá trị dùng trong chương}\label{tab:ch4-hparams}
+\small
+\begin{tabular}{L{3.3cm}L{6.7cm}L{4.2cm}}
+\toprule
+Siêu tham số & Ảnh hưởng & Giá trị dùng \\
+\midrule
+sequence\_length & Độ dài lịch sử mô hình nhìn thấy (mục~\ref{sec:rnn-ablation} khảo sát 10--90) & 30 \\
+hidden\_size & Năng lực biểu diễn; lớn quá tốn tài nguyên, quá khớp & 64 \\
+num\_layers & Độ sâu mạng & 1 \\
+dropout & Chống quá khớp & 0,2 \\
+learning\_rate & Bước cập nhật & $10^{-3}$, giảm ×0,5 khi chững \\
+batch\_size & Tốc độ và độ nhiễu của gradient & 64 \\
+epochs / patience & Số lượt quét tối đa / số epoch chờ trước khi dừng & 150 / 15 \\
+clipnorm & Ngưỡng cắt chuẩn gradient & 1,0 \\
+bidirectional & Đọc hai chiều trong cửa sổ & chỉ ở BiLSTM \\
+optimizer, loss & Cách cập nhật, mục tiêu tối ưu & Adam, MSE \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Cài đặt RNN từ đầu bằng NumPy}
+\label{sec:rnn-scratch}
+
+Trước khi dùng thư viện, ta cài đặt một SimpleRNN many-to-one chỉ bằng NumPy để thấy rõ từng phép tính của
+mục~\ref{sec:rnn-cautruc} và~\ref{sec:rnn-bptt}. Lớp \texttt{RNNScratch} giữ năm tham số $W_{xh}, W_{hh}, b_h, W_{hy},
+b_y$, khởi tạo theo phân phối chuẩn với độ lệch $1/\sqrt{H}$.
+
+\maNguon{ch4_scratch__RNNScratch.forward}{Lan truyền xuôi: lặp qua các bước, lưu mọi $h_t$ để dùng cho BPTT}
+
+Lan truyền ngược cài đặt đúng công thức~\eqref{eq:bptt-delta}--\eqref{eq:bptt-w}: tín hiệu lỗi $\delta$ đi từ bước cuối
+về bước đầu, mỗi bước nhân với $\mathrm{diag}(1-h_t^2)$ rồi với $W_{hh}^\top$; gradient của $W_{hh}$, $W_{xh}$ được cộng
+dồn. Hàm còn ghi lại $\|\delta_t\|$ ở từng bước để quan sát gradient biến mất ngay trên mô hình thật.
+
+\maNguon{ch4_scratch__RNNScratch.backward}{BPTT viết tay: cộng dồn gradient theo thời gian và ghi chuẩn $\|\delta_t\|$}
+
+\subsection{Kiểm tra gradient bằng sai phân số}
+
+Một BPTT viết tay rất dễ sai chỉ số. Cách kiểm tra chuẩn là so gradient giải tích với sai phân trung tâm
+\begin{gather*}
+  \frac{\partial L}{\partial\theta_j}\approx\frac{L(\theta+\epsilon e_j)-L(\theta-\epsilon e_j)}{2\epsilon},\\
+  \text{sai số tương đối}=\frac{|g_{\text{giải tích}}-g_{\text{số}}|}{\max(|g_{\text{giải tích}}|+|g_{\text{số}}|,\,10^{-12})}.
+\end{gather*}
+Hàm \texttt{grad\_check} lấy ngẫu nhiên 12 phần tử của mỗi tham số, $\epsilon=10^{-5}$.
+
+\maNguon{ch4_scratch__grad_check}{Kiểm tra gradient BPTT bằng sai phân trung tâm}
+\bang{ch4_gradcheck}{Sai số tương đối lớn nhất giữa gradient BPTT và sai phân số}{ch4-gradcheck}
+
+Sai số lớn nhất chỉ \SL{ch4_scratch/max_rel_err}, nằm trong vùng sai số làm tròn của số thực 64 bit: BPTT viết tay
+đúng. Để chắc chắn công thức xuôi cũng khớp với thư viện, trọng số NumPy được chép sang \texttt{torch.nn.RNN} và hai
+đầu ra được so trực tiếp; chênh lệch lớn nhất là \SL{ch4_scratch/torch_diff}.
+
+\maNguon{ch4_scratch_run__torch_equivalence}{So khớp RNN NumPy với \texttt{torch.nn.RNN} khi dùng chung trọng số}
+
+\subsection{Huấn luyện trên chuỗi sin có nhiễu}
+
+Dữ liệu thử là chuỗi $\sin$ cộng nhiễu Gauss, cửa sổ \SL{ch4_scratch/window} bước, \SL{ch4_scratch/n_train} mẫu
+train, \SL{ch4_scratch/n_val} mẫu validation và \SL{ch4_scratch/n_test} mẫu test. Mô hình có \SL{ch4_scratch/hidden}
+đơn vị ẩn, tổng cộng \SL{ch4_scratch/params} tham số, huấn luyện bằng SGD mini-batch có cắt chuẩn gradient trong
+\SL{ch4_scratch/epochs} epoch.
+
+\maNguon{ch4_scratch_run__sine_series}{Sinh chuỗi sin có nhiễu cho thí nghiệm RNN từ đầu}
+\maNguon{ch4_scratch__sgd_train}{Vòng huấn luyện SGD mini-batch có cắt chuẩn gradient cho \texttt{RNNScratch}}
+
+\hinhpdf{ch4_scratch_train}{1}{RNN NumPy: MSE train/validation theo epoch (trái) và dự báo một bước trên test
+(phải).}{ch4-scratch-train}
+
+\nhanxet{MSE cuối cùng là \SL{ch4_scratch/final_train} trên train và \SL{ch4_scratch/final_val} trên validation, hai
+đường gần nhau nên mô hình không quá khớp. RMSE trên test là \SL{ch4_scratch/rmse}, nhỏ hơn dự báo naive
+(\SL{ch4_scratch/rmse_naive}) gần một nửa: khác với chuỗi tài chính ở các mục sau, chuỗi sin có cấu trúc tuần hoàn
+thật mà RNN học được.}
+
+\hinhpdf{ch4_scratch_dh}{0.92}{Chuẩn $\|\delta_t\|=\|\partial L/\partial h_t\|$ của RNN NumPy đã huấn luyện, đi ngược từ
+bước cuối về bước đầu của cửa sổ.}{ch4-scratch-dh}
+
+\nhanxet{Ngay cả trên cửa sổ chỉ \SL{ch4_scratch/window} bước, chuẩn gradient tại bước cuối cửa sổ ($T-t=0$) là
+\SL{ch4_scratch/dh_first}, còn khi lùi về bước đầu cửa sổ chỉ còn \SL{ch4_scratch/dh_last}: tín hiệu lỗi suy giảm hơn
+một bậc. Đây là bằng chứng trực tiếp cho phân tích ở mục~\ref{sec:rnn-vanish}.}
+
+% =====================================================================
+\section{Thiết lập chung cho ba thực nghiệm}
+\label{sec:rnn-setup}
+
+\subsection{Dữ liệu}
+
+Ba bộ dữ liệu thực, tải từ Kaggle bằng \texttt{kagglehub} (Bảng~\ref{tab:ch4-datasets}):
+\begin{itemize}
+  \item \textbf{E-commerce Customer Behavior \& Sales -- TR} \cite{ch4:data_ecom}: \SL{ch4_eda/ecom/orders} đơn hàng của
+        một sàn thương mại điện tử Thổ Nhĩ Kỳ, \SL{ch4_eda/ecom/raw_cols} cột. Đơn được gộp thành chuỗi ngày.
+  \item \textbf{AAPL Stock Performance} \cite{ch4:data_aapl}: \SL{ch4_eda/aapl/n_obs} phiên giao dịch cổ phiếu Apple từ
+        \SL{ch4_eda/aapl/start} đến \SL{ch4_eda/aapl/end}.
+  \item \textbf{Gold Price Prediction Dataset} \cite{ch4:data_gold}: \SL{ch4_eda/gold/n_obs} phiên của quỹ vàng GLD
+        cùng \SL{ch4_eda/gold/cols_raw} cột thị trường liên quan; dùng \SL{ch4_eda/gold/cols_used} cột.
+\end{itemize}
+
+\bang{ch4_datasets}{Ba bộ dữ liệu chuỗi thời gian của chương}{ch4-datasets}
+\maNguon{ch4_data__download_all}{Tải ba bộ dữ liệu Kaggle vào \texttt{data/ch4}}
+\maNguon{ch4_data__experiment}{Đóng gói mỗi thực nghiệm: khung dữ liệu, cột mục tiêu, kiểu chuẩn hoá, đơn vị}
+
+\subsection{Tiền xử lý và cửa sổ}
+
+Lớp \texttt{Prepared} thực hiện toàn bộ đường ống ở Hình~\ref{fig:ch4-pipeline}: cắt cửa sổ 30 bước, chia 70/15/15
+theo thời gian trên tập cửa sổ, ước lượng thống kê chuẩn hoá chỉ trên phần train, và cung cấp các baseline naive,
+trung bình trượt để so sánh. Có ba chế độ chuẩn hoá: \texttt{level} (z-score trên mức, dùng cho e-commerce vốn không
+có xu hướng), \texttt{relative} (chuẩn hoá tương đối theo cửa sổ, dùng cho giá) và \texttt{minmax} (Min--Max toàn
+cục, chỉ để làm thí nghiệm đối chứng ở mục~\ref{sec:rnn-ablation}).
+
+\maDai{ch4_data__Prepared.__init__}{Khởi tạo \texttt{Prepared}: cửa sổ, chia tập theo thời gian và chọn kiểu chuẩn hoá}
+\maNguon{ch4_data__Prepared._level}{Chuẩn hoá z-score trên mức, thống kê lấy từ train}
+\maNguon{ch4_data__Prepared._relative}{Chuẩn hoá tương đối theo cửa sổ: log-tỉ số so với bước cuối, mục tiêu là
+log-lợi suất}
+\maNguon{ch4_data__Prepared.to_original}{Đổi dự báo đã chuẩn hoá về đơn vị gốc}
+\maNguon{ch4_data__Prepared.naive}{Dự báo ngây thơ: giá trị của bước cuối cửa sổ}
+\maNguon{ch4_data__Prepared.moving_average}{Baseline trung bình trượt $k$ ngày}
+
+\bang{ch4_shapes}{Kích thước tensor đầu vào sau khi cắt cửa sổ}{ch4-shapes}
+
+\subsection{Mô hình}
+
+Cả hai framework dùng cùng một kiến trúc: một lớp hồi tiếp 64 đơn vị (SimpleRNN, LSTM, GRU, hoặc BiLSTM $2\times64$),
+lấy trạng thái ẩn ở bước cuối, Dropout 0,2 và một lớp tuyến tính ra một giá trị. Bản PyTorch \cite{ch4:paszke2019}
+chạy trên GPU, bản Keras \cite{ch4:chollet2021} chạy trên CPU sáu luồng.
+
+\maNguon{ch4_torch__SeqRegressor}{Mô hình hồi quy chuỗi trong PyTorch, chọn kiến trúc bằng tham số \texttt{arch}}
+\maNguon{ch4_torch__train_epoch}{Một epoch huấn luyện PyTorch có cắt chuẩn gradient}
+\maNguon{ch4_torch__predict}{Suy luận theo lô trong PyTorch}
+\clearpage
+\maDai{ch4_torch__fit}{Vòng huấn luyện PyTorch: Adam, ReduceLROnPlateau, dừng sớm và khôi phục trọng số tốt nhất}
+\maNguon{ch4_keras__build_keras_model}{Cùng kiến trúc trong Keras: \texttt{SimpleRNN}/\texttt{LSTM}/\texttt{GRU}/\texttt{Bidirectional}}
+\maNguon{ch4_keras__fit_keras}{Huấn luyện Keras với \texttt{EarlyStopping}, khôi phục trọng số tốt nhất}
+
+\bang{ch4_params}{Số tham số và tốc độ huấn luyện của bốn kiến trúc}{ch4-params}
+
+\subsection{Quy trình đánh giá}
+
+Mỗi mô hình được huấn luyện tối đa 150 epoch, dừng sớm theo validation loss, rồi dự báo một bước trên test. Dự báo
+được đổi về đơn vị gốc trước khi tính MAE, RMSE, MAPE, $R^2$ và độ chính xác hướng; tất cả được so với dự báo naive
+trên cùng tập test.
+
+\maNguon{ch4_train__evaluate}{Đổi dự báo về đơn vị gốc và tính chỉ số trên validation/test}
+\maDai{ch4_train__run}{Kịch bản huấn luyện: 3 thực nghiệm × 4 kiến trúc cho một framework, ghi JSON, NPZ và mô hình}
+
+% =====================================================================
+\section{Thực nghiệm 1: dự báo doanh thu ngày của sàn thương mại điện tử}
+\label{sec:rnn-tn1}
+
+\subsection{Bài toán}
+Dự báo tổng doanh thu \texttt{Total\_Amount} (TRY) của ngày kế tiếp từ 30 ngày gần nhất của chín chuỗi hành vi: doanh
+thu, số giao dịch, số lượng, đơn giá trung bình, chiết khấu, thời lượng phiên, số trang xem, điểm đánh giá và tỉ lệ
+khách quay lại. Đây là bài toán dự báo nhu cầu kinh điển cho kế hoạch tồn kho và nhân sự.
+
+\hinhtikz{ch4_aggregate}{Gộp các đơn hàng lẻ thành chuỗi ngày: mỗi ngày là một vector chín đặc trưng (tổng, đếm,
+trung bình).}{ch4-aggregate}
+\maNguon{ch4_data__ecommerce_daily}{Gộp đơn hàng thành chín chuỗi theo ngày}
+
+\subsection{Khám phá dữ liệu}
+
+Dữ liệu sạch: \SL{ch4_eda/ecom/missing} giá trị thiếu, \SL{ch4_eda/ecom/dup} dòng trùng, không có ngày nào trống
+đơn. Gộp theo ngày cho \SL{ch4_eda/ecom/days} ngày từ \SL{ch4_eda/ecom/start} đến \SL{ch4_eda/ecom/end}, trung bình
+\SL{ch4_eda/ecom/orders_per_day} đơn mỗi ngày. Doanh thu ngày trung bình \SL{ch4_eda/ecom/target/mean} TRY, độ lệch
+chuẩn \SL{ch4_eda/ecom/target/std}, dao động từ \SL{ch4_eda/ecom/target/min} đến \SL{ch4_eda/ecom/target/max}.
+
+\hinhpdf{ch4_eda_ecom_series}{1}{Các chuỗi hành vi theo ngày của sàn thương mại điện tử.}{ch4-eda-ecom-series}
+\hinhpdf{ch4_eda_ecom_hist}{1}{Phân phối của chín đặc trưng ngày; doanh thu lệch phải mạnh.}{ch4-eda-ecom-hist}
+\hinhpdf{ch4_eda_ecom_corr}{0.82}{Ma trận tương quan giữa các đặc trưng ngày.}{ch4-eda-ecom-corr}
+
+\nhanxet{Doanh thu tương quan dương với số lượng (\SL{ch4_eda/ecom/corr_amount_qty}) và số giao dịch
+(\SL{ch4_eda/ecom/corr_amount_tx}), nhưng gần như không liên quan tới điểm đánh giá
+(\SL{ch4_eda/ecom/corr_amount_rating}). Như vậy cấu trúc đáng khai thác nằm ở quy mô đơn hàng trong ngày, không phải ở
+các chỉ số trải nghiệm.}
+
+\hinhpdf{ch4_eda_ecom_season}{1}{Doanh thu trung bình theo thứ, tổng theo tháng và hàm tự tương quan (ACF) của doanh
+thu ngày.}{ch4-eda-ecom-season}
+
+\begin{phathien}{Phát hiện: doanh thu gần như không tự tương quan}
+Hệ số tự tương quan bậc 1 chỉ \SL{ch4_eda/ecom/acf1}, bậc 7 là \SL{ch4_eda/ecom/acf7}: doanh thu hôm nay hầu như
+không cho biết gì về doanh thu ngày mai. Chênh lệch theo thứ có tồn tại (ngày cao nhất \SL{ch4_eda/ecom/dow_max} so với
+thấp nhất \SL{ch4_eda/ecom/dow_min} gấp \SL{ch4_eda/ecom/dow_ratio} lần), nhưng nhỏ so với nhiễu. Hệ quả: dự báo naive
+``ngày mai bằng hôm nay'' sẽ rất tệ, vì nó lặp lại nguyên nhiễu của hôm nay; một mô hình chỉ cần học được \emph{mức
+trung bình} đã thắng naive.
+\end{phathien}
+
+\maNguon{ch4_eda__acf}{Hàm tự tương quan dùng trong phần khám phá dữ liệu}
+\hinhpdf{ch4_eda_ecom_mix}{1}{Cơ cấu doanh thu theo danh mục (nhiều nhất là \SL{ch4_eda/ecom/top_category}) và đơn
+theo thiết bị.}{ch4-eda-ecom-mix}
+\hinhpdf{ch4_eda_ecom_split}{1}{Chia train/validation/test theo thời gian: train tới \SL{ch4_eda/ecom/split/train_end},
+validation tới \SL{ch4_eda/ecom/split/val_end}, test từ \SL{ch4_eda/ecom/split/test_start}.}{ch4-eda-ecom-split}
+
+\subsection{Huấn luyện}
+
+\hinhpdf{ch4_ecommerce_loss_torch}{1}{E-commerce: MSE train và validation theo epoch của bốn kiến trúc PyTorch; chấm
+đỏ là epoch có validation loss nhỏ nhất.}{ch4-ecom-loss}
+\hinhpdf{ch4_ecommerce_loss_keras}{1}{E-commerce: đường học của bốn kiến trúc Keras.}{ch4-ecom-loss-keras}
+
+\nhanxet{Với chỉ \SL{ch4_eda/shapes/ecommerce/train/0} cửa sổ train, validation loss chạm đáy sau vài chục epoch rồi
+đi ngang hoặc tăng trong khi train loss vẫn giảm: dấu hiệu quá khớp điển hình mà dừng sớm xử lý. LSTM PyTorch dừng ở
+epoch \SL{ch4_ecommerce_torch/lstm/epochs}, GRU Keras ở epoch \SL{ch4_ecommerce_keras/gru/epochs}.}
+
+\subsection{Kết quả}
+
+\bang{ch4_ecommerce_results}{E-commerce: kết quả dự báo doanh thu ngày trên tập test}{ch4-ecom-results}
+
+\hinhpdf{ch4_ecommerce_pred_torch}{1}{E-commerce: dự báo một bước của bốn kiến trúc PyTorch trên toàn bộ tập
+test.}{ch4-ecom-pred-torch}
+\hinhpdf{ch4_ecommerce_pred_keras}{1}{E-commerce: dự báo một bước của bốn kiến trúc Keras trên toàn bộ tập
+test.}{ch4-ecom-pred-keras}
+\hinhpdf{ch4_ecommerce_zoom}{1}{E-commerce: 30 ngày cuối của test, so LSTM/GRU của hai framework với naive và trung
+bình trượt 7 ngày.}{ch4-ecom-zoom}
+
+\nhanxet{Naive có RMSE \SL{ch4_ecommerce_torch/naive/test/rmse} TRY, trung bình trượt 7 ngày
+\SL{ch4_summary/ecommerce/ma7/rmse} và 30 ngày \SL{ch4_summary/ecommerce/ma30/rmse}. Cả \SL{ch4_summary/ecommerce/n_beat_naive}
+mô hình RNN đều thắng naive; tốt nhất là LSTM PyTorch với RMSE \SL{ch4_ecommerce_torch/lstm/test/rmse}
+($R^2$ = \SL{ch4_ecommerce_torch/lstm/test/r2}), Keras tốt nhất là GRU với \SL{ch4_summary/ecommerce/keras_best_rmse}.
+Quan trọng hơn, RNN còn thắng cả trung bình trượt 30 ngày, nghĩa là nó không chỉ ``làm trơn'' mà dùng được thông tin
+của các đặc trưng phụ (số giao dịch, số lượng). Hình~\ref{fig:ch4-ecom-zoom} cho thấy đường dự báo bám mức trung bình
+và bỏ qua phần lớn dao động ngày: đó là hành vi đúng khi ACF gần 0. $R^2$ chỉ khoảng 0,1 nhắc rằng phần lớn biến động
+doanh thu ngày là ngẫu nhiên và không mô hình nào dự báo được.}
+
+\hinhpdf{ch4_ecommerce_resid}{1}{E-commerce: phần dư của mô hình tốt nhất theo thời gian và phân phối của nó.}{ch4-ecom-resid}
+\hinhpdf{ch4_ecommerce_bars}{1}{E-commerce: RMSE và MAE của bốn kiến trúc trên hai framework, đường đứt là naive,
+đường chấm là trung bình trượt 7 ngày.}{ch4-ecom-bars}
+
+\nhanxet{Phần dư dao động quanh 0, không có xu hướng theo thời gian, phân phối lệch phải do những ngày doanh thu đột
+biến mà mô hình (hợp lý) không đoán trước được. Độ chính xác hướng của LSTM PyTorch là
+\SL{ch4_ecommerce_torch/lstm/test/dir_accPct}\%, cao vì doanh thu có tính hồi quy về trung bình: sau một ngày cao,
+dự báo ``giảm'' thường đúng.}
+
+% =====================================================================
+\section{Thực nghiệm 2: dự báo giá cổ phiếu AAPL}
+\label{sec:rnn-tn2}
+
+\subsection{Bài toán}
+Dự báo giá đóng cửa \texttt{close} của phiên kế tiếp từ 30 phiên gần nhất với sáu đặc trưng open, high, low, close,
+adjclose, volume. Đây là bài toán được nhiều bài tham khảo chọn; các bài này thường báo cáo $R^2$ âm hoặc đường dự báo
+lệch hẳn khỏi giá thật ở cuối chuỗi, và mục này giải thích vì sao.
+
+\maNguon{ch4_data__aapl_frame}{Đọc dữ liệu AAPL, sắp xếp theo ngày, giữ sáu cột số}
+
+\subsection{Khám phá dữ liệu}
+
+Giá đóng cửa đi từ \SL{ch4_eda/aapl/close_first} USD lên \SL{ch4_eda/aapl/close_last} USD (đỉnh
+\SL{ch4_eda/aapl/close_max}), tức gấp \SL{ch4_eda/aapl/growth_x} lần trong 44 năm. Lợi suất ngày trung bình
+\SL{ch4_eda/aapl/ret_mean_pct}\%, độ lệch chuẩn \SL{ch4_eda/aapl/ret_sd_pct}\%, nhưng có đuôi rất dày: độ nhọn dư
+\SL{ch4_eda/aapl/ret_kurt}, phiên giảm mạnh nhất \SL{ch4_eda/aapl/ret_min_pct}\% ngày
+\SL{ch4_eda/aapl/ret_min_date}.
+
+\hinhpdf{ch4_eda_aapl_overview}{1}{AAPL: giá đóng cửa (thang log), chênh lệch close--open, biên độ high--low và khối
+lượng.}{ch4-eda-aapl-overview}
+\hinhpdf{ch4_eda_aapl_hist}{1}{Phân phối của sáu đặc trưng AAPL; khối lượng vẽ theo $\log(1+x)$.}{ch4-eda-aapl-hist}
+\hinhpdf{ch4_eda_aapl_corr}{0.75}{Tương quan giữa các đặc trưng AAPL: bốn cột giá gần như trùng nhau.}{ch4-eda-aapl-corr}
+\hinhpdf{ch4_eda_aapl_yearly}{1}{AAPL: giá cuối năm và lợi suất từng năm; năm tốt nhất \SL{ch4_eda/aapl/best_yearRaw}
+(\SL{ch4_eda/aapl/best_year_pct}\%), tệ nhất \SL{ch4_eda/aapl/worst_yearRaw} (\SL{ch4_eda/aapl/worst_year_pct}\%).}{ch4-eda-aapl-yearly}
+\hinhpdf{ch4_eda_aapl_returns}{1}{AAPL: biến động năm hoá trên cửa sổ 60 phiên và đuôi dày của lợi suất ngày so với
+phân phối chuẩn.}{ch4-eda-aapl-returns}
+
+\begin{phathien}{Phát hiện: lợi suất không tự tương quan, độ biến động thì có}
+ACF bậc 1 của lợi suất chỉ \SL{ch4_eda/aapl/acf1_ret}, trong khi ACF bậc 1 của \emph{trị tuyệt đối} lợi suất là
+\SL{ch4_eda/aapl/acf1_abs}. Hướng đi của giá gần như không dự báo được từ quá khứ, phù hợp với giả thuyết thị trường
+hiệu quả \cite{ch4:fama1970}; còn độ lớn dao động thì có tính tụ cụm (biến động cao đi liền biến động cao). Ta nên kỳ
+vọng RNN không thắng naive đáng kể về giá.
+\end{phathien}
+
+\hinhpdf{ch4_eda_aapl_split}{1}{AAPL: chia theo thời gian (thang log). Giá test (từ \SL{ch4_eda/aapl/split/test_start})
+cao hơn hẳn mọi giá trong train.}{ch4-eda-aapl-split}
+
+\subsection{Huấn luyện}
+
+\hinhpdf{ch4_aapl_loss_torch}{1}{AAPL: MSE train và validation trên log-lợi suất đã chuẩn hoá (PyTorch).}{ch4-aapl-loss}
+\hinhpdf{ch4_aapl_loss_keras}{1}{AAPL: đường học của bốn kiến trúc Keras.}{ch4-aapl-loss-keras}
+
+\nhanxet{Validation loss gần như đi ngang quanh 1 ngay từ đầu (phương sai của lợi suất đã chuẩn hoá): mạng không tìm
+được tín hiệu nào tốt hơn ``dự báo lợi suất bằng 0'' và dừng sớm sau vài chục epoch. Đây là đường học đặc trưng của
+một chuỗi gần với bước ngẫu nhiên.}
+
+\subsection{Kết quả}
+
+\bang{ch4_aapl_results}{AAPL: kết quả dự báo giá đóng cửa trên tập test}{ch4-aapl-results}
+\hinhpdf{ch4_aapl_pred_torch}{1}{AAPL: dự báo một bước của bốn kiến trúc PyTorch trên test
+(\SL{ch4_eda/aapl/split/test_start} -- \SL{ch4_eda/aapl/end}).}{ch4-aapl-pred-torch}
+\hinhpdf{ch4_aapl_pred_keras}{1}{AAPL: dự báo một bước của bốn kiến trúc Keras trên test.}{ch4-aapl-pred-keras}
+\hinhpdf{ch4_aapl_zoom}{1}{AAPL: 60 phiên cuối của test.}{ch4-aapl-zoom}
+
+\nhanxet{Mọi mô hình có $R^2$ khoảng \SL{ch4_aapl_torch/lstm/test/r2} và đường dự báo trùng khít đường thực tế ở
+Hình~\ref{fig:ch4-aapl-pred-torch}. Nhưng naive cũng có RMSE \SL{ch4_aapl_torch/naive/test/rmse} USD, còn mô hình tốt
+nhất đạt \SL{ch4_summary/aapl/best/rmse}, tỉ số chỉ \SL{ch4_summary/aapl/best_ratio}. Độ chính xác hướng của mô hình
+tốt nhất là \SL{ch4_summary/aapl/best/dir_accPct}\%, tức tương đương tung đồng xu. Nhìn kỹ ở
+Hình~\ref{fig:ch4-aapl-zoom}, đường dự báo chính là đường thực tế dịch sang phải một phiên. Kết luận trung thực: RNN học
+được đúng điều duy nhất có thể học từ giá quá khứ, ``giá ngày mai xấp xỉ giá hôm nay'', và không học được hướng.
+Ngược lại với bài mẫu, mô hình không bị kẹt ở trần của train nhờ chuẩn hoá tương đối; mục~\ref{sec:rnn-ablation} đo
+định lượng khác biệt này.}
+
+\hinhpdf{ch4_aapl_resid}{1}{AAPL: phần dư theo thời gian và phân phối; độ lớn phần dư tăng theo mức giá và theo các
+giai đoạn biến động.}{ch4-aapl-resid}
+\hinhpdf{ch4_aapl_bars}{1}{AAPL: RMSE và MAE theo kiến trúc và framework; đường đứt là naive.}{ch4-aapl-bars}
+
+% =====================================================================
+\section{Thực nghiệm 3: dự báo giá quỹ vàng GLD}
+\label{sec:rnn-tn3}
+
+\subsection{Bài toán}
+Dự báo giá đóng cửa của quỹ vàng GLD ở phiên kế tiếp. Khác với AAPL, mô hình được cho thêm thông tin \emph{liên thị
+trường}: chỉ số S\&P~500, Dow Jones, tỉ giá EUR/USD, dầu Brent, chỉ số USD, hợp đồng bạc, quỹ cổ phiếu mỏ vàng GDX và
+quỹ dầu USO, tổng cộng \SL{ch4_eda/gold/cols_used} đặc trưng. Câu hỏi: thông tin bổ sung có giúp RNN vượt naive không?
+
+\maNguon{ch4_data__gold_frame}{Chọn 13 cột thị trường từ bộ dữ liệu vàng}
+
+\subsection{Khám phá dữ liệu}
+
+GLD dao động từ \SL{ch4_eda/gold/target/min} đến \SL{ch4_eda/gold/target/max} USD trong giai đoạn
+\SL{ch4_eda/gold/start} -- \SL{ch4_eda/gold/end}, sụt giảm lớn nhất \SL{ch4_eda/gold/drawdown_pct}\% sau đỉnh 2012;
+độ lệch chuẩn lợi suất ngày \SL{ch4_eda/gold/ret_sd_pct}\%, thấp hơn nhiều so với AAPL.
+
+\hinhpdf{ch4_eda_gold_series}{1}{Vàng GLD và các thị trường liên quan 2011--2018, chuẩn hoá về 100 ở phiên đầu.}{ch4-eda-gold-series}
+\hinhpdf{ch4_eda_gold_corr}{0.85}{Tương quan lợi suất ngày giữa GLD và 12 chuỗi còn lại.}{ch4-eda-gold-corr}
+
+\begin{phathien}{Phát hiện: tương quan cùng phiên mạnh, nhưng không phải dự báo}
+Lợi suất GLD tương quan mạnh với GDX (\SL{ch4_eda/gold/corr_ret/GDX}) và bạc (\SL{ch4_eda/gold/corr_ret/Silver_Fut}),
+ngược chiều với chỉ số USD (\SL{ch4_eda/gold/corr_ret/USD_Index}), gần như độc lập với S\&P~500
+(\SL{ch4_eda/gold/corr_ret/SP500}). Nhưng đó là tương quan \emph{cùng phiên}: để biết GDX hôm nay thì cũng phải đợi tới
+cuối phiên, khi giá vàng đã biết. Thông tin có ích cho dự báo ngày mai phải là tương quan \emph{trễ}, và nó yếu hơn
+nhiều.
+\end{phathien}
+
+\hinhpdf{ch4_eda_gold_rollcorr}{1}{Tương quan trượt 120 phiên giữa lợi suất GLD và các thị trường: quan hệ thay đổi
+theo thời gian.}{ch4-eda-gold-rollcorr}
+\hinhpdf{ch4_eda_gold_hist}{1}{Phân phối của các đặc trưng thị trường vàng.}{ch4-eda-gold-hist}
+\hinhpdf{ch4_eda_gold_split}{1}{GLD: chia theo thời gian; test bắt đầu \SL{ch4_eda/gold/split/test_start}.}{ch4-eda-gold-split}
+
+\subsection{Huấn luyện}
+
+\hinhpdf{ch4_gold_loss_torch}{1}{Vàng GLD: MSE train và validation theo epoch (PyTorch).}{ch4-gold-loss}
+\hinhpdf{ch4_gold_loss_keras}{1}{Vàng GLD: đường học của bốn kiến trúc Keras.}{ch4-gold-loss-keras}
+
+\nhanxet{Train loss giảm rõ (13 đặc trưng cho mạng nhiều cách khớp nhiễu của train), nhưng validation loss gần như
+không giảm: khoảng cách train--validation lớn là dấu hiệu của quá khớp, và dừng sớm giữ lại trọng số của những epoch
+đầu.}
+
+\subsection{Kết quả}
+
+\bang{ch4_gold_results}{Vàng GLD: kết quả dự báo giá đóng cửa trên tập test}{ch4-gold-results}
+\hinhpdf{ch4_gold_pred_torch}{1}{Vàng GLD: dự báo một bước của bốn kiến trúc PyTorch trên test.}{ch4-gold-pred-torch}
+\hinhpdf{ch4_gold_pred_keras}{1}{Vàng GLD: dự báo một bước của bốn kiến trúc Keras trên test.}{ch4-gold-pred-keras}
+\hinhpdf{ch4_gold_zoom}{1}{Vàng GLD: 60 phiên cuối của test.}{ch4-gold-zoom}
+
+\nhanxet{Naive đạt RMSE \SL{ch4_gold_torch/naive/test/rmse} USD; LSTM PyTorch \SL{ch4_gold_torch/lstm/test/rmse} và
+LSTM Keras \SL{ch4_gold_keras/lstm/test/rmse}. Chỉ \SL{ch4_summary/gold/n_beat_naive} trên 8 mô hình nhỉnh hơn naive và
+chênh lệch dưới 1\%. $R^2$ khoảng \SL{ch4_gold_torch/lstm/test/r2} nghe ấn tượng nhưng, như với AAPL, gần như toàn bộ
+đến từ thông tin ``giá hôm nay''. Thêm 12 chuỗi liên thị trường không đem lại kỹ năng dự báo một bước, đúng như phân
+tích tương quan trễ ở trên.}
+
+\hinhpdf{ch4_gold_resid}{1}{Vàng GLD: phần dư của mô hình tốt nhất.}{ch4-gold-resid}
+\hinhpdf{ch4_gold_bars}{1}{Vàng GLD: RMSE và MAE theo kiến trúc và framework.}{ch4-gold-bars}
+
+% =====================================================================
+\clearpage
+\section{So sánh tổng hợp và thí nghiệm bổ trợ}
+\label{sec:rnn-ablation}
+
+\subsection{Mô hình nào thắng dự báo ngây thơ?}
+
+\hinhpdf{ch4_overview_ratio}{1}{Tỉ số RMSE mô hình / RMSE naive trên test cho 8 mô hình × 3 thực nghiệm.}{ch4-overview}
+
+\nhanxet{Bức tranh rất rõ: trên e-commerce mọi RNN giảm sai số khoảng một phần ba so với naive (mô hình được
+chọn theo validation đạt tỉ số \SL{ch4_summary/ecommerce/best_ratio} trên test), còn trên AAPL và vàng mọi mô hình nằm sát 1. Lý do không
+nằm ở kiến trúc mà ở dữ liệu: doanh thu ngày có mức trung bình ổn định và nhiễu độc lập, nên mô hình nào học được mức
+trung bình cũng thắng ``hôm qua''; giá tài sản là gần bước ngẫu nhiên, ``hôm qua'' đã là dự báo gần tối ưu.}
+
+\subsection{PyTorch so với Keras}
+
+\bang{ch4_fw_compare}{RMSE trên test của cùng kiến trúc trong hai framework}{ch4-fw}
+\hinhpdf{ch4_cost}{1}{Số tham số (trái) và thời gian mỗi epoch (phải) của bốn kiến trúc trên AAPL.}{ch4-cost}
+
+\nhanxet{Hai framework cho kết quả rất gần nhau; RMSE trung bình của bốn kiến trúc là
+\SL{ch4_summary/ecommerce/torch_mean_rmse} (PyTorch) và \SL{ch4_summary/ecommerce/keras_mean_rmse} (Keras) trên
+e-commerce, \SL{ch4_summary/aapl/torch_mean_rmse} và \SL{ch4_summary/aapl/keras_mean_rmse} trên AAPL,
+\SL{ch4_summary/gold/torch_mean_rmse} và \SL{ch4_summary/gold/keras_mean_rmse} trên vàng. Chênh lệch nhỏ đến từ khởi tạo
+mặc định khác nhau (Keras dùng Glorot và khởi tạo trực giao cho $W_{hh}$, đặt sẵn bias cổng quên LSTM bằng 1), cách
+tính tham số (PyTorch có hai vector bias mỗi cổng) và tính ngẫu nhiên của huấn luyện. Ở quy mô dữ liệu này lựa chọn
+framework không ảnh hưởng tới chất lượng; nó chỉ ảnh hưởng tới cách viết mã và tốc độ.}
+
+\subsection{Chuẩn hoá Min--Max toàn cục so với chuẩn hoá tương đối}
+
+Để kiểm chứng lập luận ở mục~\ref{sec:rnn-chuanhoa}, LSTM và GRU được huấn luyện lại với Min--Max toàn cục (fit trên
+train, đúng cách làm của nhiều bài tham khảo) và so với chuẩn hoá tương đối.
+
+\maNguon{ch4_data__Prepared._minmax}{Chuẩn hoá Min--Max toàn cục, chỉ dùng làm đối chứng}
+\maNguon{ch4_extras__minmax_ablation}{Thí nghiệm đối chứng: cùng mô hình, hai cách chuẩn hoá}
+\bang{ch4_minmax}{Ảnh hưởng của cách chuẩn hoá tới dự báo trên test}{ch4-minmax}
+\hinhpdf{ch4_minmax}{1}{Dự báo của LSTM với Min--Max toàn cục (đỏ) và với chuẩn hoá tương đối (xanh, đứt) trên test
+AAPL (trái) và vàng (phải).}{ch4-minmax}
+
+\begin{phathien}{Phát hiện: $R^2$ âm của bài mẫu là lỗi chuẩn hoá, không phải lỗi mô hình}
+Với Min--Max toàn cục, LSTM trên AAPL có RMSE \SL{ch4_extras/minmax/aapl/minmax_lstm/rmse} USD và
+$R^2=$ \SL{ch4_extras/minmax/aapl/minmax_lstm/r2}; cùng mô hình với chuẩn hoá tương đối đạt
+$R^2=$ \SL{ch4_extras/minmax/aapl/relative_lstm/r2}. Giá cao nhất của train là \SL{ch4_extras/minmax/aapl/train_max}
+USD trong khi test lên tới \SL{ch4_extras/minmax/aapl/test_max}: đầu vào test nằm ngoài $[0,1]$, $\tanh$ bão hoà và dự
+báo ``kẹt'' gần mức trần (Hình~\ref{fig:ch4-minmax}). Trên vàng, nơi giá test vẫn nằm phần lớn trong vùng train, khác
+biệt nhỏ hơn: $R^2$ là \SL{ch4_extras/minmax/gold/minmax_lstm/r2} so với \SL{ch4_extras/minmax/gold/relative_lstm/r2}.
+\end{phathien}
+
+\subsection{Độ dài cửa sổ}
+
+\maNguon{ch4_extras__window_ablation}{Thí nghiệm độ dài cửa sổ 10--90 bước}
+\bang{ch4_window}{Tỉ số RMSE/naive theo độ dài cửa sổ}{ch4-window}
+\hinhpdf{ch4_window}{1}{Tỉ số RMSE/naive của LSTM và GRU khi đổi độ dài cửa sổ.}{ch4-window-fig}
+
+\nhanxet{Trên AAPL và vàng mọi độ dài cửa sổ cho tỉ số sát 1: thêm lịch sử không giúp vì lịch sử không chứa thông tin
+về hướng. Trên e-commerce cửa sổ dài giúp ước lượng mức trung bình ổn định hơn; tốt nhất là LSTM với 60 ngày
+(\SL{ch4_extras/window/ecommerce/lstm_w60/ratio}), nhưng cửa sổ dài cũng làm giảm số mẫu train của một chuỗi vốn đã
+ngắn.}
+
+\subsection{Dự báo nhiều bước bằng đệ quy}
+\label{sec:rnn-horizon}
+
+Ứng dụng web cần dự báo nhiều ngày tới. Ta dùng chiến lược đệ quy (Hình~\ref{fig:ch4-recursive}): dự báo một bước,
+dựng hàng đặc trưng của ngày mới từ giá trị vừa dự báo, nối vào cửa sổ và lặp lại. Với giá, các cột giá cùng tài sản
+(open, high, low, close) được dịch theo cùng tỉ lệ thay đổi, các cột khác giữ nguyên giá trị cuối; với e-commerce,
+các đặc trưng phụ lấy trung bình 7 ngày gần nhất.
+
+\maNguon{ch4_forecast__window_to_input}{Đưa một cửa sổ giá trị thô về đầu vào chuẩn hoá của mô hình}
+\maNguon{ch4_forecast__next_row}{Dựng hàng đặc trưng của bước tiếp theo từ giá trị vừa dự báo}
+\maNguon{ch4_forecast__recursive_forecast}{Dự báo đệ quy nhiều bước}
+\maNguon{ch4_extras__horizon_eval}{Đánh giá sai số theo tầm dự báo trên nhiều gốc thời gian của tập test}
+
+\bang{ch4_horizon}{RMSE theo tầm dự báo của LSTM đệ quy so với naive}{ch4-horizon}
+\hinhpdf{ch4_horizon}{1}{RMSE theo tầm dự báo $h=1..10$ trên ba thực nghiệm.}{ch4-horizon-fig}
+
+\nhanxet{Sai số tăng theo tầm dự báo ở cả ba bộ dữ liệu. Với AAPL, RMSE tăng từ \SL{ch4_extras/horizon/aapl/h1} ở $h=1$
+lên \SL{ch4_extras/horizon/aapl/h10} ở $h=10$ (gấp \SL{ch4_extras/horizon/aapl/growth} lần), sát với naive
+(\SL{ch4_extras/horizon/aapl/naive_h10}), đúng quy luật $\sqrt h$ của bước ngẫu nhiên. Trên e-commerce, sai số tăng
+chậm hơn (\SL{ch4_extras/horizon/ecommerce/h1} lên \SL{ch4_extras/horizon/ecommerce/h10}) và vẫn thấp hơn naive
+(\SL{ch4_extras/horizon/ecommerce/naive_h10}), vì dự báo đệ quy hội tụ về mức trung bình. Ứng dụng web vì vậy hiển thị
+dự báo nhiều bước như một xu hướng tham khảo, không phải lời hứa về giá.}
+
+% =====================================================================
+\section{Triển khai hệ thống}
+\label{sec:rnn-deploy}
+
+Ba thực nghiệm được đóng gói thành mô-đun suy luận \texttt{tl3/serve\_ch4.py} mà Web App chung của tiểu luận gọi tới.
+Mô-đun khai báo \texttt{SPECS} cho ba mã thực nghiệm \texttt{ch4\_ecommerce}, \texttt{ch4\_aapl}, \texttt{ch4\_gold};
+mỗi mã có kiểu \texttt{series}, hai ô nhập (số bước dự báo 1--30 và chuỗi lịch sử tuỳ chọn), danh sách tám mô hình
+\texttt{torch\_rnn} \dots\ \texttt{keras\_bilstm}, mặc định \texttt{torch\_lstm}. Hàm \texttt{predict} nạp mô hình lười
+từ \texttt{models/ch4}, lấy 30 bước cuối của dữ liệu (hoặc chuỗi người dùng dán vào), dự báo bước kế tiếp và
+\texttt{horizon} bước đệ quy, rồi trả về giá trị chính cùng lịch sử 90 bước, ngày tương ứng, chuỗi dự báo, ngày dự báo,
+thay đổi phần trăm so với hôm nay, dự báo naive và chỉ số test của mô hình đã chọn để giao diện vẽ biểu đồ.
+
+\maDai{serve_ch4__predict}{Hàm suy luận của Chương 4 cho Web App}
+
+\begin{luuy}{Cách đọc dự báo trên giao diện}
+Biểu đồ hiển thị lịch sử thực (màu đậm) và dự báo đệ quy (màu nhạt, nét đứt). Dựa trên kết quả mục~\ref{sec:rnn-ablation},
+giao diện luôn hiện kèm dự báo naive và RMSE test để người dùng thấy mô hình có thực sự hơn ``giá hôm nay'' hay
+không. Với AAPL và vàng, dự báo nhiều bước chỉ mang tính minh hoạ.
+\end{luuy}
+
+\subsection{Thực nghiệm 1 trên Web App}
+\anhUI{ch4_ecommerce_web}{Web App: dự báo doanh thu ngày kế tiếp và 10 ngày tới của sàn thương mại điện tử.}{ch4-ecom-web}
+\anhMobile{ch4_ecommerce_mobile}{Giao diện dự báo doanh thu trên điện thoại.}{ch4-ecom-mobile}
+
+\subsection{Thực nghiệm 2 trên Web App}
+\anhUI{ch4_aapl_web}{Web App: dự báo giá đóng cửa AAPL, so với naive và chỉ số test của mô hình.}{ch4-aapl-web}
+\anhMobile{ch4_aapl_mobile}{Giao diện dự báo AAPL trên điện thoại.}{ch4-aapl-mobile}
+
+\subsection{Thực nghiệm 3 trên Web App}
+\anhUI{ch4_gold_web}{Web App: dự báo giá quỹ vàng GLD với lựa chọn tám mô hình.}{ch4-gold-web}
+\anhMobile{ch4_gold_mobile}{Giao diện dự báo giá vàng trên điện thoại.}{ch4-gold-mobile}
+
+% =====================================================================
+\section{Kết luận chương}
+\label{sec:rnn-ketluan}
+
+Chương này đi từ lý thuyết đến triển khai mạng nơ-ron hồi quy:
+\begin{itemize}
+  \item Về lý thuyết, RNN là hệ động lực rời rạc có tham số dùng chung theo thời gian, huấn luyện bằng BPTT. Tích các
+        Jacobian trong BPTT là nguồn gốc của gradient biến mất/bùng nổ, và đo trực tiếp cho thấy SimpleRNN mất gần
+        hết gradient sau 50 bước, LSTM giữ được nhờ cổng quên gần 1, còn RNN-ReLU với $\rho>1$ bùng nổ.
+  \item RNN cài đặt từ đầu bằng NumPy có gradient khớp sai phân số tới \SL{ch4_scratch/max_rel_err} và khớp
+        \texttt{torch.nn.RNN}, rồi học được chuỗi sin có nhiễu tốt gần gấp đôi naive.
+  \item Trên dữ liệu thực, chất lượng dự báo do \emph{dữ liệu} quyết định nhiều hơn \emph{kiến trúc}. Doanh thu ngày
+        có ACF gần 0 nên mọi RNN thắng naive khoảng một phần ba; giá AAPL và vàng gần bước ngẫu nhiên nên mọi RNN chỉ
+        ngang naive, độ chính xác hướng khoảng 50\%. SimpleRNN, LSTM, GRU, BiLSTM chênh nhau rất ít; PyTorch và Keras
+        cũng vậy.
+  \item Thiết kế tiền xử lý quan trọng hơn chọn mô hình: chuẩn hoá tương đối theo cửa sổ đưa $R^2$ của LSTM trên AAPL
+        từ \SL{ch4_extras/minmax/aapl/minmax_lstm/r2} lên \SL{ch4_extras/minmax/aapl/relative_lstm/r2}. Luôn so với
+        dự báo ngây thơ trước khi tin vào $R^2$.
+  \item Ba mô hình được triển khai thành dịch vụ dự báo nhiều bước trong Web App, hiển thị kèm baseline để người dùng
+        đọc kết quả đúng mức.
+\end{itemize}
+Hướng mở rộng tự nhiên gồm dự báo xác suất (khoảng tin cậy thay vì một điểm), mô hình hoá độ biến động thay vì hướng
+giá, và so sánh với Transformer cho chuỗi thời gian hoặc các mô hình không gian trạng thái \cite{ch4:gu2023}.

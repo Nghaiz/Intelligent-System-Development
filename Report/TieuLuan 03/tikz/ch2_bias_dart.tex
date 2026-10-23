@@ -1,0 +1,13 @@
+\begin{tikzpicture}
+  \foreach \c/\r/\t/\cx/\cy/\sp in {0/0/{Thiên lệch thấp\\phương sai thấp}/0/0/0.18, 1/0/{Thiên lệch thấp\\phương sai cao}/0/0/0.7,
+                            0/1/{Thiên lệch cao\\phương sai thấp}/0.85/0.6/0.18, 1/1/{Thiên lệch cao\\phương sai cao}/0.8/0.55/0.7}{
+    \begin{scope}[shift={(\c*5.6,-\r*5.6)}]
+      \foreach \rad/\col in {1.8/cRed!20, 1.35/white, 0.9/cRed!35, 0.45/cRed!70}{\fill[\col] (0,0) circle (\rad);}
+      \draw[cRed!60!black, thick] (0,0) circle (1.8);
+      \pgfmathsetseed{7}
+      \foreach \k in {1,...,9}{
+        \pgfmathsetmacro{\dx}{\cx+\sp*rand}\pgfmathsetmacro{\dy}{\cy+\sp*rand}
+        \shade[ball color=cBlue] (\dx,\dy) circle (3.5pt);}
+      \node[font=\small\bfseries, align=center] at (0,-2.55) {\t};
+    \end{scope}}
+\end{tikzpicture}

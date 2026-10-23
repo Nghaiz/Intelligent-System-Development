@@ -1,0 +1,36 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \t/\c/\y in {{(1) Trực tiếp}/cSlate/0, {(2) CoT}/cBlue/-1.8, {(3) PAL}/cOrange/-3.7, {(4) Đa tác tử}/cPurple/-7.2}
+    \node[font=\normalsize\bfseries\sffamily, text=\c!80!black, anchor=west] at (-0.2,\y) {\t};
+  % mọi mũi tên đầu vào bắt đầu ở x = 3.5, sau nhãn dài nhất "(4) Đa tác tử"; các khối đều nằm bên phải điểm này
+  % (1)
+  \node[hop=cSlate, text width=3.6cm] (d1) at (6.0,0) {LLM: chỉ in con số};
+  \node[hop=cGreen] (d2) at (12.6,0) {đáp án};
+  \draw[mui] (3.5,0) -- (d1); \draw[mui] (d1) -- (d2);
+  % (2)
+  \node[hop=cBlue, text width=4.4cm] (c1) at (6.4,-1.8) {LLM suy luận từng bước,\\``The answer is N.''};
+  \node[hop=cGreen] (c2) at (12.6,-1.8) {đáp án};
+  \draw[mui] (3.5,-1.8) -- (c1); \draw[mui] (c1) -- (c2);
+  % (3)
+  \node[hop=cOrange, text width=2.3cm] (p1) at (5.3,-3.7) {LLM viết hàm\\\texttt{solution()}};
+  \node[hop=cTeal, text width=2.3cm] (p2) at (8.7,-3.7) {chạy Python\\trong hộp cát};
+  \node[hop=cGreen] (p3) at (12.6,-3.7) {đáp án};
+  \draw[mui] (3.5,-3.7) -- (p1); \draw[mui] (p1) -- (p2); \draw[mui] (p2) -- node[above, font=\small] {giá trị} (p3);
+  \draw[muiM=cRed, dashed] (p2.south) to[bend left=28] node[below, font=\small] {lỗi thực thi $\to$ sửa mã (1 lần)} (p1.south);
+  % (4)
+  \node[hop=cSky] (m1) at (4.9,-7.2) {Planner};
+  \node[hop=cOrange] (m2) at (7.6,-6.5) {Solver-PAL};
+  \node[hop=cPink] (m3) at (7.6,-7.9) {Solver-CoT};
+  \node[hop=cYellow, text width=1.7cm] (m4) at (10.1,-7.2) {đáp án\\A = B?};
+  \node[hop=cGreen] (m6) at (12.6,-7.2) {đáp án};
+  \node[hop=cRed, text width=3.0cm] (m5) at (9.95,-9.3) {Verifier phân xử\\+ PAL\#2 + biểu quyết};
+  \node[hop=cGreen] (m7) at (12.6,-9.3) {đáp án};
+  \draw[mui] (3.5,-7.2) -- (m1);
+  \draw[mui] (m1.east) -- node[above left, font=\small] {kế hoạch} (m2.west);
+  \draw[mui] (m1.east) -- (m3.west);
+  \draw[mui] (m2) -- (m4); \draw[mui] (m3) -- (m4);
+  \draw[muiM=cGreen!60!black] (m4) -- node[above, font=\small] {có} (m6);
+  \draw[muiM=cRed] (m4) -- node[right, font=\small] {không} (m5);
+  \draw[mui] (m5) -- (m7);
+  \node[nhan, anchor=west] at (13.4,-7.2) {3--4 lượt gọi};
+  \node[nhan, anchor=west] at (13.4,-9.3) {5--6 lượt gọi};
+\end{tikzpicture}

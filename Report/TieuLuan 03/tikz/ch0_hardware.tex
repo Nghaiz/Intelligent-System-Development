@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % CPU
+  \khoibaD{0}{0}{6.6}{5.4}{1.6}{cBlue}
+  \node[font=\normalsize\bfseries, text=white, align=center] at (3.3,4.68) {CPU Ryzen 9 7945HX\\32 luồng};
+  \foreach \r/\t in {0/{NumPy from scratch (CNN, RNN)}, 1/{TensorFlow -- Keras (CNN, RNN)},
+                     2/{scikit-learn, XGBoost (Ch.\,2)}, 3/{TF-IDF, BM25, NetworkX (Ch.\,5)},
+                     4/{Vẽ hình, biên dịch LaTeX}} {
+    \node[draw=white, fill=white, fill opacity=0.88, text opacity=1, rounded corners=2pt, minimum width=6.0cm,
+          font=\small, text=cBlue!40!black] at (3.3,3.42-\r*0.74) {\t};
+  }
+  % GPU
+  \khoibaD{8.8}{0}{6.6}{5.4}{1.6}{cOrange}
+  \node[font=\normalsize\bfseries, text=white, align=center] at (12.1,4.68) {GPU RTX 4060 Laptop\\8 GB VRAM};
+  \foreach \r/\t in {0/{CNN PyTorch (khoá việc nặng)}, 1/{LLM Qwen2.5-1.5B, embedding},
+                     2/{MLP, RNN, GNN (việc nhẹ)}, 3/{Giới hạn VRAM mỗi tiến trình}, 4/{Khoá tệp chia lượt GPU}} {
+    \node[draw=white, fill=white, fill opacity=0.88, text opacity=1, rounded corners=2pt, minimum width=6.0cm,
+          font=\small, text=cOrange!40!black] at (12.1,3.42-\r*0.74) {\t};
+  }
+  \draw[muiM=cNavy, <->, line width=2pt] (7.5,2.6) -- (8.7,2.6);
+  \node[hop=cGreen, minimum width=14.8cm, font=\small, align=center] at (7.7,-1.3)
+    {CPU và GPU chạy song song; RAM 40 GB: mỗi tiến trình $\le$ 4 GB,\\giới hạn số luồng để nhiều thực nghiệm chạy cùng lúc};
+\end{tikzpicture}

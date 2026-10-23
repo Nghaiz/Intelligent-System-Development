@@ -1,0 +1,13 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % kim tự tháp 3D các chiều đánh giá hệ tác tử
+  \foreach \i/\w/\t/\c in {0/14/{Độ đúng: accuracy, tỷ lệ hoàn thành}/cGreen,
+                          1/12.4/{Chi phí: lượt gọi LLM, token vào/ra}/cBlue,
+                          2/10.8/{Độ trễ: thời gian sinh và công cụ}/cOrange,
+                          3/9.2/{Tin cậy: lỗi phối hợp, vòng lặp}/cPurple,
+                          4/7.6/{An toàn: hộp cát, quyền công cụ}/cRed}{
+    \pgfmathsetmacro{\x}{(14-\w)/2}
+    \khoibaD{\x}{\i*1.15}{\w}{0.85}{1.4}{\c}
+    \node[text=white, font=\small\bfseries] at (7,\i*1.15+0.43) {\t};}
+  \node[khoiX, text width=3.8cm, anchor=west] at (15.3,3.0) {Một hệ đa tác tử chỉ ``tốt hơn'' khi lợi về độ đúng bù được chi phí và độ trễ tăng thêm};
+  \draw[muiM=cSlate, line width=1.5pt] (15.2,3.0) -- (12.6,3.0);
+\end{tikzpicture}

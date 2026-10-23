@@ -1,0 +1,2341 @@
+{
+ "n_questions": 39,
+ "systems": {
+  "llm_only": {
+   "acc": 0.0,
+   "ms": 40000.761758975066,
+   "ms_median": 41156.073100006324,
+   "gold_in_sources": 0.0,
+   "n": 39,
+   "acc_indicator": 0.0,
+   "acc_month": 0.0,
+   "acc_record": 0.0,
+   "acc_year": 0.0,
+   "acc_lex": 0.0,
+   "acc_para": 0.0
+  },
+  "naive_rag": {
+   "acc": 0.6666666666666666,
+   "ms": 16609.689869230446,
+   "ms_median": 15054.702400004317,
+   "gold_in_sources": 0.6923076923076923,
+   "n": 39,
+   "acc_indicator": 1.0,
+   "acc_month": 0.625,
+   "acc_record": 0.5,
+   "acc_year": 0.7142857142857143,
+   "acc_lex": 0.8064516129032258,
+   "acc_para": 0.125
+  },
+  "advanced_rag": {
+   "acc": 0.9487179487179487,
+   "ms": 18053.608207692516,
+   "ms_median": 16124.422699998831,
+   "gold_in_sources": 1.0,
+   "n": 39,
+   "acc_indicator": 1.0,
+   "acc_month": 0.875,
+   "acc_record": 1.0,
+   "acc_year": 0.8571428571428571,
+   "acc_lex": 0.9354838709677419,
+   "acc_para": 1.0
+  },
+  "agent": {
+   "acc": 1.0,
+   "ms": 3.018284615768024,
+   "ms_median": 3.1888000012259,
+   "gold_in_sources": 1.0,
+   "n": 39,
+   "acc_indicator": 1.0,
+   "acc_month": 1.0,
+   "acc_record": 1.0,
+   "acc_year": 1.0,
+   "acc_lex": 1.0,
+   "acc_para": 1.0
+  }
+ },
+ "tool_use": {
+  "kg_lookup": 24,
+  "pandas_calc": 15
+ },
+ "rows": [
+  {
+   "system": "llm_only",
+   "qid": "gol065",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 26697.883200002252,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá quỹ S&P 500 (SPY) ngày 06/09/2012. Giá chứng khoán có thể thay đổi theo thời gian và cần được cập nhật từ nguồn tin cậy.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol065",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 9657.21179999673,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá quỹ S&P 500 (SPY) ngày 06/09/2012 là 143,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol065",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 11341.756299996632,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá quỹ S&P 500 (SPY) ngày 06/09/2012 là 143,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol065",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 7.263900006364565,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "S&P 500 (quỹ SPY) ngày 06/09/2012 là 143,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol062",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 19646.313800003554,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá dầu Brent ngày 12/09/2013. Giá dầu thường thay đổi liên tục và không có dữ liệu cụ thể cho một ngày cụ thể được lưu trữ trong hệ thống của tôi. Bạn có thể tìm kiếm trên các trang web uy tín về thị trường能源 để nhận được thông tin chính xác nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol062",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 6666.03309999482,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu Brent ngày 12/09/2013 là 112,63 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol062",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 9992.822899999737,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu Brent ngày 12/09/2013 là 112,63 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol062",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 6.1014000020804815,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Dầu Brent ngày 12/09/2013 là 112,63 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol066",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 16887.752499998896,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về tỷ giá EUR/USD ngày 15/12/2015. Tôi có thể cung cấp thông tin gần đây nhất hoặc thông tin tổng quan về tỷ giá này.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol066",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 7297.597600001609,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ giá EUR/USD ngày 15/12/2015 là 1,0928.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol066",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 7901.986400000169,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ giá EUR/USD ngày 15/12/2015 là 1,0928.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol066",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.9293000004836358,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Tỷ giá EUR/USD ngày 15/12/2015 là 1,0928.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol060",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 24993.795399997907,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá quỹ mỏ vàng GDX ngày 21/12/2018. Giá tài sản này thường thay đổi liên tục và dựa trên thị trường tài chính. Bạn có thể tìm kiếm thông tin từ các nguồn tin cậy như Bloomberg, Reuters hoặc các trang web tài chính trực tuyến khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol060",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 8800.075899998774,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá quỹ mỏ vàng GDX ngày 21/12/2018 là 20,44 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol060",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 10652.421999999206,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá quỹ mỏ vàng GDX ngày 21/12/2018 là 20,44 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol060",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 5.721000001358334,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Quỹ cổ phiếu mỏ vàng GDX ngày 21/12/2018 là 20,44 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol061",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 27744.32920000254,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá quỹ S&P 500 (SPY) ngày 12/09/2017. Giá chứng khoán có thể thay đổi theo thời gian và cần được cập nhật từ nguồn tin cậy.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol061",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 18340.12910000456,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá quỹ S&P 500 (SPY) ngày 12/09/2017 là 250,05 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol061",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 18278.42399999645,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá quỹ S&P 500 (SPY) ngày 12/09/2017 là 250,05 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol061",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.4525000010035,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "S&P 500 (quỹ SPY) ngày 12/09/2017 là 250,05 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol069",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 34699.77089999884,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá dầu WTI ngày 29/09/2017. Giá dầu thường thay đổi liên tục và không được lưu trữ trong cơ sở dữ liệu của tôi. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến để nhận được thông tin chính xác nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol069",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 13987.559000001056,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu WTI ngày 29/09/2017 là 51,34 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol069",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 16171.996600001876,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu WTI ngày 29/09/2017 là 51,34 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol069",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.473099997790996,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Dầu WTI ngày 29/09/2017 là 51,34 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol064",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 36058.059299997694,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá dầu Brent ngày 09/10/2015. Giá dầu thường thay đổi liên tục và không được lưu trữ trong cơ sở dữ liệu của tôi. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến để nhận được thông tin chính xác nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol064",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 14054.385299998103,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu Brent ngày 09/10/2015 là 52,65 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol064",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 13948.561099998187,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu Brent ngày 09/10/2015 là 52,65 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol064",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.4572999938973226,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Dầu Brent ngày 09/10/2015 là 52,65 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol068",
+   "type": "indicator",
+   "style": "lex",
+   "correct": false,
+   "ms": 38398.22129999811,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá dầu Brent ngày 06/04/2017. Giá dầu thường thay đổi liên tục và không được lưu trữ trong cơ sở dữ liệu của tôi. Bạn có thể tìm kiếm trên các trang web uy tín về thị trường能源 hoặc sử dụng công cụ tra cứu giá để cập nhật thông tin gần nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol068",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 13137.29020000028,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu Brent ngày 06/04/2017 là 54,89 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol068",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 14156.92410000338,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá dầu Brent ngày 06/04/2017 là 54,89 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol068",
+   "type": "indicator",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.2785000003059395,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Dầu Brent ngày 06/04/2017 là 54,89 USD/thùng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol083",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 30902.738700002374,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về sự thay đổi của quỹ vàng GLD trong tháng 6/2018. Để có thông tin chính xác nhất, bạn nên truy cập các nguồn tin cậy về thị trường tài chính hoặc liên hệ với công ty quản lý quỹ GLD trực tiếp.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol083",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15783.757700002752,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 6/2018, quỹ vàng GLD thay đổi -3,13% so với giá đóng cửa đầu tháng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol083",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 13198.36960000248,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 6/2018, quỹ vàng GLD thay đổi -3,13%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol083",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.1888000012259,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 06/2018, quỹ vàng GLD có thay đổi -3,13% (đóng cửa từ 122,49 USD xuống 118,65 USD) (21 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol090",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 43983.68450000271,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá đóng cửa trung bình của quỹ vàng GLD trong tháng 12/2012. Giá cổ phiếu và quỹ vàng thường thay đổi theo thời gian và có thể thay đổi tùy thuộc vào nhiều yếu tố khác nhau. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các công ty chứng khoán trực tuyến.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol090",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15994.0024000025,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 12/2012, quỹ vàng GLD có giá đóng cửa trung bình là 163,17 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol090",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 16239.940300001763,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 12/2012, quỹ vàng GLD có giá đóng cửa trung bình là 163,17 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol090",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.189800001156982,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 12/2012, quỹ vàng GLD có giá đóng cửa trung bình 163,17 USD (20 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol073",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 24334.91900000081,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về sự thay đổi của quỹ vàng GLD trong tháng 6/2014. Để có thông tin chính xác nhất, bạn nên kiểm tra các nguồn dữ liệu tài chính hoặc công bố của quỹ này.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol073",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15375.483799994981,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 6/2014, quỹ vàng GLD thay đổi 6,97% so với giá đóng cửa đầu tháng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol073",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 15808.102200004214,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 6/2014, quỹ vàng GLD thay đổi 3,75% so với giá đóng cửa đầu tháng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol073",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0877000022446737,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 06/2014, quỹ vàng GLD có thay đổi 6,97% (đóng cửa từ 119,70 USD lên 128,04 USD) (21 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol088",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 37310.05000000005,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi xin lỗi, nhưng tôi không có thông tin cụ thể về giá đóng cửa trung bình của quỹ vàng GLD trong tháng 5/2018. Giá tài sản như vậy thường được cập nhật hàng ngày và có thể thay đổi theo thời gian. Bạn có thể tìm kiếm trên các trang web tài chính hoặc sử dụng ứng dụng tài chính để tra cứu thông tin này.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol088",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 14989.221700001508,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 5/2018, quỹ vàng GLD có giá đóng cửa trung bình là 120,21 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol088",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15590.86589999788,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 5/2018, quỹ vàng GLD có giá đóng cửa trung bình là 123,54 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol088",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0639000029186718,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 05/2018, quỹ vàng GLD có giá đóng cửa trung bình 123,54 USD (22 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol078",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 36907.473300001584,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá đóng cửa trung bình của quỹ vàng GLD trong tháng 12/2014. Giá cổ phiếu và quỹ được cập nhật hàng ngày và thường xuyên thay đổi. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các công ty chứng khoán trực tuyến.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol078",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 15391.74059999641,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 12/2014, quỹ vàng GLD có giá đóng cửa trung bình là 113,58 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol078",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 16124.422699998831,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 12/2014, quỹ vàng GLD có giá đóng cửa trung bình là 115,19 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol078",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.8805999968899414,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 12/2014, quỹ vàng GLD có giá đóng cửa trung bình 115,19 USD (22 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol072",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 27530.24240000377,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về sự thay đổi của quỹ vàng GLD trong tháng 7/2015. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các trang web tài chính uy tín khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol072",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 13771.997099996952,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 7/2015, quỹ vàng GLD thay đổi -1,43% so với tháng trước.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol072",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15182.155300004524,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 7/2015, quỹ vàng GLD thay đổi -6,30% so với giá đóng cửa đầu tháng.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol072",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.9694000036688522,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 07/2015, quỹ vàng GLD có thay đổi -6,30% (đóng cửa từ 111,98 USD xuống 104,93 USD) (22 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol089",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 44836.511600005906,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cao nhất của quỹ vàng GLD trong tháng 10/2018. Giá của các quỹ vàng thường thay đổi theo thời gian và có thể thay đổi tùy thuộc vào nhiều yếu tố như thị trường tài chính quốc tế, lãi suất, và nhu cầu đầu tư. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy hoặc trang web của công ty quản lý quỹ.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol089",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 20806.016000002273,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 10/2018, quỹ vàng GLD có giá cao nhất là 117,65 USD, đạt đỉnh vào ngày 26/10/2018.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol089",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 20264.016399996763,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 10/2018, quỹ vàng GLD có giá cao nhất là 117,65 USD vào ngày 26/10/2018.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol089",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.2235999965923838,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 10/2018, quỹ vàng GLD có giá cao nhất 117,65 USD (ngày 26/10/2018) (22 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol087",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 46055.41909999738,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá thấp nhất của quỹ vàng GLD trong tháng 7/2014. Giá của các quỹ vàng thường thay đổi theo thời gian và có thể thay đổi tùy thuộc vào nhiều yếu tố như thị trường tài chính quốc tế, lãi suất, và nhu cầu mua vàng của người tiêu dùng. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các trang web chuyên về thị",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol087",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 23631.036999999196,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 7/2014, quỹ vàng GLD có giá thấp nhất là 123,23 USD. Đây là giá đóng cửa thấp nhất trong tháng này, đạt vào ngày 31/07/2014.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol087",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 21621.851299998525,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 7/2014, quỹ vàng GLD có giá thấp nhất là 123,23 USD. Đây là giá đóng cửa thấp nhất trong tháng này, đạt vào ngày 31/07/2014.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol087",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.8702999984961934,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 07/2014, quỹ vàng GLD có giá thấp nhất 123,23 USD (ngày 31/07/2014) (22 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol026",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 38951.7216000022,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá cao nhất của quỹ vàng GLD vào ngày 12/05/2014. Giá chứng khoán và quỹ vàng thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính hoặc sử dụng công cụ tra cứu giá chứng khoán trực tuyến để tìm ra thông tin này.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol026",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 14384.308200002124,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là 125,42 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol026",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15692.083900001307,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là 125,42 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol026",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 4.357900004833937,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là 125,42 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol004",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 41156.073100006324,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của quỹ vàng GLD vào ngày 26/05/2016. Giá chứng khoán và quỹ vàng thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm thông tin này trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch chứng khoán.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol004",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 13819.277899994631,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 26/05/2016 là 117,57 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol004",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15822.072599999956,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 26/05/2016 là 117,57 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol004",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.658299996459391,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 26/05/2016 là 117,57 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol015",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 44487.75410000235,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của quỹ vàng GLD vào ngày 21/03/2017. Giá chứng khoán và quỹ đầu tư thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm thông tin này trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch chứng khoán.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol015",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15595.438299998932,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 21/03/2017 là 117,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol015",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 16903.54240000306,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 21/03/2017 là 117,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol015",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.256700001657009,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 21/03/2017 là 117,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol005",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 50325.41240000137,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của quỹ vàng GLD vào ngày 20/05/2016. Giá chứng khoán và quỹ vàng thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch để tra cứu giá cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 26028.84909999557,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 20/05/2016 là 120,19 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 21743.256299996574,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 20/05/2016 là 120,19 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.094099993177224,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 20/05/2016 là 120,19 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol035",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 69284.90439999587,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá đóng cửa của quỹ vàng GLD vào ngày 12/04/2018. Giá chứng khoán và quỹ vàng thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo thị trường chứng khoán.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol035",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 28200.114200000826,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 12/04/2018 là 126,62 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol035",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 23853.67319999932,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 12/04/2018 là 126,62 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol035",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 13.524199996027164,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 12/04/2018 là 126,62 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol027",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 55265.86259999749,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá đóng cửa của quỹ vàng GLD vào ngày 29/06/2016. Giá chứng khoán và quỹ đầu tư thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm thông tin này trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch chứng khoán.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol027",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 14039.613000000827,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 29/06/2016 là 126,47 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 12779.763799997454,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 29/06/2016 là 125,84 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.2248000061372295,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 29/06/2016 là 125,84 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol003",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 41180.22370000108,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của quỹ vàng GLD vào ngày 18/07/2012. Giá chứng khoán và quỹ vàng thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch để tra cứu giá cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15054.702400004317,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 18/07/2012 là 152,67 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15748.307900001237,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 18/07/2012 là 152,67 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 4.870199998549651,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 18/07/2012 là 152,67 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol007",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 24548.098200000823,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về khối lượng giao dịch của quỹ vàng GLD vào ngày 11/04/2012. Thông tin chi tiết về giao dịch hàng ngày thường được công bố bởi các nhà quản lý quỹ hoặc các nguồn tin tài chính uy tín khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol007",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 17787.1282000051,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Khối lượng giao dịch của quỹ vàng GLD ngày 11/04/2012 là 10.005.400 đơn vị.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol007",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 16655.600400001276,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Khối lượng giao dịch của quỹ vàng GLD ngày 11/04/2012 là 10.005.400 đơn vị.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol007",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.1079000036697835,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Khối lượng giao dịch của quỹ vàng GLD ngày 11/04/2012 là 10.005.400 cổ phiếu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol047",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 46061.08669999958,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá chốt phiên của quỹ vàng GLD vào ngày 1 tháng 12 năm 2017. Giá chứng khoán và quỹ vàng thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính hoặc sử dụng ứng dụng giao dịch để tra cứu giá cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol047",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 17233.658899996954,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của quỹ vàng GLD vào ngày 1 tháng 12 năm 2017 là 123,65 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol047",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 19943.142000003718,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của quỹ vàng GLD vào ngày 1 tháng 12 năm 2017 là 121,59 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol047",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 3.6848999952781014,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 01/12/2017 là 121,59 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol058",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 43577.99330000125,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi xin lỗi, nhưng tôi không có thông tin cụ thể về giá quỹ vàng GLD vào ngày 6/10/2016. Giá chứng khoán và các quỹ thường thay đổi liên tục theo thị trường và các yếu tố khác nhau. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo thị trường chứng khoán để có được số liệu chính xác nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol058",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 14751.967500000319,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá thấp nhất của quỹ vàng GLD vào 2016-10-07 là 118,42 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 15379.072600000654,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá thấp nhất của quỹ vàng GLD vào ngày 06/10/2016 là 119,24 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 2.483000003849156,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá thấp nhất của quỹ vàng GLD ngày 06/10/2016 là 119,24 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol041",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 33241.242399999464,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá chốt phiên của quỹ vàng GLD vào ngày 3 tháng 5 năm 2017. Giá chứng khoán và quỹ vàng thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính hoặc sử dụng công cụ phân tích thị trường để tra cứu thông tin này.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol041",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 11823.471299998346,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của quỹ vàng GLD vào 2017-05-03 là 120,62 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol041",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 11641.722100001061,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của quỹ vàng GLD vào ngày 03/05/2017 là 117,98 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol041",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 1.0231999985990115,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của quỹ vàng GLD ngày 03/05/2017 là 117,98 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol052",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 9924.005200002284,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của quỹ vàng GLD vào ngày 18 tháng 9 năm 2014 là 176,35 USD/ounce.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol052",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 10278.576999997313,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của quỹ vàng GLD vào ngày 18 tháng 9 năm 2014 là 122,66 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol052",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 16071.399000000383,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của quỹ vàng GLD vào ngày 18 tháng 9 năm 2014 là 118,09 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol052",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 4.233300001942553,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá cao nhất của quỹ vàng GLD ngày 18/09/2014 là 118,09 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol057",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 46188.73639999947,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của quỹ vàng GLD vào ngày 19/7/2013. Giá tài sản như quỹ vàng thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính hoặc sử dụng công cụ tra cứu giá để có thông tin chính xác hơn.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol057",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 6462.370599998394,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol057",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 21106.497300002957,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD vào ngày 19/07/2013 là 124,89 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol057",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 3.300399999716319,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 19/07/2013 là 124,89 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol043",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 48887.500699995144,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi xin lỗi, nhưng tôi không có thông tin cụ thể về mức giá thấp nhất của quỹ vàng GLD vào ngày 17 tháng 3 năm 2015. Điều này thường phụ thuộc vào nhiều yếu tố như thị trường tài chính, xu hướng tiền tệ và các biến động khác trong ngành vàng. Để có thông tin chính xác, bạn nên tham khảo dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các trang web chuyên về thị trường tài chính.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol043",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 19956.721599999582,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá thấp nhất của quỹ vàng GLD vào ngày 17 tháng 3 năm 2015 là 109,77 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol043",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 17197.29219999863,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá thấp nhất của quỹ vàng GLD vào ngày 17 tháng 3 năm 2015 là 109,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol043",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 2.9814000008627772,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá thấp nhất của quỹ vàng GLD ngày 17/03/2015 là 109,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol040",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 49240.81930000102,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về mức giá cao nhất của quỹ vàng GLD vào ngày 3 tháng 4 năm 2017. Giá tài sản như quỹ vàng thường thay đổi theo thời gian và có thể thay đổi tùy thuộc vào nhiều yếu tố khác nhau. Bạn có thể tìm kiếm thông tin từ các nguồn tin cậy như Bloomberg, Reuters hoặc các trang web tài chính trực tuyến khác để có được thông tin chính xác nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol040",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 20357.38290000154,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của quỹ vàng GLD vào 2017-04-03 là 123,07 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol040",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 24443.451099999947,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của quỹ vàng GLD vào ngày 03/04/2017 là 119,77 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol040",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 3.5136000005877577,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá cao nhất của quỹ vàng GLD ngày 03/04/2017 là 119,37 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol048",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 46248.85550000181,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của quỹ vàng GLD vào ngày 25/11/2015. Giá tài sản như quỹ vàng thường thay đổi liên tục và không có cơ sở dữ liệu cụ thể cho từng ngày cụ thể. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính hoặc thị trường chứng khoán trực tuyến.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol048",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 4121.78529999801,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol048",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 15767.70039999974,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD vào ngày 25/11/2015 là 102,47 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol048",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 3.6029999973834492,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của quỹ vàng GLD ngày 25/11/2015 là 102,47 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol098",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 44981.78610000468,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá đóng cửa trung bình của quỹ vàng GLD trong năm 2015. Giá cổ phiếu và quỹ được cập nhật hàng ngày và có thể thay đổi theo thời gian. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến để có thông tin chính xác nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol098",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 28787.297200004105,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2015, quỹ vàng GLD có giá đóng cửa trung bình là 111,11 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol098",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 34222.24489999644,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2015, quỹ vàng GLD có giá đóng cửa trung bình là 111,11 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol098",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.9741000030771829,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2015, quỹ vàng GLD có giá đóng cửa trung bình 111,11 USD (250 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol093",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 85357.03460000514,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cao nhất của quỹ vàng GLD trong năm 2018. Giá của các quỹ vàng thường thay đổi theo thời gian và có thể thay đổi tùy thuộc vào nhiều yếu tố như thị trường tài chính quốc tế, lãi suất, và nhu cầu mua vàng của người tiêu dùng. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các công ty đầu tư chuyên về vàn",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol093",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 24646.18779999728,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2018, quỹ vàng GLD có giá cao nhất là 121,26 USD vào ngày 31/12/2018.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol093",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 25132.21579999663,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2018, quỹ vàng GLD có giá cao nhất là 129,51 USD, đạt đỉnh vào ngày 25/01/2018.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol093",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0355999984312803,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2018, quỹ vàng GLD có giá cao nhất 129,51 USD (ngày 25/01/2018) (248 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol094",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 38779.29959999892,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá thấp nhất của quỹ vàng GLD trong năm 2014. Giá của quỹ vàng thường thay đổi theo thời gian và có thể bị ảnh hưởng bởi nhiều yếu tố như thị trường tài chính quốc tế, lãi suất, và nhu cầu mua vàng. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các trang web chuyên về thị trường tài chính.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol094",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 13046.962699998403,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2014, quỹ vàng GLD có giá thấp nhất là 109,67 USD, xảy ra vào ngày 05/11/2014.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol094",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 12477.850900002522,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2014, quỹ vàng GLD có giá thấp nhất là 109,67 USD, xảy ra vào ngày 05/11/2014.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol094",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.7010000044829212,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2014, quỹ vàng GLD có giá thấp nhất 109,67 USD (ngày 05/11/2014) (245 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol095",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 43607.715300000564,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cao nhất của quỹ vàng GLD trong năm 2013. Giá của các quỹ vàng thường thay đổi theo thời gian và có thể thay đổi tùy thuộc vào nhiều yếu tố như thị trường tài chính quốc tế, lãi suất, và nhu cầu mua vàng của người tiêu dùng. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc các trang web chuyên về thị trườ",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol095",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 25745.31890000071,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2013, quỹ vàng GLD có giá cao nhất là 164,40 USD vào ngày 17/01/2013.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol095",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 24731.381199999305,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2013, quỹ vàng GLD có giá cao nhất là 164,40 USD, đạt đỉnh vào ngày 17/01/2013.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol095",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.9552000046824105,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2013, quỹ vàng GLD có giá cao nhất 164,40 USD (ngày 17/01/2013) (223 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol092",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 44920.578600002045,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cao nhất của quỹ vàng GLD trong năm 2017. Giá của quỹ vàng thường phụ thuộc vào nhiều yếu tố như thị trường tài chính toàn cầu, lãi suất và nhu cầu mua vàng. Để có thông tin chính xác nhất, bạn nên tham khảo dữ liệu từ các nguồn tin cậy hoặc trang web chuyên về thị trường tài chính.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol092",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 24823.651899998367,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2017, quỹ vàng GLD có giá cao nhất là 128,32 USD vào ngày 07/09/2017.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol092",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 27896.49620000273,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2017, quỹ vàng GLD có giá cao nhất là 128,32 USD, đạt đỉnh vào ngày 07/09/2017.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol092",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.6931000025360845,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2017, quỹ vàng GLD có giá cao nhất 128,32 USD (ngày 07/09/2017) (248 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol096",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 27250.7209999967,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về biến động của quỹ vàng GLD trong năm 2016. Để có thông tin chính xác nhất, bạn nên kiểm tra các nguồn tài chính hoặc công ty quản lý quỹ vàng GLD trực tiếp.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol096",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 14280.884500003594,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2016, quỹ vàng GLD thay đổi 6,53% so với giá đóng cửa đầu năm.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol096",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 37689.0779000023,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2016, quỹ vàng GLD thay đổi 6,53% so với giá đóng cửa đầu năm 102,89 USD và cuối năm 109,61 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol096",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.429700002016034,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2016, quỹ vàng GLD có thay đổi 6,53% (đóng cửa từ 102,89 USD lên 109,61 USD) (248 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "gol097",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 69575.11959999829,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá thấp nhất của quỹ vàng GLD trong năm 2012. Giá của quỹ vàng thường thay đổi theo thời gian và có thể bị ảnh hưởng bởi nhiều yếu tố như thị trường tài chính quốc tế, lãi suất, và nhu cầu mua vàng. Để có thông tin chính xác nhất, bạn nên kiểm tra các nguồn tin cậy về thị trường vàng hoặc quỹ vàng.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "gol097",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 38868.69719999959,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2012, quỹ vàng GLD có giá thấp nhất là 154,55 USD vào ngày 03/01/2012.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "gol097",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 24718.258900000365,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2012, quỹ vàng GLD có giá thấp nhất là 154,55 USD vào ngày 03/01/2012.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "gol097",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.8563999945181422,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2012, quỹ vàng GLD có giá thấp nhất 148,53 USD (ngày 30/05/2012) (245 phiên).",
+   "gold_in_sources": true
+  }
+ ],
+ "traces": [
+  {
+   "question": "Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là bao nhiêu?",
+   "trace": [
+    [
+     "question",
+     "Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là bao nhiêu?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (G2014-05-12; loại bản ghi) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "kg_lookup(\"Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là bao nhiêu?…\")",
+     2
+    ],
+    [
+     "obs",
+     "(MarketDay_2014-05-12, has_date, 2014-05-12) | (MarketDay_2014-05-12, has_open, 125,40) | (MarketDay_2014-05-12, has_high, 125,42) | (MarketDay_2014-05-12, has_low, 124,69) | (MarketDay_2014-05-12, has_close, 124,94) | (MarketDay_2014-05-12, has_volume, 4025500) | (MarketDay_2014-05-12, has_return_pct, 0,68) | (MarketDay_2014-05-12, has_sp500_close, 189,79)"
+    ],
+    [
+     "answer",
+     "Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là 125,42 USD."
+    ]
+   ],
+   "tools": [
+    "kg_lookup"
+   ],
+   "sources": [
+    "G2014-05-12"
+   ],
+   "ms": 2.7210000043851323
+  },
+  {
+   "question": "Giá quỹ S&P 500 (SPY) ngày 06/09/2012 là bao nhiêu?",
+   "trace": [
+    [
+     "question",
+     "Giá quỹ S&P 500 (SPY) ngày 06/09/2012 là bao nhiêu?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (G2012-09-06; loại bản ghi) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "kg_lookup(\"Giá quỹ S&P 500 (SPY) ngày 06/09/2012 là bao nhiêu?…\")",
+     3
+    ],
+    [
+     "obs",
+     "(MarketDay_2012-09-06, has_date, 2012-09-06) | (MarketDay_2012-09-06, has_open, 165,16) | (MarketDay_2012-09-06, has_high, 165,78) | (MarketDay_2012-09-06, has_low, 164,80) | (MarketDay_2012-09-06, has_close, 164,89) | (MarketDay_2012-09-06, has_volume, 12961100) | (MarketDay_2012-09-06, has_return_pct, 0,35) | (MarketDay_2012-09-06, has_sp500_close, 143,77)"
+    ],
+    [
+     "answer",
+     "S&P 500 (quỹ SPY) ngày 06/09/2012 là 143,77 USD."
+    ]
+   ],
+   "tools": [
+    "kg_lookup"
+   ],
+   "sources": [
+    "G2012-09-06"
+   ],
+   "ms": 2.9763999991700985
+  },
+  {
+   "question": "Quỹ vàng GLD diễn biến thế nào trong năm 2013?",
+   "trace": [
+    [
+     "question",
+     "Quỹ vàng GLD diễn biến thế nào trong năm 2013?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (M-2013; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "pandas_calc(\"Quỹ vàng GLD diễn biến thế nào trong năm 2013?…\")",
+     1
+    ],
+    [
+     "obs",
+     "Tổng hợp quỹ vàng GLD giai đoạn 2013: 223 phiên; đóng cửa phiên đầu 163,17 USD, phiên cuối 119,38 USD, thay đổi -26,84%; cao nhất 164,40 USD ngày 17/01/2013, thấp nhất 116,74 USD ngày 05/07/2013; giá đóng cửa trung bình 137,43 USD; độ biến động (độ lệch chuẩn lợi suất ngày) 1,45%; khối lượng trung bình 10.183.626."
+    ],
+    [
+     "answer",
+     "Trong năm 2013, quỹ vàng GLD có thay đổi -26,84% (đóng cửa từ 163,17 USD xuống 119,38 USD) (223 phiên)."
+    ]
+   ],
+   "tools": [
+    "pandas_calc"
+   ],
+   "sources": [
+    "M-2013"
+   ],
+   "ms": 1.1955000009038486
+  },
+  {
+   "question": "Giá vàng và giá dầu thay đổi ra sao trong năm 2015?",
+   "trace": [
+    [
+     "question",
+     "Giá vàng và giá dầu thay đổi ra sao trong năm 2015?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (M-2015; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "pandas_calc(\"Giá vàng và giá dầu thay đổi ra sao trong năm 2015?…\")",
+     0
+    ],
+    [
+     "obs",
+     "Tổng hợp quỹ vàng GLD giai đoạn 2015: 250 phiên; đóng cửa phiên đầu 114,08 USD, phiên cuối 101,46 USD, thay đổi -11,06%; cao nhất 125,58 USD ngày 22/01/2015, thấp nhất 100,23 USD ngày 17/12/2015; giá đóng cửa trung bình 111,11 USD; độ biến động (độ lệch chuẩn lợi suất ngày) 0,88%; khối lượng trung bình 6.170.533."
+    ],
+    [
+     "answer",
+     "Trong năm 2015, quỹ vàng GLD có thay đổi -11,06% (đóng cửa từ 114,08 USD xuống 101,46 USD) (250 phiên)."
+    ]
+   ],
+   "tools": [
+    "pandas_calc"
+   ],
+   "sources": [
+    "M-2015"
+   ],
+   "ms": 0.47479999921051785
+  },
+  {
+   "question": "Năm nào quỹ vàng GLD tăng mạnh nhất trong dữ liệu?",
+   "trace": [
+    [
+     "question",
+     "Năm nào quỹ vàng GLD tăng mạnh nhất trong dữ liệu?"
+    ],
+    [
+     "thought",
+     "Không thấy ngày, giai đoạn, nhóm hay hồ sơ cụ thể → câu hỏi mở, dùng RAG lai + LLM tổng hợp."
+    ],
+    [
+     "action",
+     "rag_search(\"Năm nào quỹ vàng GLD tăng mạnh nhất trong dữ liệu?…\", k=5) — RRF(BM25 + Dense (e5-small) + Graph) + Rerank",
+     626
+    ],
+    [
+     "obs",
+     "[1] G2013-10-17; [2] G2012-06-01; [3] G2014-06-19; [4] M-2017; [5] M-2015-07"
+    ],
+    [
+     "answer",
+     "Năm 2013 là năm quỹ vàng GLD tăng mạnh nhất trong dữ liệu, với thay đổi 3,14%."
+    ]
+   ],
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "sources": [
+    "G2013-10-17",
+    "G2012-06-01",
+    "G2014-06-19",
+    "M-2017",
+    "M-2015-07"
+   ],
+   "ms": 19677.627299999585
+  }
+ ]
+}

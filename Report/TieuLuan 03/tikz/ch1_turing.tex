@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+  % ---- Phép thử Turing
+  \node[tieude] at (3.6,5.1) {(a) Phép thử Turing (1950)};
+  \fill[cSlate!25, blur shadow={shadow blur steps=5, shadow opacity=25}] (3.45,-1.0) rectangle (3.75,4.0);
+  \node[cau=cIndigo, minimum size=14mm, font=\small\bfseries] (c) at (0.9,1.5) {C};
+  \node[font=\small, below=1mm of c] {người hỏi};
+  \node[hop=cBlue, minimum width=1.9cm, minimum height=1.3cm] (a) at (6.2,3.0) {A\\[1pt]{\small máy}};
+  \node[hop=cGreen, minimum width=1.9cm, minimum height=1.3cm] (bb) at (6.2,0.0) {B\\[1pt]{\small người}};
+  \draw[muiM=cNavy, <->] (c) -- node[above, sloped, font=\small] {văn bản} (a);
+  \draw[muiM=cNavy, <->] (c) -- node[below, sloped, font=\small] {văn bản} (bb);
+  \node[hop=cYellow, text width=6.2cm, font=\small] at (3.6,-3.05) {C chỉ đọc câu trả lời và phải đoán ai là máy;\\ nếu C đoán sai đủ thường xuyên, máy ``qua'' phép thử};
+  % ---- Căn phòng tiếng Trung
+  \begin{scope}[xshift=9.0cm]
+    \node[tieude] at (3.3,5.1) {(b) Căn phòng tiếng Trung (1980)};
+    \draw[very thick, cBrown, fill=cBrown!10, blur shadow={shadow blur steps=6, shadow opacity=30}] (0.8,-0.9) rectangle (5.8,3.9);
+    \node[cau=cOrange, minimum size=12mm, font=\small\bfseries] (p) at (2.3,1.4) {người};
+    \node[hop=cTeal, minimum width=1.8cm, font=\small, text width=1.7cm] (book) at (4.5,2.4) {sổ luật\\thao tác\\ký hiệu};
+    \node[hop=cPurple, minimum width=1.8cm, font=\small] (box) at (4.5,0.2) {giỏ ký hiệu};
+    \draw[muiM=cTeal!60!black] (book) -- (p);
+    \draw[muiM=cPurple!60!black] (box) -- (p);
+    \draw[mui] (-0.4,2.9) -- (0.8,2.9);
+    \node[font=\small, anchor=south west] at (-0.5,3.95) {vào: ``ni hao ma?''};
+    \draw[mui] (0.8,0.0) -- (-0.4,0.0);
+    \node[font=\small, anchor=north west] at (-0.5,-0.95) {ra: ``wo hen hao''};
+    \node[hop=cYellow, text width=6.0cm, font=\small] at (3.3,-3.05) {làm đúng cú pháp (syntax) theo luật\\ nhưng không hiểu ngữ nghĩa (semantics)};
+  \end{scope}
+\end{tikzpicture}

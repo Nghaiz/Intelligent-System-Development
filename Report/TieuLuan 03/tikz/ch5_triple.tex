@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % giải phẫu bộ ba
+  \node[cau=cRed, minimum size=22mm, font=\small\bfseries, align=center] (s) at (0,0) {Chủ thể\\[-2pt]\footnotesize (subject)};
+  \node[cau=cGreen, minimum size=22mm, font=\small\bfseries, align=center] (o) at (9,0) {Đối tượng\\[-2pt]\footnotesize (object)};
+  \draw[mui, line width=2.4pt] (s) -- node[hop=cOrange, font=\small\bfseries] {Quan hệ (predicate)} (o);
+  \node[nhan, align=center] at (0,-1.8) {thực thể: \texttt{Person\_P000000}};
+  \node[nhan, align=center] at (9,-1.8) {thực thể / khái niệm / giá trị};
+  \node[nhan] at (4.5,-0.9) {\texttt{has\_hba1c\_level}};
+  % ba ví dụ ba miền
+  \foreach \y/\s/\p/\o/\c in {-3.3/Person\_P000000/has\_hba1c\_level/6{,}6/cRed,
+                              -4.4/TradingDay\_2020-03-16/has\_close/54{,}22/cBlue,
+                              -5.5/MarketDay\_2015-04-24/has\_brent/65{,}28/cOrange}{
+    \node[hop=\c, minimum width=4.6cm, font=\small\ttfamily] at (0.6,\y) {\s};
+    \node[hop=cSlate, minimum width=3.6cm, font=\small\ttfamily] at (5.0,\y) {\p};
+    \node[hop=cGreen, minimum width=2.4cm, font=\small\ttfamily] at (8.6,\y) {\o};
+    \draw[mui] (2.95,\y) -- (3.15,\y); \draw[mui] (6.85,\y) -- (7.35,\y);
+  }
+  \node[nhan, rotate=90] at (-2.4,-4.4) {ba miền};
+\end{tikzpicture}

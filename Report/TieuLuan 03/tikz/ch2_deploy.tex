@@ -1,0 +1,14 @@
+\begin{tikzpicture}
+  \node[hop=cSky, minimum width=3.0cm, minimum height=2.0cm, align=center] (web) at (0,1.5) {Trình duyệt\\(desktop)};
+  \node[hop=cSky, minimum width=3.0cm, minimum height=2.0cm, align=center] (mob) at (0,-1.5) {Điện thoại\\(giao diện\\đáp ứng)};
+  \khoibaD{4.2}{-1.6}{3.2}{3.2}{1.0}{cBlue}
+  \node[font=\small\bfseries, text=white, align=center] at (5.8,0) {Flask\\Web App\\\texttt{/api/predict}};
+  \node[hop=cPurple, minimum width=3.4cm, minimum height=2.6cm, align=center] (sv) at (10.3,0)
+    {\texttt{serve\_ch2}\\\texttt{.predict(exp\_id,}\\\texttt{payload, model)}};
+  \node[csdl=cTeal, minimum width=2.6cm, minimum height=2.2cm] (m) at (14.9,0) {models/ch2\\.joblib · .pt};
+  \draw[muiM=cNavy, <->] (web.east) -- node[above, font=\small] {JSON} (4.2,0.8);
+  \draw[muiM=cNavy, <->] (mob.east) -- node[below, font=\small] {JSON} (4.2,-0.8);
+  \draw[muiM=cNavy, <->] (7.5,0) -- (sv.west);
+  \draw[muiM=cTeal!70!black] (m.west) -- node[above, font=\small, align=center, text=cTeal!60!black] {nạp\\lười} (sv.east);
+  \node[nhan, align=center] at (10.3,-2.0) {tiền xử lý giống lúc huấn luyện\\+ ngưỡng chọn trên Validation};
+\end{tikzpicture}

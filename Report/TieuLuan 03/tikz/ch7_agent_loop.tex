@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % môi trường ở giữa, vòng tác tử bốn pha quanh nó
+  % quả cầu đủ rộng để chữ nằm trọn bên trong, màu nhạt để chữ đen đọc rõ
+  \shade[ball color=cTeal!28] (0,0) circle (2.0);
+  \node[font=\normalsize\bfseries\sffamily, align=center] at (0,0) {Môi trường\\{\small người dùng,}\\{\small công cụ, dữ liệu,}\\{\small tác tử khác}};
+  \node[khoi, text width=3.0cm] (p) at (0,4.0) {\textbf{Quan sát}\\nhận yêu cầu, kết quả công cụ, thông điệp};
+  \node[khoiP, text width=3.0cm] (r) at (5.4,0) {\textbf{Suy luận}\\LLM lập kế hoạch, chọn bước tiếp theo};
+  \node[khoiC, text width=3.0cm] (a) at (0,-4.0) {\textbf{Hành động}\\gọi công cụ, gửi thông điệp, trả lời};
+  \node[khoiG, text width=3.0cm] (m) at (-5.4,0) {\textbf{Bộ nhớ / trạng thái}\\vết hội thoại, kết quả trung gian};
+  \draw[muiM=cBlue, line width=1.6pt] (p.east) to[bend left=25] (r.north);
+  \draw[muiM=cPurple, line width=1.6pt] (r.south) to[bend left=25] (a.east);
+  \draw[muiM=cOrange!85!black, line width=1.6pt] (a.west) to[bend left=25] (m.south);
+  \draw[muiM=cGreen!70!black, line width=1.6pt] (m.north) to[bend left=25] (p.west);
+  \draw[muiM=cRed, dashed, thick] (a) -- (0,-2.05);
+  \draw[muiM=cRed, dashed, thick] (0,2.05) -- (p);
+  \node[khoiR, text width=3.4cm] at (5.6,-4.0) {\textbf{Điều kiện dừng}: đạt mục tiêu, hết lượt, Verifier từ chối};
+\end{tikzpicture}

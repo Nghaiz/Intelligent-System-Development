@@ -1,0 +1,16 @@
+\begin{tabular}{llr}
+\toprule
+Khối & \makecell[l]{Kích thước\\đầu ra} & \makecell[r]{Số tham\\số} \\
+\midrule
+Stem: Conv $3{\times}3$ + BN + ReLU & $96\times96\times32$ & 928 \\
+ResBlock 1 (32 kênh) $\to$ MaxPool $\to$ Dropout 0{,}1 & $48\times48\times32$ & 18{.}560 \\
+ResBlock 2 (64 kênh) $\to$ MaxPool $\to$ Dropout 0{,}2 & $24\times24\times64$ & 57{.}728 \\
+ResBlock 3 (128 kênh) $\to$ MaxPool $\to$ Dropout 0{,}3 & $12\times12\times128$ & 230{.}144 \\
+ResBlock 4 (256 kênh) $\to$ MaxPool $\to$ Dropout 0{,}4 & $6\times6\times256$ & 919{.}040 \\
+Global Average Pooling & 256 & 0 \\
+Dense 256 + ReLU + Dropout 0,4 & 256 & 65{.}792 \\
+Dense $K$ + Softmax & 3 & 771 \\
+\midrule
+\textbf{Tổng} &  & \textbf{1{.}292{.}963} \\
+\bottomrule
+\end{tabular}

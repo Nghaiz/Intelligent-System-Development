@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % --- hàng trên: cấu trúc dữ liệu (hộp 3D) ---
+  \node[tieude] at (7.3,7.15) {Cấu trúc của dữ liệu quyết định thiên kiến quy nạp của mô hình};
+  \tensorbaD{0.2}{4.6}{2.0}{1.25}{1.0}{cBlue}{Bảng thuộc tính}
+  \tensorbaD{3.1}{4.6}{2.0}{1.25}{1.0}{cOrange}{Ảnh (lưới 2D)}
+  \tensorbaD{6.0}{4.6}{2.0}{1.25}{1.0}{cGreen}{Chuỗi thời gian}
+  \tensorbaD{8.9}{4.6}{2.0}{1.25}{1.0}{cPurple}{Đồ thị, bộ ba}
+  \tensorbaD{11.8}{4.6}{2.0}{1.25}{1.0}{cRed}{Văn bản, tác vụ}
+  % --- hàng giữa: kiến trúc ---
+  \node[hop=cBlue,   text width=2.45cm, minimum height=1.3cm] (m2) at (1.2,2.25) {\textbf{Ch.\,2}\\ LR, cây, XGBoost, MLP};
+  \node[hop=cOrange, text width=2.45cm, minimum height=1.3cm] (m3) at (4.1,2.25) {\textbf{Ch.\,3}\\ CNN: tích chập cục bộ};
+  \node[hop=cGreen,  text width=2.45cm, minimum height=1.3cm] (m4) at (7.0,2.25) {\textbf{Ch.\,4}\\ RNN, LSTM, GRU};
+  \node[hop=cPurple, text width=2.45cm, minimum height=1.3cm] (m5) at (9.9,2.25) {\textbf{Ch.\,5--6}\\ KG, RAG, GNN};
+  \node[hop=cRed,    text width=2.45cm, minimum height=1.3cm] (m7) at (12.8,2.25) {\textbf{Ch.\,7}\\ LLM, đa tác tử};
+  % mũi tên bắt đầu dưới nhãn của khối 3D để không đè chữ
+  \foreach \x/\n in {1.2/m2, 4.1/m3, 7.0/m4, 9.9/m5, 12.8/m7} {\draw[mui] (\x,3.95) -- (\n.north);}
+  % --- thanh dưới: chu trình chung ---
+  \node[hop=cSlate, minimum width=14.2cm, minimum height=1.0cm, font=\normalsize] (cy) at (7.0,0.2)
+    {Dữ liệu \;$\rightarrow$\; baseline \;$\rightarrow$\; mô hình \;$\rightarrow$\; đánh giá trung thực \;$\rightarrow$\; triển khai Web App};
+  \foreach \n in {m2,m3,m4,m5,m7} {\draw[muiM=cSlate!80] (\n.south) -- (\n.south |- cy.north);}
+  % vòng lặp: triển khai xong quay lại thu thập dữ liệu mới
+  \draw[muiM=cTeal, rounded corners=6pt] (cy.south east) ++(-0.4,0) -- ++(0,-0.45) -| ([xshift=0.4cm]cy.south west)
+    node[pos=0.25, below, font=\small, text=cTeal!70!black] {phản hồi từ triển khai quay lại dữ liệu};
+\end{tikzpicture}

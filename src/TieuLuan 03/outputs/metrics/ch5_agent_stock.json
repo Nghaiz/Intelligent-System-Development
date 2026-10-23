@@ -1,0 +1,1959 @@
+{
+ "n_questions": 32,
+ "systems": {
+  "llm_only": {
+   "acc": 0.0,
+   "ms": 35687.84764062503,
+   "ms_median": 38121.664450001845,
+   "gold_in_sources": 0.0,
+   "n": 32,
+   "acc_month": 0.0,
+   "acc_record": 0.0,
+   "acc_year": 0.0,
+   "acc_lex": 0.0,
+   "acc_para": 0.0
+  },
+  "naive_rag": {
+   "acc": 0.4375,
+   "ms": 16505.65597812442,
+   "ms_median": 15599.381949996314,
+   "gold_in_sources": 0.40625,
+   "n": 32,
+   "acc_month": 0.125,
+   "acc_record": 0.8125,
+   "acc_year": 0.0,
+   "acc_lex": 0.375,
+   "acc_para": 0.625
+  },
+  "advanced_rag": {
+   "acc": 0.6875,
+   "ms": 18198.32914999961,
+   "ms_median": 16493.509650001215,
+   "gold_in_sources": 0.75,
+   "n": 32,
+   "acc_month": 0.625,
+   "acc_record": 1.0,
+   "acc_year": 0.125,
+   "acc_lex": 0.5833333333333334,
+   "acc_para": 1.0
+  },
+  "agent": {
+   "acc": 1.0,
+   "ms": 2.12808437527201,
+   "ms_median": 2.052900003036484,
+   "gold_in_sources": 1.0,
+   "n": 32,
+   "acc_month": 1.0,
+   "acc_record": 1.0,
+   "acc_year": 1.0,
+   "acc_lex": 1.0,
+   "acc_para": 1.0
+  }
+ },
+ "tool_use": {
+  "pandas_calc": 16,
+  "kg_lookup": 16
+ },
+ "rows": [
+  {
+   "system": "llm_only",
+   "qid": "sto070",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 46787.00889999891,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cao nhất của cổ phiếu Google (Alphabet) trong tháng 5/2018. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có dữ liệu chính xác về từng ngày trong tháng 5/2018. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến để có thông tin chính xác hơn.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto070",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 16228.228500003752,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 5/2018, cổ phiếu Google (Alphabet) có giá cao nhất là 58,67 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto070",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 22718.69990000414,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 5/2018, cổ phiếu Google (Alphabet) có giá cao nhất là 55,54 USD, đạt đỉnh vào ngày 14/05/2018.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto070",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.86309999844525,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 05/2018, cổ phiếu Alphabet có giá cao nhất 55,54 USD (ngày 14/05/2018) (22 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto064",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 37224.91599999921,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có dữ liệu cụ thể về giá cao nhất của cổ phiếu Google trong tháng 4/2023. Giá cổ phiếu thường thay đổi theo nhiều yếu tố như tình hình kinh tế, thị trường tài chính và các thông tin công bố từ Google. Để có thông tin chính xác nhất, bạn nên kiểm tra trên các trang web của Google hoặc các nguồn tin tài chính uy tín khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto064",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15137.7272000027,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 4/2023, cổ phiếu Google (Alphabet) có giá cao nhất là 109,58 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto064",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15329.406699995161,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 4/2023, cổ phiếu Google (Alphabet) có giá cao nhất là 109,58 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto064",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.6085999993956648,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 04/2023, cổ phiếu Alphabet có giá cao nhất 109,63 USD (ngày 06/04/2023) (19 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto072",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 24870.68339999678,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có dữ liệu cụ thể về tỷ lệ thay đổi cổ phiếu Google trong tháng 11/2017. Để có thông tin chính xác nhất, bạn nên kiểm tra các nguồn tài chính hoặc báo cáo công bố của Google.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto072",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 16764.381000000867,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 11/2017, cổ phiếu Google (Alphabet) thay đổi 0,39% so với phiên trước.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto072",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 18219.82079999725,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 11/2017, cổ phiếu Google (Alphabet) tăng 1,31% so với giá đóng cửa của phiên trước đó.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto072",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.3035000014933757,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 11/2017, cổ phiếu Alphabet có thay đổi -0,40% (đóng cửa từ 51,28 USD xuống 51,07 USD) (21 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto061",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 40536.01499999786,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cao nhất của cổ phiếu Google (Alphabet) trong tháng 6/2018. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có dữ liệu chính xác về từng ngày trong tháng 6/2018. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến để có thông tin chính xác hơn.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto061",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 15210.833500001172,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 6/2018, cổ phiếu Google (Alphabet) có giá cao nhất là 57,05 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto061",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 15374.844699996174,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 6/2018, cổ phiếu Google (Alphabet) có giá cao nhất là 59,31 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto061",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.098100001399871,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 06/2018, cổ phiếu Alphabet có giá cao nhất 59,31 USD (ngày 20/06/2018) (21 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto062",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 34028.791400000046,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cổ phiếu Google trong tháng 12/2023. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có cách nào xác định giá cụ thể cho một ngày cụ thể. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo công bố của Alphabet.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto062",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 15405.073699999775,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 12/2023, cổ phiếu Google (Alphabet) có giá thấp nhất là 132,15 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto062",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 15785.68730000552,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 12/2023, cổ phiếu Google (Alphabet) có giá thấp nhất là 140,83 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto062",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0379000013926998,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 12/2023, cổ phiếu Alphabet có giá thấp nhất 129,40 USD (ngày 04/12/2023) (20 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto073",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 24186.005900002783,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về tỷ lệ thay đổi cổ phiếu Google trong tháng 9/2015. Để có số liệu chính xác, bạn nên kiểm tra các tài liệu lịch sử giá cổ phiếu hoặc trang web của công ty.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto073",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 15717.954400002782,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 9/2015, cổ phiếu Google (Alphabet) thay đổi 2,21% so với giá mở cửa.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto073",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 16140.56939999864,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 9/2015, cổ phiếu Google (Alphabet) thay đổi 1,78% theo giá đóng cửa.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto073",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.2571000042953528,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 09/2015, cổ phiếu Alphabet có thay đổi 1,78% (đóng cửa từ 29,89 USD lên 30,42 USD) (21 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto068",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 35696.89010000002,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cổ phiếu Google (Alphabet) trong tháng 5/2015. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có cách nào xác định giá cụ thể trong một tháng nhất định. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo tài chính của Alphabet.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto068",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 24782.454599997436,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 5/2015, cổ phiếu Google (Alphabet) có giá thấp nhất là 26,63 USD. Đây là giá thấp nhất trong các phiên giao dịch kể từ tháng 6/2015 đến tháng 8/2015.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto068",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 29839.310499999556,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 5/2015, cổ phiếu Google (Alphabet) có giá thấp nhất là 26,05 USD. Đây là giá thấp nhất trong tháng này, được ghi trong phiên giao dịch ngày 06/05/2015.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto068",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.521300000604242,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 05/2015, cổ phiếu Alphabet có giá thấp nhất 26,05 USD (ngày 06/05/2015) (20 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto076",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 38331.289699999616,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cao nhất của cổ phiếu Google trong tháng 8/2022. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có cách nào xác định giá cao nhất một cách chính xác. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo công bố của Alphabet.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto076",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 16430.666100000963,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 8/2022, cổ phiếu Google (Alphabet) có giá cao nhất là 116,60 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto076",
+   "type": "month",
+   "style": "lex",
+   "correct": false,
+   "ms": 16571.26480000443,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong tháng 8/2022, cổ phiếu Google (Alphabet) có giá cao nhất là 111,96 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto076",
+   "type": "month",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0371000025770627,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong tháng 08/2022, cổ phiếu Alphabet có giá cao nhất 123,26 USD (ngày 15/08/2022) (23 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto023",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 41984.70359999919,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/08/2020. Giá cổ phiếu thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm thông tin này trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch chứng khoán.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto023",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15561.650999996345,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/08/2020 là 82,68 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto023",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15985.32829999749,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/08/2020 là 82,68 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto023",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 6.314599995675962,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Alphabet ngày 27/08/2020 là 82,68 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto037",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 39823.6504000015,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá cổ phiếu Google (Alphabet) ngày 12/11/2020. Giá cổ phiếu thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch chứng khoán để tra cứu giá chính xác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto037",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15364.971100003459,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá thấp nhất của cổ phiếu Google (Alphabet) ngày 12/11/2020 là 87,28 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto037",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15759.249899994757,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá thấp nhất của cổ phiếu Google (Alphabet) ngày 12/11/2020 là 87,28 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto037",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 2.680900004634168,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá thấp nhất của cổ phiếu Alphabet ngày 12/11/2020 là 87,28 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto003",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 40609.07459999726,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của cổ phiếu Google (Alphabet) ngày 22/11/2023. Giá cổ phiếu thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch chứng khoán để cập nhật giá mới nhất.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15156.290099999751,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 22/11/2023 là 139,10 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 16305.048700000043,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 22/11/2023 là 139,10 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 2.4191999982576817,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Alphabet ngày 22/11/2023 là 139,10 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto032",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 41028.28220000083,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của cổ phiếu Google (Alphabet) vào ngày 01/03/2016. Giá cổ phiếu thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến hoặc sử dụng ứng dụng giao dịch chứng khoán để tra cứu giá cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto032",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 14864.08030000166,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 01/03/2016 là 35,18 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto032",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15966.157000002568,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 01/03/2016 là 35,18 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto032",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 2.8022999977110885,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Alphabet ngày 01/03/2016 là 35,18 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto013",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 45728.97119999834,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá đóng cửa của cổ phiếu Google (Alphabet) vào ngày 17/12/2015. Giá cổ phiếu thường thay đổi liên tục và không có cơ sở dữ liệu toàn diện để cung cấp giá cụ thể cho một ngày cụ thể trong quá khứ. Bạn có thể tìm kiếm thông tin này trên các trang web tài chính trực tuyến hoặc sử dụng công cụ tra cứu giá cổ phiếu.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto013",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 14968.630899995333,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 17/12/2015 là 37,47 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto013",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15554.55559999973,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 17/12/2015 là 37,47 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto013",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 3.9741000000503846,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Alphabet ngày 17/12/2015 là 37,47 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto002",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 37874.30200000381,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá cao nhất của cổ phiếu Google (Alphabet) vào ngày 07/09/2016. Giá cổ phiếu thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến để có thông tin chính xác hơn.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto002",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15806.549299995822,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 07/09/2016 là 39,14 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto002",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 16406.19290000177,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 07/09/2016 là 39,14 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto002",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 2.7222999997320585,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá cao nhất của cổ phiếu Alphabet ngày 07/09/2016 là 39,14 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto005",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 36530.26040000259,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá mở cửa của cổ phiếu Google (Alphabet) ngày 08/11/2019. Giá cổ phiếu thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm thông tin này trên trang web của Google hoặc các nguồn tài chính trực tuyến khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15637.112899996282,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 08/11/2019 là 65,26 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 15679.298499999277,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 08/11/2019 là 65,26 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 2.8956000023754314,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá mở cửa của cổ phiếu Alphabet ngày 08/11/2019 là 65,26 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto027",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 44635.28279999446,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá đóng cửa của cổ phiếu Google (Alphabet) vào ngày 13/08/2015. Giá cổ phiếu thường thay đổi liên tục và không có cơ sở để cung cấp giá cụ thể cho một ngày cụ thể trong quá khứ. Bạn có thể tìm kiếm thông tin này trên các trang web tài chính trực tuyến hoặc sử dụng công cụ tìm kiếm giá cổ phiếu.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 14467.805600004795,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 13/08/2015 là 32,82 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 14122.771399997873,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 13/08/2015 là 32,82 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 2.2194000048330054,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Alphabet ngày 13/08/2015 là 32,82 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto053",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 15142.239600005269,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của cổ phiếu Google (Alphabet) vào ngày 4 tháng 2 năm 2016 là $735,98.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto053",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 11333.988299993507,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của cổ phiếu Google (Alphabet) vào ngày 2016-02-04 là 36,35 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto053",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 11284.272499993676,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của cổ phiếu Google (Alphabet) vào ngày 2016-02-04 là 36,35 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto053",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 1.8864000012399629,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá cao nhất của cổ phiếu Alphabet ngày 04/02/2016 là 36,35 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto042",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 38409.79990000051,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, nhưng tôi không có thông tin cụ thể về khối lượng khớp lệnh cụ thể của cổ phiếu Google (Alphabet) vào ngày 31 tháng 8 năm 2022. Thông tin này thường được công bố trong các báo cáo tài chính hàng quý hoặc hàng năm của Alphabet. Bạn có thể tìm kiếm trên trang web của Alphabet hoặc các nguồn tin cậy khác để có thông tin chính xác hơn.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto042",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 19587.599799997406,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào ngày 31 tháng 8 năm 2022 là 25.898.000 cổ phiếu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto042",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 21811.67270000151,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào ngày 31 tháng 8 năm 2022 là 25.898.000 cổ phiếu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto042",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 2.8927000021212734,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Khối lượng giao dịch của cổ phiếu Alphabet ngày 31/08/2022 là 25.898.000 cổ phiếu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto047",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 43785.211899994465,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 7 tháng 10 năm 2019. Giá cổ phiếu thường thay đổi liên tục và không được lưu trữ trong các cơ sở dữ liệu cố định. Bạn có thể tìm kiếm thông tin này trên các trang web tài chính trực tuyến hoặc sử dụng công cụ tìm kiếm giá cổ phiếu trực tuyến.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto047",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 17141.107999996166,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 7 tháng 10 năm 2019 là 60,38 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto047",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 17438.85020000016,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 7 tháng 10 năm 2019 là 60,38 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto047",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 2.9371999989962205,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Alphabet ngày 07/10/2019 là 60,38 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto058",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 38786.724700003106,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có dữ liệu cụ thể về giá cổ phiếu Google (Alphabet) vào ngày 19/12/2022. Giá cổ phiếu thường thay đổi liên tục và không có cách nào tôi có thể cung cấp thông tin chính xác và cập nhật cho ngày cụ thể đó. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến để nhận được thông tin chính xác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto058",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 4351.629700002377,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 16415.754499998002,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá thấp nhất của cổ phiếu Google (Alphabet) vào 2022-12-19 là 88,93 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 2.8477000014390796,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá thấp nhất của cổ phiếu Alphabet ngày 19/12/2022 là 88,93 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto059",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 32650.725499996042,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về khối lượng khớp lệnh cụ thể của cổ phiếu Google (Alphabet) vào ngày 14 tháng 8 năm 2018. Thông tin này thường được công bố trong các báo cáo tài chính hàng quý hoặc hàng năm của công ty, và có thể thay đổi theo thời gian.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto059",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 19523.267900003702,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào ngày 14 tháng 8 năm 2018 là 26.962.000 cổ phiếu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto059",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 23825.45140000002,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong phiên giao dịch ngày 14/08/2018 (thứ Ba), khối lượng khớp lệnh của cổ phiếu Google (Alphabet) là 26.962.000 cổ phiếu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto059",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 2.5524000011500902,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Khối lượng giao dịch của cổ phiếu Alphabet ngày 14/08/2018 là 26.962.000 cổ phiếu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto040",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 16611.966099997517,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của cổ phiếu Google (Alphabet) vào ngày 31/10/2016 là $745,88.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto040",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 16485.804699994333,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của cổ phiếu Google (Alphabet) vào 2016-10-31 là 39,02 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto040",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 17307.316400001582,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Mức giá cao nhất của cổ phiếu Google (Alphabet) vào ngày 31/10/2016 là 39,84 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto040",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 2.9060999950161204,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá cao nhất của cổ phiếu Alphabet ngày 31/10/2016 là 39,84 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto055",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 43701.742200006265,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 23 tháng 1 năm 2015. Giá cổ phiếu thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến hoặc sử dụng công cụ tìm kiếm giá cổ phiếu để tra cứu thông tin này.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto055",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 17433.6117999992,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 23 tháng 1 năm 2015 là 26,92 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto055",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 17952.374000000418,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 23 tháng 1 năm 2015 là 26,92 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto055",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 3.212099996744655,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Alphabet ngày 23/01/2015 là 26,92 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto049",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 43901.684399999795,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Xin lỗi, tôi không có thông tin cụ thể về giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 28 tháng 6 năm 2016. Giá cổ phiếu thường thay đổi liên tục và không có dữ liệu cụ thể về từng ngày được lưu trữ lâu dài. Bạn có thể tìm kiếm trên các trang web tài chính trực tuyến hoặc sử dụng công cụ tìm kiếm giá cổ phiếu để tra cứu thông tin này.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto049",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 29641.92390000244,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong các phiên giao dịch được cung cấp, không có thông tin về giá chốt phiên cụ thể cho cổ phiếu Google (Alphabet) vào ngày 28 tháng 6 năm 2016. Các phiên giao dịch được liệt kê đều không mention giá chốt phiên cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto049",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 18077.882900004624,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 28 tháng 6 năm 2016 là 34,00 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto049",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 3.2987000013235956,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Giá đóng cửa của cổ phiếu Alphabet ngày 28/06/2016 là 34,00 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto081",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 38218.091700000514,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cổ phiếu Google (Alphabet) trong năm 2022. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có cách nào để xác định giá cụ thể cho một năm cụ thể. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo công bố của Alphabet.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto081",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 20436.158099997556,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2022, cổ phiếu Google (Alphabet) có giá thấp nhất là 94,38 USD vào ngày 31/10/2022.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto081",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 23030.54410000186,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2022, cổ phiếu Google (Alphabet) có giá thấp nhất là 100,67 USD, xảy ra vào ngày 01/12/2022.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto081",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0305000032531098,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2022, cổ phiếu Alphabet có giá thấp nhất 83,45 USD (ngày 03/11/2022) (251 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto087",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 35074.82000000164,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có dữ liệu cụ thể về tỷ lệ thay đổi cổ phiếu Google trong năm 2018. Tuy nhiên, Google thường xuyên tăng trưởng mạnh và có thể có các đợt tăng giá lớn. Để có thông tin chính xác nhất, bạn nên kiểm tra báo cáo tài chính hoặc các nguồn tin tức tài chính đáng tin cậy.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto087",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 13803.55419999978,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2018, cổ phiếu Google (Alphabet) thay đổi 11,01% (tăng).",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto087",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 9810.836600001494,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2018, cổ phiếu Google (Alphabet) tăng 4,27%.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto087",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0422999985166825,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2018, cổ phiếu Alphabet có thay đổi -2,76% (đóng cửa từ 53,25 USD xuống 51,78 USD) (251 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto085",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 12236.03059999732,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Cổ phiếu Google (Alphabet) có giá cao nhất trong năm 2015 là $647,38.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto085",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 22612.61419999937,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2015, cổ phiếu Google (Alphabet) có giá cao nhất là 33,72 USD, đạt đỉnh vào phiên ngày 17/07/2015.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto085",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 16189.540999999736,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2015, cổ phiếu Google (Alphabet) có giá cao nhất là 33,16 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto085",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.9393000000272878,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2015, cổ phiếu Alphabet có giá cao nhất 39,00 USD (ngày 29/12/2015) (252 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto084",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 39545.45420000068,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có dữ liệu cụ thể về giá cổ phiếu Google (Alphabet) trong năm 2023. Giá cổ phiếu thường thay đổi theo nhiều yếu tố như tình hình kinh tế, thị trường tài chính và các thông tin công bố từ Google. Để có thông tin chính xác nhất, bạn nên kiểm tra dữ liệu từ các nguồn tin cậy như Bloomberg, Reuters hoặc chứng khoán trực tuyến.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto084",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 14950.992800004315,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2023, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là 125,75 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto084",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 17651.417099994433,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2023, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là 128,08 USD. [1]",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto084",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0889999975915998,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2023, cổ phiếu Alphabet có giá đóng cửa trung bình 119,61 USD (250 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto080",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 37023.249300000316,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cổ phiếu Google (Alphabet) trong năm 2021. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có cách nào xác định giá cụ thể cho một năm cụ thể như vậy. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo công bố của Alphabet.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto080",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 25685.809499998868,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2021, cổ phiếu Google (Alphabet) có giá thấp nhất là 133,38 USD, xảy ra vào phiên giao dịch ngày 01/10/2021 (thứ Sáu).",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto080",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 24153.859099998954,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2021, cổ phiếu Google (Alphabet) có giá thấp nhất là 119,14 USD, xảy ra vào phiên giao dịch ngày 03/06/2021.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto080",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.1019000012311153,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2021, cổ phiếu Alphabet có giá thấp nhất 84,95 USD (ngày 06/01/2021) (252 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto082",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 36061.85900000128,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có dữ liệu cụ thể về tỷ lệ thay đổi cổ phiếu Google trong năm 2019. Tỷ lệ thay đổi cổ phiếu thường phụ thuộc vào nhiều yếu tố như xu hướng thị trường, thông tin kinh doanh và các quyết định tài chính của công ty. Để có thông tin chính xác nhất, bạn nên kiểm tra báo cáo tài chính hoặc các nguồn tin cậy khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto082",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 13743.70629999612,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2019, cổ phiếu Google (Alphabet) thay đổi 0,40% (đi ngang).",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto082",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 24652.599900000496,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2019, cổ phiếu Google (Alphabet) đã thay đổi 27,84% so với giá đóng cửa đầu năm 52,29 USD và cuối năm 66,85 USD.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "sto082",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 1.0135999982594512,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2019, cổ phiếu Alphabet có thay đổi 27,84% (đóng cửa từ 52,29 USD lên 66,85 USD) (252 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto086",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 38025.237200003176,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có dữ liệu cụ thể về giá đóng cửa trung bình của cổ phiếu Google (Alphabet) trong năm 2020. Giá cổ phiếu thường thay đổi theo thời gian và có thể thay đổi tùy thuộc vào nhiều yếu tố khác nhau như tình hình kinh tế, thị trường tài chính và các thông tin công bố mới. Để có thông tin chính xác nhất, bạn nên kiểm tra trên các nguồn tin tài chính trực tuyến hoặc sử dụng các công cụ phân tích ",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto086",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 11609.668099998089,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2020, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là 76,04 USD. [1]",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto086",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 26640.70090000314,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2020, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là 71,82 USD. Đây là giá đóng cửa trung bình của phiên giao dịch ngày 30/01/2020, khi giá mở cửa là 72,00 USD và giá đóng cửa là 72,79 USD.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto086",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.7474000012734905,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2020, cổ phiếu Alphabet có giá đóng cửa trung bình 74,07 USD (253 phiên).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "sto083",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 22960.160599999654,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Tôi không có thông tin cụ thể về giá cổ phiếu Google (Alphabet) trong năm 2017. Giá cổ phiếu thường thay đổi theo nhiều yếu tố khác nhau và không có cách nào xác định giá cụ thể cho một năm cụ thể. Bạn có thể tìm kiếm thông tin từ các nguồn tài chính trực tuyến hoặc báo cáo tài chính của Alphabet.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "sto083",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 12335.143799995421,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2017, cổ phiếu Google (Alphabet) có giá thấp nhất là 39,99 USD vào ngày 30/01/2017.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "sto083",
+   "type": "year",
+   "style": "lex",
+   "correct": false,
+   "ms": 20345.253099992988,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong năm 2017, cổ phiếu Google (Alphabet) có giá thấp nhất là 46,00 USD. Đây là giá thấp nhất trong các phiên giao dịch kể từ D2017-07-20 đến D2017-10-26.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "agent",
+   "qid": "sto083",
+   "type": "year",
+   "style": "lex",
+   "correct": true,
+   "ms": 0.8462999976472929,
+   "tools": [
+    "pandas_calc"
+   ],
+   "answer": "Trong năm 2017, cổ phiếu Alphabet có giá thấp nhất 38,79 USD (ngày 03/01/2017) (251 phiên).",
+   "gold_in_sources": true
+  }
+ ],
+ "traces": [
+  {
+   "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/08/2020 là bao nhiêu?",
+   "trace": [
+    [
+     "question",
+     "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/08/2020 là bao nhiêu?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (D2020-08-27; loại bản ghi) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "kg_lookup(\"Giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/08/2020 là…\")",
+     2
+    ],
+    [
+     "obs",
+     "(TradingDay_2020-08-27, has_date, 2020-08-27) | (TradingDay_2020-08-27, has_open, 82,68) | (TradingDay_2020-08-27, has_high, 82,75) | (TradingDay_2020-08-27, has_low, 81,29) | (TradingDay_2020-08-27, has_close, 81,72) | (TradingDay_2020-08-27, has_volume, 37232000) | (TradingDay_2020-08-27, has_return_pct, -1,09) | (TradingDay_2020-08-27, in_month, Month_2020-08)"
+    ],
+    [
+     "answer",
+     "Giá mở cửa của cổ phiếu Alphabet ngày 27/08/2020 là 82,68 USD."
+    ]
+   ],
+   "tools": [
+    "kg_lookup"
+   ],
+   "sources": [
+    "D2020-08-27"
+   ],
+   "ms": 1.8106999996234663
+  },
+  {
+   "question": "Trong tháng 5/2018, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+   "trace": [
+    [
+     "question",
+     "Trong tháng 5/2018, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (M-2018-05; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "pandas_calc(\"Trong tháng 5/2018, cổ phiếu Google (Alphabet) có giá cao nh…\")",
+     0
+    ],
+    [
+     "obs",
+     "Tổng hợp cổ phiếu Alphabet giai đoạn 2018-05: 22 phiên; đóng cửa phiên đầu 51,87 USD, phiên cuối 54,25 USD, thay đổi 4,60%; cao nhất 55,54 USD ngày 14/05/2018, thấp nhất 50,31 USD ngày 03/05/2018; giá đóng cửa trung bình 53,46 USD; độ biến động (độ lệch chuẩn lợi suất ngày) 1,24%; khối lượng trung bình 28.954.000."
+    ],
+    [
+     "answer",
+     "Trong tháng 05/2018, cổ phiếu Alphabet có giá cao nhất 55,54 USD (ngày 14/05/2018) (22 phiên)."
+    ]
+   ],
+   "tools": [
+    "pandas_calc"
+   ],
+   "sources": [
+    "M-2018-05"
+   ],
+   "ms": 0.37180000072112307
+  },
+  {
+   "question": "Cổ phiếu Google biến động thế nào trong đại dịch năm 2020?",
+   "trace": [
+    [
+     "question",
+     "Cổ phiếu Google biến động thế nào trong đại dịch năm 2020?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (M-2020; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "pandas_calc(\"Cổ phiếu Google biến động thế nào trong đại dịch năm 2020?…\")",
+     0
+    ],
+    [
+     "obs",
+     "Tổng hợp cổ phiếu Alphabet giai đoạn 2020: 253 phiên; đóng cửa phiên đầu 68,37 USD, phiên cuối 87,59 USD, thay đổi 28,12%; cao nhất 92,36 USD ngày 03/12/2020, thấp nhất 50,68 USD ngày 23/03/2020; giá đóng cửa trung bình 74,07 USD; độ biến động (độ lệch chuẩn lợi suất ngày) 2,41%; khối lượng trung bình 37.833.605."
+    ],
+    [
+     "answer",
+     "Trong năm 2020, cổ phiếu Alphabet có độ biến động (độ lệch chuẩn lợi suất ngày) 2,41% (253 phiên)."
+    ]
+   ],
+   "tools": [
+    "pandas_calc"
+   ],
+   "sources": [
+    "M-2020"
+   ],
+   "ms": 0.5161000008229166
+  },
+  {
+   "question": "Năm nào cổ phiếu Google tăng trưởng tốt nhất trong giai đoạn dữ liệu?",
+   "trace": [
+    [
+     "question",
+     "Năm nào cổ phiếu Google tăng trưởng tốt nhất trong giai đoạn dữ liệu?"
+    ],
+    [
+     "thought",
+     "Không thấy ngày, giai đoạn, nhóm hay hồ sơ cụ thể → câu hỏi mở, dùng RAG lai + LLM tổng hợp."
+    ],
+    [
+     "action",
+     "rag_search(\"Năm nào cổ phiếu Google tăng trưởng tốt nhất trong giai đoạn…\", k=5) — RRF(BM25 + Dense (e5-small) + Graph) + Rerank",
+     509
+    ],
+    [
+     "obs",
+     "[1] D2015-02-05; [2] D2016-01-21; [3] D2016-01-14; [4] D2023-01-26; [5] D2015-06-18"
+    ],
+    [
+     "answer",
+     "Năm 2016 là năm cổ phiếu Google tăng trưởng tốt nhất trong giai đoạn dữ liệu. Cụ thể, từ D2015-02-05 đến D2016-01-21, cổ phiếu Google đã tăng trưởng 1,17% và từ D2016-01-14 đến D2016-01-21, cổ phiếu Google đã tăng trưởng 2,02%."
+    ]
+   ],
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "sources": [
+    "D2015-02-05",
+    "D2016-01-21",
+    "D2016-01-14",
+    "D2023-01-26",
+    "D2015-06-18"
+   ],
+   "ms": 31634.78649999888
+  },
+  {
+   "question": "Nhận xét diễn biến cổ phiếu Google trong năm 2022.",
+   "trace": [
+    [
+     "question",
+     "Nhận xét diễn biến cổ phiếu Google trong năm 2022."
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (M-2022; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "pandas_calc(\"Nhận xét diễn biến cổ phiếu Google trong năm 2022.…\")",
+     1
+    ],
+    [
+     "obs",
+     "Tổng hợp cổ phiếu Alphabet giai đoạn 2022: 251 phiên; đóng cửa phiên đầu 145,07 USD, phiên cuối 88,73 USD, thay đổi -38,84%; cao nhất 152,10 USD ngày 02/02/2022, thấp nhất 83,45 USD ngày 03/11/2022; giá đóng cửa trung bình 115,19 USD; độ biến động (độ lệch chuẩn lợi suất ngày) 2,44%; khối lượng trung bình 28.623.231."
+    ],
+    [
+     "answer",
+     "Trong năm 2022, cổ phiếu Alphabet có thay đổi -38,84% (đóng cửa từ 145,07 USD xuống 88,73 USD) (251 phiên)."
+    ]
+   ],
+   "tools": [
+    "pandas_calc"
+   ],
+   "sources": [
+    "M-2022"
+   ],
+   "ms": 0.8086000016191974
+  }
+ ]
+}

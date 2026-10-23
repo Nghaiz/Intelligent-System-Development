@@ -1,0 +1,18 @@
+\begin{tikzpicture}[scale=1.25]
+  \fill[cBlue!5] (-3.3,-2.4) rectangle (3.3,2.4);
+  \foreach \x/\y in {-2.5/1.5,-2.3/0.8,-2.2/-0.5,-1.4/1.8,-0.6/1.1,-2.7/0.2,-1.1/-1.6,0.3/1.9,-0.5/-0.4}{
+    \shade[ball color=cBlue] (\x,\y) circle (3.2pt);}
+  \foreach \x/\y in {1.0/-0.6,1.8/0.4,2.4/-1.3,1.4/-1.8,2.7/0.9,0.6/0.5,2.1/1.7,0.2/-2.1}{
+    \shade[ball color=cRed] (\x,\y) circle (3.2pt);}
+  \node[star, star points=5, fill=cYellow, draw=cOrange!80!black, thick, minimum size=7mm, inner sep=0pt] (q) at (0.15,0.15) {};
+  \draw[dashed, thick, cGreen!60!black] (0.15,0.15) circle (1.17);
+  \draw[dashed, thick, cPurple] (0.15,0.15) circle (2.2);
+  \node[font=\small, text=cGreen!50!black, fill=white, inner sep=1pt] at (1.2,-0.9) {$k=3$: 2 đỏ / 1 xanh};
+  \node[font=\small, text=cPurple, fill=white, inner sep=1pt] at (-1.6,2.25) {$k=7$: 4 xanh / 3 đỏ};
+  \node[khoi, anchor=west, align=left, text width=5.3cm] at (3.6,1.2)
+    {Khoảng cách Euclid:\\$d(\mathbf{x},\mathbf{x}')=\sqrt{\sum_j (x_j-x'_j)^2}$};
+  \node[khoiC, anchor=west, align=left, text width=5.3cm] at (3.6,-0.6)
+    {Dự đoán = bỏ phiếu đa số của\\$k$ láng giềng gần nhất (có thể\\đánh trọng số $1/d$)};
+  \node[khoiR, anchor=west, align=left, text width=5.3cm] at (3.6,-2.1)
+    {$k$ nhỏ: phương sai cao;\\$k$ lớn: thiên lệch cao};
+\end{tikzpicture}

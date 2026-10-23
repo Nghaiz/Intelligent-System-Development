@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % khối tensor 3D (batch, time, feature) vẽ bằng các lát cửa sổ
+  \foreach \b/\col in {3/cPurple, 2/cBlue, 1/cTeal, 0/cGreen} {
+    \pgfmathsetmacro{\ox}{\b*0.9}
+    \pgfmathsetmacro{\oy}{\b*0.55}
+    \foreach \t in {0,...,9} {
+      \foreach \f in {0,...,5} {
+        \pgfmathsetmacro{\shade}{25+7*\f}
+        \fill[\col!\shade, draw=white, line width=0.4pt] (\ox+\t*0.55,\oy+\f*0.42) rectangle ++(0.55,0.42);
+      }
+    }
+    \draw[\col!60!black, thick] (\ox,\oy) rectangle ++(5.5,2.52);
+  }
+  \draw[mui] (0,-0.4) -- node[below, font=\small] {thời gian (window = 30 bước)} (5.5,-0.4);
+  \draw[mui] (-0.4,0) -- node[left, font=\small, align=right] {đặc trưng\\(F = 6, 9, 13)} (-0.4,2.52);
+  \draw[mui] (5.9,0.1) -- node[right, font=\small, align=left, pos=0.7] {\;mẫu (batch)} (8.4,1.75);
+  \node[khoiX, align=left, anchor=west] at (10.0,1.6)
+    {Đầu vào RNN: tensor $\mathbf{X}\in\mathbb{R}^{B\times T\times F}$\\[2pt]
+     PyTorch: \texttt{batch\_first=True}\\
+     Keras: \texttt{Input(shape=(T, F))}\\[2pt]
+     Đầu ra: $\hat{\mathbf{y}}\in\mathbb{R}^{B}$ (many-to-one)};
+\end{tikzpicture}

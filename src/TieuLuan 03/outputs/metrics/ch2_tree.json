@@ -1,0 +1,40 @@
+{
+ "nodes": {
+  "n0": {
+   "feature": "HbA1c_level",
+   "thr": 6.7,
+   "gini": 0.161,
+   "share": 1.0,
+   "p1": 0.09
+  },
+  "n1": {
+   "feature": "blood_glucose_level",
+   "thr": 210.0,
+   "gini": 0.095,
+   "share": 0.96,
+   "p1": 0.05
+  },
+  "n2": {
+   "feature": "lá",
+   "thr": -2.0,
+   "gini": 0.06,
+   "share": 0.941,
+   "p1": 0.03
+  },
+  "n3": {
+   "feature": "lá",
+   "thr": -2.0,
+   "gini": 0.0,
+   "share": 0.019,
+   "p1": 1.0
+  },
+  "n4": {
+   "feature": "lá",
+   "thr": -2.0,
+   "gini": 0.0,
+   "share": 0.04,
+   "p1": 1.0
+  }
+ },
+ "text": "|--- HbA1c_level <= 6.70\n|   |--- blood_glucose_level <= 210.00\n|   |   |--- class: 0\n|   |--- blood_glucose_level >  210.00\n|   |   |--- class: 1\n|--- HbA1c_level >  6.70\n|   |--- class: 1\n"
+}

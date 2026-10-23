@@ -1,0 +1,23 @@
+\begin{tikzpicture}[node distance=5mm]
+  % hàng trên: 4 bước dữ liệu
+  \foreach \i/\x/\c/\t in {1/0/cBlue/{Thu thập\\dữ liệu}, 2/3.7/cSky/{Khảo sát\\\& làm sạch}, 3/7.4/cTeal/{EDA \&\\biểu diễn}, 4/11.1/cGreen/{Chia Train/\\Val/Test}}{
+    \khoibaD{\x}{3.2}{2.9}{1.5}{0.8}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\x+1.45,3.95) {\t};
+    \node[buoc=cRed] at (\x+0.1,4.8) {\i};
+  }
+  % hàng dưới: 4 bước mô hình
+  \foreach \i/\x/\c/\t in {8/0/cPurple/{Triển khai\\Web/Mobile}, 7/3.7/cPink/{Chọn mô hình\\(Validation)}, 6/7.4/cOrange/{Đánh giá\\\& tinh chỉnh}, 5/11.1/cYellow/{Huấn luyện\\mô hình}}{
+    \khoibaD{\x}{0}{2.9}{1.5}{0.8}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\x+1.45,0.75) {\t};
+    \node[buoc=cRed] at (\x+0.1,1.6) {\i};
+  }
+  \foreach \x in {2.9,6.6,10.3}{\draw[mui] (\x+0.25,3.95) -- (\x+0.75,3.95);}
+  \foreach \x in {2.9,6.6,10.3}{\draw[mui] (\x+0.75,0.75) -- (\x+0.25,0.75);}
+  \draw[mui] (12.55,3.15) -- (12.55,1.55);
+  % vòng lặp phản hồi
+  \draw[muiM=cRed, dashed, rounded corners=8pt] (8.85,-0.15) -- (8.85,-0.9) -- (5.0,-0.9) node[below, midway, font=\small, text=cRed] {quay lại đặc trưng / siêu tham số} -- (5.0,2.6) -- (8.4,2.6) -- (8.4,3.15);
+  \begin{scope}[on background layer]
+    \node[vung=cSlate, fit={(-0.2,-1.6) (15.1,5.2)}, inner sep=2pt] {};
+  \end{scope}
+  \node[tieude, anchor=south] at (7.4,5.25) {Quy trình học máy có giám sát điển hình};
+\end{tikzpicture}

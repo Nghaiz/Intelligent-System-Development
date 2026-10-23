@@ -1,0 +1,7 @@
+PREFIX kg: <http://tl3.vn/kg/>\par
+SELECT ?day ?close ?ret WHERE \{\par
+  ?day kg:in\_month kg:Month\_2020-03 ;\par
+       kg:has\_close ?close ;\par
+       kg:has\_return\_pct ?ret .\par
+  FILTER (?ret < -4.0)\par
+\} ORDER BY ?ret\par

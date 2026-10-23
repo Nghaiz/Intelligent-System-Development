@@ -1,0 +1,20 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \fill[cBlue!4] (-0.5,-0.5) rectangle (9,6);
+  \draw[gray!25, step=1] (-0.5,-0.5) grid (9,6);
+  \draw[-{Stealth[length=3mm]}, thick] (-0.5,0) -- (9.2,0); \draw[-{Stealth[length=3mm]}, thick] (0,-0.5) -- (0,6.2);
+  % hai cặp có cùng quan hệ in_month: vector r giống nhau
+  \foreach \hx/\hy/\c/\n in {1/1/cRed/{TradingDay 16/03}, 1.6/3.4/cOrange/{TradingDay 17/03}}{
+    \fill[\c] (\hx,\hy) circle (0.13) node[below left, font=\small] {\n};
+    \draw[muiM=cBlue, line width=2pt] (\hx,\hy) -- ++(4.2,1.4) node[midway, above, sloped, font=\small\bfseries, text=cBlue] {$\mathbf{r}$ = in\_month};
+  }
+  \fill[cGreen] (5.25,2.45) circle (0.16) node[right, font=\small] {Month 2020-03 ($\mathbf{t}$)};
+  \draw[cGreen, dashed, thick] (5.25,2.45) circle (0.55);
+  \draw[cGreen!70!black, dashed, thick] (5.8,4.8) circle (0.5);
+  \node[font=\small, text=cGreen!70!black] at (7.4,5.3) {$\mathbf{h}+\mathbf{r}$};
+  \node[hop=cPurple, font=\small, text width=6.2cm] at (13.0,3.6)
+    {\textbf{TransE:} $\mathbf{h} + \mathbf{r} \approx \mathbf{t}$\\[3pt]
+     $f(h,r,t) = \|\mathbf{h}+\mathbf{r}-\mathbf{t}\|_{1/2}$\\[3pt]
+     $\mathcal{L} = \sum \max\big(0,\ \gamma + f(h,r,t) - f(h',r,t')\big)$};
+  \node[hop=cSlate, font=\small, text width=6.2cm] at (13.0,0.8)
+    {bộ ba bị làm hỏng $(h',r,t')$ đóng vai mẫu âm; khoảng cách nhỏ $\Rightarrow$ bộ ba hợp lý $\Rightarrow$ dự đoán liên kết thiếu};
+\end{tikzpicture}

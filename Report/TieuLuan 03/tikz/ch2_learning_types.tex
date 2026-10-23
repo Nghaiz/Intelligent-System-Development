@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+  % ---- học có giám sát
+  \node[hop=cBlue, minimum width=4.6cm, minimum height=5.6cm] (s) at (0,0) {};
+  \node[tieude, text=cBlue!70!black] at (0,2.4) {Có giám sát};
+  \foreach \x/\y in {-1.6/1.1,-1.2/0.4,-1.7/0.2,-0.9/1.3,-1.3/-0.2}{\fill[cBlue] (\x,\y) circle (3pt);}
+  \foreach \x/\y in {0.9/-0.6,1.3/-1.2,1.6/-0.3,0.7/-1.4,1.2/0.1}{\fill[cRed] (\x,\y) circle (3pt);}
+  \draw[very thick, cNavy] (-1.8,-1.6) -- (1.8,1.4);
+  \node[nhan, align=center] at (0,-2.2) {dữ liệu $(\mathbf{x}, y)$ có nhãn\\phân loại, hồi quy};
+  % ---- không giám sát
+  \node[hop=cGreen, minimum width=4.6cm, minimum height=5.6cm] (u) at (5.2,0) {};
+  \node[tieude, text=cGreen!60!black] at (5.2,2.4) {Không giám sát};
+  \foreach \x/\y in {4.0/1.2,4.3/0.8,3.8/0.7,4.4/1.4}{\fill[cOrange] (\x,\y) circle (3pt);}
+  \foreach \x/\y in {6.2/1.0,6.5/0.5,6.0/0.6,6.6/1.2}{\fill[cPurple] (\x,\y) circle (3pt);}
+  \foreach \x/\y in {5.0/-0.8,5.4/-1.2,5.1/-1.3,5.6/-0.7}{\fill[cTeal] (\x,\y) circle (3pt);}
+  \draw[dashed, thick, cOrange] (4.1,1.0) circle (0.6);
+  \draw[dashed, thick, cPurple] (6.3,0.8) circle (0.6);
+  \draw[dashed, thick, cTeal] (5.3,-1.0) circle (0.6);
+  \node[nhan, align=center] at (5.2,-2.2) {chỉ có $\mathbf{x}$, tìm cấu trúc\\phân cụm, giảm chiều};
+  % ---- tăng cường
+  \node[hop=cOrange, minimum width=4.6cm, minimum height=5.6cm] (r) at (10.4,0) {};
+  \node[tieude, text=cOrange!70!black] at (10.4,2.4) {Tăng cường};
+  \node[cau=cPurple, minimum size=11mm] (ag) at (10.4,1.0) {Agent};
+  \node[khoiX, minimum width=2.4cm] (env) at (10.4,-0.9) {Môi trường};
+  \draw[muiM=cRed] (ag.east) to[bend left=50] node[right, font=\small] {$a_t$} (env.east);
+  \draw[muiM=cGreen!60!black] (env.west) to[bend left=50] node[left, font=\small, align=center] {$s_{t+1}$\\$r_{t+1}$} (ag.west);
+  \node[nhan, align=center] at (10.4,-2.2) {học chính sách từ\\phần thưởng tích lũy};
+\end{tikzpicture}

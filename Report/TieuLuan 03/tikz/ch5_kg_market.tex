@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % chuỗi ngày giao dịch (kiểu biến động lấy đúng theo dữ liệu tháng 3/2020)
+  \foreach \i/\d/\m in {0/13/Move\_tăng mạnh, 1/16/Move\_giảm mạnh, 2/17/Move\_tăng mạnh, 3/18/Move\_giảm}{
+    \node[hop=cBlue, text width=2.6cm, font=\small, align=center] (d\i) at (\i*3.8,0)
+       {\textbf{TradingDay}\\ 2020-03-\d\\ \scriptsize close, open, high, low, volume};
+    \node[hop=cOrange, font=\scriptsize, text width=2.2cm, align=center] (mv\i) at (\i*3.8,-2.6) {\m};
+    \draw[mui] (d\i) -- node[nhan, right, font=\scriptsize] {has\_movement} (mv\i);
+  }
+  \foreach \i/\j in {0/1,1/2,2/3}\draw[mui] (d\i) -- node[nhan, above, font=\scriptsize] {next\_day} (d\j);
+  % tháng, năm
+  \node[cau=cGreen, minimum size=18mm, align=center] (mo) at (5.7,3.6) {\scriptsize Month\\[-2pt]\scriptsize 2020-03};
+  \node[cau=cPurple, minimum size=18mm, align=center] (yr) at (10.6,4.0) {\scriptsize Year\\[-2pt]\scriptsize 2020};
+  \foreach \i in {0,...,3}\draw[muiM=cGreen] (d\i.north) -- (mo);
+  \draw[muiM=cPurple] (mo) -- node[nhan, above] {in\_year} (yr);
+  \node[nhan] at (2.4,2.7) {in\_month};
+  % chỉ báo của vàng, tài liệu tổng hợp
+  \node[hop=cTeal, text width=5.6cm, font=\scriptsize, align=left] at (10.2,-5.2)
+   {\textbf{MarketDay (vàng) thêm:} has\_sp500\_close, has\_dowjones\_close, has\_eurusd, has\_brent, has\_wti,
+    has\_us\_bond\_yield, has\_usd\_index, has\_gdx\_close, has\_uso\_close};
+  \node[hop=cSlate, text width=5.8cm, font=\scriptsize, align=left] at (2.4,-5.2)
+   {\textbf{Tài liệu tổng hợp} M-2020-03, M-2020: đầu/cuối kỳ, cao/thấp nhất (ngày), trung bình, độ biến động};
+\end{tikzpicture}

@@ -1,0 +1,41 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % (a) điều phối – thợ
+  \begin{scope}
+    \filldraw[vung=cBlue] (-0.3,-0.4) rectangle (7.3,4.2);
+    \node[tieude] at (3.5,3.85) {(a) Điều phối -- thợ};
+    \node[khoiR] (o) at (3.5,2.8) {Coordinator};
+    \foreach \x/\t/\c [count=\k] in {0.9/Planner/cBlue, 2.65/Solver/cOrange, 4.35/Retriever/cTeal, 6.1/Verifier/cGreen}{
+      \node[hop=\c, minimum width=1.5cm] (w\k) at (\x,0.6) {\t};
+      \draw[muiM=cSlate, <->] (o) -- (w\k);}
+  \end{scope}
+  % (b) đường ống
+  \begin{scope}[xshift=8.2cm]
+    \filldraw[vung=cOrange] (-0.3,-0.4) rectangle (7.6,4.2);
+    \node[tieude] at (3.65,3.85) {(b) Đường ống (pipeline)};
+    \foreach \x/\t/\c [count=\k] in {0.8/Plan/cBlue, 2.8/Solve/cOrange, 4.8/Check/cGreen, 6.7/Answer/cPurple}
+      \node[hop=\c, minimum width=1.45cm, minimum height=1.0cm] (p\k) at (\x,1.7) {\t};
+    \foreach \a/\b in {1/2, 2/3, 3/4} \draw[mui] (p\a) -- (p\b);
+    \draw[muiM=cRed, dashed] (p3.south) to[bend left=35] node[below, font=\small] {sửa lại} (p2.south);
+  \end{scope}
+  % (c) tranh luận
+  \begin{scope}[yshift=-5.2cm]
+    \filldraw[vung=cPurple] (-0.3,-0.4) rectangle (7.3,4.2);
+    \node[tieude] at (3.5,3.85) {(c) Tranh luận (debate)};
+    \node[cau=cBlue, minimum size=12mm] (d1) at (1.0,2.2) {A};
+    \node[cau=cOrange, minimum size=12mm] (d2) at (6.0,2.2) {B};
+    \node[hop=cPurple] (j) at (3.5,0.5) {Giám khảo / biểu quyết};
+    \draw[muiM=cBlue, line width=1.3pt] (d1) to[bend left=20] node[above, font=\small] {lập luận} (d2);
+    \draw[muiM=cOrange!85!black, line width=1.3pt] (d2) to[bend left=20] node[above, font=\small] {phản biện} (d1);
+    \draw[mui] (d1) -- (j); \draw[mui] (d2) -- (j);
+  \end{scope}
+  % (d) bảng đen
+  \begin{scope}[xshift=8.2cm, yshift=-5.2cm]
+    \filldraw[vung=cGreen] (-0.3,-0.4) rectangle (7.6,4.2);
+    \node[tieude] at (3.65,3.85) {(d) Bảng đen chung};
+    \node[draw=black!80, fill=black!80, text=white, rounded corners=3pt, minimum width=3.4cm, minimum height=1.5cm,
+          font=\small\ttfamily, align=left] (bb) at (3.65,1.7) {plan: ...\\x = 18\\verified: true};
+    \foreach \px/\py/\t/\c in {0.9/3.0/Planner/cBlue, 6.4/3.0/Solver/cOrange, 0.9/0.4/Critic/cRed, 6.4/0.4/Tool/cTeal}
+      {\node[hop=\c, minimum width=1.4cm] (bk\t) at (\px,\py) {\t};
+       \draw[muiM=\c!80!black, <->] (bk\t) -- (bb);}
+  \end{scope}
+\end{tikzpicture}

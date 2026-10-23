@@ -120,3 +120,24 @@ Report/TieuLuan 02/_minted*/
 Report/TieuLuan 02/main.*
 !Report/TieuLuan 02/main.tex
 Report/TieuLuan 02/kiemtra.*
+# ===== Tiểu luận 03 =====
+# Ảnh Kaggle/CIFAR-10 (~580 MB) và Planetoid: tải lại tự động bằng tl3.ch3_data / torch_geometric
+src/TieuLuan 03/data/ch3/raw/
+src/TieuLuan 03/data/ch3/*.npz
+src/TieuLuan 03/data/ch6/
+# Chỉ mục truy hồi của miền tiểu đường (> 35 MB/tệp) và điểm lưu TF: dựng lại bằng scripts/ (xem README)
+src/TieuLuan 03/models/ch5/diabetes_*
+src/TieuLuan 03/models/ch3/ckpt/
+src/TieuLuan 03/outputs/gpu_heavy.lock
+src/TieuLuan 03/outputs/logs/ch6_ckpt/
+# Báo cáo: các tệp build.py tự sinh lại
+Report/TieuLuan 03/code/
+Report/TieuLuan 03/_minted*/
+Report/TieuLuan 03/_*.data.minted
+Report/TieuLuan 03/tikzcache/
+Report/TieuLuan 03/generated/so_lieu.tex
+Report/TieuLuan 03/main.*
+!Report/TieuLuan 03/main.tex
+Report/TieuLuan 03/kiemtra_*
+Report/TieuLuan 03/toanbo.*
+Report/TieuLuan 03/*.auxlock

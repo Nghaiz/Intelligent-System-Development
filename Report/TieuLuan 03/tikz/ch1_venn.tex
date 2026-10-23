@@ -1,0 +1,21 @@
+\begin{tikzpicture}
+  \begin{scope}[blur shadow={shadow blur steps=8, shadow xshift=1.5pt, shadow yshift=-1.5pt, shadow opacity=30}]
+    \draw[very thick, cNavy, inner color=cSky!10, outer color=cSky!40] (0,0) ellipse (7.4cm and 4.6cm);
+    \draw[very thick, cTeal!70!black, inner color=cTeal!8, outer color=cTeal!40] (1.3,-0.35) ellipse (5.5cm and 3.65cm);
+    \draw[very thick, cOrange!80!black, inner color=cOrange!8, outer color=cOrange!45] (2.5,-0.7) ellipse (3.75cm and 2.6cm);
+    \draw[very thick, cRed!80!black, inner color=cRed!10, outer color=cRed!50] (3.55,-1.0) ellipse (2.1cm and 1.45cm);
+  \end{scope}
+  % mỗi nhãn nằm trọn trong vành của nó, không cắt đường viền elip
+  \node[font=\large\bfseries\sffamily, text=cNavy, align=center] at (-4.7,2.3) {Trí tuệ\\nhân tạo};
+  \node[font=\small, text=cNavy, align=center] at (-5.5,0.3) {tìm kiếm, logic,\\lập kế hoạch,\\hệ chuyên gia,\\robot};
+  \node[font=\large\bfseries\sffamily, text=cTeal!50!black] at (-1.2,2.25) {Học máy};
+  \node[font=\small, text=cTeal!40!black, align=center] at (-2.6,0.0) {hồi quy, SVM,\\cây quyết định,\\rừng ngẫu\\nhiên, K-means};
+  \node[font=\large\bfseries\sffamily, text=cOrange!50!black] at (1.15,1.25) {Học sâu};
+  \node[font=\small, text=cOrange!40!black, align=center] at (0.15,-1.05) {MLP, CNN,\\RNN, GNN};
+  \node[font=\bfseries\sffamily, text=cRed!50!black, align=center] at (3.55,-0.75) {AI tạo sinh\\LLM};
+  \node[font=\small, text=cRed!40!black, align=center] at (3.55,-1.75) {GPT, Diffusion};
+  % nhãn năm hình thành
+  \foreach \x/\y/\t/\c in {-6.4/-2.9/1956/cNavy, -3.1/-3.6/1959/cTeal, 0.2/-3.3/2006/cOrange, 4.9/-2.7/2017/cRed} {
+    \node[buoc=\c, minimum size=9mm, font=\small\bfseries] at (\x,\y) {\t};
+  }
+\end{tikzpicture}

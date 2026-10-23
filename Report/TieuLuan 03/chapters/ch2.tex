@@ -1,0 +1,997 @@
+% =====================================================================
+%  Chương 2 — Các kỹ thuật học máy cơ bản (làn L2)
+%  Mọi con số thực nghiệm lấy từ \SL{ch2_*}; mã trích từ src/TieuLuan 03/{tl3,scripts}/ch2_*.py
+% =====================================================================
+\providecommand{\bonhanxet}[3]{%
+  \begin{phathien}{Quan sát -- Diễn giải -- Hàm ý cho mô hình}
+  \textbf{Quan sát.} #1\par\smallskip
+  \textbf{Diễn giải.} #2\par\smallskip
+  \textbf{Hàm ý.} #3
+  \end{phathien}}
+
+\chapter{Các kỹ thuật học máy cơ bản (Machine Learning)}
+\label{chap:ml}
+
+Chương~1 cho thấy bước ngoặt của trí tuệ nhân tạo là chuyển từ \emph{viết tay tri thức} sang \emph{để máy học từ
+dữ liệu}. Chương này trình bày nền tảng của bước chuyển đó: học máy (machine learning). Phần đầu (các mục
+\ref{sec:ml-concepts}--\ref{sec:ml-scratch}) hệ thống hóa các khái niệm, thuật toán kinh điển và cách đánh giá mô hình,
+mỗi thuật toán có công thức, hình minh họa và mã cài đặt. Phần sau là ba thực nghiệm đầy đủ theo cùng một quy trình:
+dự đoán bệnh tiểu đường (phân loại nhị phân trên \SL{ch2_diabetes/survey/shape/0} hồ sơ), dự đoán giá nhà (hồi quy) và
+phân loại nhận xét khách hàng (phân loại văn bản). Mỗi thực nghiệm đi qua đủ các bước: mô tả bài toán, giới thiệu dữ liệu,
+khảo sát, làm sạch, biểu diễn, phân tích khám phá (EDA), chia tập, xây dựng mô hình, đánh giá, lựa chọn và triển khai.
+
+Theo định nghĩa thường được trích dẫn của Mitchell~\cite{ch2:mitchell1997}: \emph{một chương trình máy tính được nói là
+học từ kinh nghiệm $E$ đối với lớp nhiệm vụ $T$ và độ đo hiệu năng $P$, nếu hiệu năng của nó trên các nhiệm vụ thuộc
+$T$, đo bằng $P$, được cải thiện nhờ kinh nghiệm $E$}. Với bài toán tiểu đường, $T$ là phân loại một hồ sơ bệnh nhân,
+$E$ là các hồ sơ đã biết kết quả chẩn đoán và $P$ là F1 hay ROC-AUC trên những hồ sơ mô hình chưa từng thấy.
+
+% =====================================================================
+\section{Các khái niệm nền tảng}
+\label{sec:ml-concepts}
+
+\subsection{Dữ liệu, đặc trưng và nhãn}
+Một tập dữ liệu có giám sát gồm $n$ cặp $\mathcal{D}=\{(\mathbf{x}_i, y_i)\}_{i=1}^{n}$. Mỗi \emph{mẫu} (sample,
+observation) là một vector đặc trưng $\mathbf{x}_i\in\mathbb{R}^d$; mỗi thành phần $x_{ij}$ là một \emph{đặc trưng}
+(feature, thuộc tính). Xếp các vector thành hàng ta được \emph{ma trận thiết kế} $X\in\mathbb{R}^{n\times d}$. Biến
+cần dự đoán $y_i$ là \emph{nhãn} (label, target): rời rạc với bài toán phân loại (classification), liên tục với bài toán
+hồi quy (regression).
+
+Đặc trưng có hai dạng chính. \emph{Đặc trưng số} (numerical) như tuổi, BMI, diện tích có phép so sánh và phép trừ có
+nghĩa. \emph{Đặc trưng phân loại} (categorical) như giới tính, thành phố chỉ là tên nhóm; muốn đưa vào mô hình phải mã
+hóa thành số (mục~\ref{sec:ml-feature}). Văn bản, ảnh và chuỗi thời gian là dữ liệu phi cấu trúc, cần bước biểu diễn
+riêng: TF-IDF cho văn bản ở chương này, tích chập cho ảnh ở Chương~3, mạng hồi quy cho chuỗi ở Chương~4.
+
+\begin{dinhnghia}{Học máy như bài toán xấp xỉ hàm}
+Giả sử tồn tại hàm chưa biết $f:\mathcal{X}\to\mathcal{Y}$ sinh ra nhãn (cộng nhiễu). Học máy chọn trong một
+\emph{lớp giả thuyết} $\mathcal{H}$ (ví dụ mọi hàm tuyến tính, mọi cây độ sâu $\le 8$) một hàm $h\in\mathcal{H}$ sao cho
+$h(\mathbf{x})\approx y$ \emph{trên dữ liệu mới}, không chỉ trên dữ liệu đã thấy.
+\end{dinhnghia}
+
+\subsection{Ba kiểu học chính}
+Hình~\ref{fig:ch2-types} tóm tắt ba kiểu học. \textbf{Học có giám sát} (supervised learning) dùng dữ liệu có nhãn để
+học ánh xạ $\mathbf{x}\mapsto y$; đây là kiểu của cả ba thực nghiệm trong chương. \textbf{Học không giám sát}
+(unsupervised learning) chỉ có $\mathbf{x}$ và tìm cấu trúc ẩn như cụm (K-means) hay các hướng biến thiên chính (PCA),
+được minh họa ở mục~\ref{sec:ml-unsup}. \textbf{Học tăng cường} (reinforcement learning) học một chính sách hành động
+từ phần thưởng trả về sau mỗi tương tác với môi trường; đây là nền tảng của AlphaGo được nhắc ở Chương~1.
+
+\hinhtikz{ch2_learning_types}{Ba kiểu học máy: có giám sát (đường biên tách hai lớp có nhãn), không giám sát (tự tìm
+ba cụm) và tăng cường (vòng lặp tác tử -- môi trường với hành động $a_t$, trạng thái $s_{t+1}$, phần thưởng $r_{t+1}$).}{ch2-types}
+
+\subsection{Hàm mất mát và huấn luyện}
+\label{sec:ml-loss}
+Để đo mức sai của $h$ trên một mẫu, ta dùng \emph{hàm mất mát} $\ell(h(\mathbf{x}), y)$. Huấn luyện là cực tiểu
+\emph{rủi ro thực nghiệm} (empirical risk), thường kèm một số hạng chính quy hóa $\Omega$ phạt mô hình phức tạp:
+\begin{equation}
+  \hat{\mathbf{w}}=\arg\min_{\mathbf{w}}\; J(\mathbf{w})=\frac{1}{n}\sum_{i=1}^{n}\ell\big(h_{\mathbf{w}}(\mathbf{x}_i),y_i\big)+\lambda\,\Omega(\mathbf{w}).
+  \label{eq:erm}
+\end{equation}
+Hai hàm mất mát dùng nhiều nhất là sai số bình phương $\ell=(\hat{y}-y)^2$ cho hồi quy và cross-entropy
+$\ell=-[y\log p+(1-y)\log(1-p)]$ cho phân loại. Khi không có nghiệm đóng, ta dùng \textbf{Gradient Descent}: lặp lại
+\begin{equation}
+  \mathbf{w}^{(t+1)}=\mathbf{w}^{(t)}-\eta\,\nabla_{\mathbf{w}}J\big(\mathbf{w}^{(t)}\big),
+\end{equation}
+với $\eta$ là tốc độ học (learning rate). Phiên bản \emph{ngẫu nhiên} (SGD) và \emph{mini-batch} ước lượng gradient
+trên một phần nhỏ dữ liệu mỗi bước, rẻ hơn nhiều với $n$ lớn; Adam~\cite{ch2:kingma2015} điều chỉnh $\eta$ riêng cho
+từng tham số theo mô-men bậc một và bậc hai của gradient. Hình~\ref{fig:ch2-gd} cho thấy vai trò của $\eta$ trên một
+hàm mất mát bậc hai lệch trục: $\eta$ quá nhỏ hội tụ chậm, $\eta$ vừa phải đi thẳng vào cực tiểu, $\eta$ lớn gây dao
+động qua lại theo trục dốc.
+
+\hinhpdf{ch2_gd_lr}{1}{Đường đi của Gradient Descent trên mặt mất mát $J(\mathbf{w})=\tfrac12\mathbf{w}^\top A\mathbf{w}$
+(ngôi sao là cực tiểu) với ba tốc độ học. Mặt mất mát dốc theo $w_1$ và thoải theo $w_2$ nên $\eta$ lớn dao động theo $w_1$.}{ch2-gd}
+
+\subsection{Chia dữ liệu: huấn luyện, kiểm định, kiểm thử}
+Mục tiêu của học máy là \emph{tổng quát hóa}. Vì vậy dữ liệu được chia thành ba phần không giao nhau
+(Hình~\ref{fig:ch2-split}a): \textbf{Train} để học tham số, \textbf{Validation} để so sánh mô hình, chọn siêu tham số
+và ngưỡng quyết định, \textbf{Test} để báo cáo hiệu năng cuối cùng và chỉ dùng một lần. Với bài toán phân loại mất cân
+bằng, việc chia được \emph{phân tầng} (stratified) để tỷ lệ các lớp ở ba tập như nhau. Khi dữ liệu ít, \emph{kiểm định
+chéo $k$-fold}~\cite{ch2:kohavi1995} (Hình~\ref{fig:ch2-split}b) cho ước lượng ổn định hơn: dữ liệu chia $k$ phần, mỗi
+lượt dùng một phần làm kiểm định và $k-1$ phần còn lại để huấn luyện, rồi lấy trung bình và độ lệch chuẩn của $k$ điểm số.
+
+\hinhtikz{ch2_split}{(a) Chia hold-out 70/15/15 dùng trong cả ba thực nghiệm; (b) kiểm định chéo 5-fold trên tập
+Train dùng để ước lượng độ ổn định của mô hình.}{ch2-split}
+
+\begin{luuy}{Rò rỉ dữ liệu (data leakage)}
+Mọi phép biến đổi học tham số từ dữ liệu (trung bình và độ lệch chuẩn của chuẩn hóa, từ vựng TF-IDF, ngưỡng quyết
+định) phải được \emph{fit trên Train}, rồi chỉ \emph{áp dụng} cho Validation và Test. Trong mã của chương, điều này được
+bảo đảm bằng cách gói tiền xử lý và mô hình vào cùng một \texttt{Pipeline} của scikit-learn~\cite{ch2:pedregosa2011}.
+\end{luuy}
+
+% =====================================================================
+\section{Quy trình học máy điển hình}
+Hình~\ref{fig:ch2-pipeline} là quy trình tám bước mà cả ba thực nghiệm tuân theo, cũng là cấu trúc đề mục của các
+mục~\ref{sec:ml-diab}--\ref{sec:ml-cmt}. Điểm đáng chú ý là vòng phản hồi: kết quả đánh giá trên Validation thường đưa
+ta quay lại thiết kế đặc trưng hoặc siêu tham số. Ranh giới quan trọng là tập Test không được tham gia vòng lặp này.
+
+\hinhtikz{ch2_pipeline}{Quy trình học máy có giám sát tám bước, từ thu thập dữ liệu tới triển khai; vòng đứt nét là
+phản hồi từ đánh giá trên Validation về đặc trưng và siêu tham số.}{ch2-pipeline}
+
+\begin{enumerate}
+  \item \textbf{Thu thập dữ liệu} và hiểu ngữ cảnh: nguồn, đơn vị, ý nghĩa từng cột.
+  \item \textbf{Khảo sát và làm sạch}: giá trị thiếu, bản ghi trùng, giá trị vô lý, ngoại lai.
+  \item \textbf{EDA và biểu diễn}: phân bố, tương quan, quan hệ với nhãn; mã hóa và chuẩn hóa.
+  \item \textbf{Chia tập} Train/Validation/Test, phân tầng nếu là phân loại.
+  \item \textbf{Huấn luyện} nhiều họ mô hình, luôn kèm một \emph{baseline} ngây thơ để biết mức ``không học gì''.
+  \item \textbf{Đánh giá và tinh chỉnh} bằng các chỉ số phù hợp bản chất bài toán.
+  \item \textbf{Chọn mô hình} dựa trên Validation, rồi đánh giá một lần trên Test.
+  \item \textbf{Triển khai}: đóng gói tiền xử lý + mô hình thành dịch vụ dự đoán.
+\end{enumerate}
+
+% =====================================================================
+\section{Hồi quy tuyến tính (Linear Regression)}
+\label{sec:ml-linreg}
+
+\subsection{Bình phương tối thiểu và hàm mất mát}
+Hồi quy tuyến tính giả định nhãn là tổ hợp tuyến tính của đặc trưng cộng nhiễu:
+$y=w_0+w_1x_1+\dots+w_dx_d+\varepsilon=\tilde{\mathbf{x}}^\top\mathbf{w}+\varepsilon$, trong đó
+$\tilde{\mathbf{x}}=(1,x_1,\dots,x_d)$ đã thêm thành phần 1 cho hệ số chặn. Phương pháp bình phương tối thiểu (OLS)
+chọn $\mathbf{w}$ cực tiểu trung bình bình phương phần dư (Hình~\ref{fig:ch2-linreg}):
+\begin{equation}
+  J(\mathbf{w})=\frac{1}{n}\lVert X\mathbf{w}-\mathbf{y}\rVert_2^2,\qquad
+  \nabla J=\frac{2}{n}X^\top(X\mathbf{w}-\mathbf{y})=0\;\Rightarrow\;\hat{\mathbf{w}}=(X^\top X)^{-1}X^\top\mathbf{y}.
+  \label{eq:ols}
+\end{equation}
+Công thức (\ref{eq:ols}) là \emph{phương trình chuẩn} (normal equation). Nó cho nghiệm chính xác trong một bước nhưng
+chi phí $O(nd^2+d^3)$; khi $d$ lớn hoặc $X^\top X$ gần suy biến, ta dùng Gradient Descent hoặc phân rã QR/SVD.
+
+\hinhtikz{ch2_linreg}{Hồi quy tuyến tính một biến: đường $\hat y=w_0+w_1x$ cực tiểu tổng bình phương phần dư (đoạn
+đứt nét màu cam); bên phải là ba cách tìm $\mathbf{w}$.}{ch2-linreg}
+
+\textbf{Ví dụ số nhỏ.} Với ba điểm $(1,2),(2,3),(3,5)$: $\bar{x}=2$, $\bar{y}=10/3$; hệ số góc
+$w_1=\sum(x_i-\bar x)(y_i-\bar y)/\sum(x_i-\bar x)^2=(-1)(-4/3)+0+(1)(5/3)$ chia cho $2$, tức $w_1=1{,}5$, và
+$w_0=\bar y-w_1\bar x=1/3$. Đường thẳng $\hat{y}=0{,}33+1{,}5x$ có phần dư $0{,}17;\,-0{,}33;\,0{,}17$, tổng bằng 0 đúng
+như tính chất của OLS khi có hệ số chặn.
+
+Đoạn mã~\ref{code:ch2_scratch__linreg_normal_equation} và~\ref{code:ch2_scratch__linreg_gd} cài đặt cả hai cách
+bằng NumPy; mục~\ref{sec:ml-scratch} đối chiếu chúng với scikit-learn trên dữ liệu giá nhà.
+
+\maNguon{ch2_scratch__linreg_normal_equation}{Hồi quy tuyến tính bằng phương trình chuẩn (NumPy)}
+\maNguon{ch2_scratch__linreg_gd}{Hồi quy tuyến tính bằng Gradient Descent trên MSE (NumPy)}
+
+\subsection{Mở rộng: đa thức, Ridge và Lasso}
+\textbf{Hồi quy đa thức} vẫn là hồi quy tuyến tính theo tham số, chỉ thay $\mathbf{x}$ bằng các đặc trưng mở rộng
+$\phi(\mathbf{x})=(x_1,x_2,x_1^2,x_1x_2,x_2^2,\dots)$, nhờ đó học được quan hệ cong. Bậc càng cao, mô hình càng linh hoạt
+và càng dễ quá khớp (mục~\ref{sec:ml-overfit}). \textbf{Ridge}~\cite{ch2:hoerl1970} thêm phạt L2, \textbf{Lasso}%
+~\cite{ch2:tibshirani1996} thêm phạt L1:
+\begin{equation}
+  J_{\text{Ridge}}=\tfrac{1}{n}\lVert X\mathbf{w}-\mathbf{y}\rVert^2+\lambda\lVert\mathbf{w}\rVert_2^2,\qquad
+  J_{\text{Lasso}}=\tfrac{1}{2n}\lVert X\mathbf{w}-\mathbf{y}\rVert^2+\lambda\lVert\mathbf{w}\rVert_1 .
+\end{equation}
+Ridge vẫn có nghiệm đóng $\hat{\mathbf{w}}=(X^\top X+n\lambda I)^{-1}X^\top\mathbf{y}$, luôn khả nghịch nên ổn định khi
+các đặc trưng tương quan. Lasso không có nghiệm đóng nhưng có tính chất quý: đưa một số hệ số về \emph{đúng bằng 0},
+tức tự chọn đặc trưng. Hình~\ref{fig:ch2-l1l2} giải thích bằng hình học: nghiệm là điểm đường đồng mức của hàm mất mát
+chạm miền ràng buộc lần đầu; miền L1 là hình thoi có đỉnh nằm trên trục nên điểm chạm thường là đỉnh, nơi một tọa độ bằng 0.
+
+\hinhtikz{ch2_l1l2}{Hình học của chính quy hóa: đường đồng mức (cam) của MSE quanh nghiệm OLS chạm miền ràng buộc. Hình
+tròn L2 cho nghiệm co nhỏ đều; hình thoi L1 cho nghiệm nằm ở đỉnh, khiến $w_1=0$.}{ch2-l1l2}
+
+% =====================================================================
+\section{Perceptron, hồi quy logistic và Softmax}
+\label{sec:ml-logreg}
+
+\subsection{Perceptron Learning Algorithm (PLA)}
+Perceptron của Rosenblatt~\cite{ch2:rosenblatt1958} là bộ phân loại tuyến tính sớm nhất có thuật toán học:
+$\hat{y}=\operatorname{sign}(\mathbf{w}^\top\tilde{\mathbf{x}})$ với $y\in\{-1,+1\}$. Mỗi khi gặp điểm bị phân loại sai
+($y_i\mathbf{w}^\top\tilde{\mathbf{x}}_i\le 0$), PLA cập nhật $\mathbf{w}\leftarrow\mathbf{w}+y_i\tilde{\mathbf{x}}_i$,
+tức xoay siêu phẳng về phía điểm đó. Định lý hội tụ Novikoff bảo đảm PLA dừng sau hữu hạn bước \emph{nếu} dữ liệu tách
+được tuyến tính; ngược lại nó dao động mãi, đó cũng là giới hạn XOR đã gây ra mùa đông AI thứ nhất (Chương~1).
+Trên hai cụm tách được (Hình~\ref{fig:ch2-pla}, trái), cài đặt ở Đoạn mã~\ref{code:ch2_scratch__pla} hội tụ sau
+\SL{ch2_scratch/pla/epochs} epoch.
+
+\maNguon{ch2_scratch__pla}{Perceptron Learning Algorithm cài đặt bằng NumPy}
+
+\subsection{Hồi quy logistic và hàm mất mát}
+Thay vì nhãn cứng, \textbf{hồi quy logistic}~\cite{ch2:cox1958} ước lượng xác suất lớp dương bằng hàm sigmoid
+(Hình~\ref{fig:ch2-logistic}):
+\begin{equation}
+  p=P(y=1\mid\mathbf{x})=\sigma(z)=\frac{1}{1+e^{-z}},\qquad z=\mathbf{w}^\top\mathbf{x}+b .
+\end{equation}
+Logarit tỷ số odds tuyến tính theo $\mathbf{x}$: $\log\frac{p}{1-p}=\mathbf{w}^\top\mathbf{x}+b$, nên mỗi hệ số $w_j$
+có diễn giải trực tiếp: tăng $x_j$ một đơn vị làm odds nhân với $e^{w_j}$. Tham số học bằng cực đại hợp lý, tương đương
+cực tiểu cross-entropy nhị phân (BCE). Gradient có dạng gọn đẹp
+\begin{equation}
+  \nabla_{\mathbf{w}}\mathcal{L}=\frac{1}{n}X^\top\big(\sigma(X\mathbf{w})-\mathbf{y}\big),
+\end{equation}
+giống hệt hồi quy tuyến tính với $\hat{\mathbf{y}}$ thay bằng $\sigma(X\mathbf{w})$. BCE lồi theo $\mathbf{w}$ nên GD
+hội tụ về cực tiểu toàn cục. Hình~\ref{fig:ch2-sigmoid} cho thấy BCE phạt rất nặng các dự đoán tự tin nhưng sai.
+
+\hinhtikz{ch2_logistic}{Hồi quy logistic như một nơ-ron: tổng có trọng số $z$, hàm sigmoid cho xác suất $p$, so với
+ngưỡng $\tau$ để ra nhãn.}{ch2-logistic}
+\hinhpdf{ch2_sigmoid_logloss}{1}{Trái: hàm sigmoid ánh xạ $z\in\mathbb{R}$ vào $(0,1)$. Phải: cross-entropy nhị phân
+tiến tới vô cùng khi mô hình tự tin sai.}{ch2-sigmoid}
+
+\maNguon{ch2_scratch__logreg_gd}{Hồi quy logistic bằng mini-batch Gradient Descent trên BCE + L2 (NumPy)}
+
+\subsection{Ngưỡng quyết định}
+Nhãn dự đoán là $\hat{y}=\mathbf{1}[p\ge\tau]$. Ngưỡng mặc định $\tau=0{,}5$ chỉ tối ưu cho accuracy khi hai loại lỗi
+có chi phí như nhau và các lớp cân bằng. Với dữ liệu y tế mất cân bằng, bỏ sót bệnh (FN) đắt hơn báo động nhầm (FP),
+nên $\tau$ được chọn trên tập Validation để cực đại F1 hoặc đạt Recall mong muốn (Đoạn mã~\ref{code:ch2_metrics__best_threshold}).
+
+\subsection{Mở rộng nhiều lớp: Softmax Regression}
+Với $K$ lớp, mỗi lớp có một vector trọng số $\mathbf{w}_k$ và xác suất được chuẩn hóa bằng hàm softmax:
+\begin{equation}
+  \begin{gathered}
+  P(y=k\mid\mathbf{x})=\frac{\exp(\mathbf{w}_k^\top\mathbf{x})}{\sum_{j=1}^{K}\exp(\mathbf{w}_j^\top\mathbf{x})},\\
+  \mathcal{L}=-\frac{1}{n}\sum_{i}\sum_{k}\mathbf{1}[y_i=k]\log P(y_i=k\mid\mathbf{x}_i).
+  \end{gathered}
+\end{equation}
+Gradient theo ma trận $W$ là $X^\top(P-Y)/n$, với $Y$ là ma trận one-hot của nhãn. Hình~\ref{fig:ch2-pla} (phải) là
+biên quyết định Softmax 3 lớp do Đoạn mã~\ref{code:ch2_scratch__softmax_gd} học được, đạt accuracy
+\SL{ch2_scratch/softmax/acc}. Softmax cũng là lớp ra của mọi mạng phân loại nhiều lớp ở Chương~3. Trong TN3, Softmax
+Regression được dùng để dự đoán số sao (1--5) của một nhận xét.
+
+\hinhpdf{ch2_pla_softmax}{1}{Trái: siêu phẳng do PLA tìm được trên hai cụm tách được tuyến tính. Phải: ba vùng quyết định
+của Softmax Regression; các biên giữa hai vùng là đường thẳng.}{ch2-pla}
+\maNguon{ch2_scratch__softmax_gd}{Softmax Regression $K$ lớp bằng Gradient Descent (NumPy)}
+
+% =====================================================================
+\section{Đánh giá mô hình}
+\label{sec:ml-eval}
+
+\subsection{Ma trận nhầm lẫn và các chỉ số phân loại}
+Với phân loại nhị phân, mọi dự đoán rơi vào một trong bốn ô của \emph{ma trận nhầm lẫn} (Hình~\ref{fig:ch2-confusion}).
+Accuracy là tỷ lệ đúng tổng thể nhưng \emph{gây hiểu lầm khi mất cân bằng}: trên tập tiểu đường, mô hình luôn đoán
+``không bệnh'' đạt accuracy \SL{ch2_diabetes/val/baseline/accPct}\% mà không phát hiện được ca nào. Precision đo độ tin
+cậy của các báo động, Recall (độ nhạy) đo tỷ lệ ca bệnh được phát hiện, F1 là trung bình điều hòa của hai đại lượng.
+Với nhiều lớp, \emph{macro-F1} lấy trung bình F1 của từng lớp, coi các lớp quan trọng như nhau.
+
+\hinhtikz{ch2_confusion}{Ma trận nhầm lẫn và bốn chỉ số phân loại suy ra từ nó.}{ch2-confusion}
+
+\subsection{Đường ROC và Precision--Recall}
+Khi quét ngưỡng $\tau$ từ 1 xuống 0, ta được đường \textbf{ROC} (TPR theo FPR); diện tích dưới đường (ROC-AUC) bằng xác
+suất mô hình xếp một mẫu dương ngẫu nhiên cao hơn một mẫu âm ngẫu nhiên~\cite{ch2:fawcett2006}. ROC-AUC không phụ thuộc
+ngưỡng và không phụ thuộc tỷ lệ lớp, nên lại có thể ``lạc quan'' khi lớp dương hiếm. Đường \textbf{Precision--Recall}
+và diện tích của nó (PR-AUC, hay Average Precision) nhạy hơn với hiệu năng trên lớp hiếm~\cite{ch2:saito2015}: mức
+ngẫu nhiên của PR-AUC chính là tỷ lệ lớp dương, chứ không phải 0,5.
+
+\subsection{Chỉ số cho hồi quy}
+Với $e_i=y_i-\hat{y}_i$:
+\begin{equation}
+  \begin{gathered}
+  \mathrm{MAE}=\frac{1}{n}\sum|e_i|,\qquad \mathrm{RMSE}=\sqrt{\frac{1}{n}\sum e_i^2},\\
+  R^2=1-\frac{\sum e_i^2}{\sum(y_i-\bar{y})^2},\qquad \mathrm{MAPE}=\frac{1}{n}\sum\left|\frac{e_i}{y_i}\right| .
+  \end{gathered}
+\end{equation}
+MAE dễ diễn giải (cùng đơn vị với $y$) và ít nhạy với ngoại lai; RMSE phạt nặng sai số lớn; $R^2$ là tỷ lệ phương sai
+của $y$ được giải thích, bằng 0 với mô hình luôn dự đoán trung bình; MAPE là sai số tương đối, thuận tiện khi so sánh
+giữa các thang giá.
+
+\maNguon{ch2_metrics__clf_metrics}{Tính các chỉ số phân loại ở một ngưỡng cho trước}
+\maNguon{ch2_metrics__best_threshold}{Chọn ngưỡng quyết định theo F1 trên tập Validation}
+\maNguon{ch2_metrics__reg_metrics}{Bốn chỉ số hồi quy MAE, RMSE, $R^2$, MAPE}
+
+% =====================================================================
+\section{Quá khớp, chính quy hóa và thiên lệch -- phương sai}
+\label{sec:ml-overfit}
+
+\subsection{Quá khớp và chưa khớp}
+Mô hình \emph{chưa khớp} (underfitting) quá đơn giản để nắm được quy luật: sai số cao trên cả Train lẫn Test. Mô hình
+\emph{quá khớp} (overfitting) học thuộc cả nhiễu: sai số Train rất thấp nhưng Test cao. Hình~\ref{fig:ch2-poly} minh họa
+bằng đa thức bậc 1, 4 và 15 khớp 30 điểm sinh từ hàm sin cộng nhiễu.
+
+\hinhpdf{ch2_poly_fit}{1}{Đa thức bậc 1 (chưa khớp), bậc 4 (khớp vừa) và bậc 15 (quá khớp, dao động giữa các điểm) trên cùng
+30 điểm dữ liệu; đường đứt nét là hàm thật.}{ch2-poly}
+
+\subsection{Phân rã thiên lệch -- phương sai}
+Với sai số bình phương, sai số kỳ vọng tại một điểm phân rã thành ba thành phần~\cite{ch2:geman1992}:
+\begin{equation}
+  \mathbb{E}\big[(y-\hat{f}(\mathbf{x}))^2\big]=\underbrace{\big(\mathbb{E}[\hat f(\mathbf{x})]-f(\mathbf{x})\big)^2}_{\text{thiên lệch}^2}
+  +\underbrace{\mathbb{E}\big[(\hat f(\mathbf{x})-\mathbb{E}[\hat f(\mathbf{x})])^2\big]}_{\text{phương sai}}+\underbrace{\sigma^2}_{\text{nhiễu}} .
+\end{equation}
+Mô hình đơn giản có thiên lệch cao, phương sai thấp; mô hình phức tạp ngược lại (Hình~\ref{fig:ch2-dart}). Sai số Test
+có dạng chữ U theo độ phức tạp (Hình~\ref{fig:ch2-bv}); chọn mô hình là tìm đáy của chữ U đó bằng Validation.
+
+\hinhtikz{ch2_bias_dart}{Bốn tổ hợp thiên lệch và phương sai: tâm bia là giá trị thật, mỗi chấm là dự đoán của một mô
+hình huấn luyện trên một tập dữ liệu khác nhau.}{ch2-dart}
+\hinhpdf{ch2_bias_variance}{1}{Sai số Train giảm đơn điệu theo bậc đa thức, còn sai số Test có dạng chữ U: vùng trái thiên
+lệch cao, vùng phải phương sai cao.}{ch2-bv}
+
+\subsection{Các cách giảm quá khớp}
+\begin{itemize}
+  \item \textbf{Chính quy hóa} L2/L1 (Ridge, Lasso, \texttt{weight\_decay} trong mạng nơ-ron); hệ số $C=1/\lambda$ của
+        logistic và SVM.
+  \item \textbf{Giới hạn độ phức tạp}: độ sâu cây, số lá tối thiểu, số láng giềng $k$ lớn hơn.
+  \item \textbf{Tổ hợp mô hình}: Random Forest lấy trung bình nhiều cây để giảm phương sai.
+  \item \textbf{Dừng sớm} (early stopping) theo mất mát Validation và \textbf{Dropout}~\cite{ch2:srivastava2014} với mạng nơ-ron.
+  \item \textbf{Thêm dữ liệu}: đường học (learning curve) cho biết thêm dữ liệu còn giúp được hay không.
+\end{itemize}
+
+% =====================================================================
+\section{Cây quyết định (Decision Trees)}
+\label{sec:ml-tree}
+Cây quyết định~\cite{ch2:quinlan1986,ch2:breiman1984} chia không gian đặc trưng bằng một chuỗi câu hỏi dạng
+``$x_j\le t$?''. Tại mỗi nút, thuật toán CART thử mọi đặc trưng và ngưỡng, chọn phép tách làm giảm độ vẩn đục (impurity)
+nhiều nhất, rồi đệ quy cho đến khi gặp điều kiện dừng (độ sâu tối đa, số mẫu tối thiểu ở lá). Với tỷ lệ lớp $p_k$ trong
+một nút:
+\begin{equation}
+  \begin{gathered}
+  \text{Gini}=1-\sum_k p_k^2,\qquad \text{Entropy}=-\sum_k p_k\log_2 p_k,\\
+  \Delta=I(\text{cha})-\sum_{c}\frac{n_c}{n}I(\text{con}_c) .
+  \end{gathered}
+\end{equation}
+Hai độ đo có hình dạng gần như nhau (Hình~\ref{fig:ch2-impurity}), cực đại khi hai lớp cân bằng và bằng 0 khi nút thuần.
+Hình~\ref{fig:ch2-tree} là cây độ sâu 2 học trên dữ liệu tiểu đường thật (Đoạn mã~\ref{code:ch2_tree_demo__describe_tree}):
+câu hỏi đầu tiên mà thuật toán tự tìm ra là HbA1c, đúng là xét nghiệm chẩn đoán lâm sàng~\cite{ch2:ada2023}.
+
+\hinhpdf{ch2_impurity}{1}{Entropy, chỉ số Gini và lỗi phân loại theo tỷ lệ lớp dương trong một nút.}{ch2-impurity}
+\hinhtikz{ch2_tree}{Cây quyết định độ sâu 2 huấn luyện trên \SL{ch2_diabetes/clean/n_rows} hồ sơ tiểu đường; mọi ngưỡng,
+Gini và tỷ lệ mẫu đọc từ cây đã khớp.}{ch2-tree}
+\maNguon{ch2_tree_demo__describe_tree}{Duyệt cấu trúc cây scikit-learn để lấy ngưỡng, Gini và xác suất lá}
+
+Ưu điểm của cây là dễ diễn giải, không cần chuẩn hóa, xử lý được quan hệ phi tuyến và tương tác. Nhược điểm là phương
+sai cao: một thay đổi nhỏ trong dữ liệu có thể đổi cả cây, và cây sâu dễ quá khớp. Đó là lý do ra đời các phương pháp tổ hợp.
+
+% =====================================================================
+\section{Phương pháp tổ hợp (Ensembles)}
+\label{sec:ml-ensemble}
+\textbf{Bagging}~\cite{ch2:breiman1996} huấn luyện $B$ mô hình trên $B$ mẫu bootstrap (lấy mẫu có hoàn lại) rồi lấy
+trung bình. Nếu các mô hình có phương sai $\sigma^2$ và tương quan $\rho$, phương sai của trung bình là
+$\rho\sigma^2+\frac{1-\rho}{B}\sigma^2$. \textbf{Random Forest}~\cite{ch2:breiman2001} giảm thêm $\rho$ bằng cách chỉ xét
+một tập con ngẫu nhiên đặc trưng ở mỗi lần tách. \textbf{Boosting} xây cây \emph{tuần tự}: cây sau học phần sai của
+tổng các cây trước. Gradient Boosting~\cite{ch2:friedman2001} khớp cây thứ $m$ với gradient âm của hàm mất mát
+$g_i^{(m)}=-\partial\ell(y_i,F_{m-1}(\mathbf{x}_i))/\partial F$ rồi cập nhật $F_m=F_{m-1}+\eta f_m$.
+\textbf{XGBoost}~\cite{ch2:chen2016} dùng khai triển Taylor bậc hai và phạt độ phức tạp của cây; \textbf{LightGBM}%
+~\cite{ch2:ke2017} tăng tốc bằng histogram đặc trưng và mọc cây theo lá. Hình~\ref{fig:ch2-ensemble} so sánh hai cơ chế.
+
+\hinhtikz{ch2_ensemble}{Bagging (trái): các cây độc lập trên mẫu bootstrap, kết quả bỏ phiếu. Boosting (phải): mỗi cây
+học phần dư/gradient của tổng các cây trước, kết quả là tổng có hệ số học $\eta$.}{ch2-ensemble}
+
+% =====================================================================
+\section{Các thuật toán kinh điển khác}
+\label{sec:ml-other}
+
+\subsection{K láng giềng gần nhất (KNN)}
+KNN~\cite{ch2:cover1967} không có bước huấn luyện: lưu toàn bộ dữ liệu, và khi dự đoán thì tìm $k$ điểm gần nhất rồi bỏ
+phiếu (phân loại) hoặc lấy trung bình (hồi quy), có thể đánh trọng số $1/d$ (Hình~\ref{fig:ch2-knn}). Vì dựa trên khoảng
+cách nên KNN \emph{bắt buộc phải chuẩn hóa} đặc trưng; nếu không, glucose (đơn vị hàng trăm) sẽ lấn át HbA1c (đơn vị vài
+phần trăm). $k$ nhỏ cho biên quyết định răng cưa (phương sai cao), $k$ lớn làm biên mượt dần (Hình~\ref{fig:ch2-knnk}).
+Chi phí dự đoán $O(nd)$ cho mỗi truy vấn là nhược điểm lớn với dữ liệu nhiều mẫu.
+
+\hinhtikz{ch2_knn}{KNN: với $k=3$ điểm truy vấn (ngôi sao) được gán lớp đỏ, với $k=7$ lại thành lớp xanh: lựa chọn $k$
+thay đổi dự đoán.}{ch2-knn}
+\hinhpdf{ch2_knn_k}{1}{Biên quyết định của KNN trên dữ liệu ``mặt trăng'' với $k=1$, 15 và 75.}{ch2-knnk}
+
+\subsection{Naive Bayes}
+Naive Bayes áp dụng định lý Bayes với giả định ``ngây thơ'' rằng các đặc trưng độc lập có điều kiện khi biết lớp:
+\begin{equation}
+  P(y=k\mid\mathbf{x})\propto P(y=k)\prod_{j=1}^{d}P(x_j\mid y=k) .
+\end{equation}
+Gaussian NB mô hình $P(x_j\mid y)$ bằng phân phối chuẩn; Multinomial NB~\cite{ch2:mccallum1998} mô hình tần suất từ,
+rất hợp với văn bản; Complement NB~\cite{ch2:rennie2003} ước lượng trên phần bù của lớp nên bền hơn khi mất cân bằng.
+Mô hình huấn luyện cực nhanh nhưng xác suất đầu ra thường bị đẩy về 0 hoặc 1 do giả định độc lập bị vi phạm.
+
+\subsection{Máy vector hỗ trợ (SVM) và SVR}
+SVM~\cite{ch2:cortes1995} tìm siêu phẳng $\mathbf{w}^\top\mathbf{x}+b=0$ có \emph{lề} lớn nhất tới các điểm gần nhất
+của hai lớp (các \emph{vector hỗ trợ}). Lề hình học là $2/\lVert\mathbf{w}\rVert$, dẫn đến bài toán tối ưu lồi:
+\begin{equation}
+  \min_{\mathbf{w},b,\boldsymbol\xi}\;\tfrac12\lVert\mathbf{w}\rVert^2+C\sum_i\xi_i\quad
+  \text{s.t.}\quad y_i(\mathbf{w}^\top\mathbf{x}_i+b)\ge 1-\xi_i,\;\xi_i\ge0 .
+\end{equation}
+Ta có ba cấp độ: \emph{lề cứng} khi dữ liệu tách được ($\xi_i=0$), \emph{lề mềm} cho phép vi phạm với chi phí $C$
+(Hình~\ref{fig:ch2-svm}), và \emph{kernel} cho dữ liệu không tách tuyến tính. Ở dạng đối ngẫu, dữ liệu chỉ xuất hiện qua
+tích vô hướng $\mathbf{x}_i^\top\mathbf{x}_j$, có thể thay bằng hàm nhân $K(\mathbf{x}_i,\mathbf{x}_j)=\phi(\mathbf{x}_i)^\top
+\phi(\mathbf{x}_j)$ như RBF $K=\exp(-\gamma\lVert\mathbf{x}_i-\mathbf{x}_j\rVert^2)$. Đây là ``kernel trick'': làm việc
+ngầm trong không gian đặc trưng nhiều chiều mà không cần tính $\phi$ tường minh (Hình~\ref{fig:ch2-kernel}).
+\textbf{SVR}~\cite{ch2:drucker1997} dùng cùng ý tưởng cho hồi quy: chỉ phạt những điểm nằm ngoài một ống rộng
+$\pm\varepsilon$ quanh hàm dự đoán (hàm mất mát $\varepsilon$-insensitive).
+
+\hinhpdf{ch2_svm_margin}{1}{SVM tuyến tính: $C$ lớn (trái) cho lề hẹp, ít vector hỗ trợ; $C$ nhỏ (phải) chấp nhận vi phạm
+để có lề rộng, nhiều vector hỗ trợ (vòng cam).}{ch2-svm}
+\hinhtikz{ch2_svm_kernel}{Kernel trick: hai vòng tròn đồng tâm không tách được trong $\mathbb{R}^2$ trở nên tách được
+bằng một mặt phẳng sau phép nâng $\phi(\mathbf{x})=(x_1,x_2,x_1^2+x_2^2)$.}{ch2-kernel}
+
+\subsection{So sánh trực quan các biên quyết định}
+Hình~\ref{fig:ch2-boundaries} đặt chín mô hình lên cùng một bài toán hai chiều phi tuyến. Logistic Regression và SVM
+tuyến tính chỉ vẽ được đường thẳng; Naive Bayes cho biên cong bậc hai; cây quyết định cho các bậc thang song song trục;
+Random Forest và XGBoost mượt hơn nhờ trung bình nhiều cây; KNN, SVM RBF và logistic với đặc trưng đa thức bám theo hình
+dạng thật của dữ liệu. Mỗi họ mô hình mang một \emph{thiên kiến quy nạp} (inductive bias) khác nhau, và không có họ nào
+tốt nhất cho mọi bài toán.
+
+\hinhpdf{ch2_boundaries}{1}{Biên quyết định của chín mô hình trên dữ liệu \texttt{make\_moons} (400 điểm, nhiễu 0,28).}{ch2-boundaries}
+
+% =====================================================================
+\section{Học không giám sát}
+\label{sec:ml-unsup}
+
+\subsection{Phân cụm K-means}
+K-means~\cite{ch2:lloyd1982} chia $n$ điểm thành $k$ cụm bằng cách cực tiểu tổng bình phương khoảng cách tới tâm cụm
+(inertia) $J=\sum_{i}\lVert\mathbf{x}_i-\boldsymbol\mu_{c(i)}\rVert^2$. Thuật toán Lloyd luân phiên hai bước cho tới khi
+hội tụ: \emph{gán} mỗi điểm vào tâm gần nhất, rồi \emph{cập nhật} mỗi tâm bằng trung bình các điểm của nó
+(Hình~\ref{fig:ch2-kmeans}). Mỗi bước không làm tăng $J$ nên thuật toán luôn hội tụ, nhưng chỉ tới cực tiểu cục bộ; vì vậy
+thực tế chạy nhiều lần khởi tạo (k-means++, \texttt{n\_init}). Số cụm $k$ được chọn bằng phương pháp ``khuỷu tay'' trên
+đường inertia và hệ số silhouette~\cite{ch2:rousseeuw1987} $s=(b-a)/\max(a,b)$.
+
+\hinhpdf{ch2_kmeans_iter}{1}{Thuật toán Lloyd trên 4 cụm: khởi tạo ngẫu nhiên rồi ba vòng gán -- cập nhật tâm (dấu X).}{ch2-kmeans}
+\maNguon{ch2_unsup__kmeans_numpy}{K-means (thuật toán Lloyd) cài đặt bằng NumPy}
+
+\subsection{Giảm chiều: PCA}
+PCA~\cite{ch2:pearson1901} tìm các hướng trực giao có phương sai lớn nhất. Sau khi tâm hóa dữ liệu, phân rã SVD
+$Z=U\Sigma V^\top$ cho các thành phần chính là các hàng của $V^\top$, và tỷ lệ phương sai giải thích của thành phần $k$
+là $\sigma_k^2/\sum_j\sigma_j^2$. Chiếu lên $m<d$ thành phần đầu cho biểu diễn ít chiều giữ được nhiều thông tin nhất theo
+nghĩa bình phương tối thiểu (Hình~\ref{fig:ch2-pca}).
+
+\hinhpdf{ch2_pca_toy}{1}{PCA trên dữ liệu 2 chiều tương quan: PC1 nằm dọc hướng biến thiên lớn nhất.}{ch2-pca}
+\maNguon{ch2_unsup__pca_svd}{PCA bằng phân rã SVD}
+
+\subsection{Thực nghiệm: K-means và PCA trên hồ sơ tiểu đường}
+\label{sec:ml-unsup-exp}
+Áp dụng lên \SL{ch2_unsup/n} hồ sơ (bốn thuộc tính liên tục đã chuẩn hóa: tuổi, BMI, HbA1c, glucose), đường inertia
+giảm đều và silhouette (Hình~\ref{fig:ch2-elbow}) đạt khoảng \SL{ch2_unsup/scan/silhouette/2} ở $k=4$, một giá trị khiêm
+tốn cho thấy dữ liệu không có cụm tách bạch rõ. Hai thành phần chính đầu giải thích
+\SL{ch2_unsup/pca/explained/0Pct}\% và \SL{ch2_unsup/pca/explained/1Pct}\% phương sai.
+
+\hinhpdf{ch2_unsup_elbow}{1}{Chọn số cụm: inertia (khuỷu tay) và hệ số silhouette theo $k$.}{ch2-elbow}
+\hinhpdf{ch2_unsup_pca}{1}{Chiếu hồ sơ lên hai thành phần chính: tô theo cụm K-means (trái) và theo nhãn tiểu đường thật
+(phải). Ca bệnh tập trung ở một phía của PC1.}{ch2-unsuppca}
+\bang{ch2_unsup_profiles}{Hồ sơ trung bình của bốn cụm K-means ($k=4$) và tỷ lệ tiểu đường trong từng cụm}{ch2-unsup-prof}
+\hinhpdf{ch2_unsup_profiles}{1}{Tỷ lệ tiểu đường trong bốn cụm tìm được \emph{không cần nhãn}.}{ch2-unsupprof}
+
+\nhanxet{Dù K-means không hề nhìn thấy nhãn, các cụm có tỷ lệ tiểu đường chênh nhau rõ rệt (Bảng~\ref{tab:ch2-unsup-prof}):
+cụm có HbA1c và glucose trung bình cao nhất cũng có tỷ lệ bệnh cao nhất. Học không giám sát vì vậy hữu ích để phân nhóm
+nguy cơ và khám phá dữ liệu, nhưng không thay được bộ phân loại có giám sát: silhouette thấp cho thấy ranh giới cụm chỉ là
+quy ước, không phải cấu trúc tự nhiên.}
+
+% =====================================================================
+\section{Mạng nơ-ron nhân tạo (nhập môn)}
+\label{sec:ml-mlp}
+Mạng nơ-ron truyền thẳng nhiều lớp (MLP) xếp chồng các phép biến đổi affine và hàm kích hoạt phi tuyến:
+$\mathbf{h}^{(l)}=\phi\big(W^{(l)}\mathbf{h}^{(l-1)}+\mathbf{b}^{(l)}\big)$ với $\phi=\mathrm{ReLU}(z)=\max(0,z)$. Hồi quy
+logistic chính là MLP không có lớp ẩn. Định lý xấp xỉ phổ quát nói rằng một lớp ẩn đủ rộng xấp xỉ được mọi hàm liên tục
+trên miền compact. Tham số được học bằng lan truyền ngược~\cite{ch2:rumelhart1986}: áp dụng quy tắc dây chuyền từ lớp ra
+về lớp vào, $\partial\mathcal{L}/\partial W^{(l)}=\boldsymbol\delta^{(l)}\mathbf{h}^{(l-1)\top}$ với
+$\boldsymbol\delta^{(l)}=\big(W^{(l+1)\top}\boldsymbol\delta^{(l+1)}\big)\odot\phi'(\mathbf{z}^{(l)})$.
+
+MLP dùng trong TN1 và TN2 (Hình~\ref{fig:ch2-mlp}) có ba lớp ẩn 128--64--32, mỗi lớp gồm Linear, Batch Normalization%
+~\cite{ch2:ioffe2015}, ReLU và Dropout, huấn luyện bằng Adam với dừng sớm theo mất mát Validation trên GPU bằng
+PyTorch~\cite{ch2:paszke2019}. Chương~3 và~4 sẽ mở rộng ý tưởng này thành mạng tích chập và mạng hồi quy.
+
+\hinhtikz{ch2_mlp}{MLP cho dữ liệu bảng: \SL{ch2_diabetes/split/n_features} đặc trưng vào (TN1), ba lớp ẩn 128--64--32 (Linear, BatchNorm, ReLU, Dropout) và một
+nơ-ron ra với sigmoid (phân loại) hoặc tuyến tính (hồi quy).}{ch2-mlp}
+\maNguon{ch2_mlp__TabularMLP}{Kiến trúc MLP cho dữ liệu bảng bằng PyTorch}
+\maNguon{ch2_mlp__train_epoch}{Một epoch huấn luyện: lan truyền thuận, lan truyền ngược, cập nhật Adam}
+\maDai{ch2_mlp__fit_mlp}{Huấn luyện MLP với dừng sớm theo mất mát Validation và giảm tốc độ học}
+
+% =====================================================================
+\section{Xử lý và biến đổi đặc trưng}
+\label{sec:ml-feature}
+\begin{itemize}
+  \item \textbf{Chuẩn hóa z-score} $x'=(x-\mu)/\sigma$ (StandardScaler) cho mô hình dựa trên khoảng cách hay gradient
+        (KNN, SVM, logistic, MLP); mô hình cây không cần.
+  \item \textbf{Mã hóa One-Hot} cho biến phân loại: một hạng mục thành một cột nhị phân. Với mô hình tuyến tính có hệ số
+        chặn, bỏ một cột mỗi biến (\texttt{drop="first"}) để tránh đa cộng tuyến hoàn hảo.
+  \item \textbf{TF-IDF} cho văn bản~\cite{ch2:salton1988}: trọng số của từ $t$ trong tài liệu $d$ là
+        $\text{tf}(t,d)\cdot\log\frac{1+N}{1+\text{df}(t)}+1$, tức từ xuất hiện nhiều trong tài liệu nhưng hiếm trong kho
+        thì có trọng số cao.
+  \item \textbf{Xử lý mất cân bằng}: trọng số lớp (\texttt{class\_weight="balanced"}, \texttt{pos\_weight}), lấy mẫu
+        lại, hoặc đơn giản và hiệu quả nhất là \emph{chọn ngưỡng} trên Validation.
+  \item \textbf{Ngoại lai}: chỉ loại khi chắc chắn là lỗi đo/nhập; giá trị cực trị có thật (đường huyết rất cao) mang
+        thông tin quan trọng.
+\end{itemize}
+
+\maNguon{ch2_data__diabetes_preprocessor}{Bộ tiền xử lý dùng chung: StandardScaler cho thuộc tính số, One-Hot cho thuộc tính phân loại}
+\maNguon{ch2_data__split_3way}{Chia Train/Validation/Test 70/15/15 có phân tầng}
+
+% =====================================================================
+\section{Cài đặt từ đầu và đối chiếu với thư viện}
+\label{sec:ml-scratch}
+Để chắc chắn công thức ở các mục trên là đúng chứ không chỉ ``gọi thư viện'', Bảng~\ref{tab:ch2-scratch} đối chiếu các
+cài đặt NumPy với scikit-learn trên chính dữ liệu thực nghiệm. Phương trình chuẩn cho hệ số trùng với
+\texttt{LinearRegression} tới sai khác lớn nhất \SL{ch2_scratch/linreg/max_coef_diff}; hồi quy logistic tự viết đạt
+ROC-AUC \SL{ch2_scratch/logreg/auc_numpy} so với \SL{ch2_scratch/logreg/auc_sklearn} của thư viện, hệ số tương quan
+giữa hai vector trọng số \SL{ch2_scratch/logreg/corr_coef}. Khác biệt duy nhất là tốc độ: mini-batch GD bằng Python mất
+\SL{ch2_scratch/logreg/time_numpy_s} giây so với \SL{ch2_scratch/logreg/time_sklearn_s} giây của bộ giải L-BFGS.
+
+\bang{ch2_scratch}{Đối chiếu cài đặt NumPy từ đầu với scikit-learn trên tập Test}{ch2-scratch}
+\hinhpdf{ch2_scratch_loss}{1}{Mất mát giảm dần của hai thuật toán Gradient Descent tự viết.}{ch2-scratchloss}
+
+% =====================================================================
+\section{Thực nghiệm 1: Dự đoán bệnh tiểu đường}
+\label{sec:ml-diab}
+
+\subsection{Mô tả bài toán}
+Tiểu đường type 2 thường tiến triển âm thầm nhiều năm trước khi được chẩn đoán. Một mô hình sàng lọc dựa trên các chỉ số
+sẵn có trong hồ sơ khám (tuổi, BMI, HbA1c, đường huyết, tiền sử tăng huyết áp và tim mạch) giúp khoanh vùng người có nguy
+cơ cao để chỉ định xét nghiệm chuyên sâu. Bài toán là \textbf{phân loại nhị phân}: đầu vào là một hồ sơ $\mathbf{x}$, đầu
+ra là xác suất $P(\text{diabetes}=1\mid\mathbf{x})$ và nhãn sau khi so với ngưỡng. Vì là bài toán sàng lọc y tế, \emph{bỏ
+sót} người bệnh (FN) nghiêm trọng hơn \emph{báo động nhầm} (FP), nên ngoài accuracy ta theo dõi Recall, F1 và PR-AUC.
+
+\subsection{Giới thiệu dữ liệu}
+Bộ dữ liệu \emph{Diabetes Prediction Dataset}~\cite{ch2:ds_diabetes} gồm \SL{ch2_diabetes/audit_raw/n_rows} hồ sơ và
+\SL{ch2_diabetes/audit_raw/cols} cột: hai biến phân loại (\texttt{gender}, \texttt{smoking\_history}), hai biến nhị phân
+(\texttt{hypertension}, \texttt{heart\_disease}), bốn biến liên tục (\texttt{age}, \texttt{bmi}, \texttt{HbA1c\_level},
+\texttt{blood\_glucose\_level}) và nhãn \texttt{diabetes}. HbA1c phản ánh đường huyết trung bình 2--3 tháng; theo tiêu
+chuẩn ADA~\cite{ch2:ada2023}, HbA1c $\ge 6{,}5\%$ hoặc glucose lúc đói $\ge 126$ mg/dL là ngưỡng chẩn đoán.
+Đoạn mã~\ref{code:ch2_data__download} tải ba bộ dữ liệu của chương về \texttt{data/ch2}.
+
+\maNguon{ch2_data__download}{Tải ba bộ dữ liệu của Chương 2 về thư mục dữ liệu cục bộ}
+
+\subsection{Khảo sát dữ liệu}
+\bang{ch2_diab_describe}{Thống kê mô tả các thuộc tính số của dữ liệu tiểu đường (trước làm sạch)}{ch2-diab-describe}
+
+Bảng~\ref{tab:ch2-diab-describe} và Hình~\ref{fig:ch2-diab-target} cho thấy ba đặc điểm. Thứ nhất, dữ liệu \textbf{mất
+cân bằng}: chỉ \SL{ch2_diabetes/survey/pos_ratePct}\% hồ sơ có bệnh. Thứ hai, không có giá trị thiếu dạng
+\texttt{NaN} (\SL{ch2_diabetes/audit_raw/missing} ô), nhưng \texttt{smoking\_history} có hạng mục ``No Info'', về bản chất
+là thiếu thông tin được mã hóa thành một nhóm. Thứ ba, có \SL{ch2_diabetes/audit_raw/duplicates} bản ghi trùng lặp hoàn toàn.
+
+\maNguon{ch2_diabetes__survey}{Khảo sát nhanh: kích thước, kiểu dữ liệu, phân bố nhãn và hạng mục}
+\maNguon{ch2_data__audit}{Kiểm tra chất lượng: giá trị thiếu, bản ghi trùng và ngoại lai theo quy tắc IQR}
+\hinhpdf{ch2_diab_target}{1}{Phân bố nhãn \texttt{diabetes}: lớp dương chiếm chưa tới một phần mười.}{ch2-diab-target}
+
+\subsection{Làm sạch dữ liệu}
+Quy tắc IQR đánh dấu một điểm là ngoại lai nếu nằm ngoài $[Q_1-1{,}5\,\mathrm{IQR},\;Q_3+1{,}5\,\mathrm{IQR}]$.
+Bảng~\ref{tab:ch2-diab-outliers} cho thấy BMI có \SL{ch2_diabetes/audit_raw/outliers/bmi/n} điểm vượt ngưỡng,
+glucose có \SL{ch2_diabetes/audit_raw/outliers/blood_glucose_level/n} điểm và HbA1c có
+\SL{ch2_diabetes/audit_raw/outliers/HbA1c_level/n} điểm. Tuy nhiên, Hình~\ref{fig:ch2-diab-outliers} cho thấy các điểm
+``ngoại lai'' của glucose và HbA1c tập trung gần như hoàn toàn ở lớp có bệnh: đó chính là tín hiệu cần học, không phải lỗi.
+
+\bang{ch2_diab_outliers}{Ngoại lai theo quy tắc IQR trên bốn thuộc tính liên tục}{ch2-diab-outliers}
+\hinhpdf{ch2_diab_outliers}{1}{Biểu đồ hộp theo nhãn của ba thuộc tính có ngoại lai (age không có điểm nào nằm ngoài cận
+IQR): giá trị cao của HbA1c và glucose gần như chỉ thuộc người bệnh.}{ch2-diab-outliers}
+
+Vì vậy chiến lược làm sạch (Đoạn mã~\ref{code:ch2_data__clean_diabetes}) là: (1) loại bản ghi trùng; (2) chỉ loại giá trị
+\emph{bất khả về sinh lý} (BMI, HbA1c, glucose ngoài khoảng sống được), \emph{giữ nguyên} các giá trị cao có thật;
+(3) giữ ``No Info'' như một hạng mục riêng vì việc thiếu thông tin hút thuốc tự nó mang tín hiệu. Sau làm sạch còn
+\SL{ch2_diabetes/clean/n_rows} hồ sơ (loại \SL{ch2_diabetes/clean/removed}), trong đó \SL{ch2_diabetes/clean/pos} ca bệnh
+(\SL{ch2_diabetes/clean/pos_ratePct}\%).
+
+\maNguon{ch2_data__clean_diabetes}{Làm sạch dữ liệu tiểu đường: bỏ trùng lặp, chỉ loại giá trị bất khả về sinh lý}
+
+\subsection{Biểu diễn dữ liệu}
+Sáu thuộc tính số được chuẩn hóa z-score; \texttt{gender} (3 hạng mục) và \texttt{smoking\_history} (6 hạng mục) được mã
+hóa One-Hot, tổng cộng \SL{ch2_diabetes/split/n_features} đặc trưng (Đoạn mã~\ref{code:ch2_data__diabetes_preprocessor}).
+Bộ tiền xử lý là một \texttt{ColumnTransformer} được fit trên Train và lưu cùng mô hình, nên Web App ở mục
+\ref{sec:ml-diab-deploy} biến đổi dữ liệu người dùng nhập vào \emph{đúng như} lúc huấn luyện.
+
+\maNguon{ch2_data__feature_names}{Lấy tên các đặc trưng sau biến đổi để diễn giải hệ số và độ quan trọng}
+
+\subsection{Phân tích khám phá (EDA)}
+\hinhpdf{ch2_diab_hist}{1}{Phân bố bốn thuộc tính liên tục theo nhãn (mật độ chuẩn hóa).}{ch2-diab-hist}
+\bonhanxet{Phân bố HbA1c và glucose của hai lớp gần như tách rời: người không bệnh tập trung ở HbA1c dưới 6{,}5\% và
+glucose dưới 200, còn người bệnh trải rộng sang phải (Hình~\ref{fig:ch2-diab-hist}). Tuổi và BMI của người bệnh dịch
+sang phải nhưng chồng lấn lớn.}
+{HbA1c và glucose là các xét nghiệm dùng trực tiếp để chẩn đoán, nên tách lớp tốt là đúng với kiến thức y khoa. Dữ liệu
+có vẻ được sinh với những ngưỡng sắc nét (glucose nhận ít giá trị rời rạc), điều sẽ có lợi cho mô hình cây.}
+{Một mô hình chỉ cần vài ngưỡng trên HbA1c và glucose đã đạt hiệu năng cao; phần khó là các ca bệnh có chỉ số xét nghiệm
+``bình thường'', nơi tuổi, BMI và bệnh nền phải bù vào.}
+
+\hinhpdf{ch2_diab_violin}{1}{Biểu đồ violin của bốn thuộc tính liên tục theo nhãn (0: không bệnh, 1: có bệnh).}{ch2-diab-violin}
+\hinhpdf{ch2_diab_corr}{1}{Ma trận tương quan Pearson giữa các thuộc tính số và nhãn.}{ch2-diab-corr}
+
+Hình~\ref{fig:ch2-diab-corr} định lượng quan sát trên: tương quan với nhãn cao nhất thuộc về glucose
+(\SL{ch2_diabetes/clean/corr_target/blood_glucose_level}) và HbA1c (\SL{ch2_diabetes/clean/corr_target/HbA1c_level}),
+tiếp theo là tuổi (\SL{ch2_diabetes/clean/corr_target/age}) và BMI (\SL{ch2_diabetes/clean/corr_target/bmi}). Các thuộc
+tính đầu vào tương quan với nhau ở mức thấp, nên mô hình tuyến tính không gặp vấn đề đa cộng tuyến nghiêm trọng.
+
+\hinhpdf{ch2_diab_rates}{1}{Tỷ lệ tiểu đường theo giới tính, tiền sử hút thuốc, tăng huyết áp và bệnh tim.}{ch2-diab-rates}
+\bonhanxet{Tỷ lệ bệnh ở người tăng huyết áp là \SL{ch2_diabetes/clean/rate_hyper/1Pct}\% so với
+\SL{ch2_diabetes/clean/rate_hyper/0Pct}\% ở người không tăng huyết áp; với bệnh tim là
+\SL{ch2_diabetes/clean/rate_heart/1Pct}\% so với \SL{ch2_diabetes/clean/rate_heart/0Pct}\%. Nhóm từng hút thuốc
+(\texttt{former}) có tỷ lệ \SL{ch2_diabetes/clean/rate_by_smoking/formerPct}\%, cao hơn nhóm chưa từng hút
+(\SL{ch2_diabetes/clean/rate_by_smoking/neverPct}\%).}
+{Tăng huyết áp, bệnh tim và tiểu đường là các bệnh đồng mắc của hội chứng chuyển hóa. Nhóm \texttt{former} thường lớn tuổi
+hơn, nên một phần chênh lệch đến từ tuổi chứ không phải từ hút thuốc.}
+{Các biến nhị phân có ích nhưng yếu hơn xét nghiệm; tương quan không phải nhân quả, nên không diễn giải hệ số của
+\texttt{smoking\_history} như ``tác động'' của hút thuốc.}
+
+\hinhpdf{ch2_diab_scatter}{1}{Biểu đồ phân tán HbA1c theo glucose (mẫu ngẫu nhiên): ca bệnh nằm ở phần trên bên phải và
+dọc theo các ngưỡng.}{ch2-diab-scatter}
+
+\subsection{Chia tập dữ liệu}
+Dữ liệu sạch được chia phân tầng 70/15/15 (Đoạn mã~\ref{code:ch2_data__split_3way}). Bảng~\ref{tab:ch2-diab-split} xác
+nhận tỷ lệ lớp dương của ba tập gần như bằng nhau, nên điểm số trên Validation và Test có thể so sánh trực tiếp.
+\bang{ch2_diab_split}{Kích thước và tỷ lệ lớp dương của ba tập}{ch2-diab-split}
+
+\subsection{Xây dựng mô hình}
+Chín họ mô hình được huấn luyện trên cùng tập Train, cùng bộ tiền xử lý (Đoạn mã~\ref{code:ch2_models__classifiers}):
+\begin{itemize}
+  \item \textbf{Baseline}: luôn dự đoán lớp đa số; mức sàn để biết một mô hình có ``học'' được gì không.
+  \item \textbf{Logistic Regression} với \texttt{class\_weight="balanced"} để bù mất cân bằng.
+  \item \textbf{KNN} $k=25$ trọng số theo khoảng cách; \textbf{Gaussian Naive Bayes}.
+  \item \textbf{Decision Tree} độ sâu 8, tối thiểu 20 mẫu ở lá; \textbf{Random Forest} 300 cây.
+  \item \textbf{XGBoost} và \textbf{LightGBM} 400 cây, \texttt{scale\_pos\_weight} bằng tỷ lệ âm/dương
+        (\SL{ch2_diabetes/pos_weight}).
+  \item \textbf{SVM RBF}: huấn luyện trên \SL{ch2_diabetes/models/svm/n_train} mẫu con do độ phức tạp $O(n^2)$ của bộ giải.
+  \item \textbf{MLP} PyTorch (mục~\ref{sec:ml-mlp}) với \SL{ch2_diabetes/models/mlp/n_params} tham số, chạy trên GPU.
+\end{itemize}
+
+\maNguon{ch2_models__classifiers}{Khai báo chín bộ phân loại với siêu tham số dùng trong thực nghiệm}
+\maNguon{ch2_models__clf_pipeline}{Ghép bộ tiền xử lý và mô hình thành một Pipeline duy nhất}
+\maNguon{ch2_diabetes__fit_classic}{Huấn luyện một mô hình cổ điển, đo thời gian và lưu ra đĩa}
+
+\subsection{Đánh giá mô hình}
+\bang{ch2_diab_val}{Kết quả trên tập Validation ở ngưỡng tối ưu F1 của từng mô hình}{ch2-diab-val}
+\hinhpdf{ch2_diab_compare}{1}{So sánh Precision, Recall, F1 và ROC-AUC của các mô hình trên Validation (ngưỡng tối ưu F1).}{ch2-diab-compare}
+
+\bonhanxet{Baseline đạt accuracy \SL{ch2_diabetes/val/baseline/accPct}\% nhưng F1 bằng \SL{ch2_diabetes/val/baseline/f1}:
+accuracy hoàn toàn không phản ánh khả năng phát hiện bệnh. Các mô hình cây tổ hợp và MLP đứng đầu: XGBoost đạt F1
+\SL{ch2_diabetes/val/xgb/f1} và ROC-AUC \SL{ch2_diabetes/val/xgb/auc}, MLP đạt F1 \SL{ch2_diabetes/val/mlp/f1}, LightGBM
+\SL{ch2_diabetes/val/lgbm/f1}. Chỉ một cây quyết định đơn đã đạt F1 \SL{ch2_diabetes/val/tree/f1} với Precision rất cao
+\SL{ch2_diabetes/val/tree/prec}. Logistic Regression (\SL{ch2_diabetes/val/logreg/f1}) và KNN
+(\SL{ch2_diabetes/val/knn/f1}) kém hơn rõ; Naive Bayes thấp nhất (\SL{ch2_diabetes/val/nb/f1}).}
+{Quan hệ giữa xét nghiệm và nhãn có dạng ngưỡng (đã thấy ở EDA), đúng sở trường của cây: một phép tách
+``HbA1c $>$ \SL{ch2_tree/nodes/n0/thr}'' đã cho lá thuần. Mô hình tuyến tính phải xấp xỉ một bậc thang bằng một mặt phẳng nên mất độ chính xác ở
+vùng giáp ranh. Naive Bayes giả định các thuộc tính độc lập và có phân phối chuẩn, trong khi HbA1c và glucose rời rạc,
+lệch phải và cùng phụ thuộc vào bệnh.}
+{Với dữ liệu bảng có quan hệ ngưỡng, gradient boosting là lựa chọn mặc định đáng tin cậy. MLP gần bằng nhưng tốn hơn
+nhiều thời gian huấn luyện (\SL{ch2_diabetes/models/mlp/train_s} giây so với \SL{ch2_diabetes/models/xgb/train_s} giây).}
+
+\subsubsection{Ảnh hưởng của ngưỡng quyết định}
+\bang{ch2_diab_thr}{Precision, Recall, F1 ở ngưỡng 0,5 và ở ngưỡng tối ưu F1 (*) chọn trên Validation}{ch2-diab-thr}
+\hinhpdf{ch2_diab_threshold}{1}{Trái: F1 trên Validation theo ngưỡng của năm mô hình (chấm tròn là ngưỡng tối ưu). Phải: Precision và
+Recall của XGBoost theo ngưỡng; đường dọc là ngưỡng đã chọn.}{ch2-diab-thr}
+
+Bảng~\ref{tab:ch2-diab-thr} cho thấy chọn ngưỡng giúp nhiều nhất cho các mô hình có xác suất \emph{lệch chuẩn}: Naive Bayes
+và SVM. Với các mô hình đã cân bằng lớp như XGBoost, ngưỡng tối ưu (\SL{ch2_diabetes/thresholds/xgb}) gần 0,5. Hình
+\ref{fig:ch2-diab-thr} là lựa chọn thực tế: hạ ngưỡng xuống tăng Recall, đổi lại Precision giảm nhanh. Nếu mục tiêu sàng lọc
+đòi Recall cao hơn, ta chọn ngưỡng thấp hơn ngưỡng tối ưu F1 và chấp nhận nhiều ca cần xét nghiệm lại hơn.
+
+\subsubsection{Đường ROC, Precision--Recall và ma trận nhầm lẫn}
+\hinhpdf{ch2_diab_roc_pr}{1}{Đường ROC (trái) và Precision--Recall (phải) của các mô hình trên tập Test; chú giải ghi AUC và AP.}{ch2-diab-rocpr}
+\hinhpdf{ch2_diab_confusion}{1}{Ma trận nhầm lẫn của chín mô hình trên tập Test ở ngưỡng chọn trên Validation (tỷ lệ theo hàng, số
+lượng trong ngoặc).}{ch2-diab-cm}
+
+Trên đường ROC, mọi mô hình trừ Naive Bayes đều ôm sát góc trên bên trái nên khó phân biệt. Đường Precision--Recall
+phân biệt rõ hơn: mức ngẫu nhiên là \SL{ch2_diabetes/test/baseline/ap} (tỷ lệ lớp dương), XGBoost đạt PR-AUC
+\SL{ch2_diabetes/test/xgb/ap} còn Logistic Regression \SL{ch2_diabetes/test/logreg/ap}. Ma trận nhầm lẫn
+(Hình~\ref{fig:ch2-diab-cm}) cho thấy điểm yếu chung của các mô hình tốt nhất: chúng gần như không báo động nhầm nhưng bỏ sót khoảng
+một phần ba số ca bệnh, là những ca có HbA1c và glucose nằm trong vùng bình thường.
+
+\subsubsection{Độ phức tạp, đường học và kiểm định chéo}
+\haihinh{ch2_diab_depth}{Decision Tree theo độ sâu}{ch2_diab_knnk}{KNN theo số láng giềng $k$}{Đường kiểm định: ROC-AUC
+trên Train và Validation theo siêu tham số độ phức tạp.}{ch2-diab-curves}
+
+Hình~\ref{fig:ch2-diab-curves}a minh họa đúng lý thuyết thiên lệch -- phương sai: AUC Train tăng đơn điệu theo độ sâu,
+còn AUC Validation đạt đỉnh \SL{ch2_diabetes/curve_depth/val_auc/7} ở độ sâu \SL{ch2_diabetes/curve_depth/depth/7} rồi giảm
+về \SL{ch2_diabetes/curve_depth/val_auc/11} ở độ sâu \SL{ch2_diabetes/curve_depth/depth/11} khi cây học thuộc nhiễu. KNN
+cho chiều ngược lại: $k$ nhỏ quá khớp, $k$ lớn làm mượt và AUC Validation tăng dần.
+
+\hinhpdf{ch2_diab_learning}{1}{Đường học của XGBoost: F1 trên Train và Validation theo số mẫu huấn luyện.}{ch2-diab-learning}
+\bang{ch2_diab_cv}{Kiểm định chéo 5-fold trên tập Train: trung bình $\pm$ độ lệch chuẩn}{ch2-diab-cv}
+\hinhpdf{ch2_diab_cv}{1}{Phân bố điểm số 5-fold của bốn mô hình.}{ch2-diab-cvfig}
+
+Đường học (Hình~\ref{fig:ch2-diab-learning}) cho thấy khoảng cách Train -- Validation thu hẹp khi tăng dữ liệu và
+Validation gần như bão hòa từ khoảng nửa tập Train: thêm dữ liệu cùng loại sẽ không cải thiện đáng kể, muốn tốt hơn cần
+thêm \emph{thông tin mới} (đặc trưng khác). Kiểm định chéo (Bảng~\ref{tab:ch2-diab-cv}) xác nhận thứ hạng ổn định:
+XGBoost có ROC-AUC $\SL{ch2_diabetes/cv/xgb/test_roc_auc/mean}\pm\SL{ch2_diabetes/cv/xgb/test_roc_auc/std}$, cao nhất và
+dao động nhỏ nhất giữa các fold.
+
+\subsubsection{Diễn giải mô hình}
+\hinhpdf{ch2_diab_importance}{1}{Độ quan trọng đặc trưng: hoán vị (permutation, mức giảm ROC-AUC trên Validation) và gain của XGBoost (10
+đặc trưng đầu).}{ch2-diab-imp}
+\hinhpdf{ch2_diab_coef}{1}{Hệ số của Logistic Regression trên đặc trưng đã chuẩn hóa.}{ch2-diab-coef}
+
+\bonhanxet{Cả ba cách đo độ quan trọng (hoán vị, gain của XGBoost và mức giảm Gini của Random Forest, với HbA1c
+\SL{ch2_diabetes/importance/rf/HbA1c_level}) đều xếp HbA1c và glucose ở hai vị trí đầu, cách xa phần còn lại: hoán vị HbA1c làm
+ROC-AUC của XGBoost giảm \SL{ch2_diabetes/importance/perm/HbA1c_level/mean}, glucose
+\SL{ch2_diabetes/importance/perm/blood_glucose_level/mean}, tuổi chỉ \SL{ch2_diabetes/importance/perm/age/mean}. Hệ số
+Logistic Regression lớn nhất cũng thuộc HbA1c (\SL{ch2_diabetes/importance/logreg_coef/HbA1c_level}).}
+{Mô hình học đúng các yếu tố mà y khoa dùng để chẩn đoán, không phải một quy luật giả tạo từ dữ liệu. Hệ số dương lớn của
+tuổi và BMI phù hợp với hiểu biết về yếu tố nguy cơ.}
+{Mô hình đủ đáng tin để làm công cụ sàng lọc; nhưng chính vì phụ thuộc mạnh vào xét nghiệm, nó không giúp được nhiều cho
+người chưa từng đo HbA1c. Một mô hình ``không xét nghiệm'' chỉ dùng tuổi, BMI, bệnh nền sẽ là bài toán khác, khó hơn.}
+
+\hinhpdf{ch2_diab_mlp_calib}{1}{Trái: mất mát Train/Validation của MLP theo epoch (dừng sớm). Phải: biểu đồ hiệu chuẩn
+xác suất của các mô hình trên tập Test.}{ch2-diab-mlp}
+Biểu đồ hiệu chuẩn (Hình~\ref{fig:ch2-diab-mlp}) kiểm tra xác suất dự đoán có ``trung thực'' hay không~\cite{ch2:niculescu2005}:
+trong các hồ sơ được gán xác suất 0,7, có thực sự khoảng 70\% bị bệnh? Logistic Regression, XGBoost và MLP bám sát
+đường chéo, tức xác suất của chúng dùng được như mức nguy cơ. Naive Bayes thì ngược lại: nó gán xác suất gần 1 cho rất
+nhiều hồ sơ mà tỷ lệ bệnh thật trong nhóm đó thấp hơn nhiều, hệ quả của giả định độc lập bị vi phạm. Đây là lý do ngưỡng
+tối ưu của Naive Bayes lên tới \SL{ch2_diabetes/thresholds/nb}, và lý do ngưỡng phải được chọn trên Validation cho từng
+mô hình thay vì mặc định 0,5. Web App vì vậy hiển thị xác suất như một ``mức nguy cơ'' để tham khảo, không phải chẩn đoán.
+
+\subsection{Lựa chọn mô hình và kết quả trên tập Test}
+Mô hình được chọn theo F1 trên Validation, tiêu chí phụ là ROC-AUC và độ ổn định qua kiểm định chéo: \textbf{XGBoost}.
+Tập Test chỉ được dùng một lần sau khi đã cố định mô hình và ngưỡng.
+
+\bang{ch2_diab_test}{Kết quả trên tập Test (ngưỡng cố định từ Validation)}{ch2-diab-test}
+\bang{ch2_diab_best_cm}{Ma trận nhầm lẫn của XGBoost trên tập Test}{ch2-diab-bestcm}
+
+\begin{ketqua}{Kết quả cuối cùng -- Thực nghiệm 1}
+Mô hình: \SL{ch2_diabetes/best/label} (ngưỡng \SL{ch2_diabetes/best/thr})\\
+Accuracy = \SL{ch2_diabetes/best/acc} · Precision = \SL{ch2_diabetes/best/prec} · Recall = \SL{ch2_diabetes/best/rec}\\
+F1 = \SL{ch2_diabetes/best/f1} · ROC-AUC = \SL{ch2_diabetes/best/auc} · PR-AUC = \SL{ch2_diabetes/best/ap}\\
+Bỏ sót \SL{ch2_diabetes/test/xgb/fn} ca, báo động nhầm \SL{ch2_diabetes/test/xgb/fp} ca trên \SL{ch2_diabetes/split/test} hồ sơ Test
+\end{ketqua}
+
+Kết quả Test (F1 \SL{ch2_diabetes/test/xgb/f1}) rất sát Validation (\SL{ch2_diabetes/val/xgb/f1}), xác nhận không có quá
+khớp vào Validation khi chọn mô hình và ngưỡng. Precision \SL{ch2_diabetes/best/prec} nghĩa là gần như mọi cảnh báo đều
+đúng; Recall \SL{ch2_diabetes/best/rec} là giới hạn chính: khoảng ba phần mười ca bệnh có chỉ số xét nghiệm không khác người
+khỏe, và không mô hình nào trong chín mô hình phát hiện được chúng từ dữ liệu này.
+
+\subsection{Triển khai hệ thống}
+\label{sec:ml-diab-deploy}
+Mô hình được triển khai thành dịch vụ dự đoán trong Web App chung của tiểu luận (Hình~\ref{fig:ch2-deploy}). Mọi mô hình
+đã huấn luyện được lưu bằng \texttt{joblib} (MLP lưu \texttt{state\_dict} của PyTorch) cùng bộ tiền xử lý. Module
+\texttt{tl3/serve\_ch2.py} cung cấp một hàm duy nhất \texttt{predict(exp\_id, payload, model\_id)}; Web App gọi hàm này
+qua endpoint \texttt{POST /api/predict} với thân JSON
+\texttt{\{"exp\_id": "ch2\_diabetes", "model": "xgb", "payload": \{...\}\}}. Mô hình được nạp lười một lần rồi giữ trong
+bộ nhớ (\texttt{lru\_cache}), nên mỗi lượt dự đoán chỉ mất vài mili giây.
+
+\hinhtikz{ch2_deploy}{Kiến trúc triển khai: trình duyệt và điện thoại gửi JSON tới Web App, Web App gọi
+\texttt{serve\_ch2.predict}, mô hình được nạp lười từ \texttt{models/ch2}.}{ch2-deploy}
+\maNguon{serve_ch2__predict}{Điểm vào dùng chung của dịch vụ dự đoán Chương 2}
+\maNguon{serve_ch2__predict_diabetes}{Dự đoán nguy cơ tiểu đường: tiền xử lý, xác suất, so với ngưỡng đã chọn}
+
+Kết quả trả về gồm \texttt{label} (nhãn tiếng Việt), \texttt{proba} (xác suất của hai lớp), \texttt{details} (ngưỡng và
+xác suất lớp dương), tên mô hình và thời gian xử lý. Người dùng có thể đổi mô hình (XGBoost, LightGBM, Random Forest,
+Logistic Regression, Decision Tree, KNN, Naive Bayes, MLP) để so sánh trực tiếp cùng một hồ sơ.
+
+\anhUI{ch2_diabetes_web}{Giao diện Web App -- dự đoán nguy cơ tiểu đường trên máy tính.}{ch2-diab-web}
+\anhMobile{ch2_diabetes_mobile}{Giao diện dự đoán tiểu đường trên điện thoại (giao diện đáp ứng).}{ch2-diab-mobile}
+
+% =====================================================================
+\section{Thực nghiệm 2: Dự đoán giá nhà}
+\label{sec:ml-house}
+
+\subsection{Mô tả bài toán}
+Định giá bất động sản là bài toán \textbf{hồi quy} kinh điển: từ các thuộc tính của căn nhà (diện tích, số phòng, số tầng,
+tuổi nhà, tiện ích, thành phố, mức độ nội thất) dự đoán giá bán. Mô hình định giá tự động hỗ trợ người mua kiểm tra mức giá
+rao bán, ngân hàng thẩm định tài sản thế chấp và sàn giao dịch gợi ý giá. Sai số được đo bằng MAE (đơn vị tiền),
+RMSE, $R^2$ và MAPE.
+
+\subsection{Giới thiệu và khảo sát dữ liệu}
+Bộ dữ liệu \emph{House Price Prediction}~\cite{ch2:ds_house} gồm \SL{ch2_house/audit/n_rows} căn nhà ở bảy thành phố Ấn Độ,
+\SL{ch2_house/audit/cols} cột: bảy thuộc tính số (diện tích, phòng ngủ, phòng tắm, số tầng, chỗ đỗ xe, tuổi nhà, điểm khu
+vực), tám thuộc tính phân loại và nhãn \texttt{Price}. Dữ liệu sạch: \SL{ch2_house/audit/missing} giá trị thiếu,
+\SL{ch2_house/audit/duplicates} bản ghi trùng; chỉ \SL{ch2_house/audit/outliers/Price/n} giá trị giá nằm ngoài khoảng IQR.
+
+\bang{ch2_house_describe}{Thống kê mô tả các thuộc tính số của dữ liệu giá nhà}{ch2-house-describe}
+\hinhpdf{ch2_house_price}{1}{Phân bố giá nhà (trái) và giá trung bình theo số phòng ngủ (phải).}{ch2-house-price}
+
+Phân bố giá gần đối xứng (độ lệch \SL{ch2_house/survey/skew_price}), nên không cần biến đổi logarit như thường gặp với dữ
+liệu giá thật. Giá trung bình tăng đều theo số phòng ngủ: từ \SL{ch2_house/survey/price_by_bedrooms/1} với một phòng lên
+\SL{ch2_house/survey/price_by_bedrooms/5} với năm phòng.
+
+\subsection{Phân tích khám phá}
+\hinhpdf{ch2_house_numeric}{1}{Quan hệ giữa giá và các thuộc tính số; đường đỏ là xu hướng tuyến tính.}{ch2-house-num}
+\hinhpdf{ch2_house_cats}{1}{Phân bố giá theo thành phố, mức độ nội thất, đối tượng thuê và nguồn nước.}{ch2-house-cats}
+\hinhpdf{ch2_house_corr}{1}{Tương quan Pearson giữa các thuộc tính số và giá.}{ch2-house-corr}
+
+\bonhanxet{Số phòng ngủ có tương quan với giá cao nhất (\SL{ch2_house/survey/corr_target/Bedrooms}), sau đó là diện
+tích (\SL{ch2_house/survey/corr_target/Area}) và số phòng tắm (\SL{ch2_house/survey/corr_target/Bathrooms}); tuổi nhà
+tương quan âm yếu (\SL{ch2_house/survey/corr_target/Age}). Giá trung bình giữa các thành phố chênh không nhiều
+(Mumbai \SL{ch2_house/survey/price_by_city/Mumbai}, Chennai \SL{ch2_house/survey/price_by_city/Chennai}), trong khi nhà có
+nội thất đầy đủ đắt hơn rõ rệt (\SL{ch2_house/survey/price_by_furnishing/Furnished} so với
+\SL{ch2_house/survey/price_by_furnishing/Unfurnished}).}
+{Các đám mây điểm trong Hình~\ref{fig:ch2-house-num} có dạng dải thẳng với nhiễu đồng đều, không có đường cong hay
+tương tác rõ rệt: dấu hiệu dữ liệu được sinh bởi một quan hệ gần tuyến tính cộng nhiễu. Việc thành phố hầu như không ảnh
+hưởng tới giá cũng khác với thị trường thật, nơi Mumbai đắt hơn nhiều lần các thành phố khác.}
+{Cần thận trọng khi diễn giải: đây là bộ dữ liệu tổng hợp. Mô hình tuyến tính có thể đã là mô hình ``đúng'', và các mô
+hình linh hoạt hơn khó có lợi thế. Thực nghiệm này vì vậy là dịp kiểm chứng điều đó chứ không giả định cây luôn thắng.}
+
+\subsection{Biểu diễn và chia tập}
+Thuộc tính số được chuẩn hóa z-score; thuộc tính phân loại được mã hóa One-Hot với \texttt{drop="first"} để hệ số của
+mô hình tuyến tính có nghĩa so với một nhóm tham chiếu (ví dụ Bangalore, nhà có nội thất), tổng cộng
+\SL{ch2_house/split/n_features} đặc trưng. Dữ liệu chia ngẫu nhiên 70/15/15: \SL{ch2_house/split/train} căn để huấn luyện,
+\SL{ch2_house/split/val} kiểm định và \SL{ch2_house/split/test} kiểm thử.
+
+\maNguon{ch2_data__house_preprocessor}{Bộ tiền xử lý cho dữ liệu giá nhà (One-Hot bỏ hạng mục tham chiếu)}
+
+\subsection{Xây dựng mô hình}
+Mười mô hình hồi quy được so sánh (Đoạn mã~\ref{code:ch2_models__regressors}): Baseline (dự đoán trung bình), Linear
+Regression (OLS), Ridge, Lasso, hồi quy đa thức bậc 2 có Ridge, KNN, Decision Tree, Random Forest, XGBoost, SVR RBF (biến
+mục tiêu được chuẩn hóa qua \texttt{TransformedTargetRegressor} vì SVR nhạy với thang của $y$) và MLP. Đoạn mã
+\ref{code:ch2_house__regularization_path} tính \emph{đường chính quy hóa}: hệ số của Ridge và Lasso khi $\lambda$ thay đổi.
+
+\maNguon{ch2_models__regressors}{Khai báo mười mô hình hồi quy}
+\maNguon{ch2_models__reg_pipeline}{Pipeline tiền xử lý + mô hình hồi quy}
+\maNguon{ch2_house__regularization_path}{Đường chính quy hóa của Ridge và Lasso theo $\lambda$}
+
+\subsection{Đánh giá mô hình}
+\bang{ch2_house_val}{Kết quả hồi quy trên tập Validation}{ch2-house-val}
+\hinhpdf{ch2_house_compare}{1}{$R^2$ và RMSE của các mô hình trên Validation.}{ch2-house-compare}
+
+\bonhanxet{Ba mô hình tuyến tính đứng đầu và gần như bằng nhau: Lasso $R^2=\SL{ch2_house/val/lasso/r2}$, Linear
+\SL{ch2_house/val/linear/r2}, Ridge \SL{ch2_house/val/ridge/r2}. MLP (\SL{ch2_house/val/mlp/r2}) và XGBoost
+(\SL{ch2_house/val/xgb/r2}) theo sau, còn Random Forest (\SL{ch2_house/val/rf/r2}), KNN (\SL{ch2_house/val/knn/r2}) và
+Decision Tree (\SL{ch2_house/val/tree/r2}) kém hơn rõ. Đặc trưng đa thức bậc 2 cũng làm $R^2$ giảm
+(\SL{ch2_house/val/poly/r2}).}
+{Khi quan hệ thật là tuyến tính, mô hình tuyến tính có thiên lệch bằng 0 và phương sai nhỏ nhất. Cây và KNN phải xấp xỉ một
+mặt phẳng bằng các bậc thang hoặc trung bình cục bộ; với chỉ \SL{ch2_house/split/train} mẫu huấn luyện trong không gian
+\SL{ch2_house/split/n_features} chiều, phương sai của chúng lớn. Đặc trưng bậc 2 thêm hàng trăm tham số không cần thiết,
+đúng kịch bản quá khớp của mục~\ref{sec:ml-overfit}.}
+{``Mô hình phức tạp hơn thì tốt hơn'' không phải là quy luật. Trên dữ liệu nhỏ và gần tuyến tính, hồi quy tuyến tính có chính
+quy hóa vừa chính xác nhất, vừa nhanh nhất, vừa diễn giải được. Phần $R^2$ còn lại (khoảng một phần tư phương sai) là nhiễu
+không mô hình nào giải thích được từ các thuộc tính đã có.}
+
+\hinhpdf{ch2_house_pred}{1}{Giá dự đoán so với giá thật trên tập Test của Lasso và Random Forest; đường chéo là dự đoán hoàn hảo.}{ch2-house-pred}
+\hinhpdf{ch2_house_resid}{1}{Phần dư của Lasso: theo giá dự đoán (trái) và phân bố (phải).}{ch2-house-resid}
+
+Phần dư của Lasso (Hình~\ref{fig:ch2-house-resid}) phân bố đối xứng quanh 0 và không có hình phễu theo giá dự đoán, tức
+giả định phương sai sai số không đổi của OLS được thỏa mãn. Hình~\ref{fig:ch2-house-pred} cho thấy đám điểm của Lasso bám
+đường chéo chặt hơn đám điểm của Random Forest, đúng với chênh lệch $R^2$ giữa hai mô hình trên tập Test.
+
+\subsubsection{Hệ số, đường chính quy hóa và kiểm định chéo}
+\hinhpdf{ch2_house_coef}{1}{Hệ số của Linear Regression (đơn vị tiền trên một độ lệch chuẩn của thuộc tính số, hoặc so với
+nhóm tham chiếu của thuộc tính phân loại).}{ch2-house-coef}
+\hinhpdf{ch2_house_regpath}{1}{Đường chính quy hóa: hệ số Ridge co dần đều về 0, còn hệ số Lasso lần lượt bằng đúng 0 khi
+$\lambda$ tăng.}{ch2-house-regpath}
+
+Hệ số tuyến tính cho câu trả lời có thể dùng ngay: tăng số phòng ngủ thêm một độ lệch chuẩn làm giá tăng
+\SL{ch2_house/linear_coef/Bedrooms}, nhà không nội thất rẻ hơn nhà có nội thất \SL{ch2_house/linear_coef/Furnishing_Unfurnished}
+khi các yếu tố khác như nhau, còn hệ số của các thành phố đều nhỏ. Đường chính quy hóa (Hình~\ref{fig:ch2-house-regpath})
+minh họa trực quan khác biệt L1/L2 ở mục~\ref{sec:ml-linreg}: Lasso loại các đặc trưng thành phố đầu tiên, đúng những
+đặc trưng ít thông tin nhất.
+
+\bang{ch2_house_cv}{Kiểm định chéo 5-fold ($R^2$ trung bình $\pm$ độ lệch chuẩn, RMSE trung bình)}{ch2-house-cv}
+\hinhpdf{ch2_house_cv}{1}{$R^2$ trung bình $\pm$ 2 độ lệch chuẩn qua 5 fold của các mô hình.}{ch2-house-cvfig}
+\hinhpdf{ch2_house_learning}{1}{Trái: đường học của Lasso ($R^2$ theo số mẫu huấn luyện). Phải: mất mát Train/Validation của MLP theo epoch.}{ch2-house-learning}
+
+Kiểm định chéo xác nhận thứ hạng: Lasso $R^2=\SL{ch2_house/cv/lasso/r2_mean}\pm\SL{ch2_house/cv/lasso/r2_std}$, XGBoost
+$\SL{ch2_house/cv/xgb/r2_mean}\pm\SL{ch2_house/cv/xgb/r2_std}$, Decision Tree dao động mạnh nhất
+($\pm\SL{ch2_house/cv/tree/r2_std}$). Đường học của Lasso (Hình~\ref{fig:ch2-house-learning}) hội tụ ngay từ vài trăm mẫu và khoảng cách Train --
+Validation rất nhỏ: mô hình đã đạt trần của dữ liệu, thêm mẫu không giúp được. Ngược lại, các mô hình linh hoạt như
+Random Forest cần nhiều dữ liệu hơn nhiều để bù phương sai, điều mà \SL{ch2_house/split/train} mẫu không đáp ứng được;
+MLP dừng sớm sau \SL{ch2_house/models/mlp/epochs} epoch khi mất mát Validation ngừng giảm.
+
+\subsection{Lựa chọn mô hình và kết quả trên tập Test}
+\bang{ch2_house_test}{Kết quả hồi quy trên tập Test}{ch2-house-test}
+\bang{ch2_house_quartile}{MAE của Lasso theo bốn khoảng giá (tứ phân vị của giá thật) trên tập Test}{ch2-house-quart}
+
+\begin{ketqua}{Kết quả cuối cùng -- Thực nghiệm 2}
+Mô hình: \SL{ch2_house/best/label}\\
+$R^2$ = \SL{ch2_house/best/r2} · MAE = \SL{ch2_house/best/mae} · RMSE = \SL{ch2_house/best/rmse} · MAPE = \SL{ch2_house/best/mapePct}\%\\
+Baseline (trung bình): $R^2$ = \SL{ch2_house/test/baseline/r2} · MAE = \SL{ch2_house/test/baseline/mae}
+\end{ketqua}
+
+Lasso được chọn vì đứng đầu trên cả Validation và kiểm định chéo. Trên Test, nó giảm MAE so với baseline còn chưa tới một
+nửa; sai số tương đối trung bình \SL{ch2_house/best/mapePct}\% là mức chấp nhận được cho một công cụ tham khảo giá. Bảng
+\ref{tab:ch2-house-quart} cho thấy sai số lớn nhất ở nhóm nhà đắt nhất, nơi có ít mẫu và giá biến thiên nhiều. $R^2$ trên
+Test cao hơn Validation chủ yếu do phép chia ngẫu nhiên trên một tập nhỏ; con số đáng tin hơn là trung bình 5-fold.
+
+\subsection{Triển khai hệ thống}
+Dịch vụ \texttt{ch2\_house} nhận hồ sơ căn nhà gồm bảy trường số và tám trường lựa chọn, trả về giá dự đoán ở trường
+\texttt{value}, kèm đơn vị trong \texttt{details}. Người dùng có thể chuyển giữa Lasso, Linear, Ridge, XGBoost, đa thức,
+Random Forest, SVR, KNN và Decision Tree để thấy cùng một căn nhà được định giá khác nhau thế nào.
+
+\maNguon{serve_ch2__predict_house}{Dự đoán giá nhà từ hồ sơ người dùng nhập vào}
+
+\anhUI{ch2_house_web}{Giao diện Web App -- dự đoán giá nhà.}{ch2-house-web}
+\anhMobile{ch2_house_mobile}{Giao diện dự đoán giá nhà trên điện thoại.}{ch2-house-mobile}
+
+% =====================================================================
+\section{Thực nghiệm 3: Phân loại nhận xét khách hàng}
+\label{sec:ml-cmt}
+
+\subsection{Mô tả bài toán}
+Doanh nghiệp thương mại điện tử nhận hàng chục nghìn nhận xét mỗi tháng; đọc thủ công là bất khả thi. Bài toán là từ văn bản
+nhận xét, dự đoán khách hàng có \textbf{giới thiệu} sản phẩm hay không (phân loại nhị phân, nhãn \texttt{Recommended IND}),
+và mở rộng: dự đoán số sao 1--5 (phân loại nhiều lớp). Lớp quan trọng về kinh doanh là lớp \emph{không giới thiệu}, vì đó
+là những khách hàng cần được chăm sóc lại. Đây cũng là lớp thiểu số, nên chỉ số chính là \textbf{macro-F1} và F1 của lớp âm.
+
+\subsection{Giới thiệu và khảo sát dữ liệu}
+Bộ dữ liệu \emph{Women's E-Commerce Clothing Reviews}~\cite{ch2:ds_reviews} gồm \SL{ch2_comments/survey/raw_rows} nhận
+xét, mỗi nhận xét có tiêu đề, nội dung, số sao, nhãn giới thiệu và nhóm sản phẩm. Có \SL{ch2_comments/survey/missing_text}
+nhận xét không có nội dung (bị loại) và \SL{ch2_comments/survey/missing_title} nhận xét không có tiêu đề (giữ lại, dùng
+nội dung). Sau làm sạch còn \SL{ch2_comments/survey/n_rows} nhận xét, trong đó
+\SL{ch2_comments/survey/pos_ratePct}\% được giới thiệu. Văn bản đầu vào là tiêu đề nối với nội dung
+(Đoạn mã~\ref{code:ch2_data__load_reviews}).
+
+\maNguon{ch2_data__load_reviews}{Nạp và làm sạch dữ liệu nhận xét: bỏ nhận xét rỗng, ghép tiêu đề với nội dung}
+\maNguon{ch2_data__reviews_splits}{Chia phân tầng dữ liệu nhận xét theo nhãn giới thiệu}
+
+\hinhpdf{ch2_cmt_labels}{1}{Trái: phân bố số sao. Phải: tỷ lệ giới thiệu theo số sao.}{ch2-cmt-labels}
+\hinhpdf{ch2_cmt_length}{1}{Phân bố độ dài nhận xét (số từ) theo nhãn.}{ch2-cmt-length}
+\hinhpdf{ch2_cmt_dept}{1}{Số nhận xét theo nhóm sản phẩm.}{ch2-cmt-dept}
+
+\bonhanxet{Số sao lệch hẳn về 5 sao (\SL{ch2_comments/survey/rating_counts/5} nhận xét). Nhãn giới thiệu gần như trùng với
+số sao: tỷ lệ giới thiệu là \SL{ch2_comments/survey/rec_by_rating/1Pct}\% ở 1 sao, \SL{ch2_comments/survey/rec_by_rating/3Pct}\%
+ở 3 sao và \SL{ch2_comments/survey/rec_by_rating/5Pct}\% ở 5 sao. Nhận xét có độ dài trung vị
+\SL{ch2_comments/survey/words_median} từ, phân vị 95 là \SL{ch2_comments/survey/words_p95} từ, độ dài của hai lớp tương
+đương.}
+{Nhóm 3 sao là vùng mập mờ: khách vừa khen vừa chê và việc có giới thiệu hay không phụ thuộc vào cảm nhận tổng thể. Độ dài
+không phân biệt được hai lớp, nên mô hình phải dựa vào nội dung từ ngữ.}
+{Không được dùng số sao làm đặc trưng (gần như là nhãn, gây rò rỉ). Lỗi của mô hình sẽ tập trung ở các nhận xét 3 sao;
+nhận xét ngắn và vừa phải, rất hợp với biểu diễn túi từ.}
+
+\subsection{Biểu diễn văn bản}
+Văn bản được chuẩn hóa (chữ thường, bỏ URL, chữ số, ký tự đặc biệt) rồi biểu diễn bằng TF-IDF với unigram và bigram
+(Đoạn mã~\ref{code:ch2_text__normalize},~\ref{code:ch2_text__tfidf}). Bigram quan trọng với cảm xúc: ``not good'',
+``too small'', ``runs large'' mang nghĩa khác hẳn từng từ riêng lẻ. Từ điển giữ \SL{ch2_comments/models/logreg/vocab} đặc
+trưng có tần suất tài liệu ít nhất 3; TF dùng dạng $1+\log(\text{tf})$ để giảm ảnh hưởng của từ lặp nhiều lần. Ma trận
+thu được thưa: mỗi nhận xét chỉ có vài chục phần tử khác 0 trên hàng chục nghìn cột, nên mô hình tuyến tính huấn luyện
+trong vài giây.
+
+\maNguon{ch2_text__normalize}{Chuẩn hóa văn bản trước khi tách từ}
+\maNguon{ch2_text__tfidf}{Bộ biến đổi TF-IDF unigram + bigram}
+\hinhpdf{ch2_cmt_wordcloud}{1}{Đám mây từ của nhận xét được giới thiệu (trái) và không được giới thiệu (phải).}{ch2-cmt-cloud}
+
+\subsection{Xây dựng mô hình}
+Năm mô hình được so sánh trên cùng biểu diễn TF-IDF (Đoạn mã~\ref{code:ch2_text__text_models}): Logistic Regression có
+cân bằng lớp, Multinomial Naive Bayes, Complement Naive Bayes, Linear SVM~\cite{ch2:joachims1998} (được hiệu chuẩn xác suất
+bằng \texttt{CalibratedClassifierCV}) và Softmax Regression; baseline luôn dự đoán ``giới thiệu''.
+
+\maNguon{ch2_text__text_models}{Năm mô hình phân loại văn bản trên TF-IDF}
+\maNguon{ch2_text__top_terms}{Trích các từ/cụm từ có hệ số lớn nhất của mỗi lớp}
+
+\subsection{Đánh giá mô hình}
+\bang{ch2_cmt_val}{Kết quả phân loại nhận xét trên tập Validation}{ch2-cmt-val}
+\hinhpdf{ch2_cmt_compare}{1}{Accuracy, macro-F1, F1 lớp ``không giới thiệu'' và ROC-AUC của các mô hình trên Validation.}{ch2-cmt-compare}
+
+\bonhanxet{Logistic Regression (macro-F1 \SL{ch2_comments/val/logreg/macro_f1}), Linear SVM
+(\SL{ch2_comments/val/svm/macro_f1}) và Complement NB (\SL{ch2_comments/val/cnb/macro_f1}) gần như ngang nhau, còn
+Multinomial NB tụt hẳn (\SL{ch2_comments/val/nb/macro_f1}) vì Recall lớp âm chỉ \SL{ch2_comments/val/nb/rec_neg}.
+Complement NB có Recall lớp âm cao nhất (\SL{ch2_comments/val/cnb/rec_neg}).}
+{Multinomial NB học từ tần suất từ trong mỗi lớp; lớp âm có ít văn bản nên ước lượng kém và bị lớp dương lấn át. Complement
+NB ước lượng trên \emph{phần bù} của lớp nên khắc phục đúng điểm này~\cite{ch2:rennie2003}. Logistic Regression có
+\texttt{class\_weight="balanced"} cân bằng Precision và Recall của lớp âm tốt nhất.}
+{Với văn bản ngắn và TF-IDF, các mô hình tuyến tính là lựa chọn mạnh, rẻ và dễ diễn giải. Khi lớp quan trọng là lớp thiểu
+số, cân bằng lớp quan trọng hơn việc chọn họ mô hình.}
+
+\hinhpdf{ch2_cmt_confusion}{1}{Trái: ma trận nhầm lẫn của Logistic Regression trên tập Test. Phải: Softmax Regression dự đoán số sao
+(tỷ lệ theo hàng).}{ch2-cmt-cm}
+\hinhpdf{ch2_cmt_terms}{1}{Các từ/cụm từ có hệ số dương (giới thiệu) và âm (không giới thiệu) lớn nhất của Logistic Regression.}{ch2-cmt-terms}
+
+Hình~\ref{fig:ch2-cmt-terms} cho thấy mô hình học được ngôn ngữ cảm xúc có nghĩa: phía âm là các từ thất vọng, trả hàng
+và chê độ vừa (disappointed, unflattering, cheap, returned, huge); phía dương là các từ khen ngợi (love, perfect,
+great, comfortable, beautiful). Nhiều cụm từ hai từ xuất hiện
+trong danh sách, xác nhận lợi ích của bigram.
+
+\subsection{Mở rộng: dự đoán số sao bằng Softmax Regression}
+Dự đoán số sao là bài toán 5 lớp có thứ tự, khó hơn nhiều. Softmax Regression trên cùng TF-IDF đạt accuracy
+\SL{ch2_comments/rating/acc} và macro-F1 \SL{ch2_comments/rating/macro_f1}, nhưng tỷ lệ dự đoán lệch không quá một sao
+là \SL{ch2_comments/rating/within1Pct}\% (Bảng~\ref{tab:ch2-cmt-rating}). Lớp 5 sao dễ nhất (F1
+\SL{ch2_comments/rating/f1_per_class/4}), các lớp 1--4 sao khó (F1 từ \SL{ch2_comments/rating/f1_per_class/0} tới
+\SL{ch2_comments/rating/f1_per_class/2}), vì ranh giới giữa ``3 sao'' và ``4 sao'' trong lời văn là rất mờ.
+
+\bang{ch2_cmt_rating}{F1 từng lớp của Softmax Regression khi dự đoán số sao trên tập Test}{ch2-cmt-rating}
+
+\subsection{Lựa chọn mô hình và kết quả trên tập Test}
+\bang{ch2_cmt_test}{Kết quả phân loại nhận xét trên tập Test}{ch2-cmt-test}
+
+\begin{ketqua}{Kết quả cuối cùng -- Thực nghiệm 3}
+Mô hình: \SL{ch2_comments/best/label}\\
+Macro-F1 = \SL{ch2_comments/best/macro_f1} · Accuracy = \SL{ch2_comments/best/acc} · ROC-AUC = \SL{ch2_comments/best/auc}\\
+Lớp ``không giới thiệu'': F1 = \SL{ch2_comments/best/f1_neg} · Precision = \SL{ch2_comments/best/prec_neg} · Recall = \SL{ch2_comments/best/rec_neg}\\
+Baseline: Accuracy = \SL{ch2_comments/test/baseline/acc} · Macro-F1 = \SL{ch2_comments/test/baseline/macro_f1}
+\end{ketqua}
+
+Trên Test, Logistic Regression giữ vị trí đầu với macro-F1 \SL{ch2_comments/test/logreg/macro_f1}, hơn Complement NB
+(\SL{ch2_comments/test/cnb/macro_f1}) và Linear SVM (\SL{ch2_comments/test/svm/macro_f1}). So với baseline có accuracy
+\SL{ch2_comments/test/baseline/accPct}\% nhưng không phát hiện được nhận xét tiêu cực nào, mô hình tìm ra
+\SL{ch2_comments/best/rec_negPct}\% số khách hàng không hài lòng. Phần lớn lỗi còn lại là nhận xét 3 sao và nhận xét
+mỉa mai, giới hạn cố hữu của biểu diễn túi từ vốn bỏ qua thứ tự từ; Chương~4 sẽ dùng mạng hồi quy để khắc phục.
+
+\subsection{Triển khai hệ thống}
+Dịch vụ \texttt{ch2\_comments} nhận một trường văn bản tự do, chạy cùng pipeline chuẩn hóa -- TF-IDF -- mô hình đã huấn
+luyện, trả về nhãn ``Giới thiệu''/``Không giới thiệu'' và xác suất của hai lớp. Ví dụ, nhận xét ``The fabric is cheap and the
+dress runs very small, I returned it'' được phân loại ``Không giới thiệu'' với xác suất cao.
+
+\maNguon{serve_ch2__predict_comments}{Phân loại một nhận xét khách hàng}
+
+\anhUI{ch2_comments_web}{Giao diện Web App -- phân loại nhận xét khách hàng.}{ch2-cmt-web}
+\anhMobile{ch2_comments_mobile}{Giao diện phân loại nhận xét trên điện thoại.}{ch2-cmt-mobile}
+
+% =====================================================================
+\section{Tổng kết chương}
+\label{sec:ml-summary}
+Chương này đi từ nền tảng lý thuyết tới ba hệ thống dự đoán hoàn chỉnh. Ba bài học xuyên suốt:
+
+\begin{enumerate}
+  \item \textbf{Chỉ số đánh giá phải khớp với bài toán.} Trên dữ liệu mất cân bằng, baseline đạt accuracy
+        \SL{ch2_diabetes/test/baseline/accPct}\% (tiểu đường) và \SL{ch2_comments/test/baseline/accPct}\% (nhận xét) mà
+        không có giá trị sử dụng; F1, PR-AUC và macro-F1 mới phản ánh đúng chất lượng.
+  \item \textbf{Không có mô hình tốt nhất cho mọi dữ liệu.} Gradient boosting thắng trên dữ liệu y tế có quan hệ ngưỡng
+        (F1 \SL{ch2_diabetes/best/f1}); Lasso thắng trên dữ liệu giá nhà gần tuyến tính ($R^2$ \SL{ch2_house/best/r2});
+        Logistic Regression trên TF-IDF thắng với văn bản (macro-F1 \SL{ch2_comments/best/macro_f1}). Thiên kiến quy nạp
+        của mô hình phải phù hợp với cấu trúc của dữ liệu.
+  \item \textbf{Quy trình quan trọng không kém thuật toán.} Làm sạch có hiểu biết miền (giữ ngoại lai có thật), Pipeline
+        tránh rò rỉ, chọn ngưỡng trên Validation, chỉ dùng Test một lần, và đóng gói tiền xử lý cùng mô hình khi triển khai.
+\end{enumerate}
+
+\begin{table}[H]\centering
+\caption{Tóm tắt ba thực nghiệm của Chương 2}\label{tab:ch2-summary}
+\small
+\begin{tabular}{p{3.2cm}p{3.4cm}p{3.6cm}p{4.2cm}}
+\toprule
+Thực nghiệm & Kiểu bài toán & Mô hình tốt nhất & Kết quả Test \\
+\midrule
+Tiểu đường & Phân loại nhị phân, mất cân bằng & \SL{ch2_diabetes/best/label} & F1 \SL{ch2_diabetes/best/f1}, ROC-AUC \SL{ch2_diabetes/best/auc} \\
+Giá nhà & Hồi quy & \SL{ch2_house/best/label} & $R^2$ \SL{ch2_house/best/r2}, MAPE \SL{ch2_house/best/mapePct}\% \\
+Nhận xét & Phân loại văn bản & Logistic Regression (TF-IDF) & Macro-F1 \SL{ch2_comments/best/macro_f1}, Acc \SL{ch2_comments/best/acc} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Giới hạn chung của các mô hình trong chương là chúng làm việc trên \emph{đặc trưng do con người thiết kế}: các cột của bảng
+hay túi từ TF-IDF. Với ảnh và chuỗi, việc thiết kế đặc trưng bằng tay trở nên bất khả thi. Hai chương tiếp theo trình bày
+cách mạng nơ-ron sâu tự học đặc trưng: mạng tích chập cho ảnh (Chương~3) và mạng hồi quy cho chuỗi (Chương~4).

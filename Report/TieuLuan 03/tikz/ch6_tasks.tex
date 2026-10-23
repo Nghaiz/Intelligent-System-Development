@@ -1,0 +1,27 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \t/\c/\desc [count=\p from 0] in {{Mức nút}/cBlue/{phân loại tài liệu (Cora), phát hiện tài khoản gian lận},
+                                           {Mức cạnh}/cOrange/{gợi ý sản phẩm, hoàn thiện Knowledge Graph},
+                                           {Mức đồ thị}/cGreen/{dự đoán tính chất phân tử, độc tính thuốc}}{
+    \begin{scope}[xshift=\p*5.4cm]
+      \filldraw[draw=\c!70!black, top color=\c!6, bottom color=\c!22, rounded corners=6pt, thick,
+                blur shadow={shadow blur steps=6, shadow opacity=25}] (0,0) rectangle (4.8,4.4);
+      \node[font=\normalsize\bfseries\sffamily, text=\c!70!black] at (2.4,4.0) {\t};
+      \foreach \n/\x/\y in {a/0.8/2.9, b/2.0/3.2, c/1.2/1.8, d/2.6/2.1, e/3.8/2.9, f/3.6/1.3}
+        \coordinate (\n) at (\x,\y);
+      \foreach \u/\v in {a/b, a/c, b/d, c/d, d/e, d/f, e/f} \draw[gray!60, thick] (\u) -- (\v);
+      \ifnum\p=0
+        \foreach \n/\cc in {a/cBlue, b/cBlue, c/cBlue, e/cOrange, f/cOrange} \fill[\cc] (\n) circle (0.17);
+        \node[circle, draw=cRed, ultra thick, fill=white, minimum size=6mm, font=\small\bfseries] at (d) {?};
+      \fi
+      \ifnum\p=1
+        \foreach \n in {a,b,c,d,e,f} \fill[cSlate] (\n) circle (0.15);
+        \draw[cRed, ultra thick, dashed] (c) -- (f) node[midway, below, font=\small\bfseries, text=cRed] {?};
+      \fi
+      \ifnum\p=2
+        \foreach \n in {a,b,c,d,e,f} \fill[cGreen!70!black] (\n) circle (0.15);
+        \draw[cGreen!70!black, ultra thick, rounded corners] (0.4,0.95) rectangle (4.3,3.6);
+        \node[hop=cRed, font=\small\bfseries] at (2.4,0.55) {nhãn: độc / không độc};
+      \fi
+      \node[nhan, text width=4.6cm, align=center, anchor=north] at (2.4,-0.15) {\desc};
+    \end{scope}}
+\end{tikzpicture}

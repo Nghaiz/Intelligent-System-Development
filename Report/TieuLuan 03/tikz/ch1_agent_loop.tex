@@ -1,0 +1,19 @@
+\begin{tikzpicture}
+  \node[circle, minimum size=3.6cm, draw=cNavy, very thick, inner color=cSky!15, outer color=cBlue!45,
+        blur shadow={shadow blur steps=8, shadow opacity=35}, align=center, font=\normalsize\bfseries] (llm) at (0,0)
+        {Mô hình\\ngôn ngữ lớn\\(bộ não)};
+  \foreach \ang/\c/\t/\n in {90/cRed/{Mục tiêu\\từ người dùng}/g, 30/cOrange/{Lập kế hoạch\\chia nhỏ nhiệm vụ}/p,
+      -30/cGreen/{Hành động:\\gọi công cụ, mã}/a, -90/cTeal/{Quan sát\\kết quả trả về}/o,
+      -150/cPurple/{Phản tư,\\tự kiểm chứng}/r, 150/cIndigo/{Bộ nhớ ngắn hạn\\và dài hạn}/m} {
+    \node[hop=\c, minimum width=3.4cm, minimum height=1.35cm, font=\small\bfseries] (\n) at (\ang:4.9cm) {\t};
+  }
+  \foreach \u/\v/\c in {g/p/cRed, p/a/cOrange, a/o/cGreen, o/r/cTeal, r/m/cPurple, m/g/cIndigo} {
+    \draw[muiM=\c!70!black, line width=1.6pt, bend left=18] (\u) to (\v);
+  }
+  \foreach \n in {p, a, r, m} { \draw[cSlate, thick, dashed, <->] (llm) -- (\n); }
+  % công cụ bên ngoài
+  \node[csdl=cTeal, minimum width=2.2cm, minimum height=1.6cm, font=\small] (kb) at (8.3,-1.2) {Kho tri thức\\RAG / KG};
+  \node[hop=cSlate, minimum width=2.2cm, font=\small] (tool) at (8.3,1.4) {API, máy tính,\\trình duyệt};
+  \draw[muiM=cGreen!60!black] (a) -- (kb);
+  \draw[muiM=cGreen!60!black] (a) -- (tool);
+\end{tikzpicture}

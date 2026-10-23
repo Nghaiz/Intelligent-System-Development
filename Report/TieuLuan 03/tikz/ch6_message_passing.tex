@@ -1,0 +1,32 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ba mặt phẳng 3D (lớp 0, 1, 2) xếp chồng; mỗi mặt là cùng một đồ thị
+  \foreach \L/\col/\yy in {0/cBlue/0, 1/cOrange/3.3, 2/cGreen/6.6}{
+    \begin{scope}[yshift=\yy cm, yslant=0.0, xslant=0.9]
+      \filldraw[draw=\col!70!black, top color=\col!8, bottom color=\col!28, thick, rounded corners=4pt,
+                blur shadow={shadow blur steps=6, shadow opacity=25}] (0,0) rectangle (8,2.2);
+      \foreach \n/\x/\y in {a/1.0/1.1, b/2.6/1.7, c/4.0/1.0, d/2.4/0.4, e/5.6/1.6, f/6.8/0.6}
+        \coordinate (\n\L) at (\x,\y);
+      \foreach \u/\v in {a/b, a/d, b/c, d/c, c/e, c/f, e/f}
+        \draw[gray!60, thick] (\u\L) -- (\v\L);
+    \end{scope}
+    \node[font=\small\bfseries\sffamily, text=\col!70!black, anchor=east] at (-0.4,\yy+1.1) {lớp $\ell=\L$};
+  }
+  % nút
+  \foreach \L in {0,1,2}{
+    \foreach \n/\c in {a/cSky, b/cPink, d/cLime, e/cPurple, f/cYellow}
+      \fill[\c, draw=black!50] (\n\L) circle (0.17);
+    \fill[cRed, draw=black!60] (c\L) circle (0.24);
+  }
+  % luồng thông điệp: láng giềng ở lớp 0 -> c ở lớp 1; láng giềng ở lớp 1 -> c ở lớp 2
+  \foreach \n in {b,d,e,f} \draw[muiM=cBlue!80!black, thick, shorten >=3pt, shorten <=3pt] (\n0) -- (c1);
+  \draw[muiM=cRed, thick, dashed, shorten >=3pt] (c0) -- (c1);
+  \foreach \n in {b,d,e,f} \draw[muiM=cOrange!85!black, thick, shorten >=3pt, shorten <=3pt] (\n1) -- (c2);
+  \draw[muiM=cRed, thick, dashed, shorten >=3pt] (c1) -- (c2);
+  \draw[muiM=gray, thick, dotted, shorten >=3pt] (a0) -- (b1);
+  \draw[muiM=gray, thick, dotted, shorten >=3pt] (a0) -- (d1);
+  % chú thích
+  \node[khoiR, text width=5.6cm, anchor=west] at (11.8,8.0) {\textbf{UPDATE}: $h_v^{(\ell+1)}=\phi\big(h_v^{(\ell)},m_v^{(\ell)}\big)$};
+  \node[khoiC, text width=5.6cm, anchor=west] at (11.8,4.9) {\textbf{AGGREGATE}: $m_v^{(\ell)}=\bigoplus_{u\in\mathcal N(v)}\psi\big(h_u^{(\ell)},h_v^{(\ell)},e_{uv}\big)$};
+  \node[khoi, text width=5.6cm, anchor=west] at (11.8,1.6) {\textbf{ĐẦU VÀO}: $h_v^{(0)}=x_v$ (đặc trưng nút)};
+  \node[nhan, text width=5.6cm, anchor=west, align=left] at (11.8,-0.4) {Sau 2 lớp, nút đỏ nhận thông tin từ láng giềng 2 bước (đường chấm từ nút $a$).};
+\end{tikzpicture}

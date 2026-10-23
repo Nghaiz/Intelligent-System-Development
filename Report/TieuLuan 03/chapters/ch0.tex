@@ -1,0 +1,152 @@
+% =====================================================================
+%  MỞ ĐẦU — làn L1
+% =====================================================================
+\chapter*{Mở đầu}
+\addcontentsline{toc}{chapter}{Mở đầu}
+\markboth{Mở đầu}{Mở đầu}
+
+\section*{Bối cảnh và lý do chọn đề tài}
+Chỉ trong khoảng hơn một thập niên, trí tuệ nhân tạo (Artificial Intelligence -- AI) đã đi từ các phòng thí nghiệm vào
+đời sống thường ngày. Mở khoá điện thoại bằng khuôn mặt, gợi ý phim và bài hát, dịch tự động, phát hiện giao dịch gian lận,
+trợ lý hội thoại trả lời câu hỏi chuyên môn: phía sau những dịch vụ quen thuộc đó là các mô hình học từ dữ liệu. Trong y tế,
+AI hỗ trợ đọc ảnh chẩn đoán và sàng lọc nguy cơ; trong tài chính, nó tham gia dự báo, quản trị rủi ro và tư vấn; trong thương
+mại điện tử, nó dự đoán hành vi khách hàng và tối ưu tồn kho. Vì vậy, hiểu AI không còn là mối quan tâm riêng của nhà khoa học
+máy tính mà trở thành một phần năng lực nghề nghiệp của kỹ sư phần mềm.
+
+Tuy nhiên, AI không phải là phát minh của vài năm gần đây. Ý tưởng về cỗ máy biết suy nghĩ đã có từ thần thoại; nền móng khoa
+học được đặt dần qua logic hình thức, lý thuyết tính toán và máy tính điện tử; lĩnh vực chính thức ra đời tại Hội thảo Dartmouth
+năm 1956 \cite{ch1:mccarthy2006}. Từ đó đến nay, AI đi qua những chu kỳ kỳ vọng và thất vọng, những ``mùa đông'' cắt giảm tài trợ,
+rồi bùng nổ trở lại khi hội đủ ba điều kiện: dữ liệu lớn, phần cứng song song và thuật toán học sâu \cite{ch1:lecun2015}. Hiểu tiến
+trình đó giúp nhìn các thành tựu hiện nay một cách tỉnh táo: ghi nhận giá trị thực, đồng thời tránh lặp lại những lời hứa vượt quá
+năng lực.
+
+Một bước ngoặt có ý nghĩa quyết định là chuyển từ \emph{viết tay tri thức} sang \emph{học từ dữ liệu}. Các hệ chuyên gia mã hoá
+quy tắc của con người đạt kết quả tốt trong miền hẹp nhưng khó mở rộng và khó bảo trì; học máy (machine learning) đưa ra cách làm
+khác: cung cấp ví dụ và để thuật toán tự điều chỉnh tham số nhằm giảm sai số. Trên nền tảng học máy cổ điển, học sâu (deep
+learning) xây dựng các kiến trúc chuyên biệt cho từng dạng dữ liệu: mạng nơ-ron tích chập (CNN) cho dữ liệu có cấu trúc không
+gian như ảnh, mạng nơ-ron hồi quy (RNN) cho dữ liệu chuỗi, mạng nơ-ron đồ thị (GNN) cho dữ liệu quan hệ. Gần đây, các mô hình
+ngôn ngữ lớn (LLM) kết hợp với đồ thị tri thức (Knowledge Graph -- KG), sinh tăng cường truy xuất (Retrieval-Augmented Generation
+-- RAG) \cite{ch1:lewis2020} và các tác tử (agent) biết dùng công cụ \cite{ch1:yao2023} đã mở rộng câu hỏi từ ``dự đoán nhãn nào?''
+sang ``bằng chứng nào hỗ trợ câu trả lời?'' và ``các bước xử lý được điều phối ra sao?''.
+
+Xuất phát từ bối cảnh đó, tiểu luận chọn đề tài \textbf{phân tích các hệ thống thông minh} theo một mạch xuyên suốt: từ lịch sử
+hình thành, qua các kỹ thuật học máy cơ bản, CNN, RNN, đến đồ thị tri thức và RAG, học sâu trên đồ thị và hệ đa tác tử. Điểm khác
+của tiểu luận so với một bài tổng quan thuần lý thuyết là \emph{mỗi chương đều có thực nghiệm tự cài đặt}, chạy trên dữ liệu thật,
+đánh giá định lượng và đóng gói thành ứng dụng web có giao diện cho cả màn hình máy tính lẫn điện thoại.
+
+\section*{Mục tiêu và câu hỏi nghiên cứu}
+Tiểu luận đặt ra bốn mục tiêu. \textbf{Thứ nhất}, hệ thống hoá các khái niệm nền tảng và chỉ ra mối liên hệ giữa chúng: học máy
+là một nhóm phương pháp của AI, học sâu là một nhóm phương pháp học máy dựa trên mạng nhiều tầng; CNN, RNN và GNN được phân biệt
+bởi cách tổ chức phép tính trên ảnh, chuỗi và đồ thị; RAG là kiến trúc kết hợp truy xuất với sinh văn bản; hệ đa tác tử là cách tổ
+chức nhiều thành phần có vai trò riêng. \textbf{Thứ hai}, xây dựng thực nghiệm có thể tái lập cho từng nhóm kỹ thuật, mô tả rõ
+nguồn dữ liệu, cách chia tập, mô hình, thước đo. \textbf{Thứ ba}, so sánh công bằng: so sánh mô hình trên cùng dữ liệu và cùng phép
+chia, so sánh framework (cài đặt từ đầu bằng NumPy, TensorFlow--Keras, PyTorch) trên cùng kiến trúc. \textbf{Thứ tư}, đóng gói mô
+hình thành dịch vụ suy luận có giao diện và xác định rõ giới hạn của kết luận.
+
+\begin{table}[H]\centering
+\caption{Câu hỏi nghiên cứu và cách tiếp cận tương ứng}\label{tab:ch0-cauhoi}
+\small
+\begin{tabular}{@{}L{0.08\linewidth}L{0.42\linewidth}L{0.44\linewidth}@{}}
+\toprule
+\textbf{Mã} & \textbf{Câu hỏi} & \textbf{Cách tiếp cận} \\
+\midrule
+CH1 & Vì sao AI phát triển theo chu kỳ, và điều gì làm nên bùng nổ hiện nay? & Phân tích lịch sử theo giai đoạn, đối chiếu dữ liệu -- phần cứng -- thuật toán (Chương~1) \\
+CH2 & Khi nào mô hình đơn giản đã đủ tốt cho dữ liệu bảng? & So sánh hồi quy tuyến tính/logistic, KNN, Naive Bayes, cây, rừng, boosting, SVM, MLP trên ba bài toán \\
+CH3 & Cải tiến kiến trúc CNN mang lại bao nhiêu, và framework có ảnh hưởng không? & Basic CNN (NumPy, PyTorch, TensorFlow) và Improved CNN trên bốn bộ ảnh \\
+CH4 & Cổng nhớ (LSTM, GRU) có giúp dự báo chuỗi thời gian thực tế? & Simple RNN, LSTM, GRU trên doanh thu thương mại điện tử, cổ phiếu và giá vàng \\
+CH5 & Truy xuất theo đồ thị và theo ngữ nghĩa đóng góp gì cho hỏi đáp có căn cứ? & KB, KG, TF-IDF, BM25, embedding, hybrid, LLM cục bộ, tác tử định tuyến \\
+CH6 & Thông tin quan hệ giữa các nút giúp phân loại tốt hơn đặc trưng riêng lẻ? & GCN, GraphSAGE, GAT so với MLP trên Cora, CiteSeer \\
+CH7 & Phối hợp nhiều tác tử có xứng đáng với chi phí tính toán? & So sánh LLM trực tiếp, một tác tử có công cụ và hệ đa tác tử trên GSM8K \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Phạm vi và phương pháp nghiên cứu}
+Về \textbf{phạm vi}, tiểu luận giới hạn ở các kỹ thuật học có giám sát, học biểu diễn trên ảnh, chuỗi và đồ thị, cùng các hệ
+thống hỏi đáp dựa trên tri thức. Các mô hình được huấn luyện trên một máy tính xách tay; vì vậy quy mô mô hình được chọn vừa đủ để
+minh hoạ nguyên lý, không nhằm cạnh tranh với kết quả tốt nhất đã công bố. Mô hình ngôn ngữ dùng trong Chương~5 và Chương~7 là
+Qwen2.5-1.5B-Instruct \cite{ch0:qwen2024} chạy hoàn toàn cục bộ, không gửi dữ liệu ra dịch vụ bên ngoài.
+
+Về \textbf{phương pháp}, tiểu luận kết hợp hai hướng. Phần lý thuyết tổng hợp và phân tích tài liệu: giáo trình kinh điển
+\cite{ch1:russell2021,ch1:goodfellow2016}, bài báo gốc đánh dấu các bước ngoặt và tài liệu chính thức của thư viện. Phần thực
+nghiệm theo một quy trình chung (Hình~\ref{fig:ch0-pipeline}): khảo sát và làm sạch dữ liệu, phân tích khám phá (EDA), chia
+train/validation/test, huấn luyện nhiều mô hình, chọn mô hình theo tập validation, báo cáo trên tập test và cuối cùng triển khai.
+Toàn bộ con số trong báo cáo được sinh tự động từ tệp kết quả của chương trình, và mọi đoạn mã in trong báo cáo được trích nguyên văn
+từ mã nguồn đã chạy ra các con số đó; nhờ vậy văn bản, số liệu và mã nguồn không thể lệch nhau.
+
+\hinhtikz{ch0_pipeline}{Quy trình thực nghiệm chung của tiểu luận: từ dữ liệu gốc tới báo cáo và ứng dụng triển khai}{ch0-pipeline}
+
+\section*{Tổng quan các chương và thực nghiệm}
+Bảng~\ref{tab:ch0-tongquan} tóm tắt dữ liệu, mô hình và công cụ của từng chương; Hình~\ref{fig:ch0-map} thể hiện quan hệ giữa các
+chương. Chương~1 cung cấp bối cảnh lịch sử; Chương~2--4 phát triển nền tảng tính toán với ba dạng dữ liệu tiêu biểu (bảng, ảnh,
+chuỗi); Chương~5--7 mở rộng sang tri thức có cấu trúc, đồ thị và sự phối hợp của nhiều thành phần.
+
+\begin{table}[H]\centering
+\caption{Tổng quan dữ liệu, mô hình và framework theo chương}\label{tab:ch0-tongquan}
+\small
+\begin{tabular}{@{}L{0.13\linewidth}L{0.27\linewidth}L{0.33\linewidth}L{0.21\linewidth}@{}}
+\toprule
+\textbf{Chương} & \textbf{Dữ liệu} & \textbf{Mô hình} & \textbf{Công cụ} \\
+\midrule
+1. Lịch sử AI & Tư liệu lịch sử & -- & -- \\
+2. Học máy & Diabetes Prediction, House Price, Customer Comments & Hồi quy tuyến tính/logistic, KNN, Naive Bayes, cây quyết định, rừng ngẫu nhiên, XGBoost, SVM/SVR, MLP; K-means, PCA & scikit-learn, XGBoost, PyTorch \\
+3. CNN & MNIST, Fashion-MNIST, Rock--Paper--Scissors, CIFAR-10 & Basic CNN (from scratch, PyTorch, TensorFlow), Improved CNN (PyTorch, TensorFlow), Grad-CAM & NumPy, PyTorch, Keras \\
+4. RNN & E-commerce Customer Behavior, AAPL, giá vàng & Simple RNN, LSTM, GRU, BiLSTM; RNN NumPy (BPTT) & NumPy, PyTorch, Keras \\
+5. KG \& RAG & Diabetes, cổ phiếu Google, giá vàng (FINAL\_USO) & KB, KG (NetworkX, RDF), TF-IDF, BM25, embedding, hybrid, LLM, tác tử & NetworkX, rdflib, Sentence-Transformers \\
+6. GNN & Cora, CiteSeer & MLP, GCN, GraphSAGE, GAT & PyTorch, PyG \\
+7. Đa tác tử & GSM8K & LLM trực tiếp, tác tử có công cụ, hệ đa tác tử & Transformers \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\hinhtikz{ch0_map}{Bản đồ báo cáo: bảy chương nối tiếp nhau từ nền tảng lịch sử, học máy, ảnh, chuỗi đến tri thức, đồ thị và tác tử}{ch0-map}
+
+\section*{Môi trường thực nghiệm và phân chia CPU/GPU}
+Thực nghiệm chạy trên máy tính xách tay với CPU AMD Ryzen 9 7945HX (16 nhân, 32 luồng), GPU NVIDIA GeForce RTX 4060 Laptop 8~GB
+và 40~GB RAM, hệ điều hành Windows~11. Phần mềm chính gồm Python~3.13, NumPy \cite{ch0:harris2020}, scikit-learn
+\cite{ch0:pedregosa2011}, XGBoost \cite{ch0:chen2016}, PyTorch \cite{ch0:paszke2019} bản CUDA, TensorFlow--Keras
+\cite{ch0:abadi2016,ch0:chollet2015}, NetworkX \cite{ch0:hagberg2008}, Hugging Face Transformers \cite{ch0:wolf2020} và PyTorch
+Geometric \cite{ch0:fey2019}.
+
+Hai thiết bị được phân vai để chạy song song (Hình~\ref{fig:ch0-hardware}). TensorFlow từ phiên bản 2.11 không còn hỗ trợ GPU
+trực tiếp trên Windows, nên mọi mô hình Keras chạy trên CPU; trong lúc đó, GPU phục vụ PyTorch. Các phép tính tự cài đặt bằng
+NumPy, các thuật toán của scikit-learn, xây dựng đồ thị tri thức, chỉ mục TF-IDF/BM25 và việc vẽ hình, biên dịch báo cáo cũng chạy
+trên CPU. Vì GPU chỉ có 8~GB bộ nhớ, các việc nặng (huấn luyện CNN bằng PyTorch, sinh văn bản bằng LLM, mã hoá embedding hàng loạt)
+được xếp lượt qua một khoá tệp dùng chung, còn các việc nhẹ (MLP, RNN, GNN) bị giới hạn phần VRAM để chạy đồng thời. Mỗi tiến trình
+cũng giới hạn số luồng CPU, nhờ đó nhiều thực nghiệm chạy cùng lúc mà không tranh chấp tài nguyên.
+
+\hinhtikz{ch0_hardware}{Phân chia công việc giữa CPU và GPU để các thực nghiệm chạy song song}{ch0-hardware}
+
+\begin{luuy}{Lưu ý về tính tái lập}
+Mọi thực nghiệm cố định hạt giống ngẫu nhiên (seed = 42), chia dữ liệu theo tỉ lệ cố định (theo thời gian với chuỗi thời gian),
+và ghi kết quả ra tệp JSON. Do phép tính trên GPU có thể không hoàn toàn tất định, chạy lại có thể cho chênh lệch rất nhỏ ở chữ số
+thập phân cuối; các kết luận định tính không phụ thuộc vào chênh lệch này.
+\end{luuy}
+
+\section*{Cấu trúc báo cáo}
+Ngoài phần Mở đầu và Kết luận, báo cáo gồm bảy chương:
+\begin{itemize}
+  \item \textbf{Chương 1 -- Lịch sử phát triển của trí tuệ nhân tạo}: từ tiền đề tư tưởng, Hội thảo Dartmouth, hai mùa đông AI,
+        hệ chuyên gia, học máy thống kê, bùng nổ học sâu, Transformer và mô hình nền, tới AI tạo sinh, tác tử, chính sách và an toàn.
+  \item \textbf{Chương 2 -- Các kỹ thuật học máy cơ bản}: khái niệm nền tảng, các thuật toán kinh điển, đánh giá mô hình, ba thực
+        nghiệm phân loại nguy cơ tiểu đường, dự đoán giá nhà và phân loại nhận xét khách hàng.
+  \item \textbf{Chương 3 -- Mạng nơ-ron tích chập}: nguyên lý tích chập, các kiến trúc từ LeNet đến EfficientNet, bốn thực nghiệm
+        ảnh với ba cách cài đặt Basic CNN và hai cách cài đặt Improved CNN.
+  \item \textbf{Chương 4 -- Mạng nơ-ron hồi quy}: RNN, BPTT, LSTM, GRU, các kỹ thuật dự báo chuỗi thời gian và ba thực nghiệm
+        trên doanh thu, giá cổ phiếu AAPL và giá vàng.
+  \item \textbf{Chương 5 -- Knowledge Graph và RAG}: cơ sở tri thức, đồ thị tri thức, các chiến lược truy xuất, sinh câu trả lời
+        có căn cứ và ba hệ hỏi đáp cho tiểu đường, cổ phiếu, giá vàng.
+  \item \textbf{Chương 6 -- Học sâu trên đồ thị}: GCN, GraphSAGE, GAT và thực nghiệm phân loại nút.
+  \item \textbf{Chương 7 -- Hệ đa tác tử}: kiến trúc điều phối, giao thức trao đổi và so sánh ba hệ thống giải toán.
+\end{itemize}
+
+\section*{Đóng góp của tiểu luận}
+\begin{enumerate}
+  \item Một bức tranh lịch sử AI có hệ thống, nối các giai đoạn với ba yếu tố dữ liệu -- phần cứng -- thuật toán và với các bộ dữ
+        liệu chuẩn đã định hình cách đo tiến bộ.
+  \item Bộ thực nghiệm tự cài đặt cho học máy, CNN, RNN, KG/RAG, GNN và đa tác tử, trong đó mỗi kiến trúc nền được cài đặt từ đầu
+        bằng NumPy để làm rõ phép tính bên trong, rồi đối chiếu với PyTorch và TensorFlow.
+  \item Hệ hỏi đáp có căn cứ chạy cục bộ, kết hợp truy xuất văn bản, truy xuất đồ thị và LLM, có đánh giá định lượng chất lượng
+        truy xuất thay vì chỉ minh hoạ bằng vài câu hỏi.
+  \item Một Web App đáp ứng (responsive) gom các mô hình đã huấn luyện, dùng được trên cả máy tính và điện thoại.
+\end{enumerate}

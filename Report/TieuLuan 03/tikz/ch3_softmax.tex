@@ -1,0 +1,17 @@
+\begin{tikzpicture}
+  \begin{axis}[a06, ybar, width=5.4cm, height=5.6cm, bar width=9pt, ymin=-1.5, ymax=3.6, xtick={0,1,2,3,4},
+               xticklabels={0,1,2,3,4}, title={Logits $z_k$}, nodes near coords, nodes near coords style={font=\scriptsize},
+               every node near coord/.append style={/pgf/number format/fixed, /pgf/number format/precision=1}]
+    \addplot[fill=cBlue!60, draw=cBlue!80!black] coordinates {(0,1.0) (1,3.0) (2,-1.0) (3,0.5) (4,2.0)};
+  \end{axis}
+  \node[font=\Large, text=cNavy] at (6.3,2.8) {$\Rightarrow$};
+  \node[font=\small, align=center] at (6.3,1.7) {$p_k=\dfrac{e^{z_k}}{\sum_j e^{z_j}}$};
+  \begin{axis}[a06, at={(8.4cm,0)}, ybar, width=5.4cm, height=5.6cm, bar width=9pt, ymin=0, ymax=0.75, xtick={0,1,2,3,4},
+               title={Xác suất $p_k$}, nodes near coords, nodes near coords style={font=\scriptsize},
+               every node near coord/.append style={/pgf/number format/fixed, /pgf/number format/precision=2}]
+    \addplot[fill=cOrange!70, draw=cOrange!80!black] coordinates {(0,0.0844) (1,0.6236) (2,0.0114) (3,0.0512) (4,0.2294)};
+  \end{axis}
+  \node[draw=cSlate, fill=softgray, rounded corners=3pt, text width=4.6cm, align=left, font=\small] at (16.4,2.4) {%
+    Nhãn đúng $y=1$:\\ $L=-\log p_1=-\log 0{,}62\approx0{,}47$.\\[4pt]
+    Nếu nhãn đúng là $y=2$:\\ $L=-\log 0{,}011\approx4{,}47$\\— phạt rất nặng dự đoán\\tự tin mà sai.};
+\end{tikzpicture}

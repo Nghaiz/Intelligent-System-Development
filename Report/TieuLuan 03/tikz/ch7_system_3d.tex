@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ba tầng 3D: hạ tầng (GPU + LLM), tác tử, điều phối
+  \khoibaD{0}{0}{14.5}{0.9}{3.2}{cSlate}
+  \node[text=white, font=\small\bfseries] at (7.25,0.45) {Hạ tầng: RTX 4060 8 GB, Qwen2.5-1.5B-Instruct bf16, khoá GPU dùng chung};
+  \khoibaD{0}{2.0}{14.5}{0.9}{3.2}{cBlue}
+  \node[text=white, font=\small\bfseries] at (7.25,2.45) {Tầng tác tử: một LLM, nhiều vai trò, ghi vết từng lượt};
+  \khoibaD{0}{4.0}{14.5}{0.9}{3.2}{cPurple}
+  \node[text=white, font=\small\bfseries] at (7.25,4.45) {Tầng điều phối: cổng đồng thuận, biểu quyết, điều kiện dừng};
+  % các vai trò đặt trên mặt trên của tầng hạ tầng
+  \foreach \x/\t/\c in {0.5/Planner/cSky, 3.3/Solver-PAL/cOrange, 6.1/Solver-CoT/cPink, 8.9/Verifier/cGreen, 11.7/Coordinator/cYellow}
+    \node[hop=\c, minimum width=2.3cm, font=\small\bfseries, anchor=west] at (\x,1.45) {\t};
+  % công cụ và dữ liệu bên phải
+  \node[csdl=cTeal] (tool) at (18.2,2.45) {Hộp cát\\Python};
+  \node[khoiT, text width=3.0cm] at (18.2,0.45) {chặn import, \texttt{-I}, thư mục tạm, timeout 5 s};
+  \node[csdl=cOrange] (data) at (18.2,4.6) {GSM8K\\test};
+  \draw[muiM=cTeal, line width=1.4pt, <->] (16.2,2.45) -- (tool.west);
+  \draw[muiM=cOrange!85!black, line width=1.4pt] (data.west) -- (16.4,4.6);
+\end{tikzpicture}

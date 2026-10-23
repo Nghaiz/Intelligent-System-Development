@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+  % ----- không gian vector dày 3D
+  \node[tieude] at (2.4,6.5) {Dense: $\cos(\mathbf{q},\mathbf{d}) = \frac{\mathbf{q}^\top\mathbf{d}}{\|\mathbf{q}\|\|\mathbf{d}\|}$};
+  \begin{scope}[x={(1.1cm,-0.45cm)}, y={(1.2cm,0.35cm)}, z={(0cm,1.25cm)}]
+    \fill[cBlue!5] (0,0,0) -- (4,0,0) -- (4,4,0) -- (0,4,0) -- cycle;
+    \foreach \i in {1,2,3}{\draw[gray!30] (\i,0,0) -- (\i,4,0); \draw[gray!30] (0,\i,0) -- (4,\i,0);}
+    \draw[-{Stealth[length=3mm]}, thick] (0,0,0) -- (4.4,0,0) node[below] {$e_1$};
+    \draw[-{Stealth[length=3mm]}, thick] (0,0,0) -- (0,4.4,0) node[right] {$e_2$};
+    \draw[-{Stealth[length=3mm]}, thick] (0,0,0) -- (0,0,3.4) node[left] {$e_3$};
+    \draw[muiM=cRed, line width=2.2pt] (0,0,0) -- (0.8,2.9,3.0) node[above, font=\small\bfseries, text=cRed] {$\mathbf{q}$ câu hỏi};
+    \draw[muiM=cGreen, line width=1.8pt] (0,0,0) -- (1.3,3.3,2.4) node[right, font=\small, text=cGreen!70!black] {$\mathbf{d}_1$ liên quan};
+    \draw[muiM=cGreen!70, line width=1.6pt] (0,0,0) -- (0.3,2.2,2.9) node[left, font=\small, text=cGreen!70!black] {$\mathbf{d}_2$};
+    \draw[muiM=cSlate, line width=1.6pt] (0,0,0) -- (3.8,0.9,0.5) node[right, font=\small, text=cSlate] {$\mathbf{d}_3$ không liên quan};
+  \end{scope}
+  \node[nhan, text width=6.4cm, align=center] at (2.6,-3.4) {chiều = 384 (e5-small) hoặc 768 (e5-base), mọi phần tử khác 0; gần nhau khi cùng nghĩa};
+  % ----- vector thưa
+  \begin{scope}[xshift=9.6cm, yshift=0.6cm]
+    \node[tieude] at (3.2,3.8) {Sparse: TF-IDF / BM25};
+    \foreach \w [count=\i] in {giá, đóng, cửa, ngày, vàng, dầu, bmi, hba1c, tuổi, {$\cdots$}}{
+      \node[font=\scriptsize, rotate=60, anchor=west] at (\i*0.62-0.3,2.35) {\w};}
+    \foreach \v [count=\i] in {0.8,0.7,0.7,0.5,0,0,0,0,0,0}{
+      \pgfmathsetmacro{\op}{\v>0 ? 100*\v : 6}
+      \filldraw[draw=cOrange!70!black, fill=cOrange!\op] (\i*0.62-0.6,1.4) rectangle ++(0.62,0.6);}
+    \foreach \v [count=\i] in {0.6,0.6,0.6,0.4,0,0,0,0,0,0.2}{
+      \pgfmathsetmacro{\op}{\v>0 ? 100*\v : 6}
+      \filldraw[draw=cBlue!70!black, fill=cBlue!\op] (\i*0.62-0.6,0.4) rectangle ++(0.62,0.6);}
+    \node[anchor=east, font=\small] at (-0.7,1.7) {$\mathbf{q}$};
+    \node[anchor=east, font=\small] at (-0.7,0.7) {$\mathbf{d}$};
+    \node[nhan, text width=6.2cm, align=center] at (3.0,-0.6) {chiều = từ vựng ($\sim 10^5$--$10^6$), đa số bằng 0;\\khớp đúng mặt chữ, không hiểu đồng nghĩa};
+  \end{scope}
+\end{tikzpicture}

@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+  \begin{axis}[a06, width=11cm, height=7cm, xlabel={$x$ (ví dụ: diện tích)}, ylabel={$y$ (giá)},
+               xmin=0, xmax=10, ymin=0, ymax=12, grid=none, axis lines=left]
+    \addplot[domain=0:10, very thick, cRed] {1.2+0.95*x} node[pos=0.88, above left, font=\small, text=cRed] {$\hat{y}=w_0+w_1x$};
+    \foreach \x/\y in {1/2.9,2/2.4,3/4.8,4/4.4,5/6.9,6/6.2,7/8.9,8/8.1,9/10.6}{
+      \edef\tmp{\noexpand\draw[cOrange, thick, dashed] (axis cs:\x,\y) -- (axis cs:\x,{1.2+0.95*\x});}\tmp
+    }
+    \addplot[only marks, mark=*, mark size=3.2pt, cBlue, mark options={draw=white}] coordinates
+      {(1,2.9) (2,2.4) (3,4.8) (4,4.4) (5,6.9) (6,6.2) (7,8.9) (8,8.1) (9,10.6)};
+    \node[font=\small, text=cOrange!80!black, align=left, anchor=west] at (axis cs:5.3,4.2) {phần dư\\$e_i = y_i-\hat{y}_i$};
+    \draw[-{Stealth}, thick, cOrange!80!black] (axis cs:5.3,4.6) -- (axis cs:5.05,6.0);
+  \end{axis}
+  \node[khoiC, anchor=west, align=left] at (11.2,3.8) {Mục tiêu: cực tiểu\\$\mathrm{MSE}=\frac{1}{n}\sum_i e_i^2$};
+  \node[khoiG, anchor=west, align=left] at (11.2,2.0) {Nghiệm đóng:\\$\mathbf{w}=(X^\top X)^{-1}X^\top\mathbf{y}$};
+  \node[khoi, anchor=west, align=left] at (11.2,0.4) {Hoặc GD:\\$\mathbf{w}\leftarrow\mathbf{w}-\eta\nabla\mathrm{MSE}$};
+\end{tikzpicture}

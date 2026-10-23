@@ -1,0 +1,1289 @@
+[
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 04/01/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-01-04"
+  ],
+  "answer": 110.860001,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol000",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 22/01/2014 là bao nhiêu?",
+  "gold": [
+   "G2014-01-22"
+  ],
+  "answer": 119.190002,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol001",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của quỹ vàng GLD ngày 29/10/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-10-29"
+  ],
+  "answer": 110.599998,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol002",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 18/07/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-07-18"
+  ],
+  "answer": 152.669998,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol003",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 26/05/2016 là bao nhiêu?",
+  "gold": [
+   "G2016-05-26"
+  ],
+  "answer": 117.57,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol004",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 20/05/2016 là bao nhiêu?",
+  "gold": [
+   "G2016-05-20"
+  ],
+  "answer": 120.190002,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol005",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 13/10/2014 là bao nhiêu?",
+  "gold": [
+   "G2014-10-13"
+  ],
+  "answer": 118.519997,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol006",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của quỹ vàng GLD ngày 11/04/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-04-11"
+  ],
+  "answer": 10005400.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol007",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 10/12/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-12-10"
+  ],
+  "answer": 165.800003,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol008",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của quỹ vàng GLD ngày 19/02/2016 là bao nhiêu?",
+  "gold": [
+   "G2016-02-19"
+  ],
+  "answer": 15192000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol009",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của quỹ vàng GLD ngày 24/03/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-03-24"
+  ],
+  "answer": 118.389999,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "gol010",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 02/01/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-01-02"
+  ],
+  "answer": 114.080002,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol011",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 23/08/2016 là bao nhiêu?",
+  "gold": [
+   "G2016-08-23"
+  ],
+  "answer": 127.760002,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol012",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 27/03/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-03-27"
+  ],
+  "answer": 119.529999,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol013",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 04/04/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-04-04"
+  ],
+  "answer": 157.699997,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol014",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 21/03/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-03-21"
+  ],
+  "answer": 117.769997,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol015",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của quỹ vàng GLD ngày 10/01/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-01-10"
+  ],
+  "answer": 14809300.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol016",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của quỹ vàng GLD ngày 18/12/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-12-18"
+  ],
+  "answer": 8345900.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol017",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 10/04/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-04-10"
+  ],
+  "answer": 115.970001,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol018",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của quỹ vàng GLD ngày 20/05/2013 là bao nhiêu?",
+  "gold": [
+   "G2013-05-20"
+  ],
+  "answer": 21594000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol019",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 08/08/2013 là bao nhiêu?",
+  "gold": [
+   "G2013-08-08"
+  ],
+  "answer": 124.779999,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol020",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của quỹ vàng GLD ngày 29/12/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-12-29"
+  ],
+  "answer": 7852100.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol021",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của quỹ vàng GLD ngày 30/03/2016 là bao nhiêu?",
+  "gold": [
+   "G2016-03-30"
+  ],
+  "answer": 116.910004,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "gol022",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 01/11/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-11-01"
+  ],
+  "answer": 116.330002,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol023",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của quỹ vàng GLD ngày 01/12/2014 là bao nhiêu?",
+  "gold": [
+   "G2014-12-01"
+  ],
+  "answer": 113.739998,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "gol024",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của quỹ vàng GLD ngày 28/03/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-03-28"
+  ],
+  "answer": 11008200.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol025",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của quỹ vàng GLD ngày 12/05/2014 là bao nhiêu?",
+  "gold": [
+   "G2014-05-12"
+  ],
+  "answer": 125.419998,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol026",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 29/06/2016 là bao nhiêu?",
+  "gold": [
+   "G2016-06-29"
+  ],
+  "answer": 125.839996,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol027",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 07/05/2014 là bao nhiêu?",
+  "gold": [
+   "G2014-05-07"
+  ],
+  "answer": 125.519997,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol028",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của quỹ vàng GLD ngày 02/01/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-01-02"
+  ],
+  "answer": 124.389999,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "gol029",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của quỹ vàng GLD ngày 09/11/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-11-09"
+  ],
+  "answer": 122.410004,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol030",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của quỹ vàng GLD ngày 20/01/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-01-20"
+  ],
+  "answer": 124.599998,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol031",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 20/02/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-02-20"
+  ],
+  "answer": 127.279999,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol032",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của quỹ vàng GLD ngày 20/10/2016 là bao nhiêu?",
+  "gold": [
+   "G2016-10-20"
+  ],
+  "answer": 121.389999,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol033",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của quỹ vàng GLD ngày 30/09/2014 là bao nhiêu?",
+  "gold": [
+   "G2014-09-30"
+  ],
+  "answer": 117.349998,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol034",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 12/04/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-04-12"
+  ],
+  "answer": 126.620003,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol035",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 24/10/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-10-24"
+  ],
+  "answer": 164.860001,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol036",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của quỹ vàng GLD ngày 25/09/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-09-25"
+  ],
+  "answer": 113.57,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "gol037",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của quỹ vàng GLD ngày 05/11/2013 là bao nhiêu?",
+  "gold": [
+   "G2013-11-05"
+  ],
+  "answer": 126.559998,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol038",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của quỹ vàng GLD ngày 10/08/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-08-10"
+  ],
+  "answer": 106.269997,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol039",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của quỹ vàng GLD vào 2017-04-03.",
+  "gold": [
+   "G2017-04-03"
+  ],
+  "answer": 119.370003,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol040",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của quỹ vàng GLD vào 2017-05-03.",
+  "gold": [
+   "G2017-05-03"
+  ],
+  "answer": 117.980003,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol041",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của quỹ vàng GLD vào ngày 21 tháng 4 năm 2017.",
+  "gold": [
+   "G2017-04-21"
+  ],
+  "answer": 15608000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol042",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá thấp nhất của quỹ vàng GLD vào ngày 17 tháng 3 năm 2015.",
+  "gold": [
+   "G2015-03-17"
+  ],
+  "answer": 109.769997,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "gol043",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của quỹ vàng GLD vào 2012-12-20.",
+  "gold": [
+   "G2012-12-20"
+  ],
+  "answer": 25148400.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol044",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của quỹ vàng GLD vào 2012-10-16.",
+  "gold": [
+   "G2012-10-16"
+  ],
+  "answer": 6204000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol045",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của quỹ vàng GLD vào ngày 3 tháng 1 năm 2013.",
+  "gold": [
+   "G2013-01-03"
+  ],
+  "answer": 16117500.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol046",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của quỹ vàng GLD vào ngày 1 tháng 12 năm 2017.",
+  "gold": [
+   "G2017-12-01"
+  ],
+  "answer": 121.589996,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol047",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá mở cửa của quỹ vàng GLD vào 2015-11-25.",
+  "gold": [
+   "G2015-11-25"
+  ],
+  "answer": 102.470001,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol048",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của quỹ vàng GLD vào ngày 18 tháng 4 năm 2018.",
+  "gold": [
+   "G2018-04-18"
+  ],
+  "answer": 127.849998,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol049",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của quỹ vàng GLD vào 2017-11-14.",
+  "gold": [
+   "G2017-11-14"
+  ],
+  "answer": 121.559998,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol050",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của quỹ vàng GLD vào 2013-06-06.",
+  "gold": [
+   "G2013-06-06"
+  ],
+  "answer": 137.619995,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol051",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của quỹ vàng GLD vào ngày 18 tháng 9 năm 2014.",
+  "gold": [
+   "G2014-09-18"
+  ],
+  "answer": 118.089996,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol052",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của quỹ vàng GLD vào 2014-04-07.",
+  "gold": [
+   "G2014-04-07"
+  ],
+  "answer": 125.470001,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "gol053",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá mở cửa của quỹ vàng GLD vào 2013-10-08.",
+  "gold": [
+   "G2013-10-08"
+  ],
+  "answer": 127.790001,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol054",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của quỹ vàng GLD vào ngày 18 tháng 6 năm 2014.",
+  "gold": [
+   "G2014-06-18"
+  ],
+  "answer": 122.669998,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "gol055",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của quỹ vàng GLD vào ngày 24 tháng 7 năm 2015.",
+  "gold": [
+   "G2015-07-24"
+  ],
+  "answer": 11572700.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol056",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá mở cửa của quỹ vàng GLD vào 2013-07-19.",
+  "gold": [
+   "G2013-07-19"
+  ],
+  "answer": 124.889999,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "gol057",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá thấp nhất của quỹ vàng GLD vào 2016-10-06.",
+  "gold": [
+   "G2016-10-06"
+  ],
+  "answer": 119.239998,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "gol058",
+  "domain": "gold"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của quỹ vàng GLD vào ngày 20 tháng 11 năm 2013.",
+  "gold": [
+   "G2013-11-20"
+  ],
+  "answer": 14281000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "gol059",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá quỹ mỏ vàng GDX ngày 21/12/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-12-21"
+  ],
+  "answer": 20.440001,
+  "field": "GDX_Close",
+  "answer_type": "number",
+  "qid": "gol060",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá quỹ S&P 500 (SPY) ngày 12/09/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-09-12"
+  ],
+  "answer": 250.050003,
+  "field": "SP_close",
+  "answer_type": "number",
+  "qid": "gol061",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá dầu Brent ngày 12/09/2013 là bao nhiêu?",
+  "gold": [
+   "G2013-09-12"
+  ],
+  "answer": 112.63,
+  "field": "OF_Price",
+  "answer_type": "number",
+  "qid": "gol062",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá dầu WTI ngày 23/01/2013 là bao nhiêu?",
+  "gold": [
+   "G2013-01-23"
+  ],
+  "answer": 95.56,
+  "field": "OS_Price",
+  "answer_type": "number",
+  "qid": "gol063",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá dầu Brent ngày 09/10/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-10-09"
+  ],
+  "answer": 52.65,
+  "field": "OF_Price",
+  "answer_type": "number",
+  "qid": "gol064",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá quỹ S&P 500 (SPY) ngày 06/09/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-09-06"
+  ],
+  "answer": 143.770004,
+  "field": "SP_close",
+  "answer_type": "number",
+  "qid": "gol065",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Tỷ giá EUR/USD ngày 15/12/2015 là bao nhiêu?",
+  "gold": [
+   "G2015-12-15"
+  ],
+  "answer": 1.0928,
+  "field": "EU_Price",
+  "answer_type": "number",
+  "qid": "gol066",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá quỹ S&P 500 (SPY) ngày 23/05/2012 là bao nhiêu?",
+  "gold": [
+   "G2012-05-23"
+  ],
+  "answer": 132.270004,
+  "field": "SP_close",
+  "answer_type": "number",
+  "qid": "gol067",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá dầu Brent ngày 06/04/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-04-06"
+  ],
+  "answer": 54.89,
+  "field": "OF_Price",
+  "answer_type": "number",
+  "qid": "gol068",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá dầu WTI ngày 29/09/2017 là bao nhiêu?",
+  "gold": [
+   "G2017-09-29"
+  ],
+  "answer": 51.34,
+  "field": "OS_Price",
+  "answer_type": "number",
+  "qid": "gol069",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Chỉ số USD ngày 11/04/2013 là bao nhiêu?",
+  "gold": [
+   "G2013-04-11"
+  ],
+  "answer": 82.325,
+  "field": "USDI_Price",
+  "answer_type": "number",
+  "qid": "gol070",
+  "domain": "gold"
+ },
+ {
+  "type": "indicator",
+  "style": "lex",
+  "question": "Giá quỹ mỏ vàng GDX ngày 06/04/2018 là bao nhiêu?",
+  "gold": [
+   "G2018-04-06"
+  ],
+  "answer": 22.07,
+  "field": "GDX_Close",
+  "answer_type": "number",
+  "qid": "gol071",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 7/2015, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2015-07"
+  ],
+  "answer": -6.295769611651103,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol072",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 6/2014, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2014-06"
+  ],
+  "answer": 6.967415379300279,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol073",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 6/2017, quỹ vàng GLD có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2017-06"
+  ],
+  "answer": 123.309998,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "gol074",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 5/2016, quỹ vàng GLD có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2016-05"
+  ],
+  "answer": 123.959999,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "gol075",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 1/2017, quỹ vàng GLD có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2017-01"
+  ],
+  "answer": 113.79105305263157,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "gol076",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 8/2013, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2013-08"
+  ],
+  "answer": 6.3265097043953,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol077",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 12/2014, quỹ vàng GLD có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2014-12"
+  ],
+  "answer": 115.19363613636365,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "gol078",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 7/2013, quỹ vàng GLD có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2013-07"
+  ],
+  "answer": 124.33523771428571,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "gol079",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 10/2014, quỹ vàng GLD có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2014-10"
+  ],
+  "answer": 117.53523728571426,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "gol080",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 2/2018, quỹ vàng GLD có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2018-02"
+  ],
+  "answer": 124.389999,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "gol081",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 11/2017, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2017-11"
+  ],
+  "answer": -0.008259433504587133,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol082",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 6/2018, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2018-06"
+  ],
+  "answer": -3.134946577434017,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol083",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 9/2016, quỹ vàng GLD có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2016-09"
+  ],
+  "answer": 124.550003,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "gol084",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 6/2016, quỹ vàng GLD có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2016-06"
+  ],
+  "answer": 115.199997,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "gol085",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 1/2016, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2016-01"
+  ],
+  "answer": 3.945959801204779,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol086",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 7/2014, quỹ vàng GLD có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2014-07"
+  ],
+  "answer": 123.230003,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "gol087",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 5/2018, quỹ vàng GLD có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2018-05"
+  ],
+  "answer": 123.53500054545454,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "gol088",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 10/2018, quỹ vàng GLD có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2018-10"
+  ],
+  "answer": 117.650002,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "gol089",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 12/2012, quỹ vàng GLD có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2012-12"
+  ],
+  "answer": 163.1720001,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "gol090",
+  "domain": "gold"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 3/2016, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2016-03"
+  ],
+  "answer": -0.11038295262927322,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol091",
+  "domain": "gold"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2017, quỹ vàng GLD có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2017"
+  ],
+  "answer": 128.320007,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "gol092",
+  "domain": "gold"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2018, quỹ vàng GLD có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2018"
+  ],
+  "answer": 129.509995,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "gol093",
+  "domain": "gold"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2014, quỹ vàng GLD có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2014"
+  ],
+  "answer": 109.669998,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "gol094",
+  "domain": "gold"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2013, quỹ vàng GLD có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2013"
+  ],
+  "answer": 164.399994,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "gol095",
+  "domain": "gold"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2016, quỹ vàng GLD thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2016"
+  ],
+  "answer": 6.531248970077241,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "gol096",
+  "domain": "gold"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2012, quỹ vàng GLD có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2012"
+  ],
+  "answer": 148.529999,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "gol097",
+  "domain": "gold"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2015, quỹ vàng GLD có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2015"
+  ],
+  "answer": 111.10716004399998,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "gol098",
+  "domain": "gold"
+ }
+]

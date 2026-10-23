@@ -1,0 +1,135 @@
+% Kết luận — lead viết ở Pha 3. Mọi con số lấy từ \SL{...} (outputs/metrics/*.json).
+\chapter*{Kết luận}
+\addcontentsline{toc}{chapter}{Kết luận}
+\markboth{Kết luận}{Kết luận}
+% chương không đánh số: hình/bảng đánh số riêng KL.1, KL.2... thay vì nối tiếp Chương 7
+\setcounter{figure}{0}\setcounter{table}{0}
+\renewcommand{\thefigure}{KL.\arabic{figure}}
+\renewcommand{\thetable}{KL.\arabic{table}}
+
+Tiểu luận đã đi một vòng từ lịch sử của trí tuệ nhân tạo đến các hệ thống thông minh nhiều thành phần. Mỗi chương
+lý thuyết được kiểm chứng bằng thực nghiệm chạy thật trên máy cá nhân (GPU RTX~4060 8~GB và CPU 32 luồng), mã nguồn
+in trong báo cáo được trích nguyên văn từ mã đã sinh ra số liệu, và mọi con số trong văn bản được đọc tự động từ
+tệp kết quả. Phần này tổng hợp những gì đã làm được, rút ra các bài học xuyên suốt, nêu hạn chế và hướng phát triển.
+
+\section*{Tổng hợp kết quả}
+\addcontentsline{toc}{section}{Tổng hợp kết quả}
+
+Chương~1 dựng lại tiến trình của AI qua các giai đoạn kỳ vọng và suy thoái, cho thấy mỗi lần phục hồi đều gắn với
+một thay đổi về dữ liệu, phần cứng hoặc thuật toán. Các chương~2 đến~7 lần lượt hiện thực hóa từng họ phương pháp.
+Bảng~\ref{tab:ch8-tongket} tóm tắt mô hình được chọn và chỉ số chính trên tập kiểm thử của từng thực nghiệm; mô hình
+được chọn theo tập kiểm định (validation), không theo tập kiểm thử. Hình~\ref{fig:ch8-tongket} đặt các họ mô hình
+cạnh dạng cấu trúc dữ liệu mà mỗi họ khai thác.
+
+Toàn bộ mô hình của các chương~2 đến~7 được tích hợp vào một Web App Flask duy nhất. Mỗi chương cung cấp một mô-đun
+phục vụ theo cùng một hợp đồng (danh sách thực nghiệm và hàm dự đoán), nên giao diện tự sinh biểu mẫu nhập liệu, nạp
+mô hình khi được gọi lần đầu và hiển thị kết quả kèm chỉ số kiểm thử của mô hình. Trang chủ
+(Hình~\ref{fig:ch8-home-web}) liệt kê 15 thực nghiệm theo chương; giao diện đáp ứng nên dùng được trên điện thoại
+(Hình~\ref{fig:ch8-home-mobile}).
+
+\begin{table}[!tbp]\centering
+\caption{Tổng hợp kết quả các thực nghiệm (chỉ số trên tập kiểm thử)}\label{tab:ch8-tongket}
+{\small\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{@{}llL{4.3cm}L{6.2cm}@{}}
+\toprule
+Ch. & Thực nghiệm & Mô hình được chọn & Chỉ số chính \\
+\midrule
+2 & Tiểu đường (100k) & \SL{ch2_diabetes/best/label} & F1 \SL{ch2_diabetes/best/f1}; ROC-AUC \SL{ch2_diabetes/best/auc} \\
+2 & Giá nhà & \SL{ch2_house/best/label} & $R^2$ \SL{ch2_house/best/r2}; MAPE \SL{ch2_house/best/mapePct}\,\% \\
+2 & Nhận xét khách hàng & \SL{ch2_comments/best/label} & macro-F1 \SL{ch2_comments/best/macro_f1}; Acc \SL{ch2_comments/best/accPct}\,\% \\
+\midrule
+3 & MNIST & Improved CNN (PyTorch) & Acc \SL{ch3_mnist/torch_improved/accPct}\,\% \\
+3 & Fashion-MNIST & Improved CNN (PyTorch) & Acc \SL{ch3_fashion/torch_improved/accPct}\,\% \\
+3 & Rock/Paper/Scissors & Improved CNN (PyTorch) & Acc \SL{ch3_rps/torch_improved/accPct}\,\% \\
+3 & CIFAR-10 & Improved CNN (PyTorch) & Acc \SL{ch3_cifar10/torch_improved/accPct}\,\% \\
+\midrule
+4 & Doanh thu ngày & \SL{ch4_summary/ecommerce/best_arch} (\SL{ch4_summary/ecommerce/best_fw}) & RMSE bằng \SL{ch4_summary/ecommerce/best_ratioPct}\,\% của dự báo ngây thơ \\
+4 & Cổ phiếu AAPL & \SL{ch4_summary/aapl/best_arch} (\SL{ch4_summary/aapl/best_fw}) & $R^2$ \SL{ch4_summary/aapl/best/r2}; RMSE bằng \SL{ch4_summary/aapl/best_ratioPct}\,\% dự báo ngây thơ \\
+4 & Quỹ vàng GLD & \SL{ch4_summary/gold/best_arch} (\SL{ch4_summary/gold/best_fw}) & $R^2$ \SL{ch4_summary/gold/best/r2}; RMSE bằng \SL{ch4_summary/gold/best_ratioPct}\,\% dự báo ngây thơ \\
+\midrule
+5 & Truy xuất (ba miền) & Truy vấn KG; lai RRF + KG & MRR \SL{ch5_retrieval/sl/all/graph/mrrPct}\,\% và \SL{ch5_retrieval/sl/all/rrfg/mrrPct}\,\% (e5-small \SL{ch5_retrieval/sl/all/esmall/mrrPct}\,\%) \\
+5 & Hỏi đáp cổ phiếu & Tác tử định tuyến công cụ & Acc \SL{ch5_agent_stock/systems/agent/accPct}\,\% (Advanced RAG \SL{ch5_agent_stock/systems/advanced_rag/accPct}\,\%, LLM thuần \SL{ch5_agent_stock/systems/llm_only/accPct}\,\%) \\
+5 & Hỏi đáp giá vàng & Tác tử định tuyến công cụ & Acc \SL{ch5_agent_gold/systems/agent/accPct}\,\% (Advanced RAG \SL{ch5_agent_gold/systems/advanced_rag/accPct}\,\%, LLM thuần \SL{ch5_agent_gold/systems/llm_only/accPct}\,\%) \\
+5 & Hỏi đáp tiểu đường & Tác tử định tuyến công cụ & Acc \SL{ch5_agent_diabetes/systems/agent/accPct}\,\% (Naive RAG \SL{ch5_agent_diabetes/systems/naive_rag/accPct}\,\%, LLM thuần \SL{ch5_agent_diabetes/systems/llm_only/accPct}\,\%) \\
+\midrule
+6 & Cora (phân loại nút) & \SL{ch6_summary/Cora/best} & Acc \SL{ch6_summary/Cora/best_accPct}\,\%; hơn MLP \SL{ch6_summary/Cora/gain_gat_mlpPct} điểm \\
+6 & CiteSeer & \SL{ch6_summary/CiteSeer/best} & Acc \SL{ch6_summary/CiteSeer/best_accPct}\,\% \\
+6 & Cora (dự đoán liên kết) & Graph Auto-Encoder & AUC \SL{ch6_link/test_auc_meanPct}\,\% \\
+\midrule
+7 & GSM8K (Qwen2.5-1.5B) & CoT một tác tử & Acc \SL{ch7_gsm8k/systems/cot/accPct}\,\% (đa tác tử \SL{ch7_gsm8k/systems/multi/accPct}\,\%) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}}
+\end{table}
+
+\hinhtikz{ch8_tongket}{Bức tranh tổng thể: mỗi họ mô hình khai thác một dạng cấu trúc của dữ liệu, trên cùng một
+chu trình dữ liệu -- baseline -- mô hình -- đánh giá -- triển khai}{ch8-tongket}
+
+\anhUI{ch0_home_web}{Trang chủ Web App: 15 thực nghiệm của các chương~2--7 trong một ứng dụng}{ch8-home-web}
+
+\anhMobile{ch0_home_mobile}{Trang chủ Web App trên khung điện thoại 390 px}{ch8-home-mobile}
+
+\section*{Các bài học xuyên suốt}
+\addcontentsline{toc}{section}{Các bài học xuyên suốt}
+
+\begin{enumerate}
+  \item \textbf{Cấu trúc của dữ liệu quyết định kiến trúc phù hợp.} Tích chập khai thác tính cục bộ của ảnh, hồi quy
+  khai thác thứ tự thời gian, truyền thông điệp khai thác quan hệ trong đồ thị. Khi cấu trúc ấy bị phá, lợi thế biến
+  mất: xáo trộn toàn bộ cạnh của Cora làm GCN chỉ còn \SL{ch6_summary/perturb/shuf100Pct}\,\%, thấp hơn cả MLP không
+  dùng đồ thị; còn mạng GCN 8 tầng không có kết nối tắt rơi xuống \SL{ch6_summary/depth/acc8Pct}\,\% vì hiện tượng
+  làm trơn quá mức (over-smoothing).
+  \item \textbf{Baseline đơn giản là thước đo bắt buộc.} Trên dữ liệu giá nhà, Lasso tuyến tính thắng cả XGBoost và
+  Random Forest vì quan hệ trong dữ liệu gần như tuyến tính. Với chuỗi giá cổ phiếu, mọi mô hình hồi quy chỉ ngang
+  dự báo ``giữ nguyên giá hôm qua''; $R^2$ cao (\SL{ch4_summary/aapl/best/r2}) không có nghĩa là mô hình dự báo được
+  biến động, vì độ chính xác hướng chỉ khoảng \SL{ch4_summary/aapl/best/dir_accPct}\,\%.
+  \item \textbf{Cải tiến kiến trúc có hiệu quả tăng theo độ khó của bài toán.} Khối chuẩn hóa theo lô, dropout, tăng
+  cường dữ liệu và kết nối tắt chỉ thêm \SL{ch3_mnist/gain_torch/accPct} điểm trên MNIST nhưng thêm
+  \SL{ch3_cifar10/gain_torch/accPct} điểm trên CIFAR-10.
+  \item \textbf{Tri thức có cấu trúc bù cho mô hình ngôn ngữ nhỏ.} Câu hỏi tra cứu chính xác (một ngày, một nhóm hồ
+  sơ) được trả lời đúng bằng truy vấn đồ thị hoặc phép tính trên bảng, trong khi tìm kiếm thuần văn bản dễ nhầm các
+  bản ghi giống nhau về con số. Trên bộ câu hỏi cổ phiếu, Qwen2.5-1.5B không có ngữ cảnh đúng
+  \SL{ch5_agent_stock/systems/llm_only/accPct}\,\%, Naive RAG \SL{ch5_agent_stock/systems/naive_rag/accPct}\,\%,
+  Advanced RAG \SL{ch5_agent_stock/systems/advanced_rag/accPct}\,\%, còn tác tử định tuyến sang công cụ tra KG và tính
+  trên bảng đúng \SL{ch5_agent_stock/systems/agent/accPct}\,\%. Truy xuất tốt hơn cũng chưa đủ: trên miền tiểu đường,
+  Advanced RAG (\SL{ch5_agent_diabetes/systems/advanced_rag/accPct}\,\%) còn thua Naive RAG
+  (\SL{ch5_agent_diabetes/systems/naive_rag/accPct}\,\%) vì mô hình 1,5B chép sai con số dù tài liệu đúng đã nằm trong
+  ngữ cảnh. Tác tử định tuyến công cụ là cách đơn giản và hiệu quả
+  để kết hợp hai nguồn, với điều kiện câu hỏi thuộc các mẫu mà bộ định tuyến đã biết.
+  \item \textbf{Nhiều tác tử hơn không tự động tốt hơn.} Hệ đa tác tử dùng trung bình \SL{ch7_gsm8k/systems/multi/calls}
+  lượt gọi mô hình mỗi câu nhưng không vượt tác tử suy luận từng bước; giá trị thật của nó là tín hiệu tin cậy: khi
+  hai bộ giải đồng ý, câu trả lời đúng \SL{ch7_gsm8k/multi/agree_accPct}\,\%.
+  \item \textbf{Đánh giá trung thực quan trọng ngang mô hình.} Chia dữ liệu theo thời gian và chuẩn hóa chỉ trên tập
+  huấn luyện tránh rò rỉ thông tin tương lai; chọn mô hình và ngưỡng trên tập kiểm định; báo cáo cả trường hợp mô hình
+  không thắng baseline thay vì chỉ chọn kết quả đẹp.
+\end{enumerate}
+
+\section*{Hạn chế}
+\addcontentsline{toc}{section}{Hạn chế}
+
+\begin{itemize}
+  \item Các thực nghiệm chạy trên một máy cá nhân, nhiều làn song song chia sẻ một GPU 8~GB, nên một số cấu hình
+  phải rút gọn: mô hình TensorFlow chỉ chạy trên CPU (TensorFlow trên Windows không hỗ trợ GPU) nên chỉ được 6--7
+  epoch và vẫn kém bản PyTorch cùng kiến trúc trên các bộ khó (Chương~3), cài đặt NumPy từ đầu
+  dùng tập con, và thực nghiệm đa tác tử dùng tập con GSM8K (số câu của từng hệ được ghi rõ ở Chương~7).
+  \item Phần lớn kết quả là một lần chạy với hạt giống cố định; chỉ Chương~6 báo cáo trung bình và độ lệch qua năm
+  hạt giống. Khác biệt nhỏ giữa các mô hình vì vậy cần được đọc thận trọng.
+  \item Mô hình ngôn ngữ dùng trong RAG và tác tử là Qwen2.5-1.5B chạy cục bộ; chất lượng diễn đạt tiếng Việt và khả
+  năng suy luận của nó thấp hơn các mô hình lớn.
+  \item Dữ liệu y tế và tài chính chỉ phục vụ mục đích học thuật; hệ thống không thay thế tư vấn y khoa hay khuyến
+  nghị đầu tư.
+\end{itemize}
+
+\section*{Hướng phát triển}
+\addcontentsline{toc}{section}{Hướng phát triển}
+
+\begin{itemize}
+  \item Lặp lại thực nghiệm với nhiều hạt giống và kiểm định thống kê để kết luận so sánh chắc chắn hơn.
+  \item Dùng học chuyển giao (mô hình CNN tiền huấn luyện) cho các bộ ảnh nhỏ như Rock/Paper/Scissors, và mô hình
+  Transformer cho chuỗi thời gian dài.
+  \item Kết hợp GNN với đồ thị tri thức của Chương~5 (biểu diễn thực thể bằng KG embedding, GraphRAG có học).
+  \item Thay mô hình ngôn ngữ 1,5B bằng mô hình lớn hơn hoặc tinh chỉnh nhẹ (LoRA) trên dữ liệu miền, và bổ sung bộ
+  kiểm chứng trích dẫn tự động cho chatbot.
+  \item Đóng gói Web App thành dịch vụ có giám sát (ghi log truy vấn, đo độ trễ, phát hiện trôi dữ liệu) để tiến gần
+  một hệ thống thông minh vận hành thực tế.
+\end{itemize}

@@ -1,0 +1,26 @@
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=3 by 1, horizontal sep=1.3cm},
+    width=5.9cm, height=5.6cm, xmin=-0.35, xmax=1.35, ymin=-0.35, ymax=1.35,
+    xtick={0,1}, ytick={0,1}, xlabel={$x_1$}, ylabel={$x_2$}, grid=major, grid style={gray!25},
+    tick label style={font=\small}, title style={font=\normalsize\bfseries}]
+  % AND
+  \nextgroupplot[title={AND -- tách được}]
+  \fill[cGreen!12] (axis cs:1.35,0.15) -- (axis cs:1.35,1.35) -- (axis cs:0.15,1.35) -- cycle;
+  \addplot[cGreen!60!black, line width=2pt, domain=-0.35:1.35] {1.5 - x};
+  \addplot[only marks, mark=*, mark size=6pt, cRed, mark options={draw=black!60}] coordinates {(0,0) (0,1) (1,0)};
+  \addplot[only marks, mark=square*, mark size=6pt, cBlue, mark options={draw=black!60}] coordinates {(1,1)};
+  % OR
+  \nextgroupplot[title={OR -- tách được}]
+  \fill[cGreen!12] (axis cs:1.35,-0.35) -- (axis cs:1.35,1.35) -- (axis cs:-0.35,1.35) -- (axis cs:-0.35,0.85) -- (axis cs:0.85,-0.35) -- cycle;
+  \addplot[cGreen!60!black, line width=2pt, domain=-0.35:1.35] {0.5 - x};
+  \addplot[only marks, mark=*, mark size=6pt, cRed, mark options={draw=black!60}] coordinates {(0,0)};
+  \addplot[only marks, mark=square*, mark size=6pt, cBlue, mark options={draw=black!60}] coordinates {(0,1) (1,0) (1,1)};
+  % XOR
+  \nextgroupplot[title={XOR -- không tách được}]
+  \addplot[cOrange!80!black, line width=2pt, dashed, domain=-0.35:1.35] {0.5 - x};
+  \addplot[cOrange!80!black, line width=2pt, dashed, domain=-0.35:1.35] {1.5 - x};
+  \addplot[only marks, mark=*, mark size=6pt, cRed, mark options={draw=black!60}] coordinates {(0,0) (1,1)};
+  \addplot[only marks, mark=square*, mark size=6pt, cBlue, mark options={draw=black!60}] coordinates {(0,1) (1,0)};
+  \node[font=\small\bfseries, text=cOrange!50!black, fill=white, inner sep=2pt] at (axis cs:0.5,0.5) {cần 2 đường};
+\end{groupplot}
+\end{tikzpicture}

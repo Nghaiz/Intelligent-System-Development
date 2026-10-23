@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % nền
+  \khoibaD{-0.6}{-0.7}{14.2}{0.6}{2.4}{cSlate}
+  % ba trụ
+  \khoibaD{0.3}{-0.1}{3.0}{5.0}{1.8}{cBlue}
+  \khoibaD{5.1}{-0.1}{3.0}{5.0}{1.8}{cGreen}
+  \khoibaD{9.9}{-0.1}{3.0}{5.0}{1.8}{cOrange}
+  % mái
+  \khoibaD{-0.3}{4.9}{13.6}{1.2}{2.4}{cRed}
+  \node[font=\Large\bfseries\sffamily, text=white] at (6.5,5.5) {HỌC SÂU (từ 2012)};
+  \foreach \x/\a/\b in {1.8/{Dữ liệu}/{ImageNet\\14 triệu ảnh\\Internet},
+                        6.6/{Phần cứng}/{GPU, CUDA\\TPU\\đám mây},
+                        11.4/{Thuật toán}/{ReLU, Dropout\\BatchNorm\\ResNet, Adam}} {
+    \node[font=\large\bfseries, text=white] at (\x,3.6) {\a};
+    \node[font=\small, text=white, align=center] at (\x,1.7) {\b};
+  }
+  \node[font=\small\bfseries, text=white] at (6.5,-0.4) {Phần mềm mã nguồn mở: Theano, Caffe, TensorFlow, PyTorch};
+\end{tikzpicture}

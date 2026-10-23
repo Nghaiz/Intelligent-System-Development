@@ -1,0 +1,37 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ba làn
+  \foreach \y/\c/\t in {5.2/cTeal/{\textbf{1. Nạp tri thức} (ingestion, ngoại tuyến)},
+                        1.9/cBlue/{\textbf{2. Truy xuất} (retrieval, trực tuyến)},
+                        -1.4/cPurple/{\textbf{3. Sinh} (generation)}}{
+    \fill[\c!6, draw=\c!50, rounded corners=6pt] (-0.4,\y-1.45) rectangle (19.4,\y+1.45);
+    \node[anchor=north west, font=\small\sffamily, text=\c!70!black] at (-0.3,\y+1.42) {\t};
+  }
+  % làn 1
+  \node[csdl=cSlate] (src) at (1.0,4.8) {Nguồn\\dữ liệu};
+  \node[khoiC] (clean) at (3.9,4.8) {Làm sạch\\văn bản hoá};
+  \node[khoiC] (chunk) at (7.0,4.8) {Chia đoạn\\(chunking)};
+  \node[khoiG] (emb) at (10.0,4.8) {Mã hoá\\embedding};
+  \node[csdl=cTeal] (vdb) at (13.0,4.8) {Kho\\vector};
+  \node[csdl=cGreen] (sp) at (15.4,4.8) {Chỉ mục\\BM25};
+  \node[csdl=cPurple] (kg) at (17.9,4.8) {Đồ thị\\tri thức};
+  \draw[mui] (src) -- (clean); \draw[mui] (clean) -- (chunk); \draw[mui] (chunk) -- (emb); \draw[mui] (emb) -- (vdb);
+  \draw[mui] (chunk.north) |- ++(0,0.55) -| (sp.north);
+  \draw[mui] (chunk.north) ++(0,0.55) -| (kg.north);
+  % làn 2
+  \node[cau=cRed, minimum size=12mm] (q) at (1.0,1.6) {\scriptsize Câu hỏi};
+  \node[khoi] (qr) at (4.0,1.6) {Viết lại /\\liên kết thực thể};
+  \node[khoi] (ret) at (8.3,1.6) {Truy xuất lai\\sparse + dense + graph};
+  \node[khoi] (fuse) at (12.2,1.6) {Hợp nhất\\RRF};
+  \node[khoiR] (rr) at (15.6,1.6) {Tái xếp hạng\\cross-encoder};
+  \draw[mui] (q) -- (qr); \draw[mui] (qr) -- (ret); \draw[mui] (ret) -- (fuse); \draw[mui] (fuse) -- (rr);
+  \draw[muiM=cTeal, dashed] (vdb.south) -- (ret.north east);
+  \draw[muiM=cGreen, dashed] (sp.south) -- (ret.north east);
+  \draw[muiM=cPurple, dashed] (kg.south) -- (ret.north east);
+  % làn 3
+  \node[khoiP] (pr) at (4.0,-1.7) {Prompt có căn cứ\\bằng chứng [1..k]};
+  \node[khoiP, minimum width=2.6cm] (llm) at (8.3,-1.7) {LLM cục bộ\\Qwen2.5-1.5B};
+  \node[khoiT] (ver) at (12.4,-1.7) {Kiểm chứng\\trích dẫn, số liệu};
+  \node[cau=cGreen, minimum size=13mm] (ans) at (16.4,-1.7) {\scriptsize Trả lời};
+  \draw[mui] (rr.south) |- ++(-4,-1.05) -| (pr.north);
+  \draw[mui] (pr) -- (llm); \draw[mui] (llm) -- (ver); \draw[mui] (ver) -- (ans);
+\end{tikzpicture}

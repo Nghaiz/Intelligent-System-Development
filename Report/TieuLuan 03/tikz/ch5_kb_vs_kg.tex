@@ -1,0 +1,39 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ---- KB: ba dạng biểu diễn
+  \node[tieude] at (3.6,5.2) {Knowledge Base (KB)};
+  \node[vung=cBlue, minimum width=7.2cm, minimum height=6.6cm] at (3.6,1.5) {};
+  % bảng
+  \foreach \i in {0,...,3}{\foreach \j in {0,...,2}{
+     \pgfmathsetmacro{\cc}{\i==0 ? 45 : 12}
+     \filldraw[draw=cBlue!70!black, fill=cBlue!\cc] (0.6+\j*0.9,3.9-\i*0.42) rectangle ++(0.9,0.42);}}
+  \node[nhan, anchor=north] at (1.95,2.15) {Bảng quan hệ};
+  % tài liệu
+  \foreach \k in {0,1,2}{
+    \filldraw[draw=cOrange!70!black, fill=cOrange!15, blur shadow={shadow blur steps=4}] (4.3+\k*0.25,2.4+\k*0.25) rectangle ++(1.6,2);
+    \foreach \l in {1,...,5} \draw[cOrange!60!black] (4.5+\k*0.25,2.4+\k*0.25+\l*0.3) -- ++(1.2,0);}
+  \node[nhan, anchor=north] at (5.4,2.35) {Tài liệu văn bản};
+  % vector
+  \foreach \v/\c in {0/cGreen,1/cTeal,2/cLime}{
+    \foreach \t in {0,...,6}{\pgfmathsetmacro{\op}{20+10*mod(\t*3+\v*5,7)}
+      \fill[\c!\op!white, draw=\c!60!black] (1.2+\t*0.42,0.6-\v*0.5) rectangle ++(0.42,0.36);}}
+  \node[nhan] at (2.7,-1.2) {Vector nhúng (embedding)};
+  \node[nhan, text width=3.4cm, align=center] at (5.6,0.0) {\textbf{Mục tiêu:} lưu trữ, tra cứu, tái sử dụng tri thức};
+  % ---- KG
+  \node[tieude] at (12.2,5.2) {Knowledge Graph (KG)};
+  \node[vung=cPurple, minimum width=7.2cm, minimum height=6.6cm] at (12.2,1.5) {};
+  \node[cau=cRed, minimum size=13mm] (p) at (12.2,2.7) {\scriptsize Person};
+  \node[cau=cOrange] (g) at (9.3,4.3) {\scriptsize Nữ};
+  \node[cau=cGreen] (a) at (15.1,4.3) {\scriptsize 60--79};
+  \node[cau=cTeal] (h) at (9.3,0.3) {\scriptsize HbA1c};
+  \node[cau=cSky] (t) at (12.2,0.3) {\scriptsize THA};
+  \node[cau=cPurple] (d) at (15.1,0.3) {\scriptsize ĐTĐ};
+  \tikzset{lbl/.style={font=\footnotesize, text=black!75, inner sep=1pt, sloped}}
+  \draw[mui] (p) -- node[lbl, above] {has\_gender} (g);
+  \draw[mui] (p) -- node[lbl, above] {in\_age\_group} (a);
+  \draw[mui] (p) -- node[lbl, above] {hba1c\_class} (h);
+  \draw[mui] (p) -- node[nhan, font=\footnotesize, right] {has\_condition} (t);
+  \draw[muiM=cRed, dashed] (t) -- node[lbl, above] {risk\_factor\_of} (d);
+  \draw[muiM=cRed, dashed] (h) to[bend right=45] node[lbl, below] {indicates} (d);
+  \node[nhan, font=\footnotesize, text=cRed!70!black] at (15.3,-1.05) {tầng ontology};
+  \draw[muiM=cOrange, line width=2pt] (7.4,1.5) -- node[above, font=\small\bfseries] {cấu trúc hoá} (8.6,1.5);
+\end{tikzpicture}

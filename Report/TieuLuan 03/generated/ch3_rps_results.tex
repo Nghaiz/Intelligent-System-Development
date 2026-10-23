@@ -1,0 +1,11 @@
+\begin{tabular}{lrrrrrcrr}
+\toprule
+Mô hình & Acc (\%) & \makecell[r]{Prec.\\(\%)} & \makecell[r]{Recall\\(\%)} & F1 (\%) & Tham số & \makecell[c]{Ep. tốt/\\tổng} & \makecell[r]{Huấn\\luyện (s)} & \makecell[r]{Suy luận\\(ms/ảnh)} \\
+\midrule
+Basic CNN – NumPy & 73{,}66 & 75{,}22 & 73{,}66 & 73{,}74 & 2{.}117{.}059 & 12/12 & 2{.}435 & 38{,}402 \\
+Basic CNN – PyTorch & 85{,}48 & 86{,}36 & 85{,}48 & 85{,}04 & 2{.}117{.}059 & 3/15 & \textbf{26} & \textbf{0{,}303} \\
+Basic CNN – TensorFlow & 77{,}69 & 77{,}83 & 77{,}69 & 77{,}63 & 2{.}117{.}059 & 4/15 & 112 & 2{,}938 \\
+Improved CNN – PyTorch & \textbf{96{,}24} & \textbf{96{,}62} & \textbf{96{,}24} & \textbf{96{,}22} & 1{.}292{.}963 & 8/25 & 310 & 1{,}513 \\
+Improved CNN – TensorFlow & 89{,}78 & 91{,}28 & 89{,}78 & 89{,}27 & 1{.}295{.}843 & 4/6 & 1{.}587 & 13{,}211 \\
+\bottomrule
+\end{tabular}

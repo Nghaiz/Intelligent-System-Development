@@ -1,0 +1,18 @@
+\begin{tikzpicture}[
+    nut/.style={hop=cBlue, minimum width=3.9cm, minimum height=1.2cm},
+    la0/.style={hop=cGreen, minimum width=3.0cm, minimum height=1.1cm},
+    la1/.style={hop=cRed, minimum width=3.0cm, minimum height=1.1cm},
+    mui2/.style={draw=cNavy, very thick, -{Stealth[length=2.4mm]}},
+    every node/.append style={font=\small}]
+  \node[nut, align=center] (n0) at (0,0) {HbA1c $\le$ \SL{ch2_tree/nodes/n0/thr} ?\\Gini \SL{ch2_tree/nodes/n0/gini}; 100\% mẫu};
+  \node[nut, align=center] (n1) at (-4,-2.6) {glucose $\le$ \SL{ch2_tree/nodes/n1/thr} ?\\Gini \SL{ch2_tree/nodes/n1/gini}; \SL{ch2_tree/nodes/n1/sharePct}\% mẫu};
+  \node[la1, align=center] (n4) at (4,-2.6) {Tiểu đường\\$P(1)=$ \SL{ch2_tree/nodes/n4/p1}; \SL{ch2_tree/nodes/n4/sharePct}\% mẫu};
+  \node[la0, align=center] (n2) at (-6.2,-5.2) {Không ĐTĐ\\$P(1)=$ \SL{ch2_tree/nodes/n2/p1}; \SL{ch2_tree/nodes/n2/sharePct}\%};
+  \node[la1, align=center] (n3) at (-1.8,-5.2) {Tiểu đường\\$P(1)=$ \SL{ch2_tree/nodes/n3/p1}; \SL{ch2_tree/nodes/n3/sharePct}\%};
+  \draw[mui2] (n0) -- node[above left, fill=white, inner sep=1pt] {đúng} (n1);
+  \draw[mui2] (n0) -- node[above right, fill=white, inner sep=1pt] {sai} (n4);
+  \draw[mui2] (n1) -- node[left, fill=white, inner sep=1pt] {đúng} (n2);
+  \draw[mui2] (n1) -- node[right, fill=white, inner sep=1pt] {sai} (n3);
+  \node[khoiC, align=left, text width=6.0cm] at (4.2,-5.2)
+    {Chọn phép tách cực đại độ giảm vẩn đục\\$\Delta=I(\text{cha})-\sum_k \frac{n_k}{n}\,I(\text{con}_k)$};
+\end{tikzpicture}

@@ -1,0 +1,15 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % cầu thang 3D: mỗi bậc một thế hệ RAG
+  \foreach \i/\c/\t/\d in {0/cSlate/{Naive RAG}/{truy xuất top-$k$\\ $\to$ ghép prompt $\to$ sinh},
+                          1/cBlue/{Advanced RAG}/{viết lại truy vấn, lai,\\ rerank, nén ngữ cảnh},
+                          2/cTeal/{Modular RAG}/{mô-đun hoá: định tuyến,\\ bộ nhớ, tìm kiếm, hợp nhất},
+                          3/cPurple/{Graph RAG}/{đồ thị thực thể, cộng đồng,\\ tóm tắt cục bộ/toàn cục},
+                          4/cRed/{Agentic RAG}/{tác tử lập kế hoạch, gọi\\ công cụ, tự kiểm chứng}}{
+    \pgfmathsetmacro{\h}{1.0+0.85*\i}
+    \khoibaD{\i*3.1}{0}{2.9}{\h}{1.0}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\i*3.1+1.45,\h-0.35) {\t};
+    \node[hop=\c, text width=2.7cm, font=\scriptsize, anchor=north] at (\i*3.1+1.45,-0.25) {\d};
+  }
+  \draw[muiM=cOrange, line width=2.5pt] (0.4,5.0) -- node[above, font=\small\bfseries, text=cOrange!70!black, sloped]
+      {độ phức tạp, khả năng suy luận và chi phí tăng dần} (14.4,6.6);
+\end{tikzpicture}

@@ -1,0 +1,20 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[tieude] at (6.5,5.3) {Khối dày đặc (DenseNet, 2017): $\mathbf{x}_\ell = H_\ell\big([\mathbf{x}_0,\mathbf{x}_1,\ldots,\mathbf{x}_{\ell-1}]\big)$};
+  \foreach \i/\c/\w in {0/cSlate/0.5,1/cBlue/0.7,2/cTeal/0.9,3/cGreen/1.1,4/cOrange/1.3}{
+    \pgfmathsetmacro{\xx}{\i*3.0}
+    \khoibaD{\xx}{0}{\w}{2.2}{1.6}{\c}
+    \node[font=\normalsize, anchor=north] at (\xx+\w/2,-0.15) {$\mathbf{x}_{\i}$};}
+  \foreach \i in {1,...,4}{\pgfmathsetmacro{\xh}{\i*3.0-1.05}
+    \node[font=\small, align=center, text=cNavy, fill=white, fill opacity=0.9, text opacity=1, rounded corners=2pt] at (\xh,-1.0) {$H_{\i}$: BN-ReLU-Conv};
+    \draw[->, thick, cNavy!70] (\xh-0.9,0.9) -- (\xh+0.3,0.9);}
+  \foreach \a in {0,...,3}{
+    \foreach \b in {1,...,4}{
+      \ifnum\b>\a
+        \pgfmathsetmacro{\hh}{2.6+0.32*(\b-\a)}
+        \pgfmathsetmacro{\xa}{\a*3.0+0.35}\pgfmathsetmacro{\xb}{\b*3.0+0.25}
+        \ifcase\a \def\cl{cSlate}\or\def\cl{cBlue}\or\def\cl{cTeal}\or\def\cl{cGreen}\fi
+        \draw[-{Stealth[length=2.2mm]}, thick, \cl!80!black] (\xa,2.5) .. controls (\xa,\hh+0.4) and (\xb,\hh+0.4) .. (\xb,2.5);
+      \fi}}
+  \node[font=\small, align=center, text width=15cm] at (6.5,-2.1) {Mỗi tầng nhận \emph{ghép kênh} của mọi tầng trước; số kênh tăng thêm $k$ (growth rate) sau mỗi tầng —
+    tái sử dụng đặc trưng, ít tham số hơn ResNet ở cùng độ chính xác.};
+\end{tikzpicture}

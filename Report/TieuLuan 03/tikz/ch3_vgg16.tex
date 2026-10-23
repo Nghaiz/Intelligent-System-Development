@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \def\stage#1#2#3#4#5#6{% x, h, số lớp conv, màu, độ dày, nhãn
+    \foreach \i in {1,...,#3}{\pgfmathsetmacro{\xx}{#1+(\i-1)*(#5+0.08)}\pgfmathsetmacro{\yy}{2.0-#2/2}%
+      \khoibaD{\xx}{\yy}{#5}{#2}{#2}{#4}}
+    \pgfmathsetmacro{\xx}{#1+0.5}%
+    \node[font=\small, align=center, anchor=north] at (\xx,-0.1) {#6};}
+  \node[tieude, align=center] at (7.4,5.6) {VGG-16 (2014): chỉ dùng kernel $3{\times}3$ xếp chồng\\13 conv + 3 FC, khoảng 138 triệu tham số};
+  \khoibaD{0}{0.3}{0.2}{3.4}{3.4}{cSlate}
+  \node[font=\small, anchor=north, align=center] at (0.6,-0.1) {Vào\\$224^2{\times}3$};
+  \stage{2.0}{3.0}{2}{cBlue}{0.22}{2×Conv64\\$224^2$}
+  \stage{4.4}{2.3}{2}{cSky}{0.28}{2×Conv128\\$112^2$}
+  \stage{6.7}{1.7}{3}{cTeal}{0.32}{3×Conv256\\$56^2$}
+  \stage{9.0}{1.2}{3}{cPurple}{0.38}{3×Conv512\\$28^2$}
+  \stage{11.3}{0.8}{3}{cPink}{0.38}{3×Conv512\\$14^2$}
+  \foreach \x in {3.6,6.1,8.5,10.8,13.0}{\fill[cRed!80] (\x,2.0) circle (0.12);}
+  \node[font=\small, text=cRed!80!black] at (7.4,4.3) {\textcolor{cRed}{\textbullet}\ MaxPool $2{\times}2$ sau mỗi khối};
+  \foreach \x/\h/\c in {13.6/2.8/cOrange,14.2/2.8/cOrange,14.8/1.2/cRed}{\pgfmathsetmacro{\yy}{2.0-\h/2}\khoibaD{\x}{\yy}{0.28}{\h}{0.28}{\c}}
+  \node[font=\small, align=center, anchor=north] at (14.3,-0.1) {FC\\4096·4096·1000};
+\end{tikzpicture}

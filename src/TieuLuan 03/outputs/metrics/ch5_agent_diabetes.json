@@ -1,0 +1,1956 @@
+{
+ "n_questions": 32,
+ "systems": {
+  "llm_only": {
+   "acc": 0.28125,
+   "ms": 17735.00888437411,
+   "ms_median": 12235.609499999555,
+   "gold_in_sources": 0.0,
+   "n": 32,
+   "acc_group": 0.0,
+   "acc_record": 0.5625,
+   "acc_lex": 0.3125,
+   "acc_para": 0.25
+  },
+  "naive_rag": {
+   "acc": 0.78125,
+   "ms": 15460.822090624333,
+   "ms_median": 12550.528749998193,
+   "gold_in_sources": 0.71875,
+   "n": 32,
+   "acc_group": 0.9375,
+   "acc_record": 0.625,
+   "acc_lex": 0.875,
+   "acc_para": 0.6875
+  },
+  "advanced_rag": {
+   "acc": 0.71875,
+   "ms": 15550.47083437421,
+   "ms_median": 13008.636800004751,
+   "gold_in_sources": 1.0,
+   "n": 32,
+   "acc_group": 0.5625,
+   "acc_record": 0.875,
+   "acc_lex": 0.75,
+   "acc_para": 0.6875
+  },
+  "agent": {
+   "acc": 1.0,
+   "ms": 170.69839062605752,
+   "ms_median": 87.10485000483459,
+   "gold_in_sources": 1.0,
+   "n": 32,
+   "acc_group": 1.0,
+   "acc_record": 1.0,
+   "acc_lex": 1.0,
+   "acc_para": 1.0
+  }
+ },
+ "tool_use": {
+  "kg_aggregate": 16,
+  "kg_lookup": 16
+ },
+ "rows": [
+  {
+   "system": "llm_only",
+   "qid": "dia070",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 9350.536099998862,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Rất tiếc, tôi không có thông tin cụ thể về tỷ lệ này. Tuy nhiên, theo các nghiên cứu gần đây, tỷ lệ mắc tiểu đường trong nhóm tuổi dưới 20 phụ thuộc nhiều vào các yếu tố như lối sống, chế độ ăn uống và di truyền. Để có thông tin chính xác nhất, bạn nên tham khảo với chuyên gia y tế hoặc trang web của tổ chức y tế quốc tế.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia070",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 1724.4754000130342,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là 0,61%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia070",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 2134.3633999931626,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là 0,00%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia070",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 16.16410000133328,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi dưới 20, không tăng huyết áp có 9.538 hồ sơ; tỷ lệ mắc tiểu đường 0,61%, HbA1c trung bình 5,41%, đường huyết trung bình 133,0 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia064",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 25931.456500009517,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, tỷ lệ mắc tiểu đường trong nhóm tuổi 60-79 với tiền sử tăng huyết áp thường cao hơn so với những người không có tiền sử này. Tuy nhiên, con số cụ thể có thể thay đổi tùy thuộc vào quốc gia, độ tuổi cụ thể và các yếu tố khác. Để có thông tin chính xác nhất, bạn nên liên hệ với cơ quan y tế hoặc chuyên gia sức khỏe của mình.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia064",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 8842.7292000124,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 có tăng huyết áp là 34,38%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia064",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 33255.58949999686,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 có tăng huyết áp là 34,38%. Đây được thể hiện từ thông tin trong các hồ sơ P069928 và P080064, cả hai đều cho thấy tỷ lệ mắc tiểu đường là 34,38% cho nhóm tuổi 60–79 có tăng huyết áp.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia064",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 60.34140000701882,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nam, nhóm tuổi 60–79, có tăng huyết áp có 1.440 hồ sơ; tỷ lệ mắc tiểu đường 34,38%, HbA1c trung bình 5,97%, đường huyết trung bình 153,1 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia072",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 51076.82099999511,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Rất tiếc, tôi không có thông tin cụ thể về tỷ lệ mắc tiểu đường trong nhóm tuổi này. Tuy nhiên, theo các nghiên cứu gần đây, tỷ lệ mắc tiểu đường ở người cao tuổi phụ thuộc nhiều vào nhiều yếu tố như lối sống, chế độ ăn uống và di truyền. Để có thông tin chính xác nhất, bạn nên tham khảo với chuyên gia y tế hoặc tìm kiếm dữ liệu từ các nguồn nghiên cứu khoa học uy tín.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia072",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 15711.045599993668,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi từ 80 không tăng huyết áp là 18,13%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia072",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 18995.801500001107,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi từ 80 không tăng huyết áp là 24,23%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia072",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 63.35149999358691,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi từ 80, không tăng huyết áp có 2.327 hồ sơ; tỷ lệ mắc tiểu đường 18,13%, HbA1c trung bình 5,69%, đường huyết trung bình 142,3 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia090",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 53831.18919999106,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Rất tiếc, tôi không có thông tin cụ thể về tỷ lệ mắc tiểu đường trong nhóm này. Tuy nhiên, theo các nghiên cứu trước đây, việc hút thuốc lá có liên quan đến nguy cơ cao mắc bệnh tiểu đường, nhưng tỷ lệ cụ thể có thể thay đổi tùy thuộc vào nhiều yếu tố khác nhau như độ tuổi, giới tính, lối sống và chế độ ăn uống. Để có thông tin chính xác nhất, bạn nên tham khảo với chuyên gia y tế hoặc nghiên cứu ",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia090",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 8520.701399989775,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"đã bỏ thuốc\" là 17,10%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia090",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 12746.315699987463,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường trong nhóm tiền sử hút thuốc \"đã bỏ thuốc\" là 17,10%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia090",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 67.71639999351464,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm hút thuốc: đã bỏ thuốc có 9.299 hồ sơ; tỷ lệ mắc tiểu đường 17,10%, HbA1c trung bình 5,65%, đường huyết trung bình 143,3 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia061",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 27196.907200006535,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Rất tiếc, tôi không có thông tin cụ thể về tỷ lệ mắc tiểu đường trong nhóm tuổi 20-39 nữ không có tiền sử tăng huyết áp. Để có được số liệu chính xác, bạn nên tham khảo các nghiên cứu y tế hoặc liên hệ với cơ quan y tế địa phương.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia061",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 10734.20449999685,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 20–39 không tăng huyết áp là 1,91%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia061",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 11704.060900010518,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi 20–39 không tăng huyết áp là 16,94%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia061",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 84.97820000047795,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi 20–39, không tăng huyết áp có 15.658 hồ sơ; tỷ lệ mắc tiểu đường 1,91%, HbA1c trung bình 5,42%, đường huyết trung bình 133,8 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia062",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 31175.61599999317,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Rất tiếc, tôi không có thông tin cụ thể về tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi từ 80 tuổi với tình trạng tăng huyết áp. Tuy nhiên, theo các nghiên cứu hiện tại, tỷ lệ mắc tiểu đường ở người cao tuổi thường cao hơn so với người trẻ tuổi. Đối với những người có tiền sử tăng huyết áp, nguy cơ mắc tiểu đường cũng tăng lên. Để có thông tin chính xác nhất, bạn nên tham khảo với bác sĩ hoặc c",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia062",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 10882.475400008843,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi từ 80 có tăng huyết áp là 24,23%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia062",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 16309.87009999808,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi từ 80 có tăng huyết áp là 100% (714/714).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia062",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 50.99619999236893,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi từ 80, có tăng huyết áp có 714 hồ sơ; tỷ lệ mắc tiểu đường 24,23%, HbA1c trung bình 5,74%, đường huyết trung bình 150,2 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia077",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 29267.007100002957,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, tỷ lệ mắc tiểu đường trong nhóm tuổi 60-79 đối với những người không có tiền sử tăng huyết áp ở mức khá cao. Tuy nhiên, con số cụ thể có thể thay đổi tùy thuộc vào quốc gia và thời điểm nghiên cứu. Một số nghiên cứu cho thấy tỷ lệ này có thể dao động từ 15% đến 30%.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia077",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 12466.85250000155,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 không tăng huyết áp là 15,81%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia077",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 41981.30499999388,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi 60–79 không tăng huyết áp là 20,84%. Đây được trích dẫn từ thông tin về nhóm bệnh nhân nam nhóm tuổi 60–79 không tăng huyết áp trong số 6.777 hồ sơ, trong đó có 6.777/6.777 = 100% không mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia077",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 73.96409999637399,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nam, nhóm tuổi 60–79, không tăng huyết áp có 6.777 hồ sơ; tỷ lệ mắc tiểu đường 20,84%, HbA1c trung bình 5,72%, đường huyết trung bình 146,6 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia063",
+   "type": "group",
+   "style": "lex",
+   "correct": false,
+   "ms": 40096.77479999664,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Rất tiếc, tôi không có thông tin cụ thể về tỷ lệ mắc tiểu đường trong nhóm tuổi này. Tuy nhiên, theo các nghiên cứu gần đây, tỷ lệ mắc tiểu đường ở người cao tuổi thường cao hơn so với người trẻ tuổi. Đối với người cao tuổi, tỷ lệ mắc tiểu đường có thể lên đến 25-30% trong một số nghiên cứu. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào nhiều yếu tố như lối sống, chế độ ăn uống và tình trạng ",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia063",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 7894.070499998634,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi từ 80 có tăng huyết áp là 31,79%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia063",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 9054.631799997878,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Tỷ lệ mắc tiểu đường của bệnh nhân nam nhóm tuổi từ 80 có tăng huyết áp là 31,79%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia063",
+   "type": "group",
+   "style": "lex",
+   "correct": true,
+   "ms": 24.49400001205504,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nam, nhóm tuổi từ 80, có tăng huyết áp có 346 hồ sơ; tỷ lệ mắc tiểu đường 31,79%, HbA1c trung bình 5,85%, đường huyết trung bình 148,9 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia083",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 9268.35199999914,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 25-30% phụ nữ 60-79 tuổi không bị cao huyết áp nhưng có thể bị đái tháo đường. Tuy nhiên, con số này có thể thay đổi tùy thuộc vào quốc gia và điều kiện cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia083",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 17126.961699992535,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 60-79 tuổi không bị cao huyết áp, 15,81% bị đái tháo đường. Đây được thể hiện trong thông tin về nhóm tuổi 60-79 không tăng huyết áp, với tỷ lệ mắc tiểu đường 15,81%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia083",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 16658.5025999957,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 60-79 tuổi không bị cao huyết áp, 15,81% bị đái tháo đường. Đây được thể hiện từ thông tin trong [1], cụ thể là tỷ lệ mắc tiểu đường 15,81% trong nhóm bệnh nhân nữ nhóm tuổi 60–79 không tăng huyết áp.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia083",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 83.7593000032939,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi 60–79, không tăng huyết áp có 8.996 hồ sơ; tỷ lệ mắc tiểu đường 15,81%, HbA1c trung bình 5,63%, đường huyết trung bình 142,7 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia078",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 7164.486899986514,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 25-30% nam giới từ 80 tuổi trở lên có đái tháo đường. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào khu vực và độ tuổi cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia078",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 4702.052399996319,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số nam giới từ 80 tuổi bị cao huyết áp, 31,79% bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia078",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 6683.475400001043,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số nam giới từ 80 tuổi bị cao huyết áp, 31,79% bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia078",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 8.151600006385706,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nam, nhóm tuổi từ 80, có tăng huyết áp có 346 hồ sơ; tỷ lệ mắc tiểu đường 31,79%, HbA1c trung bình 5,85%, đường huyết trung bình 148,9 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia081",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 8197.877500002505,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 1-2% nam giới dưới 20 tuổi có thể bị đái tháo đường. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào độ tuổi cụ thể và các yếu tố khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia081",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 20123.52799999644,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số nam giới dưới 20 tuổi không bị cao huyết áp, 5,1% bị đái tháo đường. Đây được thể hiện trong thông tin về nhóm bệnh nhân nam dưới 20 không tăng huyết áp, với tỷ lệ mắc tiểu đường là 0,51%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia081",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 19414.394000006723,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số nam giới dưới 20 tuổi không bị cao huyết áp, 0,51% bị đái tháo đường. Đây được thể hiện trong thông tin về nhóm tuổi dưới 20 không tăng huyết áp, với tỷ lệ mắc tiểu đường là 0,51%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia081",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 81.6641000128584,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nam, nhóm tuổi dưới 20, không tăng huyết áp có 9.477 hồ sơ; tỷ lệ mắc tiểu đường 0,51%, HbA1c trung bình 5,42%, đường huyết trung bình 133,1 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia086",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 15987.358200000017,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 1-2% phụ nữ dưới 20 tuổi có thể bị đái tháo đường. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào độ tuổi cụ thể và điều kiện địa phương.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia086",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 17969.08059999987,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ dưới 20 tuổi không bị cao huyết áp, 6,1% bị đái tháo đường. Đây được thể hiện trong thông tin số liệu [1], với tỷ lệ mắc tiểu đường là 0,61%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia086",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 20242.134500003885,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ dưới 20 tuổi không bị cao huyết áp, 6,1% bị đái tháo đường. Đây được thể hiện từ thông tin trong câu [1], cụ thể là tỷ lệ mắc tiểu đường 0,61% trong nhóm này.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia086",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 49.495800005388446,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi dưới 20, không tăng huyết áp có 9.538 hồ sơ; tỷ lệ mắc tiểu đường 0,61%, HbA1c trung bình 5,41%, đường huyết trung bình 133,0 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia084",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 12101.145699998597,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 15-20% phụ nữ trong độ tuổi 20-39 bị đái tháo đường. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào các yếu tố như lối sống và di truyền.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia084",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 8672.554499993566,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 20-39 tuổi không bị cao huyết áp, 1,91% bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia084",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 25337.002100000973,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 20-39 tuổi không bị cao huyết áp, khoảng 16,94% bị đái tháo đường. Đây được thể hiện từ thông tin trong các hồ sơ P000655, P024165 và P070130, tất cả đều cho biết tỷ lệ mắc tiểu đường là 16,94%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia084",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 51.42390000401065,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi 20–39, không tăng huyết áp có 15.658 hồ sơ; tỷ lệ mắc tiểu đường 1,91%, HbA1c trung bình 5,42%, đường huyết trung bình 133,8 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia085",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 3956.068500003312,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 20-30% phụ nữ trong độ tuổi 40-59 tuổi có nguy cơ mắc đái tháo đường. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào nhiều yếu tố như lối sống, di truyền và chế độ ăn uống.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia085",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 6413.117899995996,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 40-59 tuổi không bị cao huyết áp, 7,31% bị đái tháo đường. Đây được thể hiện trong thông tin về nhóm bệnh nhân nữ nhóm tuổi 40-59 không tăng huyết áp, với tỷ lệ mắc tiểu đường 7,31%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia085",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 10653.539499995532,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 40-59 tuổi không bị cao huyết áp, 23,56% bị đái tháo đường. Đây được thể hiện từ thông tin trong hồ sơ P009369, nơi chỉ ra rằng tỷ lệ mắc tiểu đường của nhóm này là 23,56%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia085",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 132.17060000170022,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi 40–59, không tăng huyết áp có 15.463 hồ sơ; tỷ lệ mắc tiểu đường 7,31%, HbA1c trung bình 5,50%, đường huyết trung bình 137,3 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia082",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 11927.352400001837,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 15-20% nam giới trong độ tuổi 20-39 bị đái tháo đường. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào các yếu tố khác như lối sống và chế độ ăn uống.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia082",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 10055.716699993354,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số nam giới 20-39 tuổi không bị cao huyết áp, 2,67% bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia082",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 15391.840800002683,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số nam giới 20-39 tuổi không bị cao huyết áp, 14,23% bị đái tháo đường. Đây được thể hiện từ thông tin trong hồ sơ P075739, nơi chỉ ra rằng tỷ lệ mắc tiểu đường ở nhóm này là 14,23%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia082",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 50.09270001028199,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nam, nhóm tuổi 20–39, không tăng huyết áp có 8.505 hồ sơ; tỷ lệ mắc tiểu đường 2,67%, HbA1c trung bình 5,44%, đường huyết trung bình 134,4 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia087",
+   "type": "group",
+   "style": "para",
+   "correct": false,
+   "ms": 10122.385800001211,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo các nghiên cứu gần đây, khoảng 25-30% phụ nữ trên 60 tuổi bị đái tháo đường. Tuy nhiên, tỷ lệ này có thể thay đổi tùy thuộc vào độ tuổi cụ thể và các yếu tố khác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia087",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 14337.833099998534,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 60-79 tuổi bị cao huyết áp, khoảng 31,42% bị đái tháo đường. Đây được thể hiện qua thống kê nhóm bệnh nhân nữ nhóm tuổi 60–79 có tăng huyết áp: 1.830 hồ sơ, tỷ lệ mắc tiểu đường 31,42%.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia087",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 11261.305599997286,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Trong số phụ nữ 60-79 tuổi bị cao huyết áp, khoảng 31,42% bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia087",
+   "type": "group",
+   "style": "para",
+   "correct": true,
+   "ms": 15.293500007828698,
+   "tools": [
+    "kg_aggregate"
+   ],
+   "answer": "Nhóm nữ, nhóm tuổi 60–79, có tăng huyết áp có 1.830 hồ sơ; tỷ lệ mắc tiểu đường 31,42%, HbA1c trung bình 5,85%, đường huyết trung bình 152,1 mg/dL.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia015",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 13271.759499999462,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Căn cứ vào thông tin bạn cung cấp, bệnh nhân có thể bị tiểu đường. BMI 26,13 và HbA1c 5,7% đều cho thấy mức độ nguy cơ cao mắc tiểu đường. Đường huyết 240 mg/dL (hoặc 13,3 mmol/l) cũng là một dấu hiệu rõ ràng của bệnh tiểu đường.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia015",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 18572.905999986688,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nữ 44 tuổi, với chỉ số BMI 26,13, HbA1c 5,7% và đường huyết 240 mg/dL, đã được nhãn \"mắc tiểu đường\".",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia015",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 22337.957800002187,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nữ 44 tuổi, với chỉ số BMI 26,13, HbA1c 5,7% và đường huyết 240 mg/dL, đã được nhãn định là mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia015",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 392.37109999521635,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P018542: MẮC tiểu đường (HbA1c 5,7%, đường huyết 240 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 27198.59629998973,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Có thể bị mắc tiểu đường. BMI cao (27,32) và đường huyết cao (280 mg/dL) là dấu hiệu của bệnh tiểu đường. HbA1c 5,7% cũng cho thấy mức độ tăng cao của đường huyết trong máu. Cần được chẩn đoán và điều trị chuyên sâu.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 14348.492200006149,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nam 47 tuổi, với chỉ số BMI 27,32 (thừa cân), HbA1c 5,7% (tiền tiểu đường) và đường huyết 280 mg/dL (nhóm từ 200), có mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 24129.835499988985,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nam 47 tuổi, với chỉ số BMI 27,32 (thừa cân), HbA1c 5,7% (tiền tiểu đường) và đường huyết 280 mg/dL (nhóm từ 200), có mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia005",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 758.0184999969788,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P005362: MẮC tiểu đường (HbA1c 5,7%, đường huyết 280 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia035",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 12370.073300000513,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Có thể mắc tiểu đường. BMI và HbA1c cao, đường huyết cao đều là dấu hiệu của bệnh tiểu đường.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia035",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 37158.942599999136,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [5] chỉ có thông tin về bệnh nhân 62 tuổi với chỉ số BMI 25,54, HbA1c 5,8% và đường huyết 126 mg/dL, nhưng không cung cấp thông tin về mức độ mắc tiểu đường.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia035",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 9524.137100001099,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không mắc tiểu đường. [1]",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia035",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 544.2673000070499,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P050254: KHÔNG mắc tiểu đường (HbA1c 3,5%, đường huyết 126 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia027",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 43685.972099992796,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Căn cứ vào thông tin bạn cung cấp, bệnh nhân có thể bị tiểu đường. BMI cao (31,63), HbA1c cao (3,5%) và đường huyết cao (155 mg/dL) là các dấu hiệu rõ ràng của bệnh tiểu đường. Tuy nhiên, cần kiểm tra thêm các xét nghiệm khác để xác định chính xác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 67128.6962999875,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [4] chỉ ra rằng bệnh nhân 32 tuổi có chỉ số BMI 25,89 (thừa cân), HbA1c 8,2% (ngưỡng chẩn đoán) và đường huyết 159 mg/dL, nhưng nhãn cho biết bệnh nhân mắc tiểu đường. Tuy nhiên, [5] chỉ ra rằng bệnh nhân 31 tuổi có chỉ số BMI 23,77 (bình thường), HbA1c 6,0% (tiền tiểu đường) và đường huyết 158 mg/dL, nhãn cho biết bệnh nhân không mắc tiểu đường.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 32695.1657999889,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nữ 32 tuổi, với chỉ số BMI 31,63 (béo phì), HbA1c 3,5% (bình thường) và đường huyết 155 mg/dL (nhóm 126–199), không mắc tiểu đường. [5]",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia027",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 536.0987000021851,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P066958: KHÔNG mắc tiểu đường (HbA1c 3,5%, đường huyết 155 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 17968.305699992925,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Có thể bị mắc tiểu đường. BMI cao và HbA1c cao đều là dấu hiệu của bệnh tiểu đường. Đường huyết cao (260 mg/dL) cũng là một triệu chứng của tiểu đường. Cần kiểm tra và điều trị kịp thời để ngăn ngừa biến chứng.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 19531.960299995262,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nam 45 tuổi, với chỉ số BMI 28,53 (thừa cân), HbA1c 7,0% (ngưỡng chẩn đoán) và đường huyết 260 mg/dL (nhóm từ 200), có mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 23912.626500008628,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nam 45 tuổi, với chỉ số BMI 28,53 (thừa cân), HbA1c 7,0% (ngưỡng chẩn đoán) và đường huyết 260 mg/dL (nhóm từ 200), có mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia003",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 390.179399997578,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P091688: MẮC tiểu đường (HbA1c 7,0%, đường huyết 260 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia007",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 24720.65630000725,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Có thể mắc tiểu đường. BMI cao (27,32) và đường huyết cao (300 mg/dL) là dấu hiệu của bệnh tiểu đường. HbA1c 6,8% cũng cho thấy mức độ tăng cao của đường huyết trong máu. Cần được chẩn đoán và điều trị chuyên sâu.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia007",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 23509.119599999394,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nam 65 tuổi, với chỉ số BMI 27,32, HbA1c 6,8%, và đường huyết 300 mg/dL, đã được nhãn định nghĩa là mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia007",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 27285.155700010364,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nam 65 tuổi, với chỉ số BMI 27,32 (thừa cân), HbA1c 6,8% (ngưỡng chẩn đoán) và đường huyết 300 mg/dL (nhóm từ 200), có mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia007",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 343.98700000019744,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P073557: MẮC tiểu đường (HbA1c 6,8%, đường huyết 300 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia014",
+   "type": "record",
+   "style": "lex",
+   "correct": false,
+   "ms": 18603.836299997056,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Cô ấy có thể bị mắc tiểu đường. Mặc dù chỉ số BMI và HbA1c ở mức an toàn, đường huyết cao (145 mg/dL) là dấu hiệu của bệnh tiểu đường. Cần kiểm tra lại đường huyết định kỳ để theo dõi tình trạng sức khỏe.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia014",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 16081.372799992096,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nữ 27 tuổi, với chỉ số BMI 23,22, HbA1c 3,5% và đường huyết 145 mg/dL, không mắc tiểu đường. [5]",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia014",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 6173.982899999828,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không mắc tiểu đường. [1]",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia014",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 387.7535000065109,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P051268: KHÔNG mắc tiểu đường (HbA1c 3,5%, đường huyết 145 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia037",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 10032.055499992566,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Căn cứ vào thông tin bạn cung cấp, bệnh nhân có thể bị tiểu đường. BMI cao (30,41), HbA1c cao (6,6%) và đường huyết cao (145 mg/dL) là các dấu hiệu rõ ràng của bệnh tiểu đường.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia037",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 21513.999600007082,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nữ 75 tuổi, với chỉ số BMI 30,41 (béo phì), HbA1c 6,6% (ngưỡng chẩn đoán) và đường huyết 145 mg/dL (nhóm 126–199) có mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia037",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 13178.778800007422,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Bệnh nhân nữ 75 tuổi, với chỉ số BMI 30,41 (béo phì), HbA1c 6,6% (ngưỡng chẩn đoán) và đường huyết 145 mg/dL (nhóm 126–199) có mắc tiểu đường. [1]",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia037",
+   "type": "record",
+   "style": "lex",
+   "correct": true,
+   "ms": 292.69839999324176,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P044313: MẮC tiểu đường (HbA1c 6,6%, đường huyết 145 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 7549.5800000062445,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI (33,28) và HbA1c (7,5%), người này có nguy cơ cao mắc đái tháo đường. Tuy nhiên, kết quả này cần được xác nhận bởi một bác sĩ chuyên khoa để có đánh giá chính xác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 25728.275600005873,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [4] chỉ ra rằng bệnh nhân 65 tuổi có chỉ số BMI 31,00 (béo phì), HbA1c 6,2% (tiền tiểu đường), đường huyết 90 mg/dL (nhóm dưới 100). Điều này cho thấy bệnh nhân có nguy cơ cao mắc tiểu đường nhưng chưa được chẩn đoán chính thức.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 6324.9036000052,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "[Từ câu 1] Người này có chỉ số khối cơ thể 33,28 (béo phì), glucose máu 130, HbA1c đo được 7,5 phần trăm — người này có bị đái tháo đường không? [Trả lời] Có, người này có bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia058",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 74.58529999712482,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P092794: MẮC tiểu đường (HbA1c 7,5%, đường huyết 130 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia059",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 7815.500700002303,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI và HbA1c, người đàn ông này có nguy cơ cao mắc đái tháo đường. Tuy nhiên, cần kiểm tra glucose máu và các xét nghiệm khác để xác định chính xác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia059",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 19123.147200007224,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [4] chỉ ra rằng bệnh nhân 19 tuổi có chỉ số BMI 23,83 (bình thường), HbA1c 5,0% (bình thường), đường huyết 80 mg/dL (nhóm dưới 100), và không mắc tiểu đường. Tuy nhiên, câu hỏi đề cập đến một người 32 tuổi với các chỉ số khác nhau.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia059",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 13578.90929999121,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [4] chỉ ra rằng bệnh nhân này có chỉ số HbA1c 6,5%, ngưỡng chẩn đoán của đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia059",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 140.94189999741502,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P044791: KHÔNG mắc tiểu đường (HbA1c 4,0%, đường huyết 100 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia052",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 4826.993099995889,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI (29,79) và HbA1c (8,8%), người đàn ông này có nguy cơ cao mắc bệnh đái tháo đường. Tuy nhiên, chỉ số BMI và HbA1c không đủ để chẩn đoán chính xác bệnh đái tháo đường. Cần kết hợp với các xét nghiệm khác để chẩn đoán chính xác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia052",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 12406.234200010658,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "[Từ câu 1] Người này có chỉ số BMI 29,79 (thừa cân), HbA1c 8,8% (ngưỡng chẩn đoán), đường huyết 260 mg/dL (nhóm từ 200). Nhãn: mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia052",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 9020.363099989481,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "[Từ câu 1] Người này có chỉ số BMI 29,79 (thừa cân), HbA1c 8,8% (ngưỡng chẩn đoán), đường huyết 260 mg/dL (nhóm từ 200). Nhãn: mắc tiểu đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia052",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 101.81049999664538,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P022483: MẮC tiểu đường (HbA1c 8,8%, đường huyết 260 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia041",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 13220.662199993967,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI (56,85) và HbA1c (6,8%), người đàn ông này có nguy cơ cao mắc đái tháo đường. Tuy nhiên, chỉ số BMI không đủ để chẩn đoán đái tháo đường, nên cần kết hợp với các xét nghiệm khác như glucose máu và kiểm tra đường huyết trong thời gian dài để xác định tình trạng cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia041",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 8602.137800000492,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [1] cho thấy chỉ số BMI 19,85 (bình thường) và HbA1c 6,1% (tiền tiểu đường), nhưng không cung cấp thông tin về glucose máu. [2] cho thấy chỉ số BMI 37,08 (béo phì) và HbA1c 6,6% (ngưỡng chẩn đoán), nhưng glucose máu không được cung cấp.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia041",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 12838.494800002081,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "[Từ câu 1] Người này có chỉ số khối cơ thể 56,85, glucose máu 280, HbA1c đo được 6,8 phần trăm — người này có bị đái tháo đường không? [Trả lời]: Có, người này có bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia041",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 89.64189999096561,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P032240: MẮC tiểu đường (HbA1c 6,8%, đường huyết 280 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia047",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 5833.671300002607,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI (14,80) và HbA1c (6,0%), người này có nguy cơ cao mắc đái tháo đường. Tuy nhiên, chỉ số BMI và HbA1c không đủ để chẩn đoán chính xác đái tháo đường. Cần kết hợp với các xét nghiệm khác để đánh giá tình trạng sức khỏe.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia047",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 6161.217899993062,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [5] chỉ ra rằng người này có chỉ số HbA1c 5,8%, nhưng không cung cấp thông tin về glucose máu. Cần thêm thông tin để xác định xem người này có bị đái tháo đường hay không.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia047",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 6276.3946000050055,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [4] chỉ ra rằng bệnh nhân có chỉ số BMI 14,51 và HbA1c 4,0%, nhưng không có thông tin về glucose máu.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia047",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 109.76669999945443,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P065955: KHÔNG mắc tiểu đường (HbA1c 6,0%, đường huyết 155 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia040",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 5001.128300005803,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI (31,53) và HbA1c (5,8%), người này có nguy cơ cao mắc đái tháo đường. Tuy nhiên, kết quả này cần được xác nhận bởi một bác sĩ chuyên khoa để có thông tin chính xác.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia040",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 12634.204999994836,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [4] và [5] đều cho thấy chỉ số BMI 27,32 (thừa cân) và 24,00 (bình thường), nhưng chỉ số glucose máu và HbA1c khác nhau. Cần thêm thông tin về glucose máu để xác định.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia040",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 3010.3666999930283,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "[Từ câu 1] Người này có bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia040",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 89.23150000919122,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P088833: MẮC tiểu đường (HbA1c 5,8%, đường huyết 260 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia048",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 2917.871199999354,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI (40,20) và HbA1c (3,5%), người này có rất cao nguy cơ mắc đái tháo đường. Cần kiểm tra glucose máu định kỳ và theo dõi sức khỏe thường xuyên để phát hiện sớm.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia048",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 6737.566000010702,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [4] cho thấy bệnh nhân có chỉ số BMI 37,17 (béo phì), HbA1c 5,8% (tiền tiểu đường), đường huyết 200 mg/dL (nhóm từ 200). Điều này cho thấy bệnh nhân có nguy cơ cao mắc tiểu đường.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia048",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 7673.034399995231,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [5] Hồ sơ P017079 cho thấy bệnh nhân này có chỉ số BMI 39,86 (béo phì), HbA1c 6,5% (ngưỡng chẩn đoán) và đường huyết 200 mg/dL (nhóm từ 200). Điều này cho thấy bệnh nhân này có thể bị đái tháo đường.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia048",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 153.76230000401847,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P052279: KHÔNG mắc tiểu đường (HbA1c 3,5%, đường huyết 200 mg/dL).",
+   "gold_in_sources": true
+  },
+  {
+   "system": "llm_only",
+   "qid": "dia042",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 5852.287600006093,
+   "tools": [
+    "llm"
+   ],
+   "answer": "Theo chỉ số BMI (27,80) và HbA1c (6,0%), người đàn ông này có nguy cơ cao mắc đái tháo đường. Tuy nhiên, chỉ số BMI và HbA1c không đủ để chẩn đoán chính xác đái tháo đường. Cần kết hợp với các xét nghiệm khác và đánh giá toàn diện từ bác sĩ để xác định tình trạng sức khỏe cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "naive_rag",
+   "qid": "dia042",
+   "type": "record",
+   "style": "para",
+   "correct": false,
+   "ms": 9330.634400001145,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. [5] chỉ ra rằng người này có chỉ số BMI 34,29 (béo phì), HbA1c 5,7% (tiền tiểu đường), và đường huyết 140 mg/dL (nhóm 126–199). Điều này cho thấy người này có nguy cơ cao mắc tiểu đường, nhưng không chắc chắn về tình trạng cụ thể.",
+   "gold_in_sources": false
+  },
+  {
+   "system": "advanced_rag",
+   "qid": "dia042",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 7830.827700003283,
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "answer": "Không đủ thông tin để trả lời chính xác. Người này có chỉ số BMI 27,80 (thừa cân), HbA1c 6,0% (tiền tiểu đường), và đường huyết 126 mg/dL (nhóm 126–199), nhưng không có thông tin về việc họ hút thuốc hay có tiền sử tăng huyết áp. Cần thêm thông tin về các yếu tố nguy cơ khác để xác định liệu họ có bị đái tháo đường hay không.",
+   "gold_in_sources": true
+  },
+  {
+   "system": "agent",
+   "qid": "dia042",
+   "type": "record",
+   "style": "para",
+   "correct": true,
+   "ms": 143.17709999158978,
+   "tools": [
+    "kg_lookup"
+   ],
+   "answer": "Hồ sơ P007450: KHÔNG mắc tiểu đường (HbA1c 6,0%, đường huyết 126 mg/dL).",
+   "gold_in_sources": true
+  }
+ ],
+ "traces": [
+  {
+   "question": "Bệnh nhân nữ 44 tuổi, BMI 26,13, HbA1c 5,7%, đường huyết 240 mg/dL có mắc tiểu đường không?",
+   "trace": [
+    [
+     "question",
+     "Bệnh nhân nữ 44 tuổi, BMI 26,13, HbA1c 5,7%, đường huyết 240 mg/dL có mắc tiểu đường không?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (P018542; loại bản ghi) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "kg_lookup(\"Bệnh nhân nữ 44 tuổi, BMI 26,13, HbA1c 5,7%, đường huyết 240…\")",
+     55
+    ],
+    [
+     "obs",
+     "(Person_P018542, has_age, 44,00) | (Person_P018542, has_hypertension, 0) | (Person_P018542, has_heart_disease, 0) | (Person_P018542, has_bmi, 26,13) | (Person_P018542, has_hba1c_level, 5,70) | (Person_P018542, has_blood_glucose_level, 240) | (Person_P018542, has_diabetes, 1) | (Person_P018542, has_gender, Gender_Female)"
+    ],
+    [
+     "answer",
+     "Hồ sơ P018542: MẮC tiểu đường (HbA1c 5,7%, đường huyết 240 mg/dL)."
+    ]
+   ],
+   "tools": [
+    "kg_lookup"
+   ],
+   "sources": [
+    "P018542"
+   ],
+   "ms": 115.92409999866504
+  },
+  {
+   "question": "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là bao nhiêu?",
+   "trace": [
+    [
+     "question",
+     "Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 không tăng huyết áp là bao nhiêu?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (S-Female|dưới 20|0, S-gender=Female; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "kg_aggregate(\"Tỷ lệ mắc tiểu đường của bệnh nhân nữ nhóm tuổi dưới 20 khôn…\")",
+     23
+    ],
+    [
+     "obs",
+     "giao các tập láng giềng vào của: age_group, gender, hypertension | |tập hồ sơ| = 9538"
+    ],
+    [
+     "answer",
+     "Nhóm nữ, nhóm tuổi dưới 20, không tăng huyết áp có 9.538 hồ sơ; tỷ lệ mắc tiểu đường 0,61%, HbA1c trung bình 5,41%, đường huyết trung bình 133,0 mg/dL."
+    ]
+   ],
+   "tools": [
+    "kg_aggregate"
+   ],
+   "sources": [
+    "S-Female|dưới 20|0",
+    "S-gender=Female"
+   ],
+   "ms": 23.152599998866208
+  },
+  {
+   "question": "Những yếu tố nào liên quan mạnh nhất tới tỷ lệ mắc tiểu đường trong dữ liệu?",
+   "trace": [
+    [
+     "question",
+     "Những yếu tố nào liên quan mạnh nhất tới tỷ lệ mắc tiểu đường trong dữ liệu?"
+    ],
+    [
+     "thought",
+     "Không thấy ngày, giai đoạn, nhóm hay hồ sơ cụ thể → câu hỏi mở, dùng RAG lai + LLM tổng hợp."
+    ],
+    [
+     "action",
+     "rag_search(\"Những yếu tố nào liên quan mạnh nhất tới tỷ lệ mắc tiểu đườn…\", k=5) — RRF(BM25 + Dense (e5-small) + Graph) + Rerank",
+     923
+    ],
+    [
+     "obs",
+     "[1] S-glucose_class=từ 200; [2] S-gender=Female; [3] S-gender=Male; [4] S-glucose_class=126–199; [5] S-hba1c_class=ngưỡng chẩn đoán"
+    ],
+    [
+     "answer",
+     "Những yếu tố liên quan mạnh nhất tới tỷ lệ mắc tiểu đường trong dữ liệu là giới tính và độ tuổi. Theo thống kê, tỷ lệ mắc tiểu đường cao hơn ở nữ giới so với nam giới, với tỷ lệ 7,92% so với 10,10%. Độ tuổi cũng đóng vai trò quan trọng, với tuổi trung bình 47,9 tuổi cho nữ và 41,0 tuổi cho nam."
+    ]
+   ],
+   "tools": [
+    "rag_search",
+    "llm"
+   ],
+   "sources": [
+    "S-glucose_class=từ 200",
+    "S-gender=Female",
+    "S-gender=Male",
+    "S-glucose_class=126–199",
+    "S-hba1c_class=ngưỡng chẩn đoán"
+   ],
+   "ms": 7330.151099988143
+  },
+  {
+   "question": "Người hút thuốc có tỷ lệ tiểu đường cao hơn người chưa từng hút không?",
+   "trace": [
+    [
+     "question",
+     "Người hút thuốc có tỷ lệ tiểu đường cao hơn người chưa từng hút không?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (S-smoking_history=ever; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "kg_aggregate(\"Người hút thuốc có tỷ lệ tiểu đường cao hơn người chưa từng …\")",
+     5
+    ],
+    [
+     "obs",
+     "giao các tập láng giềng vào của: smoking_history | |tập hồ sơ| = 3998"
+    ],
+    [
+     "answer",
+     "Nhóm hút thuốc: từng hút có 3.998 hồ sơ; tỷ lệ mắc tiểu đường 11,81%, HbA1c trung bình 5,58%, đường huyết trung bình 139,3 mg/dL."
+    ]
+   ],
+   "tools": [
+    "kg_aggregate"
+   ],
+   "sources": [
+    "S-smoking_history=ever"
+   ],
+   "ms": 5.207700000028126
+  },
+  {
+   "question": "Mức HbA1c ở nhóm tiền tiểu đường khác nhóm bình thường thế nào?",
+   "trace": [
+    [
+     "question",
+     "Mức HbA1c ở nhóm tiền tiểu đường khác nhóm bình thường thế nào?"
+    ],
+    [
+     "thought",
+     "Câu hỏi nêu thực thể cụ thể (S-hba1c_class=tiền tiểu đường; loại tổng hợp) → dùng công cụ tra cứu chính xác trên KG/bảng."
+    ],
+    [
+     "action",
+     "kg_aggregate(\"Mức HbA1c ở nhóm tiền tiểu đường khác nhóm bình thường thế n…\")",
+     54
+    ],
+    [
+     "obs",
+     "giao các tập láng giềng vào của: hba1c_class | |tập hồ sơ| = 39778"
+    ],
+    [
+     "answer",
+     "Nhóm HbA1c tiền tiểu đường có 39.778 hồ sơ; tỷ lệ mắc tiểu đường 8,30%, HbA1c trung bình 5,96%, đường huyết trung bình 137,9 mg/dL."
+    ]
+   ],
+   "tools": [
+    "kg_aggregate"
+   ],
+   "sources": [
+    "S-hba1c_class=tiền tiểu đường"
+   ],
+   "ms": 53.78980000386946
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+\begin{tikzpicture}[every node/.style={font=\small}]
+  \foreach \n/\t/\s [count=\i from 0] in {x/{Ảnh\\$X$}/khoiX, c1/{Conv1}/khoi, r1/{ReLU}/khoiT, p1/{Pool1}/khoiP, c2/{Conv2}/khoi,
+       r2/{ReLU}/khoiT, p2/{Pool2}/khoiP, f1/{FC1\\ReLU}/khoiC, f2/{FC2}/khoiC, sm/{Softmax\\CE}/khoiR}{
+    \node[\s, minimum width=1.25cm, text width=1.15cm, minimum height=1.3cm] (\n) at (\i*1.75,0) {\t};}
+  \foreach \a/\b in {x/c1,c1/r1,r1/p1,p1/c2,c2/r2,r2/p2,p2/f1,f1/f2,f2/sm}{
+    \draw[muiM=cBlue] ([yshift=3mm]\a.east) -- ([yshift=3mm]\b.west);
+    \draw[muiM=cRed] ([yshift=-3mm]\b.west) -- ([yshift=-3mm]\a.east);}
+  \node[text=cBlue, font=\normalsize\bfseries] at (7.9,1.4) {lan truyền thuận: $Z^{(\ell)}=W^{(\ell)}\ast A^{(\ell-1)}+b^{(\ell)}$};
+  \node[text=cRed, font=\normalsize\bfseries] at (7.9,-1.4) {lan truyền ngược: $\delta^{(\ell-1)} = \delta^{(\ell)} \ast \mathrm{rot180}(W^{(\ell)})$};
+  \node[draw=cSlate, fill=softgray, rounded corners=3pt, text width=16cm, align=left, anchor=north] at (7.9,-2.1) {%
+   \textbullet\ Softmax + CE: $\partial L/\partial \mathbf{z}=\mathbf{p}-\mathbf{y}$.\quad
+   \textbullet\ Trọng số: $\partial L/\partial W^{(\ell)} = A^{(\ell-1)} \star \delta^{(\ell)}$ (tương quan chéo đầu vào với gradient).\\[2pt]
+   \textbullet\ Độ lệch: $\partial L/\partial b^{(\ell)}=\sum_{u,v}\delta^{(\ell)}_{u,v}$.\quad
+   \textbullet\ ReLU: nhân với $\mathbf{1}[z>0]$.\quad \textbullet\ MaxPool: chỉ ô cực đại nhận gradient.\\[2pt]
+   \textbullet\ Cập nhật Adam: $\theta \leftarrow \theta - \eta\,\hat m/(\sqrt{\hat v}+\epsilon)$.};
+\end{tikzpicture}

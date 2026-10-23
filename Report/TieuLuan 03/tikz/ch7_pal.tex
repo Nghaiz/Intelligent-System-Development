@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[khoi, text width=2.4cm] (q) at (0,0) {Bài toán lời văn\\(GSM8K)};
+  \node[khoiP, text width=2.6cm] (llm) at (3.6,0) {Tác tử PAL\\viết hàm\\\texttt{solution()}};
+  \node[draw=cSlate!70!black, fill=cSlate!85!black, text=white, rounded corners=4pt, text width=5.6cm, align=left,
+        font=\small, inner sep=6pt, blur shadow={shadow blur steps=5}] (sb) at (8.8,0)
+        {\textbf{Hộp cát Python}\\[2pt]
+         $\bullet$ tiến trình con \texttt{python -I}\\
+         $\bullet$ thư mục tạm, môi trường rỗng\\
+         $\bullet$ chỉ import 6 thư viện toán\\
+         $\bullet$ không \texttt{open}, \texttt{eval}, \texttt{exec}\\
+         $\bullet$ giới hạn 5 giây};
+  \node[khoiG, text width=2.2cm] (r) at (14.1,0) {Giá trị số\\$\Rightarrow$ đáp án};
+  \draw[mui] (q) -- (llm); \draw[mui] (llm) -- node[above, font=\small] {mã} (sb); \draw[mui] (sb) -- node[above, font=\small] {ok} (r);
+  \node[khoiR, text width=4.6cm] (err) at (8.8,-3.6) {Lỗi thực thi / timeout /\\không có \texttt{solution()}};
+  \draw[muiM=cRed] (sb) -- (err);
+  \draw[muiM=cRed, dashed, line width=1.2pt] (err.west) -| (llm.south);
+  \node[font=\small, text=cRed!80!black, align=center] at (3.6,-4.4) {thông báo lỗi thật gửi lại,\\tác tử sửa mã (tối đa 1 lần)};
+\end{tikzpicture}

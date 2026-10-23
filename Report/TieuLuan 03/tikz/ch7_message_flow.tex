@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % biểu đồ tuần tự: các đường đời (lifeline) của tác tử
+  \foreach \x/\t/\c in {0/Coordinator/cRed, 3.0/Planner/cBlue, 6.0/Solver-PAL/cOrange, 9.0/{Tool: Python}/cTeal,
+                        12.0/Solver-CoT/cPurple, 15.0/Verifier/cGreen}{
+    \node[hop=\c, minimum width=2.3cm, minimum height=0.9cm, font=\small\bfseries] at (\x,0) {\t};
+    \draw[\c!70!black, thick, dashed] (\x,-0.5) -- (\x,-12.9);}
+  \def\tn#1#2#3#4#5{\draw[muiM=#4, line width=1.1pt] (#1,#3) -- (#2,#3) node[midway, above=2pt, font=\small, fill=white, inner sep=1pt] {#5};}%
+  \tn{0}{3}{-1.2}{cBlue}{câu hỏi}
+  % nhãn ngắn hơn khoảng cách hai đường đời để không che đầu mũi tên
+  \tn{3}{0}{-2.1}{cBlue!70!black}{kế hoạch}
+  \tn{0}{6}{-3.0}{cOrange!85!black}{câu hỏi + kế hoạch}
+  \tn{6}{9}{-3.9}{cTeal}{mã \texttt{solution()}}
+  \tn{9}{6}{-4.8}{cTeal!70!black}{kết quả / lỗi}
+  \tn{6}{0}{-5.7}{cOrange!85!black}{đáp án A}
+  \tn{0}{12}{-6.6}{cPurple}{câu hỏi}
+  \tn{12}{0}{-7.5}{cPurple!70!black}{lời giải + đáp án B}
+  \fill[cGreen!12, rounded corners] (-1.2,-8.0) rectangle (16.2,-9.2);
+  \node[font=\small\bfseries, text=cGreen!50!black] at (7.5,-8.6) {A = B: chấp nhận ngay (3 lượt gọi LLM) \quad|\quad A $\neq$ B: chuyển Verifier};
+  \tn{0}{15}{-9.9}{cGreen!70!black}{A, B và hai lời giải}
+  \tn{15}{0}{-10.7}{cGreen!50!black}{phán quyết C}
+  \tn{0}{6}{-11.5}{cOrange!85!black}{lấy mẫu lại, nhiệt độ 0,7}
+  \tn{6}{0}{-12.3}{cOrange!60!black}{đáp án D}
+  \node[khoiR, text width=12cm, align=center] at (7.5,-13.6) {Coordinator biểu quyết đa số trên \{A, B, C, D\}; hoà phiếu thì chọn C của Verifier};
+\end{tikzpicture}

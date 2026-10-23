@@ -1,0 +1,30 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[csdl=cTeal] (raw) at (0,0) {CSV\\Kaggle};
+  \node[khoiT, align=center, minimum height=12mm] (agg) at (3.0,0) {Gộp theo\\ngày / phiên};
+  \node[khoiG, align=center, minimum height=12mm] (eda) at (6.0,0) {EDA,\\làm sạch};
+  \node[khoiC, align=center, minimum height=12mm] (split) at (9.0,0) {Chia\\theo thời gian};
+  \node[khoiP, align=center, minimum height=12mm] (scale) at (12.2,0) {Chuẩn hoá\\(fit trên train)};
+  \node[khoi, align=center, minimum height=12mm] (win) at (12.2,-2.9) {Cửa sổ trượt\\$B\times30\times F$};
+  % hai nhánh framework
+  \tensorbaD{6.6}{-3.7}{1.5}{1.2}{1.0}{cRed}{PyTorch (GPU)}
+  \tensorbaD{6.6}{-6.3}{1.5}{1.2}{1.0}{cOrange}{Keras (CPU)}
+  \node[font=\small\bfseries, align=center] at (7.35,-1.95) {SimpleRNN · LSTM · GRU · BiLSTM};
+  \node[khoiX, align=center, minimum height=12mm] (inv) at (3.0,-4.3) {Đổi về\\đơn vị gốc};
+  \node[khoiR, align=center, minimum height=12mm] (met) at (0,-6.2) {MAE · RMSE · MAPE\\R² · đúng hướng};
+  \node[khoiG, align=center, minimum height=12mm] (dep) at (0,-8.5) {Web App\\(Flask, mobile)};
+  % baseline đặt riêng phía dưới để đường nét đứt không cắt nhánh Keras
+  \node[khoiX, align=center] (base) at (7.35,-8.5) {Baseline naive,\\trung bình trượt};
+  \draw[mui] (raw) -- (agg);
+  \draw[mui] (agg) -- (eda);
+  \draw[mui] (eda) -- (split);
+  \draw[mui] (split) -- (scale);
+  \draw[mui] (scale) -- (win);
+  \draw[mui] (win) -- (8.6,-3.1);
+  \draw[mui] (win) |- (8.6,-5.7);
+  \draw[mui] (6.6,-3.1) -- (inv);
+  \draw[mui] (6.6,-5.7) -| (inv);
+  \draw[mui] (inv.west) -| (met.north);
+  \draw[mui] (met) -- (dep);
+  \draw[mui, dashed] (base.west) -- (4.4,-8.5) |- (met.east);
+  \foreach \n/\k in {raw/1, agg/2, eda/3, split/4, scale/5} { \node[buoc] at (\n.north west) {\k}; }
+\end{tikzpicture}

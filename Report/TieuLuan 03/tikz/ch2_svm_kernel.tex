@@ -1,0 +1,29 @@
+\begin{tikzpicture}
+  % ---------- không gian gốc 2D: hai vòng tròn đồng tâm
+  \begin{scope}[shift={(0,0)}]
+    \node[tieude] at (0,3.0) {Không gian gốc $\mathbb{R}^2$};
+    \draw[gray!50, -{Stealth}] (-2.6,0) -- (2.6,0) node[right, font=\small] {$x_1$};
+    \draw[gray!50, -{Stealth}] (0,-2.6) -- (0,2.6) node[above, font=\small] {$x_2$};
+    \foreach \a in {0,30,...,330}{\fill[cBlue] ({0.7*cos(\a)},{0.7*sin(\a)}) circle (2.6pt);}
+    \foreach \a in {15,45,...,345}{\fill[cRed] ({1.9*cos(\a)},{1.9*sin(\a)}) circle (2.6pt);}
+    \draw[dashed, thick, cNavy] (0,0) circle (1.3);
+    \node[font=\small, align=center] at (0,-3.1) {không tách được bằng\\một đường thẳng};
+  \end{scope}
+  \draw[-{Stealth[length=4mm]}, line width=2.5pt, cOrange] (3.0,0.3) -- (4.6,0.3)
+    node[midway, above, font=\small, text=black, align=center] {$\phi(\mathbf{x})=$\\$(x_1,x_2,x_1^2+x_2^2)$};
+  % ---------- không gian đặc trưng 3D
+  \begin{scope}[shift={(8.6,-1.0)}]
+    \begin{axis}[view={40}{20}, width=9.5cm, height=8cm, axis lines=center, xlabel={$x_1$}, ylabel={$x_2$},
+                 zlabel={$x_1^2+x_2^2$}, xmin=-2.4, xmax=2.4, ymin=-2.4, ymax=2.4, zmin=0, zmax=4.4,
+                 ticks=none, anchor=center, label style={font=\small}]
+      \addplot3[surf, opacity=0.35, shader=flat, colormap={g}{rgb255=(255,214,102) rgb255=(255,180,60)},
+                domain=-2.2:2.2, y domain=-2.2:2.2, samples=2] {1.69};
+      \addplot3[only marks, mark=*, mark size=2.6pt, cBlue, samples at={0,30,...,330}, domain=0:330]
+        ({0.7*cos(x)}, {0.7*sin(x)}, {0.49});
+      \addplot3[only marks, mark=*, mark size=2.6pt, cRed, samples at={15,45,...,345}, domain=0:345]
+        ({1.9*cos(x)}, {1.9*sin(x)}, {3.61});
+    \end{axis}
+    \node[font=\small, align=center] at (0,-3.4) {siêu phẳng $z=\text{hằng số}$ tách hai lớp;\\kernel RBF làm điều này ngầm định};
+  \end{scope}
+  \node[tieude] at (8.6,2.9) {Không gian đặc trưng $\mathbb{R}^3$};
+\end{tikzpicture}

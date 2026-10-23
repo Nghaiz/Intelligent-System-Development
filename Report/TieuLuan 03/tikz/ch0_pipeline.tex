@@ -1,0 +1,20 @@
+\begin{tikzpicture}[node distance=0.4cm]
+  \node[csdl=cSlate, minimum width=1.9cm, minimum height=1.8cm, align=center] (d) {Dữ liệu\\gốc};
+  \node[khoi, right=of d, minimum width=2.0cm, minimum height=1.7cm] (c) {Làm sạch\\khảo sát\\EDA};
+  \node[khoiT, right=of c, minimum width=2.0cm, minimum height=1.7cm] (s) {Chia tập\\train / val\\/ test};
+  \node[khoiC, right=of s, minimum width=2.0cm, minimum height=1.7cm] (m) {Huấn luyện\\nhiều\\mô hình};
+  \node[khoiG, right=of m, minimum width=2.0cm, minimum height=1.7cm] (e) {Đánh giá\\chọn\\mô hình};
+  \node[khoiR, right=of e, minimum width=2.0cm, minimum height=1.7cm] (w) {Triển khai\\Web /\\Mobile};
+  \foreach \a/\b in {d/c, c/s, s/m, m/e, e/w} { \draw[mui] (\a) -- (\b); }
+  % vòng điều chỉnh siêu tham số vẽ phía trên hàng khối để nhãn không cắt mũi tên nào bên dưới
+  \draw[muiM=cOrange!70!black, dashed, rounded corners=5pt] (e.north) -- ++(0,0.75) -| node[pos=0.25, above, font=\small, text=cOrange!60!black] {điều chỉnh siêu tham số theo tập validation} (m.north);
+  % ra báo cáo
+  \node[hop=cIndigo, minimum width=4.6cm, below=1.5cm of e, font=\small, align=center] (j) {\texttt{outputs/metrics/*.json}\\số liệu, hình, bảng};
+  \node[hop=cNavy, minimum width=3.6cm, right=0.6cm of j, font=\small, align=center] (r) {\texttt{build.py} $\to$ LaTeX\\báo cáo PDF};
+  \draw[muiM=cIndigo] (e.south) -- (e.south |- j.north);
+  \draw[muiM=cIndigo] (j) -- (r);
+  \node[cau=cYellow, minimum size=11mm, font=\small\bfseries, left=1.2cm of j] (g) {GPU};
+  \node[cau=cSky, minimum size=11mm, font=\small\bfseries, left=0.4cm of g] (cpu) {CPU};
+  \draw[muiM=cBrown, dashed] (g) -- (m);
+  \draw[muiM=cBrown, dashed] (cpu) -- (c);
+\end{tikzpicture}

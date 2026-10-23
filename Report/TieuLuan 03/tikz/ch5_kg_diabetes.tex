@@ -1,0 +1,15 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[hop=cRed, text width=3.6cm, align=left, font=\small, minimum height=3.6cm] (p) at (0,0)
+    {\textbf{Person\_P000000}\\[2pt] has\_age: 80\\ has\_bmi: 25,19\\ has\_hba1c\_level: 6,6\\ has\_blood\_glucose: 140\\ has\_diabetes: 0};
+  \foreach \a/\n/\c/\r [count=\i] in {80/{Gender\_Female}/cOrange/has\_gender, 45/{AgeGroup\_từ 80}/cGreen/in\_age\_group,
+        15/{BMI\_thừa cân}/cTeal/bmi\_class, -15/{HbA1c\_ngưỡng\\chẩn đoán}/cPurple/hba1c\_class,
+        -45/{Glucose\_126--199}/cSky/glucose\_class, -80/{Condition\_\\HeartDisease}/cPink/has\_condition,
+        -110/{Smoking\_never}/cBrown/has\_smoking, 120/{Diabetes\_no}/cSlate/diabetes\_status}{
+    \node[hop=\c, font=\small, text width=2.6cm] (n\i) at ($(0,0)+(\a:6.2)$) {\n};
+    \draw[mui] (p) -- node[nhan, sloped, above, font=\scriptsize] {\r} (n\i);
+  }
+  \node[hop=cRed, font=\small\bfseries, minimum width=2.4cm] (dy) at (9.6,-5.2) {Diabetes\_yes};
+  \draw[muiM=cRed, dashed] (n4) to[bend left=15] node[nhan, right, font=\scriptsize] {indicates} (dy);
+  \draw[muiM=cRed, dashed] (n6) to[bend right=10] node[nhan, below, font=\scriptsize] {comorbid\_with} (dy);
+  \node[vung=cRed, text width=3.0cm, font=\scriptsize, align=center] at (9.9,4.6) {tầng ontology:\\ tri thức nền ADA/WHO,\\ không suy ra từ dữ liệu};
+\end{tikzpicture}

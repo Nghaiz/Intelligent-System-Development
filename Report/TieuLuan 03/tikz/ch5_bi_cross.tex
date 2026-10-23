@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % bi-encoder
+  \node[tieude] at (2.8,6.2) {Bi-encoder (e5, giai đoạn 1)};
+  \node[hop=cRed, minimum width=2.4cm] (q) at (1.4,0) {Câu hỏi $q$};
+  \node[hop=cGreen, minimum width=2.4cm] (d) at (5.2,0) {Tài liệu $d$};
+  \foreach \x/\c/\n in {1.4/cRed/q, 5.2/cGreen/d}{
+    \khoibaD{\x-1.0}{1.0}{2.0}{1.6}{0.8}{\c}
+    \node[font=\small\bfseries, text=white] at (\x,1.8) {Encoder};
+    \foreach \i in {0,...,5}\fill[\c!\the\numexpr 25+12*\i\relax, draw=\c!70!black] (\x-1.05+\i*0.35,3.4) rectangle ++(0.35,0.35);
+    \draw[mui] (\x,0.4) -- (\x,0.95); \draw[mui] (\x,2.9) -- (\x,3.35);
+  }
+  \node[cau=cOrange, minimum size=12mm] (cos) at (3.3,4.9) {cos};
+  \draw[mui] (1.4,3.8) -- (cos); \draw[mui] (5.2,3.8) -- (cos);
+  \node[nhan, text width=6cm, align=center] at (3.3,-1.1) {mã hoá tài liệu trước một lần; nhanh, quét được $10^5$ tài liệu};
+  % cross-encoder
+  \node[tieude] at (12.5,6.2) {Cross-encoder (bge-reranker, giai đoạn 2)};
+  \node[hop=cPurple, minimum width=6.4cm] (pair) at (11.8,0) {[CLS] câu hỏi $q$ [SEP] tài liệu $d$ [SEP]};
+  \khoibaD{9.6}{1.0}{4.4}{2.2}{1.0}{cPurple}
+  \node[font=\small\bfseries, text=white, align=center] at (11.8,2.1) {Transformer\\chú ý chéo $q \leftrightarrow d$};
+  \draw[mui] (11.8,0.4) -- (11.8,0.95);
+  \node[cau=cRed, minimum size=13mm] at (11.8,4.9) {\scriptsize điểm};
+  \draw[mui] (11.8,3.55) -- (11.8,4.25);
+  \node[nhan, text width=6.6cm, align=center] at (11.8,-1.1) {mỗi cặp phải chạy lại mô hình; chính xác hơn nhưng chậm $\Rightarrow$ chỉ dùng cho top-$n$ ứng viên};
+\end{tikzpicture}

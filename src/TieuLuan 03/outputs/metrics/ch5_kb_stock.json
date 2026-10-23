@@ -1,0 +1,165 @@
+{
+ "n_docs": 2390,
+ "n_records": 2271,
+ "n_summaries": 119,
+ "n_rows": 2271,
+ "n_triples": 22817,
+ "graph": {
+  "nodes": 2396,
+  "edges": 6921,
+  "kinds": {
+   "TradingDay": 2271,
+   "Month": 109,
+   "Year": 10,
+   "Move": 6
+  },
+  "relations": {
+   "in_month": 2271,
+   "has_movement": 2271,
+   "next_day": 2270,
+   "in_year": 109
+  },
+  "top_in_degree": [
+   [
+    "Move_tăng",
+    753
+   ],
+   [
+    "Move_đi ngang",
+    744
+   ],
+   [
+    "Move_giảm",
+    586
+   ],
+   [
+    "Move_tăng mạnh",
+    95
+   ],
+   [
+    "Move_giảm mạnh",
+    92
+   ],
+   [
+    "Month_2016-08",
+    23
+   ],
+   [
+    "Month_2017-03",
+    23
+   ],
+   [
+    "Month_2017-08",
+    23
+   ]
+  ],
+  "n_literals": 15896
+ },
+ "vocab": 12212,
+ "doc_len_mean": 43.133054393305436,
+ "doc_len_max": 57,
+ "corpus_s": 0.5015617000026396,
+ "build_kg_s": 0.3738856999989366,
+ "tfidf_s": 0.9572638999961782,
+ "bm25_s": 0.6361610999956611,
+ "doc_len_hist": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1339,
+  931,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  119
+ ],
+ "rdf_demo": {
+  "n_rdf_triples": 220,
+  "turtle_head": "@prefix kg: <http://tl3.vn/kg/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nkg:TradingDay_2020-03-02 kg:has_close 6.94555e+01 ;\n    kg:has_date \"2020-03-02\"^^xsd:date ;\n    kg:has_high 6.95435e+01 ;\n    kg:has_low 6.634075e+01 ;\n    kg:has_movement kg:Move_tăng_mạnh ;\n    kg:has_open 6.75805e+01 ;\n    kg:has_return_pct 3.716781e+00 ;\n    kg:has_volume 48630000 ;\n    kg:in_month kg:Month_2020-03 ;\n    kg:next_day kg:TradingDay_2020-03-03 .\n\nkg:TradingDay_2020-03-03 kg:has_close 6.70695e+01 ;\n    kg:has_date \"2020-03-03\"^^xsd:date ;",
+  "sparql": "PREFIX kg: <http://tl3.vn/kg/>\nSELECT ?day ?close ?ret WHERE {\n  ?day kg:in_month kg:Month_2020-03 ;\n       kg:has_close ?close ;\n       kg:has_return_pct ?ret .\n  FILTER (?ret < -4.0)\n} ORDER BY ?ret",
+  "sparql_rows": [
+   [
+    "TradingDay_2020-03-16",
+    54.21649932861328,
+    -11.100818183495653
+   ],
+   [
+    "TradingDay_2020-03-12",
+    55.74549865722656,
+    -8.268817124654648
+   ],
+   [
+    "TradingDay_2020-03-09",
+    60.77799987792969,
+    -6.380883884145039
+   ],
+   [
+    "TradingDay_2020-03-11",
+    60.77050018310547,
+    -5.075017005983917
+   ],
+   [
+    "TradingDay_2020-03-05",
+    65.9520034790039,
+    -4.866850958054392
+   ],
+   [
+    "TradingDay_2020-03-27",
+    55.53549957275391,
+    -4.393375314977243
+   ]
+  ]
+ },
+ "emb_minilm_s": 50.58267209999758,
+ "emb_e5-small_s": 17.54386610000074,
+ "emb_e5-base_s": 27.7907514000035
+}

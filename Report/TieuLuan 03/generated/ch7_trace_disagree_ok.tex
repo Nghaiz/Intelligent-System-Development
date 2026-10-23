@@ -1,0 +1,20 @@
+\begin{vetsuyluan}{Vết tác tử -- hai Solver bất đồng, Verifier và biểu quyết chọn đúng (PAL đơn lẻ sai) (câu 43, đáp án 48, hệ trả lời 48, 6 lượt gọi, 144{,}9 s)}
+\vetBuoc{cNavy}{CÂU HỎI}{According to its nutritional info, a bag of chips has 250 calories per serving. If a 300g bag has 5 servings, how many grams can you eat if your daily calorie target is 2000 and you have already consumed 1800 calories?}
+\vetBuoc{cIndigo}{PLANNER}{1. Total calories in a bag: 250 calories/serving * 5 servings = 1250 calories 2. Daily calorie target: 2000 calories 3. Calories already consumed: 1800 calories 4. Remaining calories for today: 2000 calories - 1800 calories = 200 calories 5. Calories per gram of chips: 1250 calories / 300 grams = 4.17 grams/calorie 6. Remaining grams of chips: 200 calories / 4.17 grams/calorie ≈ 48.1 grams}
+\vetBuoc{cGreen}{SOLVER-PAL}{def calculate\_remaining\_chips(): total\_calories\_per\_bag = 250 * 5 daily\_calorie\_target = 2000 calories\_consumed = 1800 remaining\_calories = daily\_calorie\_target - calories\_consumed calories\_per\_gram = total\_calories\_per\_bag / 300 remaining\_grams = remaining\_calories / calories\_per\_gram return round(remaining\_grams)}
+\vetBuoc{cOrange}{PYTHON}{lỗi: không có hàm solution()}
+\vetBuoc{cGreen}{SOLVER-PAL}{\texttt{\footnotesize def~solution():}\\
+\texttt{\footnotesize ~~~~total\_calories\_per\_bag~=~250~*~5}\\
+\texttt{\footnotesize ~~~~daily\_calorie\_target~=~2000}\\
+\texttt{\footnotesize ~~~~calories\_consumed~=~1800}\\
+\texttt{\footnotesize ~~~~remaining\_calories~=~daily\_calorie\_target~-~calories\_consumed}\\
+\texttt{\footnotesize ~~~~calories\_per\_gram~=~total\_calories\_per\_bag~/~300}\\
+\texttt{\footnotesize ~~~~remaining\_grams~=~remaining\_calories~/~calories\_per\_gram}\\
+\texttt{\footnotesize ~~~~return~round(remaining\_grams)}}
+\vetBuoc{cOrange}{PYTHON}{kết quả = 48}
+\vetBuoc{cBlue}{SOLVER-CoT}{First, calculate the total calories in the bag: Total calories = Calories per serving × Number of servings Total calories = 250 × 5 = 1250 calories Next, determine how many more calories you need to reach your daily target: Remaining calories needed = Daily calorie target - Calories already consumed Remaining calories needed = 2000 - 1800 = 200 calories Now, find out how many servings correspond to these remaining calories: Servings needed = (Remaining calories needed)/(Calories per serving) Servings needed = (200)/(250) = 0.8 servings Finally, calculate the weight of the additional servings:  ... [lược bớt]}
+\vetBuoc{cRed}{VERIFIER}{The answer is N.}
+\vetBuoc{cTeal}{PAL\#2}{def calculate\_remaining\_calories(): total\_calories\_in\_bag = 250 * 5 daily\_calorie\_target = 2000 calories\_consumed\_today = 1800 remaining\_calories\_for\_today = daily\_calorie\_target - calories\_consumed\_today calories\_per\_gram = total\_calories\_in\_bag / 300 remaining\_grams\_of\_chips = remaining\_calories\_for\_today / calories\_per\_gram return remaining\_grams\_of\_chips Calculate the remaining grams of chips remaining\_grams\_of\_chips = calculate\_remaining\_calories() print(remaining\_grams\_of\_chips)}
+\vetBuoc{cOrange}{PYTHON}{lỗi: không có hàm solution()}
+\vetBuoc{cPurple}{ĐIỀU PHỐI}{phiếu \{48: 1, 1800: 1\} -> chọn 48}
+\end{vetsuyluan}

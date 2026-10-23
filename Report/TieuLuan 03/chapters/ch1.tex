@@ -1,0 +1,722 @@
+% =====================================================================
+%  CHƯƠNG 1 — LỊCH SỬ PHÁT TRIỂN CỦA TRÍ TUỆ NHÂN TẠO — làn L1
+% =====================================================================
+\chapter{Lịch sử phát triển của trí tuệ nhân tạo}\label{chap:lichsu}
+
+Trí tuệ nhân tạo (Artificial Intelligence -- AI) là lĩnh vực nghiên cứu cách xây dựng các hệ thống tính toán có khả năng thực
+hiện những nhiệm vụ mà khi con người làm thì ta gọi là ``thông minh'': nhận biết, suy luận, học từ kinh nghiệm, lập kế hoạch,
+giao tiếp bằng ngôn ngữ và hành động có mục đích trong môi trường \cite{ch1:russell2021}. Lịch sử của AI không phải là một đường
+thẳng đi lên. Đó là chuỗi các chu kỳ: lời hứa lớn, thành công trong phạm vi hẹp, thất vọng khi mở rộng, cắt giảm tài trợ, rồi phục
+hồi dưới một phương pháp mới hoặc một tên gọi mới \cite{ch1:nilsson2010}. Hình~\ref{fig:ch1-timeline} tóm tắt mười giai đoạn chính
+mà chương này lần lượt trình bày; chiều cao mỗi khối thể hiện (một cách định tính) mức kỳ vọng và đầu tư mà xã hội dành cho AI trong
+giai đoạn đó.
+
+\hinhtikz{ch1_timeline3d}{Mười giai đoạn phát triển của AI; chiều cao khối biểu diễn định tính mức kỳ vọng và đầu tư; hai khối thấp số 4 và 6 là hai ``mùa đông AI''}{ch1-timeline}
+
+Trước khi đi vào lịch sử, cần phân biệt các khái niệm thường bị dùng lẫn lộn. Hình~\ref{fig:ch1-venn} cho thấy quan hệ bao hàm:
+AI là lĩnh vực rộng nhất, bao gồm cả các phương pháp không học từ dữ liệu như tìm kiếm, logic và lập kế hoạch; học máy (Machine
+Learning -- ML) là nhánh xây dựng mô hình từ dữ liệu; học sâu (Deep Learning -- DL) là nhánh học máy dùng mạng nơ-ron nhiều tầng;
+AI tạo sinh và mô hình ngôn ngữ lớn (Large Language Model -- LLM) là một phần của học sâu, chuyên sinh nội dung mới.
+
+\begin{dinhnghia}{Định nghĩa 1.1 -- Bốn cách tiếp cận định nghĩa AI}
+Russell và Norvig \cite{ch1:russell2021} xếp các định nghĩa AI theo hai trục: hướng tới \emph{suy nghĩ} hay \emph{hành động}, và lấy chuẩn là
+\emph{con người} hay \emph{tính duy lý}. Từ đó có bốn cách tiếp cận: (1) hành động như người -- tiêu biểu là phép thử Turing;
+(2) suy nghĩ như người -- mô hình hoá nhận thức; (3) suy nghĩ duy lý -- logic hình thức; (4) hành động duy lý -- \emph{tác tử duy lý}
+chọn hành động tối đa hoá kết quả kỳ vọng theo thước đo hiệu năng. Giáo trình hiện đại lấy cách thứ tư làm khung chung.
+\end{dinhnghia}
+
+\hinhtikz{ch1_venn}{Quan hệ bao hàm giữa AI, học máy, học sâu và AI tạo sinh; con số là năm hình thành thuật ngữ hoặc bước ngoặt tương ứng}{ch1-venn}
+
+% ---------------------------------------------------------------------
+\section{Những tiền đề hình thành ý tưởng về AI}
+\subsection{Thần thoại và văn học}
+Ý tưởng về sinh vật nhân tạo có trí tuệ đã xuất hiện từ rất sớm trong văn hoá loài người. Thần thoại Hy Lạp kể về những người hầu
+bằng vàng do thần thợ rèn Hephaestus tạo ra, về người khổng lồ bằng đồng Talos đi tuần quanh đảo Crete, và về bức tượng Galatea được
+ban sự sống. Thời Trung Cổ và đầu cận đại có các truyền thuyết về homunculus của giả kim thuật, về Golem bằng đất sét trong văn hoá
+Do Thái và về chiếc đầu đồng biết nói. Sang thế kỷ XIX và đầu thế kỷ XX, những tác phẩm như \emph{Frankenstein} (1818) của Mary
+Shelley hay vở kịch \emph{R.U.R.} (1921) của Karel Čapek -- nơi từ ``robot'' ra đời -- không chỉ hình dung con người nhân tạo mà còn
+đặt câu hỏi về trách nhiệm của người sáng tạo và việc kiểm soát công nghệ. Những câu hỏi đó, như sẽ thấy ở cuối chương, vẫn còn
+nguyên giá trị trong các tranh luận về an toàn AI ngày nay.
+
+\subsection{Máy tự động}
+Song song với tưởng tượng là các nỗ lực chế tạo. Nhiều nền văn minh đã làm ra máy tự động (automata): tượng thờ chuyển động ở Ai
+Cập và Hy Lạp cổ đại, các thiết bị dùng hơi nước và khí nén của Hero xứ Alexandria, cuốn sách về các cơ cấu tài tình của Al-Jazari
+(đầu thế kỷ XIII) với ban nhạc tự động, rồi người thổi sáo và chú vịt cơ khí nổi tiếng của Jacques de Vaucanson ở thế kỷ XVIII. Các
+cỗ máy này không ``suy nghĩ'', nhưng chúng gợi ra một ý tưởng quan trọng: hành vi phức tạp có thể sinh ra từ cơ chế vật chất được
+sắp đặt khéo léo -- một tiền đề ngầm của mọi chương trình AI về sau.
+
+\subsection{Logic và nỗ lực hình thức hoá suy luận}
+Hướng tiếp cận có ảnh hưởng nhất tới AI giai đoạn đầu cho rằng suy luận có thể biểu diễn bằng ký hiệu và các phép biến đổi xác định.
+Về sau, Newell và Simon gọi đây là \emph{giả thuyết hệ thống ký hiệu vật lý}: một hệ thống thao tác ký hiệu có đủ điều kiện cần và
+đủ cho hành vi thông minh \cite{ch1:newell1976}. Các cột mốc chính trên con đường này gồm:
+\begin{itemize}
+  \item \textbf{Thế kỷ XIII}: Ramon Llull hình dung các ``cỗ máy logic'' kết hợp khái niệm bằng những vòng đĩa xoay, ý tưởng về sau
+        gợi cảm hứng cho Leibniz.
+  \item \textbf{Thế kỷ XVII}: Thomas Hobbes cho rằng lý trí ``chẳng qua là tính toán''; Gottfried Leibniz mơ về một ngôn ngữ phổ quát
+        mà mọi tranh cãi có thể giải quyết bằng câu ``nào, ta hãy tính''.
+  \item \textbf{Thế kỷ XIX}: George Boole (1854) đại số hoá logic; Gottlob Frege (1879) xây dựng logic vị từ; đầu thế kỷ XX, Russell
+        và Whitehead viết \emph{Principia Mathematica} nhằm đặt toán học trên nền logic.
+  \item \textbf{Thập niên 1930}: định lý bất toàn của Gödel (1931), máy Turing và phép tính lambda của Church (1936) xác định cả sức
+        mạnh lẫn giới hạn của tính toán hình thức. Luận đề Church--Turing phát biểu rằng mọi hàm ``tính được bằng một quy trình hữu
+        hiệu'' đều tính được bằng máy Turing, đồng thời có những bài toán (như bài toán dừng) không thuật toán nào giải được.
+\end{itemize}
+
+\subsection{Khoa học máy tính và máy tính điện tử}
+Charles Babbage thiết kế Máy giải tích (Analytical Engine) dùng thẻ đục lỗ, có ``kho'' (bộ nhớ) và ``xưởng'' (bộ xử lý), hỗ trợ vòng
+lặp và rẽ nhánh. Ada Lovelace, trong các ghi chú năm 1843, nhận ra máy có thể xử lý ký hiệu chứ không chỉ con số, nhưng cũng cảnh báo
+rằng máy ``không có tham vọng khởi tạo điều gì'' -- một phản biện mà Turing về sau phải trả lời. Máy tính điện tử hiện đại xuất hiện
+trong và sau Chiến tranh thế giới thứ hai (Z3 của Zuse, Colossus, ENIAC). Kiến trúc chương trình lưu trữ hình thành trong thiết kế
+EDVAC và được phổ biến qua báo cáo năm 1945 của John von Neumann. Lần đầu tiên, con người có một cỗ máy đa năng đủ nhanh để thử
+nghiệm các ý tưởng về trí tuệ bằng chương trình.
+
+% ---------------------------------------------------------------------
+\section{Sự khai sinh của AI (1941--1956)}
+\subsection{Điều khiển học, lý thuyết thông tin và nơ-ron nhân tạo}
+Thập niên 1940--1950 chứng kiến sự hội tụ của nhiều dòng nghiên cứu. Norbert Wiener khai sinh điều khiển học (cybernetics), nghiên
+cứu cơ chế phản hồi trong động vật và máy móc \cite{ch1:wiener1948}. Claude Shannon đặt nền cho lý thuyết thông tin
+\cite{ch1:shannon1948} và phân tích cách lập trình máy chơi cờ vua \cite{ch1:shannon1950}. Năm 1943, McCulloch và Pitts mô tả một
+mô hình nơ-ron lý tưởng hoá có hai trạng thái và chứng minh rằng mạng các nơ-ron như vậy có thể thực hiện mọi biểu thức logic
+\cite{ch1:mcculloch1943}. Nơ-ron McCulloch--Pitts tính tổng có trọng số của các đầu vào và so với một ngưỡng:
+\begin{equation}
+  \hat y = \begin{cases} 1 & \text{nếu } \displaystyle\sum_{i=1}^{n} w_i x_i + b \ge 0,\\[4pt] 0 & \text{ngược lại.}\end{cases}
+  \label{eq:ch1-mcp}
+\end{equation}
+Mô hình này, cùng quy tắc học mà Rosenblatt bổ sung mười lăm năm sau (Hình~\ref{fig:ch1-neuron}), là tổ tiên trực tiếp của mọi mạng
+nơ-ron trong các Chương~2--7.
+
+\hinhtikz{ch1_neuron}{Nơ-ron McCulloch--Pitts (1943) và quy tắc học Perceptron (1958): tổng có trọng số đi qua hàm ngưỡng; trọng số chỉ được cập nhật khi dự đoán sai}{ch1-neuron}
+
+\subsection{Turing và câu hỏi ``máy có thể suy nghĩ?''}
+Năm 1950, Alan Turing công bố bài báo \emph{Computing Machinery and Intelligence} \cite{ch1:turing1950}. Thay vì tranh luận về định
+nghĩa của ``suy nghĩ'', ông đề xuất \emph{trò chơi bắt chước}: một người hỏi (C) trao đổi bằng văn bản với hai đối tượng ẩn, một
+người (B) và một máy (A); nếu C không phân biệt được đâu là máy một cách đáng tin cậy, ta có lý do để nói máy ``thông minh''
+(Hình~\ref{fig:ch1-turing}a). Điểm tinh tế của phép thử là dùng \emph{hành vi quan sát được} thay cho câu hỏi về ý thức vốn khó định
+nghĩa. Bài báo còn dự đoán và phản bác trước nhiều phản biện, trong đó có phản biện của Lovelace, và đề xuất ý tưởng ``máy trẻ em''
+được giáo dục để học thay vì lập trình sẵn mọi thứ -- một tiên đoán sớm về học máy.
+
+Ba mươi năm sau, John Searle đưa ra thí nghiệm tư duy \emph{căn phòng tiếng Trung} để phản bác cách hiểu mạnh của phép thử
+\cite{ch1:searle1980}: một người không biết tiếng Trung, ngồi trong phòng với một cuốn sổ luật, có thể trả lời đúng các câu hỏi
+tiếng Trung bằng cách tra luật thao tác ký hiệu (Hình~\ref{fig:ch1-turing}b). Người bên ngoài thấy câu trả lời hợp lý, nhưng
+người trong phòng không hiểu gì. Theo Searle, thao tác cú pháp đúng quy tắc chưa đủ để có ngữ nghĩa. Cuộc tranh luận này trở lại
+mạnh mẽ trong thời đại LLM: các mô hình sinh văn bản trôi chảy, nhưng chúng ``hiểu'' theo nghĩa nào vẫn là câu hỏi mở.
+
+\hinhtikz{ch1_turing}{(a) Phép thử Turing đánh giá trí tuệ qua hành vi hội thoại; (b) thí nghiệm căn phòng tiếng Trung của Searle phân biệt cú pháp với ngữ nghĩa}{ch1-turing}
+
+\subsection{Những chương trình đầu tiên}
+Năm 1951, Marvin Minsky và Dean Edmonds chế tạo SNARC, một trong những máy mô phỏng mạng nơ-ron đầu tiên với khoảng bốn mươi
+``nơ-ron''. Cùng thời gian, Christopher Strachey viết chương trình chơi cờ đam và Dietrich Prinz viết chương trình cờ vua trên máy
+Ferranti Mark~1. Arthur Samuel tại IBM phát triển chương trình chơi cờ đam tự cải thiện qua kinh nghiệm và năm 1959 dùng cụm từ
+``học máy'' (machine learning) để mô tả việc máy học mà không cần lập trình tường minh \cite{ch1:samuel1959}. Năm 1955--1956,
+Allen Newell, Herbert Simon và Cliff Shaw viết \emph{Logic Theorist}, chương trình chứng minh được 38 trong 52 định lý đầu tiên ở
+Chương~2 của \emph{Principia Mathematica}, có định lý còn được chứng minh gọn hơn bản gốc \cite{ch1:newell1956}. Đây là ví dụ tiêu
+biểu đầu tiên của AI biểu tượng: suy luận bằng tìm kiếm trên không gian các biểu thức logic, có dùng heuristic để cắt tỉa.
+
+\subsection{Hội thảo Dartmouth 1956}
+Mùa hè năm 1956, John McCarthy, Marvin Minsky, Nathaniel Rochester và Claude Shannon tổ chức một hội thảo kéo dài khoảng tám tuần
+tại Đại học Dartmouth. Bản đề xuất gửi Quỹ Rockefeller ngày 31/8/1955 dùng cụm từ ``trí tuệ nhân tạo'' và nêu giả thuyết làm việc:
+\emph{``mọi khía cạnh của việc học hay bất kỳ đặc điểm nào khác của trí thông minh, về nguyên tắc, đều có thể được mô tả chính xác
+đến mức có thể chế tạo một cỗ máy mô phỏng nó''} \cite{ch1:mccarthy2006}. Hội thảo không tạo ra đột phá kỹ thuật cụ thể, nhưng tập
+hợp những người sẽ dẫn dắt lĩnh vực trong hai thập niên tiếp theo và biến ``trí tuệ nhân tạo'' thành tên gọi chung. Vì vậy, 1956
+thường được xem là năm khai sinh chính thức của AI như một ngành học thuật. Cùng năm, tại một hội nghị ở MIT, Newell và Simon trình
+bày Logic Theorist, Noam Chomsky trình bày ngữ pháp tạo sinh, George Miller bàn về giới hạn ``bảy cộng trừ hai'' của trí nhớ ngắn
+hạn -- các sự kiện góp phần khởi đầu ``cách mạng nhận thức''.
+
+% ---------------------------------------------------------------------
+\section{Thành công bước đầu (1956--1974)}
+Trong gần hai thập niên sau Dartmouth, các chương trình máy tính giải được bài toán đại số viết bằng lời, chứng minh định lý hình học,
+lập kế hoạch cho robot và đối thoại đơn giản bằng tiếng Anh. Thành công diễn ra trong môi trường hẹp nhưng đủ ấn tượng để nhiều nhà
+nghiên cứu tin rằng khó khăn còn lại chủ yếu là vấn đề quy mô. Cơ quan Dự án Nghiên cứu Cao cấp ARPA (tiền thân của DARPA) đầu tư
+mạnh; các phòng thí nghiệm AI hình thành tại MIT, Carnegie Mellon, Stanford và Edinburgh. McCarthy công bố ngôn ngữ Lisp năm 1958,
+công cụ chủ đạo của AI trong ba mươi năm.
+
+\subsection{Giải quyết vấn đề bằng tìm kiếm}
+Nhiều chương trình thời kỳ này mô hình hoá bài toán như một \emph{không gian trạng thái}: mỗi trạng thái là một nút, mỗi phép biến
+đổi là một cạnh, lời giải là đường đi từ trạng thái đầu tới trạng thái đích. Trở ngại lớn là \emph{bùng nổ tổ hợp}: với hệ số rẽ
+nhánh $b$ và độ sâu $d$, số trạng thái cần xét tăng theo
+\begin{equation}
+  N(b,d) = \sum_{k=0}^{d} b^{k} = \frac{b^{d+1}-1}{b-1} = O\!\left(b^{d}\right),
+  \label{eq:ch1-search}
+\end{equation}
+nên tìm kiếm vét cạn nhanh chóng trở thành bất khả thi (Hình~\ref{fig:ch1-search}). Lời giải là các \emph{heuristic} -- quy tắc
+kinh nghiệm hướng tìm kiếm về phía hứa hẹn. General Problem Solver (GPS) của Newell và Simon (1957--1959) cố tổng quát hoá phương
+pháp ``phân tích phương tiện -- mục đích'', nhưng vẫn phụ thuộc vào việc con người mô tả bài toán phù hợp. Các chương trình khác gồm
+máy chứng minh định lý hình học của Gelernter (1959), SAINT giải tích phân của Slagle (1961) và hệ lập kế hoạch STRIPS (1971) cho
+robot Shakey -- robot di động đầu tiên biết suy luận về hành động của chính nó. Thuật toán A* (1968) ra đời từ dự án Shakey vẫn
+được dùng rộng rãi đến nay.
+
+\hinhtikz{ch1_search}{Bùng nổ tổ hợp trong cây tìm kiếm với hệ số rẽ nhánh $b=3$: số nút tăng theo $b^d$; với cờ vua, không gian trạng thái vượt xa khả năng vét cạn}{ch1-search}
+
+\subsection{Xử lý ngôn ngữ tự nhiên}
+STUDENT của Daniel Bobrow (1964) chuyển các bài toán đại số viết bằng tiếng Anh thành phương trình rồi giải, trong một phạm vi ngôn
+ngữ giới hạn. Ross Quillian đề xuất mạng ngữ nghĩa (semantic network) để biểu diễn khái niệm và quan hệ -- tổ tiên trực tiếp của đồ
+thị tri thức ở Chương~5. ELIZA của Joseph Weizenbaum (1964--1966) mô phỏng một nhà trị liệu tâm lý bằng cách khớp mẫu từ khoá và
+phản hồi lại câu của người dùng \cite{ch1:weizenbaum1966}. Dù chương trình không hiểu nội dung, nhiều người dùng vẫn phản ứng như thể
+nó thấu hiểu họ; hiện tượng gán cho máy sự hiểu biết vượt quá thực tế về sau được gọi là \emph{hiệu ứng ELIZA}.
+
+\subsection{Thế giới thu nhỏ (microworlds)}
+Minsky và Papert chủ trương nghiên cứu trí tuệ trong các ``thế giới thu nhỏ'' có cấu trúc đơn giản, tiêu biểu là thế giới các khối
+hình học trên mặt bàn. SHRDLU của Terry Winograd (1968--1970) cho phép người dùng ra lệnh và hỏi bằng tiếng Anh về các khối; chương
+trình phân tích câu, cập nhật tri thức về thế giới, lập kế hoạch và điều khiển một cánh tay robot mô phỏng \cite{ch1:winograd1972}.
+Chính việc giới hạn phạm vi giúp ngôn ngữ, suy luận và hành động phối hợp được trong một hệ thống -- nhưng cũng là lý do hệ thống
+không thể mở rộng ra thế giới thực.
+
+\subsection{Perceptron và mạng nơ-ron thời kỳ đầu}
+Năm 1958, Frank Rosenblatt công bố Perceptron, máy học phân loại bằng cách điều chỉnh trọng số mỗi khi dự đoán sai
+\cite{ch1:rosenblatt1958}:
+\begin{equation}
+  w_i \leftarrow w_i + \eta\,(y - \hat y)\,x_i, \qquad b \leftarrow b + \eta\,(y-\hat y),
+  \label{eq:ch1-perceptron}
+\end{equation}
+trong đó $\eta$ là tốc độ học. Định lý hội tụ Perceptron bảo đảm thuật toán dừng sau hữu hạn bước nếu dữ liệu \emph{tách được tuyến
+tính}. Widrow và Hoff xây dựng ADALINE với quy tắc bình phương tối thiểu \cite{ch1:widrow1960}. Tuy nhiên, Perceptron một lớp chỉ
+vẽ được một siêu phẳng phân chia; nó học được AND và OR nhưng không học được XOR (Hình~\ref{fig:ch1-xor}). Cuốn \emph{Perceptrons}
+(1969) của Minsky và Papert phân tích chặt chẽ các giới hạn này \cite{ch1:minsky1969}. Dù kết luận chủ yếu áp dụng cho mạng một lớp,
+cộng đồng khi đó chưa có phương pháp huấn luyện mạng nhiều lớp phổ biến, nên tài trợ cho hướng nơ-ron giảm mạnh và trường phái kết
+nối bị đẩy ra ngoài dòng chính khoảng mười lăm năm.
+
+\hinhtikz{ch1_xor}{AND và OR tách được bằng một đường thẳng, XOR thì không: giới hạn cốt lõi của Perceptron một lớp mà Minsky và Papert chỉ ra năm 1969}{ch1-xor}
+
+\subsection{Những dự đoán quá lạc quan}
+Thành công ban đầu khiến các nhà tiên phong đưa ra những dự đoán táo bạo. Năm 1958, Simon và Newell dự đoán trong mười năm máy tính
+sẽ vô địch cờ vua thế giới và chứng minh một định lý toán học quan trọng. Năm 1965, Simon viết rằng trong hai mươi năm máy sẽ làm được
+mọi việc con người làm. Năm 1967, Minsky cho rằng ``trong một thế hệ'' vấn đề tạo ra AI về cơ bản sẽ được giải quyết; năm 1970, ông
+nói với tạp chí \emph{Life} rằng trong ba đến tám năm sẽ có máy với trí thông minh tổng quát ngang người bình thường. Không dự đoán
+nào thành hiện thực đúng hạn: máy tính chỉ thắng nhà vô địch cờ vua sau gần bốn mươi năm.
+
+\subsection{Nguồn tài trợ}
+Năm 1963, ARPA cấp cho MIT 2,2 triệu đô la cho Project MAC, rồi khoảng 3 triệu đô la mỗi năm đến đầu thập niên 1970. J.~C.~R.~
+Licklider, người đứng đầu văn phòng xử lý thông tin của ARPA, chủ trương ``tài trợ cho con người, không phải cho dự án'', tạo ra một
+môi trường nghiên cứu tự do hiếm có. Tình hình thay đổi sau Tu chính án Mansfield (1969), khi kinh phí quốc phòng phải gắn với nhiệm
+vụ quân sự cụ thể -- một trong những nguyên nhân dẫn tới mùa đông AI.
+
+% ---------------------------------------------------------------------
+\section{Mùa đông AI lần thứ nhất (1974--1980)}
+Từ đầu đến giữa thập niên 1970, nhiều dự án AI mất tài trợ vì không đạt mục tiêu đã hứa. Các hệ thống giải tốt bài toán thu nhỏ nhưng
+thất bại khi số khả năng tăng lên hoặc khi gặp tình huống ngoài phạm vi lập trình. Hình~\ref{fig:ch1-hype} minh hoạ định tính chu kỳ
+kỳ vọng -- tài trợ qua hai mùa đông. Cũng cần lưu ý tên gọi ``mùa đông'' dễ gây hiểu lầm: các đợt cắt giảm tập trung vào một số phòng
+thí nghiệm lớn phụ thuộc chính phủ Anh hoặc DARPA, trong khi cộng đồng nghiên cứu AI nói chung vẫn tiếp tục tăng về số lượng.
+
+\hinhtikz{ch1_hype}{Chu kỳ kỳ vọng và tài trợ cho AI (minh hoạ định tính): hai mùa đông xen giữa các đợt bùng nổ, rồi tăng trưởng liên tục từ 2012}{ch1-hype}
+
+\subsection{Các sự kiện chính}
+\begin{itemize}
+  \item \textbf{Báo cáo ALPAC (1966)}: kết luận dịch máy chậm hơn, đắt hơn và kém chính xác hơn dịch giả người, dẫn đến cắt giảm phần
+        lớn kinh phí liên bang Hoa Kỳ cho dịch máy \cite{ch1:alpac1966}.
+  \item \textbf{Báo cáo Lighthill (1973)}: theo yêu cầu của Hội đồng Nghiên cứu Khoa học Anh, James Lighthill kết luận AI chưa đạt
+        các ``mục tiêu khoa trương'' và nhấn mạnh vấn đề bùng nổ tổ hợp \cite{ch1:lighthill1973}. Chính phủ Anh cắt giảm mạnh tài trợ,
+        chỉ còn vài trung tâm như Edinburgh, Essex, Sussex duy trì nghiên cứu; đầu tư lớn chỉ trở lại năm 1983 với Chương trình Alvey.
+  \item \textbf{DARPA thay đổi chính sách}: chương trình Hiểu lời nói (Speech Understanding Research, 1971) kết thúc giữa thập niên
+        1970 với hệ HARPY của Carnegie Mellon, chỉ hoạt động tốt trên các câu đã chuẩn bị với từ vựng giới hạn; DARPA chuyển sang tài
+        trợ các dự án có mục tiêu ứng dụng rõ ràng.
+\end{itemize}
+
+\subsection{Giới hạn kỹ thuật}
+Nhìn lại, mùa đông thứ nhất có nguyên nhân sâu xa từ năm giới hạn: (1) phần cứng thiếu bộ nhớ và tốc độ; (2) bùng nổ tổ hợp làm tìm
+kiếm vét cạn bất khả thi; (3) thiếu \emph{tri thức thường thức} -- con người dựa vào khối kiến thức nền khổng lồ ít khi được phát biểu
+thành lời; (4) hệ thống phụ thuộc miền hẹp, quy tắc viết sẵn không còn đúng khi bối cảnh đổi; (5) khả năng học hạn chế, tri thức chủ
+yếu do người lập trình cung cấp. Nghịch lý Moravec về sau tóm tắt một điều bất ngờ: những việc khó với người (chứng minh định lý, chơi
+cờ) lại tương đối dễ với máy, còn những việc trẻ nhỏ làm dễ dàng (nhìn, đi lại, cầm nắm) lại cực khó.
+
+\subsection{Phê bình nền tảng}
+Hubert Dreyfus lập luận rằng con người không chủ yếu suy nghĩ bằng quy tắc tường minh trên các ký hiệu tách rời, mà dựa vào kỹ năng
+thực hành, bối cảnh và cơ thể \cite{ch1:dreyfus1972}. Weizenbaum, sau trải nghiệm với ELIZA, cho rằng không phải việc gì máy làm được
+cũng nên giao cho máy. Searle với căn phòng tiếng Trung đặt câu hỏi liệu thao tác ký hiệu có tạo ra hiểu biết \cite{ch1:searle1980}.
+Các phê bình này không chặn đứng lĩnh vực, nhưng buộc cộng đồng nhìn thẳng vào khoảng cách giữa thành tích trong phòng thí nghiệm và
+trí tuệ thực sự.
+
+\subsection{Hướng nghiên cứu mới}
+Trước giới hạn của phương pháp tổng quát, các nhóm chuyển sang \emph{biểu diễn tri thức cụ thể}: lập trình logic với nguyên lý phân
+giải của Robinson và ngôn ngữ Prolog (1972), cấu trúc khung (frame) của Minsky (1975), kịch bản (script) của Schank và Abelson, logic
+mặc định của Reiter cho suy luận có thể rút lại. Thông điệp chung là: \emph{sức mạnh nằm ở tri thức}. Sự chuyển hướng này đặt nền
+cho thời kỳ hệ chuyên gia.
+
+% ---------------------------------------------------------------------
+\section{Hệ chuyên gia (1980--1987)}
+Đầu thập niên 1980, AI phục hồi nhờ \emph{hệ chuyên gia}: chương trình giải quyết vấn đề trong một lĩnh vực hẹp bằng tri thức thu thập
+từ chuyên gia, thường dưới dạng luật ``NẾU -- THÌ'' cùng một máy suy diễn. Kiến trúc điển hình (Hình~\ref{fig:ch1-expert}) gồm cơ sở
+tri thức chứa luật, bộ nhớ làm việc chứa sự kiện của ca đang xét, máy suy diễn áp dụng luật theo chiều tiến (từ dữ kiện tới kết luận)
+hoặc chiều lùi (từ giả thuyết tìm bằng chứng), mô-đun giải thích trả lời ``vì sao'' và ``như thế nào'', cùng giao diện hỏi đáp. Ưu điểm
+lớn của kiến trúc này là \emph{giải thích được} từng bước suy luận -- điều mà các mô hình học sâu hiện đại vẫn đang cố đạt lại.
+
+\hinhtikz{ch1_expert}{Kiến trúc hệ chuyên gia: tri thức chuyên gia được kỹ sư tri thức mã hoá thành luật; máy suy diễn kết hợp luật với sự kiện của ca đang xét và giải thích kết luận}{ch1-expert}
+
+\subsection{Các hệ thống tiêu biểu}
+\begin{table}[H]\centering
+\caption{Một số hệ chuyên gia tiêu biểu}\label{tab:ch1-expert}
+\small
+\begin{tabular}{@{}L{0.17\linewidth}L{0.15\linewidth}L{0.30\linewidth}L{0.31\linewidth}@{}}
+\toprule
+\textbf{Hệ thống} & \textbf{Thời gian} & \textbf{Lĩnh vực} & \textbf{Điểm đáng chú ý} \\
+\midrule
+DENDRAL & từ 1965 & Suy cấu trúc phân tử từ dữ liệu khối phổ & Hệ chuyên gia đầu tiên, khởi đầu ``kỹ thuật tri thức'' \\
+MYCIN & 1972--1976 & Chẩn đoán nhiễm khuẩn máu, chọn kháng sinh & Khoảng 600 luật, hệ số chắc chắn; trong đánh giá mù, khuyến nghị được chấm ngang chuyên gia \cite{ch1:shortliffe1976,ch1:buchanan1984} \\
+PROSPECTOR & cuối 1970 & Thăm dò khoáng sản & Suy luận xác suất theo kiểu Bayes \\
+R1/XCON & từ 1980 & Cấu hình máy VAX cho DEC & Hàng nghìn luật, ước tính tiết kiệm hàng chục triệu đô la mỗi năm \cite{ch1:mcdermott1982} \\
+Cyc & từ 1984 & Tri thức thường thức & Nỗ lực mã hoá hàng triệu khẳng định thường thức \cite{ch1:lenat1995} \\
+\bottomrule
+\end{tabular}
+\end{table}
+\nhanxet{Thành công của XCON khiến nhiều tập đoàn lập nhóm AI nội bộ; đến giữa thập niên 1980, chi tiêu doanh nghiệp cho AI ước tính
+vượt một tỷ đô la mỗi năm, nuôi sống cả một ngành công nghiệp máy Lisp và phần mềm hệ chuyên gia (Symbolics, Lisp Machines,
+IntelliCorp, Teknowledge). Edward Feigenbaum gọi đây là nguyên lý ``tri thức là sức mạnh'': năng lực của hệ chuyên gia đến chủ yếu từ
+lượng tri thức cụ thể được mã hoá, không phải từ thuật toán suy luận tinh vi.}
+
+\subsection{Đầu tư cấp quốc gia}
+Năm 1981, Nhật Bản công bố Dự án Máy tính Thế hệ thứ Năm với ngân sách dự kiến khoảng 850 triệu đô la, dựa trên lập trình logic và máy
+tính song song, với mục tiêu hội thoại, dịch máy và suy luận ở mức con người. Phản ứng lại, Anh khởi động Chương trình Alvey (khoảng 350
+triệu bảng), Hoa Kỳ thành lập tập đoàn MCC và Sáng kiến Điện toán Chiến lược của DARPA với các dự án xe tự hành, hỗ trợ phi công và nhận
+dạng tiếng nói.
+
+\subsection{Mạng nơ-ron quay lại}
+Song song với hệ chuyên gia, trường phái kết nối hồi sinh. John Hopfield (1982) chỉ ra một mạng hồi quy có thể hoạt động như bộ nhớ liên
+tưởng với hàm năng lượng giảm dần \cite{ch1:hopfield1982}; Ackley, Hinton và Sejnowski đề xuất máy Boltzmann (1985). Bước ngoặt là bài
+báo năm 1986 của Rumelhart, Hinton và Williams phổ biến thuật toán \emph{lan truyền ngược} (backpropagation) \cite{ch1:rumelhart1986},
+dùng quy tắc chuỗi để tính đạo hàm của hàm mất mát $\mathcal{L}$ theo trọng số của mọi tầng:
+\begin{equation}
+  \frac{\partial \mathcal{L}}{\partial w^{(l)}_{ij}} = \delta^{(l)}_j\, a^{(l-1)}_i, \qquad
+  \delta^{(l)}_j = \sigma'\!\left(z^{(l)}_j\right) \sum_{k} w^{(l+1)}_{jk}\, \delta^{(l+1)}_k .
+  \label{eq:ch1-backprop}
+\end{equation}
+Mạng nhiều lớp huấn luyện bằng lan truyền ngược giải được XOR và nhiều bài toán phi tuyến khác, trả lời trực tiếp phê bình của
+\emph{Perceptrons}. Tuy vậy, năng lực tính toán, dữ liệu có nhãn và các khó khăn khi huấn luyện mạng sâu (như gradient biến mất,
+xem Chương~4) khiến mạng nơ-ron chưa thay thế được các phương pháp khác ở giai đoạn này.
+
+% ---------------------------------------------------------------------
+\section{Mùa đông AI lần thứ hai (1987 -- khoảng 1993)}
+Từ cuối thập niên 1980, thị trường hệ chuyên gia và phần cứng AI chuyên dụng suy giảm nhanh; nhiều công ty đóng cửa, chương trình công
+thu hẹp, và cụm từ ``trí tuệ nhân tạo'' mất sức hấp dẫn với nhà đầu tư.
+
+\subsection{Nguyên nhân}
+\begin{itemize}
+  \item \textbf{Sụp đổ thị trường máy Lisp (1987)}: máy trạm Unix của Sun và máy tính cá nhân rẻ hơn, mạnh hơn, chạy được Lisp, khiến
+        máy chuyên dụng đắt tiền mất lý do tồn tại; một ngành có doanh thu khoảng nửa tỷ đô la tan rã trong một năm.
+  \item \textbf{Giới hạn của hệ chuyên gia}: chi phí bảo trì cao, phải cập nhật tri thức thủ công, không tự học, và ``giòn'' khi gặp
+        tình huống ngoài luật. ``Nút thắt thu thập tri thức'' (knowledge acquisition bottleneck) -- chuyên gia khó diễn đạt hết suy luận
+        ngầm -- trở thành rào cản cơ bản.
+  \item \textbf{Dự án Thế hệ thứ Năm kết thúc (1992)} mà chưa đạt các mục tiêu rộng như hội thoại tự nhiên, dù để lại kết quả có giá trị
+        về kiến trúc song song và lập trình logic.
+  \item \textbf{DARPA thu hẹp}: từ 1987, ban lãnh đạo mới yêu cầu giá trị ứng dụng rõ ràng và cắt giảm mạnh tài trợ cho AI tổng quát.
+\end{itemize}
+
+\begin{table}[H]\centering
+\caption{So sánh hai mùa đông AI}\label{tab:ch1-winters}
+\small
+\begin{tabular}{@{}L{0.20\linewidth}L{0.37\linewidth}L{0.37\linewidth}@{}}
+\toprule
+\textbf{Tiêu chí} & \textbf{Mùa đông thứ nhất (1974--1980)} & \textbf{Mùa đông thứ hai (1987--1993)} \\
+\midrule
+Kỳ vọng trước đó & AI tổng quát trong một thế hệ & Hệ chuyên gia thay thế chuyên gia người \\
+Nguyên nhân kỹ thuật & Bùng nổ tổ hợp, thiếu tri thức thường thức, Perceptron một lớp & Nút thắt thu thập tri thức, hệ thống giòn, không tự học \\
+Nguyên nhân kinh tế & Báo cáo ALPAC, Lighthill; DARPA đổi chính sách & Sụp đổ thị trường máy Lisp; kết thúc dự án Thế hệ thứ Năm \\
+Hướng đi sau đó & Biểu diễn tri thức chuyên biệt & Phương pháp xác suất, học máy thống kê \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Những hướng đi vẫn phát triển}
+Trong mùa đông, nhiều hướng nghiên cứu vẫn tiến triển và về sau trở thành chủ lưu. Rodney Brooks chủ trương \emph{trí tuệ hiện thân}:
+robot không cần mô hình biểu tượng đầy đủ về thế giới trước khi hành động, mà có thể xây dựng hành vi từ các tầng phản xạ gắn trực tiếp
+với cảm biến \cite{ch1:brooks1991}. Judea Pearl đưa mạng Bayes vào suy luận dưới bất định \cite{ch1:pearl1988}; mô hình Markov ẩn
+thống trị nhận dạng tiếng nói. Học tăng cường phát triển với học sai lệch thời gian của Sutton và Q-learning của Watkins (1989)
+\cite{ch1:sutton2018}; TD-Gammon của Tesauro (1992) tự học chơi cờ tào cáo (backgammon) đến trình độ gần nhà vô địch chỉ bằng tự đấu
+\cite{ch1:tesauro1995}.
+
+% ---------------------------------------------------------------------
+\section{Sự phục hồi: kỷ nguyên học máy thống kê (1993--2011)}
+\subsection{AI đi vào ứng dụng nhưng ít được gọi tên}
+Kỹ thuật từ nghiên cứu AI lặng lẽ đi vào nhận dạng tiếng nói, phân loại văn bản, lọc thư rác, phát hiện gian lận thẻ tín dụng, hỗ trợ
+chẩn đoán, lập lịch hậu cần và tìm kiếm trên Internet, nhưng thường không được quảng bá là ``AI''. Đây là \emph{hiệu ứng AI}: khi một
+phương pháp trở nên thông dụng, người ta không còn xem nó là trí tuệ nhân tạo. Nhiều nhà nghiên cứu chủ động dùng tên khác như học máy,
+khai phá dữ liệu, trí tuệ tính toán hay hệ thống dựa trên tri thức để tránh định kiến của hai mùa đông.
+
+\subsection{Hướng toán học và thực nghiệm}
+Nghiên cứu ngày càng dựa vào xác suất, thống kê và tối ưu hoá, và đánh giá trên \emph{tập dữ liệu chung} bằng \emph{chỉ số định lượng}.
+Trung tâm của cách làm này là định lý Bayes, nền tảng của bộ phân loại Naive Bayes (Chương~2):
+\begin{equation}
+  P(y \mid \mathbf{x}) = \frac{P(\mathbf{x}\mid y)\,P(y)}{P(\mathbf{x})}
+  \;\propto\; P(y)\prod_{j=1}^{d} P(x_j \mid y) .
+  \label{eq:ch1-bayes}
+\end{equation}
+Dấu tỉ lệ ở vế phải dựa trên giả thiết các đặc trưng độc lập có điều kiện khi biết lớp $y$.
+Mô hình \emph{tác tử thông minh} trở thành khung thống nhất: hệ thống AI là tác tử nhận tri giác từ môi trường, chọn hành động và tác động
+trở lại; tác tử duy lý chọn hành động tốt nhất theo thông tin hiện có và thước đo đã xác định \cite{ch1:russell2021}. Các hệ thống thời
+kỳ này là ``AI hẹp'', được xây cho một hoặc vài nhiệm vụ rõ ràng.
+
+\subsection{Tiến bộ học máy}
+\begin{itemize}
+  \item \textbf{1986}: cây quyết định ID3 của Quinlan \cite{ch1:quinlan1986}, về sau là C4.5 và CART.
+  \item \textbf{1995}: máy vector hỗ trợ (SVM) của Cortes và Vapnik, kết hợp lề cực đại với thủ thuật hạt nhân \cite{ch1:cortes1995};
+        cùng giai đoạn là AdaBoost của Freund và Schapire.
+  \item \textbf{1997}: mạng LSTM của Hochreiter và Schmidhuber dùng cổng điều khiển để học phụ thuộc dài trong chuỗi
+        \cite{ch1:hochreiter1997} (Chương~4).
+  \item \textbf{1998}: LeNet-5 và mạng tích chập của LeCun cùng cộng sự đọc chữ viết tay và séc ngân hàng \cite{ch1:lecun1998}
+        (Chương~3), kèm bộ dữ liệu MNIST.
+  \item \textbf{2001}: rừng ngẫu nhiên của Breiman tổng hợp nhiều cây quyết định để giảm phương sai.
+  \item \textbf{2006}: Hinton, Osindero và Teh huấn luyện mạng niềm tin sâu theo từng tầng \cite{ch1:hinton2006}, khởi đầu tên gọi
+        ``học sâu''.
+\end{itemize}
+
+\subsection{Cột mốc ứng dụng}
+Ngày 11/5/1997, Deep Blue của IBM đánh bại nhà vô địch cờ vua thế giới Garry Kasparov trong trận đấu sáu ván, nhờ phần cứng tìm kiếm
+chuyên dụng, xử lý song song, hàm đánh giá phức tạp và cơ sở dữ liệu khai cuộc -- tàn cuộc \cite{ch1:campbell2002}; hệ thống không được
+thiết kế để học hay suy luận ngoài cờ vua. Năm 2005, xe tự hành Stanley của Stanford chiến thắng DARPA Grand Challenge sau khoảng 212~km
+đường sa mạc \cite{ch1:thrun2006}; năm 2007, Boss của Carnegie Mellon thắng Urban Challenge trong môi trường đô thị mô phỏng. Các thành
+tựu này phụ thuộc đồng thời vào thuật toán, dữ liệu, cảm biến, kỹ thuật hệ thống và sức mạnh tính toán tăng theo định luật Moore.
+
+\subsection{Các dòng nghiên cứu song song}
+Nhìn tổng thể, lịch sử AI là sự cạnh tranh và bổ sung của nhiều ``trường phái'' với giả định khác nhau về bản chất của trí tuệ
+(Hình~\ref{fig:ch1-schools}, Bảng~\ref{tab:ch1-schools}). Không trường phái nào thắng tuyệt đối: các hệ thống hiện đại thường lai ghép,
+ví dụ AlphaGo kết hợp mạng nơ-ron (kết nối) với tìm kiếm cây (biểu tượng) và học tăng cường (hành vi); các hệ RAG ở Chương~5 kết hợp
+mô hình ngôn ngữ với đồ thị tri thức.
+
+\hinhtikz{ch1_schools}{Năm trường phái chính trong AI, từ ý tưởng nền tảng tới phương pháp kinh điển và phương pháp hiện đại}{ch1-schools}
+
+\begin{table}[H]\centering
+\caption{So sánh các trường phái AI}\label{tab:ch1-schools}
+\small
+\begin{tabular}{@{}L{0.15\linewidth}L{0.21\linewidth}L{0.19\linewidth}L{0.19\linewidth}L{0.18\linewidth}@{}}
+\toprule
+\textbf{Trường phái} & \textbf{Giả định cốt lõi} & \textbf{Biểu diễn} & \textbf{Điểm mạnh} & \textbf{Điểm yếu} \\
+\midrule
+Biểu tượng & Trí tuệ là thao tác ký hiệu theo luật & Logic, luật, khung, đồ thị & Giải thích được, chính xác & Giòn, khó thu thập tri thức \\
+Kết nối & Trí tuệ nổi lên từ mạng nơ-ron & Trọng số, vector & Học từ dữ liệu thô, mở rộng tốt & Cần nhiều dữ liệu, khó giải thích \\
+Thống kê -- Bayes & Trí tuệ là suy luận dưới bất định & Phân phối xác suất & Định lượng độ bất định & Mô hình hoá phức tạp tốn kém \\
+Tiến hoá & Lời giải tốt được chọn lọc qua thế hệ & Quần thể, nhiễm sắc thể & Tối ưu không cần đạo hàm & Chậm, khó bảo đảm hội tụ \\
+Hành vi -- hiện thân & Trí tuệ gắn với cảm nhận và hành động & Chính sách, phản xạ & Thích nghi trong môi trường thật & Khó mở rộng sang suy luận trừu tượng \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Bùng nổ học sâu (2006--2017)}
+\subsection{Dữ liệu, phần cứng và các tập dữ liệu chuẩn}
+Ba yếu tố hội tụ cuối thập niên 2000 đã tạo ra bùng nổ học sâu (Hình~\ref{fig:ch1-pillars}). \textbf{Dữ liệu}: Internet sinh ra lượng
+ảnh, văn bản và hành vi người dùng khổng lồ; ImageNet (2009) với khoảng 14 triệu ảnh gán nhãn qua dịch vụ Amazon Mechanical Turk trở
+thành thước đo chung của thị giác máy tính \cite{ch1:deng2009,ch1:russakovsky2015}. \textbf{Phần cứng}: GPU được thiết kế cho đồ hoạ
+hoá ra rất phù hợp với phép nhân ma trận; nền tảng CUDA (2007) cho phép lập trình GPU đa năng. \textbf{Thuật toán}: hàm kích hoạt ReLU,
+dropout, khởi tạo trọng số và chuẩn hoá theo lô giúp huấn luyện mạng sâu ổn định hơn \cite{ch1:goodfellow2016,ch1:lecun2015}. Hinton
+từng nhận xét rằng ở thập niên 1980--1990, dữ liệu có nhãn nhỏ hơn hàng nghìn lần và máy tính chậm hơn hàng triệu lần so với mức cần
+thiết -- các ý tưởng đã có, chỉ chờ điều kiện. Năm 2013, word2vec của Mikolov và cộng sự học biểu diễn từ thành vector dày đặc
+\cite{ch1:mikolov2013}, mở đường cho học biểu diễn trong xử lý ngôn ngữ.
+
+\hinhtikz{ch1_dl_pillars}{Ba trụ cột của học sâu -- dữ liệu lớn, phần cứng song song và thuật toán cải tiến -- trên nền phần mềm mã nguồn mở}{ch1-pillars}
+
+\subsection{Watson, Siri và AlexNet}
+Tháng 2/2011, hệ thống Watson của IBM thắng hai nhà vô địch trò chơi truyền hình \emph{Jeopardy!} bằng cách kết hợp xử lý ngôn ngữ, truy
+xuất thông tin, học máy và hàng trăm thuật toán chấm điểm bằng chứng \cite{ch1:ferrucci2010} -- có thể xem là tiền thân của các hệ hỏi
+đáp dựa trên truy xuất. Tháng 10/2011, Apple đưa trợ lý giọng nói Siri tới đông đảo người dùng. Nhưng bước ngoặt thực sự là AlexNet năm
+2012: mạng tích chập sâu của Krizhevsky, Sutskever và Hinton đạt tỉ lệ lỗi top-5 khoảng 15,3\% trên ImageNet, thấp hơn đối thủ xếp thứ
+hai khoảng 11 điểm phần trăm \cite{ch1:krizhevsky2012}. AlexNet kết hợp dữ liệu lớn, hai GPU, ReLU, dropout và tăng cường dữ liệu; mạng
+tự học đặc trưng từ điểm ảnh thay vì dựa vào đặc trưng thiết kế thủ công. Chỉ trong vài năm, học sâu lan sang nhận dạng tiếng nói, dịch
+máy và phân tích ảnh y khoa. Năm 2015, ResNet với kết nối tắt cho phép huấn luyện mạng hơn 150 tầng và vượt mức sai số ước tính của con
+người trên ImageNet \cite{ch1:he2016}.
+
+\subsection{Mô hình tạo sinh và AlphaGo}
+VAE (Kingma và Welling, 2013) \cite{ch1:kingma2014} và GAN (Goodfellow và cộng sự, 2014) \cite{ch1:goodfellow2014} là hai kiến trúc tạo
+sinh có ảnh hưởng lớn; GAN đặt hai mạng đối nghịch -- bộ sinh và bộ phân biệt -- vào một trò chơi tổng bằng không. Cùng năm 2014, mô hình
+seq2seq \cite{ch1:sutskever2014} và cơ chế chú ý (attention) \cite{ch1:bahdanau2015} nâng chất lượng dịch máy thần kinh. Tháng 3/2016,
+AlphaGo của DeepMind thắng kỳ thủ Lee Sedol 4--1 \cite{ch1:silver2016}, kết hợp tìm kiếm cây Monte Carlo với mạng chính sách và mạng giá
+trị, học từ ván đấu của người rồi cải thiện bằng tự đấu. Năm 2017, AlphaGo Zero tự học cờ vây chỉ từ luật chơi, không dùng ván đấu nào
+của người, và vượt mọi phiên bản trước \cite{ch1:silver2017}; AlphaZero sau đó tổng quát hoá cho cờ vua và shogi.
+
+% ---------------------------------------------------------------------
+\section{Transformer, mô hình nền và AI tạo sinh (2017 -- nay)}
+\subsection{Kiến trúc Transformer và các mô hình nền}
+Tháng 6/2017, nhóm nghiên cứu Google công bố Transformer trong bài báo \emph{Attention Is All You Need} \cite{ch1:vaswani2017}. Thay vì xử
+lý tuần tự như RNN, Transformer dùng cơ chế \emph{tự chú ý} (self-attention) tính quan hệ giữa mọi cặp phần tử trong chuỗi một cách song
+song:
+\begin{equation}
+  \operatorname{Attention}(Q,K,V) = \operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right) V ,
+  \label{eq:ch1-attention}
+\end{equation}
+trong đó $Q$, $K$, $V$ là các ma trận truy vấn, khoá và giá trị được chiếu tuyến tính từ biểu diễn đầu vào, $d_k$ là số chiều của khoá.
+Tính song song khiến Transformer huấn luyện hiệu quả trên GPU và dễ mở rộng quy mô. BERT (2018) dùng bộ mã hoá hai chiều, mạnh về hiểu
+ngôn ngữ \cite{ch1:devlin2019}; dòng GPT dùng bộ giải mã tự hồi quy, mạnh về sinh văn bản: GPT-2 (2019, 1,5 tỷ tham số, phát hành dần vì
+lo ngại lạm dụng) \cite{ch1:radford2019} và GPT-3 (2020, 175 tỷ tham số) cho thấy khả năng học ``zero-shot'' và ``few-shot'' chỉ từ vài
+ví dụ trong lời nhắc \cite{ch1:brown2020}. Bommasani và cộng sự gọi các mô hình được tiền huấn luyện trên dữ liệu rất lớn rồi thích nghi
+cho nhiều nhiệm vụ là \emph{mô hình nền} (foundation models) \cite{ch1:bommasani2021}.
+
+\begin{dinhnghia}{Định luật mở rộng (scaling laws)}
+Kaplan và cộng sự (2020) quan sát rằng hàm mất mát kiểm định của mô hình ngôn ngữ giảm theo luật luỹ thừa khi tăng số tham số $N$, lượng
+dữ liệu $D$ và tính toán $C$, chẳng hạn $L(N) \approx \left(N_c / N\right)^{\alpha_N}$ với $\alpha_N \approx 0{,}076$ \cite{ch1:kaplan2020}.
+Hoffmann và cộng sự (2022) chỉ ra rằng với ngân sách tính toán cố định, nên tăng dữ liệu cùng nhịp với số tham số -- quy tắc kinh nghiệm
+khoảng 20 token cho mỗi tham số -- và mô hình Chinchilla 70 tỷ tham số vượt các mô hình lớn hơn nhiều nhưng ``thiếu dữ liệu''
+\cite{ch1:hoffmann2022}.
+\end{dinhnghia}
+
+Hệ quả của định luật mở rộng là lượng tính toán dùng để huấn luyện các mô hình hàng đầu tăng theo hàm mũ. Sevilla và cộng sự ước tính từ
+khoảng năm 2010, tính toán huấn luyện các mô hình học sâu đáng chú ý tăng gấp đôi sau xấp xỉ sáu tháng, nhanh hơn nhiều so với định luật
+Moore \cite{ch1:sevilla2022}. Hình~\ref{fig:ch1-compute} đặt một số mô hình mốc trên trục log; các giá trị là \emph{xấp xỉ}, lấy từ bài
+báo gốc hoặc ước tính của các nhóm nghiên cứu độc lập (GPT-4 không công bố số liệu chính thức).
+
+\hinhtikz{ch1_compute}{Tính toán huấn luyện (FLOP, thang log) của một số mô hình mốc, giá trị xấp xỉ theo bài báo gốc và ước tính độc lập; đường đứt nét minh hoạ xu hướng gấp đôi sau khoảng sáu tháng \cite{ch1:sevilla2022}}{ch1-compute}
+
+\subsection{Bước chuyển trong thị giác và ngôn ngữ}
+Từ sau 2017, ranh giới giữa các lĩnh vực mờ dần. Vision Transformer (ViT, 2020) chia ảnh thành các mảnh nhỏ và xử lý như một chuỗi token,
+cạnh tranh trực tiếp với CNN khi có đủ dữ liệu \cite{ch1:dosovitskiy2021}. CLIP (2021) học biểu diễn chung cho ảnh và văn bản từ hàng
+trăm triệu cặp ảnh -- chú thích, cho phép phân loại ảnh ``zero-shot'' bằng mô tả ngôn ngữ \cite{ch1:radford2021}. Mô hình khuếch tán
+(DDPM) tạo ảnh bằng cách đảo ngược dần quá trình thêm nhiễu \cite{ch1:ho2020}, làm nền cho DALL-E 2, Midjourney và Stable Diffusion. Năm
+2020, AlphaFold~2 đạt độ chính xác đột phá trong dự đoán cấu trúc protein tại kỳ đánh giá CASP14 \cite{ch1:jumper2021}. Điểm chung của
+các bước chuyển này là một kiến trúc tổng quát (Transformer) cùng tiền huấn luyện trên dữ liệu lớn thay thế dần các kiến trúc chuyên biệt
+cho từng miền. Hình~\ref{fig:ch1-modern} tóm tắt các mốc chính từ ImageNet tới mô hình suy luận và tác tử.
+
+\hinhtikz{ch1_modern}{Dòng thời gian các mốc của AI hiện đại từ ImageNet (2009) đến mô hình suy luận và tác tử (2024--2025)}{ch1-modern}
+
+\subsection{ChatGPT và làn sóng sản phẩm}
+Bước quyết định đưa LLM tới công chúng là \emph{căn chỉnh theo chỉ dẫn}: InstructGPT tinh chỉnh GPT-3 bằng học tăng cường từ phản hồi của
+con người (RLHF) \cite{ch1:christiano2017,ch1:ouyang2022}, khiến mô hình làm theo yêu cầu tốt hơn dù nhỏ hơn nhiều. Ngày 30/11/2022,
+OpenAI phát hành ChatGPT; theo các ước tính được trích dẫn rộng rãi, sản phẩm đạt khoảng 100 triệu người dùng hằng tháng vào tháng
+1/2023, khi đó được mô tả là ứng dụng tiêu dùng tăng trưởng nhanh nhất lịch sử. Các hãng khác nhanh chóng ra mắt sản phẩm cạnh tranh:
+GPT-4 \cite{ch1:openai2023}, Gemini của Google \cite{ch1:gemini2023}, Claude của Anthropic, LLaMA mã nguồn mở của Meta
+\cite{ch1:touvron2023,ch1:llama3}, cùng các mô hình từ Trung Quốc như Qwen, GLM, Kimi và DeepSeek. DeepSeek-V3 (12/2024) dùng kiến trúc
+hỗn hợp chuyên gia với 671 tỷ tham số nhưng chỉ kích hoạt khoảng 37 tỷ tham số cho mỗi token \cite{ch1:deepseek2024}. Nhược điểm cố hữu
+của LLM là \emph{ảo giác} (hallucination): sinh ra nội dung trôi chảy nhưng sai sự thật -- một động lực chính cho các kỹ thuật RAG và đồ
+thị tri thức ở Chương~5.
+
+Trong khoa học, AlphaFold~3 (2024) mở rộng sang tương tác giữa protein, DNA, RNA và phân tử nhỏ. Giải Nobel Vật lý 2024 được trao cho John
+Hopfield và Geoffrey Hinton vì các đóng góp nền tảng cho mạng nơ-ron nhân tạo, còn Nobel Hoá học 2024 trao cho David Baker, Demis Hassabis
+và John Jumper vì thiết kế và dự đoán cấu trúc protein bằng tính toán -- sự ghi nhận chính thức rằng AI đã trở thành công cụ của khoa học
+cơ bản.
+
+% ---------------------------------------------------------------------
+\section{AI đương đại (2024 -- 2026): đa phương thức, suy luận và tác tử}
+\subsection{AI đa phương thức bản địa}
+Thế hệ mô hình đầu tiên xử lý ảnh hoặc âm thanh bằng cách ``ghép'' thêm bộ mã hoá vào một LLM văn bản. Xu hướng mới là mô hình
+\emph{đa phương thức bản địa} (native multimodal): văn bản, ảnh, âm thanh và video được huấn luyện cùng nhau từ đầu trong một không gian
+biểu diễn chung, nhờ đó mô hình có thể nghe và trả lời bằng giọng nói với độ trễ thấp, mô tả video, hay sinh ảnh theo đối thoại
+\cite{ch1:gemini2023}. Sora (2024) và các mô hình tương tự cho thấy khả năng sinh video ngắn từ mô tả văn bản.
+
+\subsection{Mô hình suy luận và mô hình ngôn ngữ nhỏ}
+Wei và cộng sự (2022) cho thấy yêu cầu LLM viết ra các bước trung gian -- \emph{chuỗi suy luận} (chain-of-thought) -- cải thiện mạnh kết
+quả trên bài toán nhiều bước \cite{ch1:wei2022}. Từ năm 2024, các \emph{mô hình suy luận} (reasoning models) như OpenAI o1
+\cite{ch1:openai2024o1} và DeepSeek-R1 \cite{ch1:deepseek2025} được huấn luyện bằng học tăng cường để ``suy nghĩ lâu hơn'' trước khi trả
+lời, đánh đổi tính toán lúc suy luận (test-time compute) lấy độ chính xác trên toán và lập trình. Song song, các \emph{mô hình ngôn ngữ
+nhỏ} (Small Language Models -- SLM) vài trăm triệu đến vài tỷ tham số, như Qwen2.5-1.5B dùng trong Chương~5 và~7, được chưng cất từ mô hình
+lớn để chạy trên máy tính cá nhân và điện thoại, phục vụ các ứng dụng cần riêng tư và độ trễ thấp.
+
+\subsection{Agentic AI -- tác tử tự chủ thực thi quy trình}
+Một LLM đơn lẻ chỉ sinh văn bản. Khi được trao \emph{công cụ} (tra cứu, chạy mã, gọi API), \emph{bộ nhớ} và một vòng lặp
+\emph{lập kế hoạch -- hành động -- quan sát -- phản tư}, nó trở thành một \emph{tác tử} có thể tự hoàn thành nhiệm vụ nhiều bước
+(Hình~\ref{fig:ch1-agent}). ReAct xen kẽ lập luận và hành động trong cùng một vết suy luận \cite{ch1:yao2023}; Toolformer cho thấy mô hình
+có thể tự học khi nào cần gọi công cụ \cite{ch1:schick2023}; Reflexion để tác tử tự rút kinh nghiệm bằng lời từ các lần thất bại
+\cite{ch1:shinn2023}. Khi nhiều tác tử với vai trò khác nhau (lập kế hoạch, thực thi, kiểm chứng) phối hợp, ta có \emph{hệ đa tác tử} --
+chủ đề của Chương~7.
+
+\hinhtikz{ch1_agent_loop}{Vòng lặp của một tác tử AI: mục tiêu $\to$ lập kế hoạch $\to$ hành động bằng công cụ $\to$ quan sát $\to$ phản tư, với LLM ở trung tâm và bộ nhớ lưu trạng thái}{ch1-agent}
+
+\begin{luuy}{Bài học từ lịch sử cho thời đại tác tử}
+Tác tử ngày nay gặp lại những vấn đề cũ dưới hình thức mới: ``bùng nổ tổ hợp'' xuất hiện khi chuỗi hành động dài làm lỗi tích luỹ;
+``hiệu ứng ELIZA'' xuất hiện khi người dùng tin vào câu trả lời trôi chảy; ``giòn ngoài miền'' xuất hiện khi tác tử gặp công cụ hay dữ
+liệu chưa thấy. Vì vậy, đánh giá có hệ thống, kiểm chứng bằng bằng chứng và giới hạn quyền hành động của tác tử là những yêu cầu cốt lõi.
+\end{luuy}
+
+% ---------------------------------------------------------------------
+\section{Bong bóng AI và kinh tế học của tính toán}
+ChatGPT kéo theo làn sóng đầu tư chưa từng có vào chip, trung tâm dữ liệu, điện năng và các công ty mô hình. Báo cáo AI Index 2025 của
+Đại học Stanford ghi nhận đầu tư tư nhân toàn cầu vào AI tạo sinh đạt khoảng 33,9 tỷ đô la trong năm 2024 \cite{ch1:aiindex2025}. Doanh
+thu mảng trung tâm dữ liệu của NVIDIA tăng nhiều lần trong vòng một năm sau ChatGPT, và vốn hoá công ty vượt các mốc một, hai rồi ba nghìn
+tỷ đô la trong giai đoạn 2023--2024.
+
+Ngày 27/1/2025 cho thấy thị trường nhạy cảm đến mức nào với chi phí tính toán. Sau khi DeepSeek công bố mô hình suy luận R1 và báo cáo kỹ
+thuật V3 cho biết toàn bộ quá trình huấn luyện chính thức (tiền huấn luyện, mở rộng ngữ cảnh và hậu huấn luyện) cần khoảng
+2,8 triệu giờ GPU H800 \cite{ch1:deepseek2024} -- tương đương chi phí thuê vài
+triệu đô la, chưa tính các chi phí nghiên cứu khác -- cổ phiếu NVIDIA giảm gần 17\% trong một phiên. Nhu cầu chip không vì thế mà chấm
+dứt, nhưng sự kiện làm nổi bật câu hỏi: hiệu quả thuật toán có thể thay thế bao nhiêu phần đầu tư phần cứng?
+
+Các tranh luận về ``bong bóng AI'' xoay quanh ba điểm: (1) định giá thị trường tăng nhanh hơn doanh thu thực tế; (2) quan hệ đầu tư chéo
+giữa nhà cung cấp chip, nhà cung cấp hạ tầng đám mây và công ty mô hình; (3) tác động lên năng suất lao động vẫn chưa rõ trong số liệu vĩ
+mô. Nhiều cơ quan tài chính đã cảnh báo rủi ro điều chỉnh, nhưng cũng thừa nhận đầu tư hiện nay có thể chuyển thành tăng trưởng bền vững
+nếu năng suất thực sự tăng. Lịch sử hai mùa đông nhắc rằng định giá và kỳ vọng thương mại có thể vượt xa năng lực đã được chứng minh.
+
+% ---------------------------------------------------------------------
+\section{Chính sách và chiến lược quốc gia}
+Đến giữa thập niên 2020, nhiều chính phủ coi năng lực AI là một phần của chính sách công nghiệp, an ninh và cạnh tranh địa chính trị,
+bao gồm chip, trung tâm dữ liệu, điện năng, dữ liệu và nhân lực, cùng các quy định về an toàn, trách nhiệm pháp lý và kiểm soát xuất khẩu.
+\begin{itemize}
+  \item \textbf{Liên minh châu Âu}: Đạo luật AI (Regulation (EU) 2024/1689) có hiệu lực từ 1/8/2024, là khung pháp lý toàn diện đầu tiên,
+        phân loại hệ thống AI theo mức rủi ro (không chấp nhận được, cao, hạn chế, tối thiểu) với nghĩa vụ áp dụng dần theo lộ trình
+        \cite{ch1:euaiact2024}.
+  \item \textbf{Hoa Kỳ}: chính sách chuyển dịch theo từng chính quyền; đầu năm 2025 có liên doanh hạ tầng Stargate với kế hoạch đầu tư tới
+        500 tỷ đô la và Sắc lệnh 14179 nhằm gỡ bỏ rào cản cho vị thế dẫn đầu, tiếp theo là Kế hoạch Hành động AI (7/2025) với các trụ
+        cột đổi mới, hạ tầng và ngoại giao -- an ninh.
+  \item \textbf{Trung Quốc}: coi AI, robot và trí tuệ hiện thân là ưu tiên trong các kế hoạch phát triển trung hạn, gắn với nền tảng công
+        nghiệp chế tạo lớn.
+  \item \textbf{Việt Nam}: Quyết định 127/QĐ-TTg ngày 26/01/2021 ban hành Chiến lược quốc gia về nghiên cứu, phát triển và ứng dụng trí
+        tuệ nhân tạo đến năm 2030, đặt mục tiêu đưa AI thành lĩnh vực công nghệ quan trọng và xây dựng các trung tâm đổi mới sáng tạo
+        \cite{ch1:qd127}. Các văn bản pháp luật về công nghiệp công nghệ số sau đó tiếp tục bổ sung khung quản lý cho AI.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\section{Nghiên cứu AI tổng quát (AGI)}
+Mục tiêu \emph{trí tuệ nhân tạo tổng quát} (Artificial General Intelligence -- AGI), tức hệ thống có năng lực rộng thay vì cho một nhiệm vụ
+hẹp, vốn là tham vọng của Dartmouth, đã quay trở lại cùng sự phát triển của học sâu và LLM. Thuật ngữ được Ben Goertzel và cộng sự phổ biến
+từ giữa thập niên 2000; nhiều phòng thí nghiệm lớn coi AGI là mục tiêu dài hạn. Tuy vậy, chưa có định nghĩa hay phép thử thống nhất.
+
+Các hệ thống AI ngày càng hỗ trợ nghiên cứu khoa học: FunSearch (2023) của DeepMind tìm được cấu trúc mới cho bài toán tổ hợp; AlphaGeometry
+giải 25 trên 30 bài hình học Olympic trong bộ đánh giá; AlphaProof cùng AlphaGeometry~2 đạt mức điểm tương đương huy chương bạc tại IMO
+2024. Các LLM đa năng cũng bắt đầu được ghi nhận đóng góp gợi ý trong một số chứng minh toán học và phát hiện lỗi phần mềm. Dù vậy, các
+thành tựu này vẫn cần con người chọn lọc, kiểm tra và diễn giải.
+
+\textbf{Khó khăn khi đánh giá.} Không có bài kiểm tra đơn lẻ nào đo được toàn bộ trí thông minh tổng quát; điểm cao trên một bộ đánh giá
+có thể chịu ảnh hưởng của dữ liệu huấn luyện bị lẫn đề, của cách đặt câu hỏi và tài nguyên tính toán. Bộ ARC của François Chollet đo khả
+năng suy ra quy tắc mới từ rất ít ví dụ \cite{ch1:chollet2019}; tháng 12/2024, một bản thử nghiệm của mô hình o3 đạt khoảng 76\% (cấu hình
+tính toán thấp) và 88\% (cấu hình cao) trên ARC-AGI-1, nhưng chính ban tổ chức ARC Prize nhấn mạnh đó chưa phải bằng chứng đã đạt AGI.
+Báo cáo An toàn AI Quốc tế do Yoshua Bengio chủ trì kết luận năng lực AI tiến bộ nhanh nhưng quỹ đạo tương lai rất bất định
+\cite{ch1:bengio2025}.
+
+% ---------------------------------------------------------------------
+\section{An toàn AI và tranh luận về rủi ro}
+Cảnh báo về máy móc vượt khỏi kiểm soát xuất hiện từ sớm: Wiener lo ngại rủi ro khi mục tiêu giao cho máy được diễn đạt sai; I.~J.~Good
+(1965) mô tả khả năng ``vụ nổ trí tuệ'' khi máy tự cải thiện \cite{ch1:good1965}. Từ đầu thế kỷ XXI, các nhóm nghiên cứu và cuốn
+\emph{Superintelligence} của Bostrom \cite{ch1:bostrom2014} hệ thống hoá thành chương trình nghiên cứu \emph{căn chỉnh} (alignment). Amodei và
+cộng sự (2016) chuyển các lo ngại trừu tượng thành bài toán kỹ thuật cụ thể như tránh tác dụng phụ, chống ``đánh lừa phần thưởng'' và giám
+sát có thể mở rộng \cite{ch1:amodei2016}.
+
+\begin{table}[H]\centering
+\caption{Các nhóm rủi ro AI và hướng giảm thiểu}\label{tab:ch1-risk}
+\small
+\begin{tabular}{@{}L{0.20\linewidth}L{0.38\linewidth}L{0.36\linewidth}@{}}
+\toprule
+\textbf{Nhóm rủi ro} & \textbf{Ví dụ} & \textbf{Hướng giảm thiểu} \\
+\midrule
+Tác hại đã quan sát & Thông tin sai lệch, ảo giác, thiên lệch và phân biệt đối xử, xâm phạm riêng tư & Đánh giá trước triển khai, RAG có trích dẫn, kiểm toán dữ liệu \\
+Lạm dụng & Lừa đảo, mã độc, thao túng dư luận, hỗ trợ vũ khí & Kiểm soát truy cập, bộ lọc, đánh giá năng lực nguy hiểm \\
+Trục trặc và mục tiêu sai & Đánh lừa phần thưởng, hành vi ngoài ý muốn khi tác tử tự chủ & RLHF, AI hiến pháp \cite{ch1:bai2022}, giới hạn quyền, giám sát \\
+Hệ thống và xã hội & Tác động lao động, tập trung quyền lực, tiêu thụ năng lượng & Chính sách, quản trị, minh bạch \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Một số nhà nghiên cứu (như Yann LeCun) phản bác các kịch bản ``mất kiểm soát'', cho rằng chúng gán động cơ sinh học cho máy móc; số khác coi
+đây là rủi ro đáng đầu tư nghiên cứu nghiêm túc. Báo cáo An toàn AI Quốc tế tách các rủi ro đã có bằng chứng thực nghiệm khỏi các kịch bản
+còn mang tính suy đoán \cite{ch1:bengio2025}. Điểm đồng thuận là chưa phương pháp nào bảo đảm một hệ thống rất mạnh luôn hành động đúng ý
+định con người trong mọi hoàn cảnh; đây vẫn là chương trình nghiên cứu mở.
+
+% ---------------------------------------------------------------------
+\section{Dữ liệu, phép đo và khả năng tái lập}
+\subsection{Bộ dữ liệu như một phần của lịch sử AI}
+Bộ dữ liệu vừa là nguyên liệu huấn luyện vừa định hình cách cộng đồng đo tiến bộ. Iris (1936) của Fisher với 150 bông hoa và bốn số đo
+\cite{ch1:fisher1936} là ví dụ kinh điển cho phân loại tuyến tính; MNIST (1998) với 70 nghìn ảnh chữ số viết tay \cite{ch1:lecun1998}
+trở thành ``bài tập nhập môn'' của mạng nơ-ron; CIFAR-10 \cite{ch1:krizhevsky2009} và ImageNet \cite{ch1:deng2009} đẩy thị giác máy tính
+lên quy mô lớn; SQuAD \cite{ch1:rajpurkar2016}, GLUE \cite{ch1:wang2019glue} và MMLU \cite{ch1:hendrycks2021} lần lượt đo đọc hiểu, hiểu
+ngôn ngữ và tri thức đa lĩnh vực; GSM8K đo khả năng giải toán lời văn nhiều bước \cite{ch1:cobbe2021}. Hình~\ref{fig:ch1-datasets} cho thấy
+quy mô các bộ dữ liệu tăng hàng trăm nghìn lần trong chưa đầy một thế kỷ. Nhiều bộ trong số này được dùng lại ở các chương thực nghiệm của
+tiểu luận (MNIST, Fashion-MNIST, CIFAR-10 ở Chương~3; GSM8K ở Chương~7).
+
+\hinhtikz{ch1_datasets}{Một số bộ dữ liệu mốc theo năm công bố và quy mô (thang log)}{ch1-datasets}
+
+\begin{table}[H]\centering
+\caption{Bộ dữ liệu mốc và vai trò trong lịch sử AI}\label{tab:ch1-datasets}
+\small
+\begin{tabular}{@{}L{0.17\linewidth}L{0.08\linewidth}L{0.24\linewidth}L{0.43\linewidth}@{}}
+\toprule
+\textbf{Bộ dữ liệu} & \textbf{Năm} & \textbf{Nhiệm vụ} & \textbf{Vai trò} \\
+\midrule
+Iris & 1936 & Phân loại 3 loài hoa & Minh hoạ phân tích phân biệt tuyến tính, bài tập kinh điển của thống kê \\
+MNIST & 1998 & Chữ số viết tay & Chuẩn đánh giá đầu tiên của CNN; nay gần như ``bão hoà'' \\
+CIFAR-10 & 2009 & Ảnh vật thể 10 lớp & Bộ ảnh màu nhỏ phổ biến để thử kiến trúc mới \\
+ImageNet & 2009 & 1.000 lớp (ILSVRC) & Chất xúc tác cho AlexNet và cuộc cách mạng học sâu \\
+SQuAD & 2016 & Đọc hiểu trích xuất & Thúc đẩy mô hình đọc hiểu, về sau bị BERT vượt mức người \\
+GLUE & 2018 & 9 nhiệm vụ hiểu ngôn ngữ & Chuẩn tổng hợp, bão hoà chỉ sau khoảng một năm \\
+MMLU & 2020 & Trắc nghiệm 57 môn & Thước đo tri thức tổng quát của LLM \\
+GSM8K & 2021 & Toán lời văn tiểu học & Đo suy luận nhiều bước, dùng cho chuỗi suy luận và tác tử \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Đo lường và những cái bẫy}
+Một con số trên bảng xếp hạng chỉ có ý nghĩa khi gắn với dữ liệu, phép chia tập, ngân sách huấn luyện và thước đo cụ thể. Lịch sử cho thấy
+ba cái bẫy lặp lại: \textbf{bão hoà} -- các bộ đánh giá bị vượt nhanh hơn dự kiến, khiến điểm số mất khả năng phân biệt; \textbf{lẫn đề}
+(data contamination) -- câu hỏi đánh giá xuất hiện trong dữ liệu tiền huấn luyện, làm điểm số phóng đại năng lực; \textbf{quá khớp với bộ
+đánh giá} -- tinh chỉnh lặp lại theo tập test biến tập test thành tập huấn luyện ngầm. Các đề xuất như ``bảng dữ liệu'' (datasheets)
+\cite{ch1:gebru2021} và ``thẻ mô hình'' (model cards) \cite{ch1:mitchell2019} khuyến khích mô tả minh bạch nguồn gốc, giới hạn và phạm vi sử
+dụng; chương trình tái lập của NeurIPS khuyến khích công bố mã và quy trình đầy đủ \cite{ch1:pineau2021}.
+
+\begin{luuy}{Áp dụng trong tiểu luận}
+Mọi thực nghiệm ở Chương~2--7 tách riêng tập validation để chọn mô hình và siêu tham số, chỉ dùng tập test một lần để báo cáo; chuỗi thời
+gian được chia theo thời gian để tránh rò rỉ tương lai; mọi con số được sinh từ tệp kết quả của chương trình và mọi đoạn mã in trong báo cáo
+là mã đã chạy -- đúng tinh thần ``tái lập được'' mà lịch sử AI đã chứng minh là cần thiết.
+\end{luuy}
+
+% ---------------------------------------------------------------------
+\section{AI hiện đại như một hệ thống hoàn chỉnh}
+Một mô hình có độ chính xác cao chưa đủ để tạo ra ứng dụng hữu ích. Sculley và cộng sự chỉ ra rằng trong hệ thống học máy thực tế, mã mô
+hình chỉ chiếm phần nhỏ; phần lớn là thu thập và kiểm định dữ liệu, trích xuất đặc trưng, phục vụ, giám sát -- nơi tích tụ ``nợ kỹ thuật''
+ẩn \cite{ch1:sculley2015}. Với LLM, hệ thống còn có thêm kho tri thức, bộ truy xuất, công cụ và lớp điều phối tác tử. Hình~\ref{fig:ch1-system}
+mô tả các tầng của một hệ thống AI hiện đại và chương tương ứng của tiểu luận: dữ liệu (Chương~2--4), mô hình học (Chương~2--4,~6), tri thức
+và truy xuất (Chương~5), suy luận và công cụ (Chương~5,~7), cùng hai tầng xuyên suốt mọi chương là đánh giá và triển khai.
+
+\hinhtikz{ch1_ai_system}{Các tầng của một hệ thống AI hiện đại và chương tương ứng trong tiểu luận}{ch1-system}
+
+% ---------------------------------------------------------------------
+\section{Dòng thời gian tóm tắt}
+Bảng~\ref{tab:ch1-timeline} gom các mốc đã trình bày trong chương theo thứ tự thời gian, từ những ý tưởng về máy tính
+toán ở thế kỷ XIX tới làn sóng tác tử dựa trên LLM hiện nay.
+
+\begingroup\small
+\begin{longtable}{@{}L{0.17\linewidth}L{0.77\linewidth}@{}}
+\caption{Dòng thời gian tóm tắt các sự kiện chính trong lịch sử AI}\label{tab:ch1-timeline}\\
+\toprule
+\textbf{Năm} & \textbf{Sự kiện tiêu biểu} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Năm} & \textbf{Sự kiện tiêu biểu (tiếp)} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+1843 & Ada Lovelace viết ghi chú về Máy giải tích, nhận ra máy có thể xử lý ký hiệu \\
+1936 & Máy Turing; phép tính lambda của Church; bộ dữ liệu Iris của Fisher \\
+1943 & McCulloch và Pitts mô tả nơ-ron lý tưởng hoá \\
+1948 & Wiener: điều khiển học; Shannon: lý thuyết thông tin \\
+1950 & Turing công bố ``Computing Machinery and Intelligence'' \\
+1955--1956 & Logic Theorist; Hội thảo Dartmouth đặt tên lĩnh vực \\
+1958 & Perceptron của Rosenblatt; ngôn ngữ Lisp \\
+1959 & Samuel dùng thuật ngữ ``machine learning''; General Problem Solver \\
+1966 & ELIZA; báo cáo ALPAC \\
+1969 & Sách \emph{Perceptrons}; robot Shakey \\
+1972 & Ngôn ngữ Prolog; MYCIN bắt đầu phát triển \\
+1973--1980 & Báo cáo Lighthill; mùa đông AI thứ nhất \\
+1980--1987 & Hệ chuyên gia (XCON); Dự án Thế hệ thứ Năm của Nhật Bản \\
+1982 & Mạng Hopfield \\
+1986 & Lan truyền ngược được phổ biến \\
+1987--1993 & Sụp đổ thị trường máy Lisp; mùa đông AI thứ hai \\
+1988 & Mạng Bayes của Pearl \\
+1992 & TD-Gammon học bằng tự đấu \\
+1995 & Máy vector hỗ trợ (SVM) \\
+1997 & Deep Blue thắng Kasparov; LSTM \\
+1998 & LeNet-5 và bộ dữ liệu MNIST \\
+2005--2007 & Stanley, Boss thắng các thử thách xe tự hành của DARPA \\
+2006 & Mạng niềm tin sâu; khởi đầu tên gọi ``học sâu'' \\
+2009 & ImageNet \\
+2011 & Watson thắng \emph{Jeopardy!}; Siri \\
+2012 & AlexNet thắng ImageNet \\
+2013--2014 & word2vec, VAE, GAN, seq2seq, cơ chế chú ý \\
+2015 & ResNet \\
+2016--2017 & AlphaGo thắng Lee Sedol; Transformer; AlphaGo Zero \\
+2018--2019 & BERT; GPT-2 \\
+2020 & GPT-3; AlphaFold~2 tại CASP14; Vision Transformer; mô hình khuếch tán \\
+2021 & Chiến lược quốc gia về AI của Việt Nam (Quyết định 127/QĐ-TTg) \\
+2022 & ChatGPT; chuỗi suy luận \\
+2023 & GPT-4, LLaMA, Gemini; tác tử ReAct, Toolformer \\
+2024 & Đạo luật AI của EU có hiệu lực; AlphaFold~3; Nobel cho Hopfield, Hinton, Baker, Hassabis, Jumper; mô hình suy luận o1 \\
+2025 & DeepSeek-R1 và cú sốc thị trường 27/1; Stargate; tác tử AI phổ biến trong phần mềm \\
+\end{longtable}
+\endgroup
+
+% ---------------------------------------------------------------------
+\section{Kết luận chương}
+Lịch sử AI là chuỗi chu kỳ: lời hứa quá mức dẫn tới cắt giảm tài trợ, nhưng nghiên cứu vẫn tiếp tục dưới những tên gọi khác, và thành công
+đến khi hội tụ đủ thuật toán, dữ liệu và tính toán. Ba bài học nổi bật xuyên suốt chương:
+\begin{enumerate}
+  \item \textbf{Thành công trong miền hẹp không tự động mở rộng ra thế giới thực.} Thế giới khối của SHRDLU, hệ chuyên gia MYCIN hay một
+        mô hình đạt điểm cao trên một bộ đánh giá đều có thể ``giòn'' khi bối cảnh thay đổi; đánh giá ngoài miền là bắt buộc.
+  \item \textbf{Tri thức viết tay khó bảo trì, nên học từ dữ liệu trở thành hướng chủ đạo} -- nhưng tri thức có cấu trúc không biến mất:
+        nó trở lại dưới dạng đồ thị tri thức và RAG để kiểm soát ảo giác của LLM (Chương~5).
+  \item \textbf{Kỳ vọng thương mại có thể vượt xa năng lực đã chứng minh.} Hai mùa đông AI là lời nhắc đối với làn sóng đầu tư hiện nay:
+        giá trị bền vững đến từ hệ thống được đánh giá cẩn thận, không từ những tuyên bố.
+\end{enumerate}
+Ngày nay, AI vừa là sản phẩm đại chúng vừa là lĩnh vực cạnh tranh chiến lược cấp quốc gia; các câu hỏi về định nghĩa AGI, về bong bóng đầu
+tư và về cách kiểm soát hệ thống ngày càng mạnh vẫn để ngỏ. Các chương tiếp theo đi từ lịch sử sang kỹ thuật: Chương~2 trình bày nền tảng
+học máy -- ngôn ngữ chung mà mọi mô hình hiện đại đều thừa hưởng.

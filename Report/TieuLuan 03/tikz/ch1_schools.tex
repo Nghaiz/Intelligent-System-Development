@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[hop=cNavy, minimum width=5.4cm, minimum height=1.1cm, font=\normalsize\bfseries, text=black!85] (root) at (7.5,0) {Các trường phái trong AI};
+  \foreach \i/\c/\ten/\y/\a/\b in {
+      0/cBlue/{Biểu tượng\\(Symbolists)}/{logic, quy tắc,\\suy diễn}/{Logic Theorist,\\hệ chuyên gia}/{Prolog, Cyc},
+      1/cOrange/{Kết nối\\(Connectionists)}/{nơ-ron, lan\\truyền ngược}/{Perceptron,\\Hopfield}/{CNN, LSTM,\\Transformer},
+      2/cTeal/{Thống kê --\\Bayes}/{xác suất,\\suy luận}/{mạng Bayes,\\HMM}/{SVM,\\Naive Bayes},
+      3/cGreen/{Tiến hoá\\(Evolutionaries)}/{chọn lọc,\\đột biến}/{giải thuật\\di truyền}/{lập trình\\di truyền},
+      4/cPurple/{Hành vi --\\hiện thân}/{cảm nhận,\\hành động}/{robot rùa,\\Brooks}/{học tăng cường,\\AlphaGo}} {
+    \pgfmathsetmacro{\x}{\i*3.25 + 1.0}
+    \node[hop=\c, minimum width=3.05cm, minimum height=1.35cm, font=\small\bfseries] (s\i) at (\x,-2.5) {\ten};
+    \node[hop=\c!60!white, minimum width=3.0cm, minimum height=1.2cm, font=\small, text width=2.8cm] (y\i) at (\x,-4.7) {\y};
+    \node[hop=\c!40!white, minimum width=3.0cm, minimum height=1.2cm, font=\small, text width=2.8cm] (a\i) at (\x,-6.7) {\a};
+    \node[hop=\c!25!white, minimum width=3.0cm, minimum height=1.2cm, font=\small, text width=2.8cm] (b\i) at (\x,-8.7) {\b};
+    \draw[muiM=\c!70!black] (root.south) -- ++(0,-0.6) -| (s\i.north);
+    \draw[muiM=\c!70!black] (s\i) -- (y\i);
+    \draw[muiM=\c!70!black] (y\i) -- (a\i);
+    \draw[muiM=\c!70!black] (a\i) -- (b\i);
+  }
+  \node[nhan, anchor=east, font=\small\itshape] at (-0.7,-4.7) {ý tưởng};
+  \node[nhan, anchor=east, font=\small\itshape] at (-0.7,-6.7) {kinh điển};
+  \node[nhan, anchor=east, font=\small\itshape] at (-0.7,-8.7) {hiện đại};
+\end{tikzpicture}

@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % H^(l): N x d  ->  Â H  ->  (Â H) W  ->  σ(.)
+  \tensorbaD{0}{0}{1.4}{3.2}{1.0}{cBlue}{$H^{(\ell)}$\\$N\times d$}
+  \node[font=\Large\bfseries, text=cNavy] at (2.4,1.6) {$\times$};
+  % Â thưa: lưới có ô tô màu
+  \begin{scope}[xshift=2.9cm]
+    \foreach \i in {0,...,5}{\foreach \j in {0,...,5}{
+      \pgfmathtruncatemacro{\on}{(\i==\j) || (mod(\i+\j,4)==1) || (abs(\i-\j)==3)}
+      \ifnum\on=1 \fill[cOrange!70] (\j*0.5,2.75-\i*0.5) rectangle ++(0.5,0.5);
+      \else \fill[cOrange!6] (\j*0.5,2.75-\i*0.5) rectangle ++(0.5,0.5); \fi
+      \draw[white] (\j*0.5,2.75-\i*0.5) rectangle ++(0.5,0.5);}}
+    \node[font=\small, align=center] at (1.5,-0.55) {$\hat A=\tilde D^{-1/2}\tilde A\tilde D^{-1/2}$\\$N\times N$ (thưa)};
+  \end{scope}
+  \draw[mui] (6.1,1.6) -- (6.9,1.6) node[midway, above, nhan] {trộn};
+  \tensorbaD{7.1}{0}{1.4}{3.2}{1.0}{cTeal}{$\hat A H^{(\ell)}$\\$N\times d$}
+  \node[font=\Large\bfseries, text=cNavy] at (9.5,1.6) {$\times$};
+  \tensorbaD{10.0}{0.8}{1.4}{1.6}{1.0}{cPurple}{$W^{(\ell)}$\\$d\times d'$}
+  \draw[mui] (12.1,1.6) -- (12.9,1.6) node[midway, above, nhan] {$\sigma$};
+  \tensorbaD{13.1}{0}{1.0}{3.2}{1.0}{cGreen}{$H^{(\ell+1)}$\\$N\times d'$}
+  % chú thích tầng dưới
+  \node[khoiC, text width=4.6cm] at (4.4,-3.1) {\textbf{Bước truyền}: mỗi hàng của $\hat A H$ là trung bình có trọng số của nút và láng giềng, trọng số $1/\sqrt{\tilde d_u\tilde d_v}$};
+  \node[khoiP, text width=4.6cm] at (10.0,-3.1) {\textbf{Bước biến đổi}: $W^{(\ell)}$ dùng chung cho mọi nút (chia sẻ tham số như kernel của CNN)};
+\end{tikzpicture}

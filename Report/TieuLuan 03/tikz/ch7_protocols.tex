@@ -1,0 +1,26 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % MCP: tác tử <-> công cụ
+  % khung kéo xuống -1.3 để chú thích cuối không chạm nhãn hai dòng của mũi tên artifact bên A2A
+  \filldraw[vung=cBlue] (-0.4,-1.3) rectangle (7.4,5.0);
+  \node[tieude] at (3.5,4.6) {MCP: tác tử $\leftrightarrow$ công cụ};
+  \node[khoiP, text width=2.2cm] (host) at (1.2,2.2) {Host / tác tử\\(MCP client)};
+  \foreach \y/\t/\c [count=\k] in {3.6/{Server: tệp}/cTeal, 2.2/{Server: CSDL}/cGreen, 0.8/{Server: web}/cOrange}{
+    \node[hop=\c, minimum width=2.5cm] (s\k) at (5.6,\y) {\t};
+    \draw[muiM=cNavy, <->] (host.east) -- (s\k.west);}
+  \node[nhan, align=center, text width=7cm] at (3.5,-0.7) {JSON-RPC: liệt kê và gọi tool, đọc resource, lấy prompt};
+  % A2A: tác tử <-> tác tử
+  \begin{scope}[xshift=8.4cm]
+    \filldraw[vung=cOrange] (-0.4,-1.3) rectangle (7.6,5.0);
+    \node[tieude] at (3.6,4.6) {A2A: tác tử $\leftrightarrow$ tác tử};
+    \node[khoiR, text width=2.0cm] (ca) at (0.9,1.5) {Tác tử A\\(client)};
+    \node[khoiG, text width=2.0cm] (cb) at (6.3,1.5) {Tác tử B\\(remote)};
+    % thẻ hai dòng, đặt thấp hơn tiêu đề khung
+    \node[draw=cOrange!80!black, fill=white, rounded corners, font=\small, align=center, text width=4.2cm] (card)
+      at (5.1,3.25) {Agent Card của B:\\kỹ năng, endpoint, xác thực};
+    \draw[muiM=cOrange!85!black] (ca.north) to[bend left=25] node[above left, font=\small] {khám phá} (card.west);
+    \draw[cOrange!80!black, dashed] (card.south) -- (cb.north);
+    \draw[muiM=cNavy, line width=1.3pt] ([yshift=0.2cm]ca.east) -- node[above, font=\small] {task} ([yshift=0.2cm]cb.west);
+    \draw[muiM=cGreen!60!black, line width=1.3pt] ([yshift=-0.3cm]cb.west) -- node[below, font=\small, align=center] {artifact,\\trạng thái} ([yshift=-0.3cm]ca.east);
+    \node[nhan, align=center, text width=7cm] at (3.6,-0.7) {vòng đời task: submitted $\to$ working $\to$ completed};
+  \end{scope}
+\end{tikzpicture}

@@ -1,0 +1,28 @@
+\begin{tikzpicture}[node distance=0.65cm]
+  % (a) khối dư cơ bản
+  \node[tieude] at (0,1.0) {(a) Khối dư (residual block)};
+  \node[cau=cSlate] (x) at (0,0) {$\mathbf{x}$};
+  \node[khoi, below=of x, minimum width=4cm] (c1) {Conv $3{\times}3$ + BN};
+  \node[khoiR, below=of c1, minimum width=4cm] (r1) {ReLU};
+  \node[khoi, below=of r1, minimum width=4cm] (c2) {Conv $3{\times}3$ + BN};
+  \node[cau=cOrange, below=0.8cm of c2] (add) {$+$};
+  \node[khoiR, below=of add, minimum width=4cm] (r2) {ReLU};
+  \node[below=0.4cm of r2, font=\normalsize] (y) {$\mathbf{y}=\mathrm{ReLU}\big(F(\mathbf{x})+\mathbf{x}\big)$};
+  \draw[mui] (x) -- (c1); \draw[mui] (c1) -- (r1); \draw[mui] (r1) -- (c2); \draw[mui] (c2) -- (add); \draw[mui] (add) -- (r2);
+  \draw[muiM=cOrange!85!black, line width=2pt, rounded corners=12pt] (x.east) -- ++(2.8,0) |- node[pos=0.25, right, font=\small, align=left] {lối tắt\\(identity)} (add.east);
+  \draw[decorate, decoration={brace, amplitude=5pt, mirror}, thick] ([xshift=-2.2cm]c1.north) -- ([xshift=-2.2cm]c2.south) node[midway, left=6pt, font=\small] {$F(\mathbf{x})$};
+  % (b) gradient + kết quả
+  \begin{scope}[shift={(9.6,0)}]
+    \node[tieude] at (0,1.0) {(b) Vì sao học được mạng rất sâu};
+    \node[draw=cNavy, fill=softgray, rounded corners=3pt, text width=6.6cm, align=left, font=\small, anchor=north] at (0,0.3) {%
+      Gradient qua khối:\\ $\dfrac{\partial L}{\partial \mathbf{x}} = \dfrac{\partial L}{\partial \mathbf{y}}\Big(1 + \dfrac{\partial F}{\partial \mathbf{x}}\Big)$.\\[4pt]
+      Số hạng ``$1$'' giữ cho gradient không tắt dần dù $\partial F/\partial \mathbf{x}$ nhỏ, nên ResNet huấn luyện được 50, 101, 152 tầng.\\[4pt]
+      Khi số kênh đổi, lối tắt dùng Conv $1{\times}1$ (projection) — như khối \texttt{ResBlock} của Improved CNN trong chương này.};
+    \begin{axis}[a06, at={(-3.2cm,-10.3cm)}, width=6.8cm, height=4.4cm, xlabel={số tầng}, ylabel={sai số test (\%)}, ymin=4, ymax=15,
+                 xtick={20,56}, legend style={font=\scriptsize, at={(0.02,0.98)}, anchor=north west},
+                 title={\small CIFAR-10: plain (định tính) vs ResNet}]
+      \addplot[cRed, very thick, mark=*, dashed] coordinates {(20,9.5) (56,13.0)}; \addlegendentry{plain}
+      \addplot[cGreen, very thick, mark=square*] coordinates {(20,8.75) (56,6.97)}; \addlegendentry{ResNet}
+    \end{axis}
+  \end{scope}
+\end{tikzpicture}

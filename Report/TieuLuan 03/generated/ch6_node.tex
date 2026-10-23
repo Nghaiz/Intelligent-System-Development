@@ -1,0 +1,17 @@
+\begin{tabular}{llcrrrr}
+\toprule
+Dữ liệu & Mô hình & Dùng cạnh & \makecell[r]{Acc test\\(\%)} & \makecell[r]{Acc val\\(\%)} & Tham số & \makecell[r]{Giây\\/ lần} \\
+\midrule
+Cora & Hồi quy logistic & không & 57{,}40 $\pm$ 0{,}00 & 56{,}00 & 10{.}038 & 0{,}19 \\
+ & MLP 2 lớp & không & 58{,}18 $\pm$ 0{,}83 & 61{,}24 & 92{.}231 & 90{,}81 \\
+ & GCN & có & 82{,}08 $\pm$ 0{,}46 & 80{,}76 & 92{.}231 & 84{,}57 \\
+ & GraphSAGE-mean & có & 80{,}70 $\pm$ 0{,}23 & 79{,}92 & 184{.}391 & 175{,}05 \\
+ & GAT (8 đầu) & có & \textbf{82{,}82 $\pm$ 0{,}39} & 81{,}56 & 92{.}373 & 140{,}88 \\
+\midrule
+CiteSeer & Hồi quy logistic & không & 61{,}40 $\pm$ 0{,}00 & 59{,}00 & 22{.}224 & 0{,}15 \\
+ & MLP 2 lớp & không & 56{,}16 $\pm$ 0{,}73 & 57{,}16 & 237{.}446 & 213{,}81 \\
+ & GCN & có & 71{,}44 $\pm$ 0{,}65 & 72{,}52 & 237{.}446 & 325{,}59 \\
+ & GraphSAGE-mean & có & 69{,}64 $\pm$ 0{,}78 & 70{,}60 & 474{.}822 & 288{,}32 \\
+ & GAT (8 đầu) & có & \textbf{71{,}86 $\pm$ 0{,}97} & 73{,}04 & 237{.}586 & 237{,}92 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+\begin{axis}[a06, width=15.5cm, height=9cm, ymode=log, xmin=2011.5, xmax=2026.5, ymin=1e17, ymax=1e27,
+    xlabel={Năm công bố}, ylabel={Tính toán huấn luyện (FLOP, thang log)},
+    xtick={2012,2014,2016,2018,2020,2022,2024,2026}, /pgf/number format/1000 sep={},
+    log basis y=10, ytick={1e17,1e19,1e21,1e23,1e25}]
+  % xu hướng: tính toán gấp đôi sau khoảng 6 tháng (Sevilla và cộng sự, 2022) — đường minh hoạ
+  \addplot[cSlate, dashed, line width=1.4pt, domain=2012:2025.5, samples=30] {4.7e17*2^(2*(x-2012.7))};
+  \node[font=\small\itshape, text=cSlate, rotate=24] at (axis cs:2015.6,1.5e20) {gấp đôi $\approx$ 6 tháng};
+  \addplot[only marks, mark=*, mark size=5.5pt, mark options={fill=cBlue, draw=black!60}] coordinates {(2012.7,4.7e17)};
+  \addplot[only marks, mark=*, mark size=5.5pt, mark options={fill=cGreen, draw=black!60}] coordinates {(2017.5,2.3e19) (2018.8,2.9e20) (2019.1,1.5e21)};
+  \addplot[only marks, mark=*, mark size=5.5pt, mark options={fill=cOrange, draw=black!60}] coordinates {(2017.8,3.4e23)};
+  \addplot[only marks, mark=*, mark size=5.5pt, mark options={fill=cRed, draw=black!60}] coordinates {(2020.4,3.1e23) (2022.3,2.5e24) (2023.2,2.1e25) (2024.5,3.8e25)};
+  \node[font=\small\bfseries, anchor=west, inner sep=6pt] at (axis cs:2012.7,4.7e17) {AlexNet};
+  \node[font=\small\bfseries, anchor=west, inner sep=6pt] at (axis cs:2017.5,2.3e19) {Transformer};
+  \node[font=\small\bfseries, anchor=west, inner sep=6pt] at (axis cs:2018.8,2.9e20) {BERT-Large};
+  \node[font=\small\bfseries, anchor=west, inner sep=6pt] at (axis cs:2019.1,1.5e21) {GPT-2};
+  \node[font=\small\bfseries, anchor=east, inner sep=6pt] at (axis cs:2017.8,3.4e23) {AlphaGo Zero};
+  \node[font=\small\bfseries, anchor=south east, inner sep=5pt] at (axis cs:2020.4,3.1e23) {GPT-3};
+  \node[font=\small\bfseries, anchor=east, inner sep=6pt] at (axis cs:2022.3,2.5e24) {PaLM};
+  \node[font=\small\bfseries, anchor=east, inner sep=6pt] at (axis cs:2023.2,2.1e25) {GPT-4 (ước tính)};
+  \node[font=\small\bfseries, anchor=south, inner sep=7pt] at (axis cs:2024.5,3.8e25) {Llama 3.1};
+\end{axis}
+\end{tikzpicture}

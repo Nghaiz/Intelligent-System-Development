@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \i/\c/\t/\ch in {
+      0/cSlate/{Dữ liệu: thu thập, làm sạch, gán nhãn, phiên bản}/{Ch.\,2--4},
+      1/cBlue/{Mô hình học: ML cổ điển, CNN, RNN, GNN}/{Ch.\,2--4, 6},
+      2/cTeal/{Tri thức: Knowledge Graph, kho văn bản, RAG}/{Ch.\,5},
+      3/cGreen/{Suy luận và công cụ: LLM, tác tử, đa tác tử}/{Ch.\,5, 7},
+      4/cOrange/{Đánh giá, giám sát, an toàn, tái lập}/{mọi chương},
+      5/cRed/{Triển khai: API, Web App, giao diện di động}/{mọi chương}} {
+    \pgfmathsetmacro{\y}{\i*1.35}
+    \pgfmathsetmacro{\x}{\i*0.35}
+    \khoibaD{\x}{\y}{9.6}{0.95}{1.6}{\c}
+    \node[font=\small\bfseries, text=white, anchor=west] at (\x+0.25,\y+0.48) {\t};
+    \node[hop=\c, minimum width=2.4cm, font=\small\bfseries, anchor=west] at (12.2,\y+0.55) {\ch};
+    \draw[\c!70!black, thick, dashed] (\x+9.6+0.85,\y+0.55) -- (12.2,\y+0.55);
+  }
+  \draw[mui, line width=2pt] (-0.7,0) -- node[rotate=90, above, font=\small\bfseries] {mức trừu tượng tăng dần} (-0.7,8.0);
+\end{tikzpicture}

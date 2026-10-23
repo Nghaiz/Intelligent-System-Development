@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[cau=cRed, minimum size=15mm] (q) at (0,0) {\small Câu hỏi};
+  \node[khoiX, text width=3.0cm] (link) at (3.6,0) {\textbf{Liên kết thực thể}\\ ngày, tháng, năm, nhóm, mã hồ sơ, chỉ số};
+  \node[diamond, aspect=1.6, draw=cOrange!70!black, top color=cOrange!15, bottom color=cOrange!45, thick, font=\small,
+        align=center, inner sep=1pt, blur shadow={shadow blur steps=5}] (dec) at (7.6,0) {có thực thể\\cụ thể?};
+  \draw[mui] (q) -- (link); \draw[mui] (link) -- (dec);
+  % nhánh chính xác
+  \node[khoiP, text width=2.8cm] (t1) at (11.6,3.3) {\texttt{kg\_lookup}\\ đọc thuộc tính nút};
+  \node[khoiP, text width=2.8cm] (t2) at (11.6,1.6) {\texttt{kg\_aggregate}\\ giao nút khái niệm};
+  \node[khoiP, text width=2.8cm] (t3) at (11.6,-0.1) {\texttt{pandas\_calc}\\ thống kê tháng/năm};
+  \draw[mui] (dec.north) |- node[nhan, above, pos=0.75] {có: ngày / hồ sơ} (t1);
+  \draw[mui] (dec.north) ++(0,0) |- node[nhan, above, pos=0.75] {nhóm} (t2);
+  \draw[mui] (dec.east) -- node[nhan, below, pos=0.4] {giai đoạn} (t3);
+  % nhánh RAG
+  \node[khoi, text width=3.4cm] (rag) at (7.6,-3.2) {\texttt{rag\_search}\\ BM25 + e5 + đồ thị, RRF, rerank top-5};
+  \node[khoiT, text width=2.8cm] (llm) at (11.6,-3.2) {LLM Qwen2.5\\ tổng hợp có trích dẫn [n]};
+  \draw[mui] (dec.south) -- node[nhan, right] {không: câu hỏi mở} (rag);
+  \draw[mui] (rag) -- (llm);
+  % đầu ra
+  \node[hop=cGreen, text width=2.6cm, font=\small] (out) at (15.4,0.6) {\textbf{Trả lời}\\ + nguồn\\ + vết suy luận};
+  \foreach \t in {t1,t2,t3}\draw[muiM=cGreen] (\t.east) -- (out.west);
+  \draw[muiM=cGreen] (llm.east) -| (out.south);
+  \draw[muiM=cRed, dashed] (t3.south) to[bend left=10] node[nhan, right, pos=0.35] {không trả lời được} (rag.north east);
+\end{tikzpicture}

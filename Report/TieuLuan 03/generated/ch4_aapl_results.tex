@@ -1,0 +1,17 @@
+\begin{tabular}{llrrrrrrr}
+\toprule
+Mô hình & Framework & MAE & RMSE & MAPE (\%) & R² & \makecell[r]{Đúng hướng\\(\%)} & Epoch & Giây/epoch \\
+\midrule
+Naive (hôm qua) & -- & 1{,}544 & 2{,}259 & 1{,}38 & 0{,}9982 & -- & -- & -- \\
+\midrule
+SimpleRNN & PyTorch & 1{,}542 & 2{,}257 & 1{,}38 & 0{,}9982 & 52{,}7 & 19 & 1{,}75 \\
+LSTM & PyTorch & 1{,}542 & 2{,}259 & 1{,}38 & 0{,}9982 & 52{,}0 & 19 & 2{,}15 \\
+GRU & PyTorch & \textbf{1{,}541} & \textbf{2{,}257} & \textbf{1{,}38} & \textbf{0{,}9982} & 51{,}3 & 19 & 1{,}38 \\
+BiLSTM & PyTorch & 1{,}542 & 2{,}259 & 1{,}38 & 0{,}9982 & 52{,}4 & 19 & 1{,}28 \\
+\midrule
+SimpleRNN & Keras & 1{,}548 & 2{,}262 & 1{,}39 & 0{,}9982 & 50{,}3 & 23 & 0{,}86 \\
+LSTM & Keras & 1{,}564 & 2{,}277 & 1{,}40 & 0{,}9981 & 46{,}5 & 18 & 2{,}63 \\
+GRU & Keras & 1{,}554 & 2{,}272 & 1{,}39 & 0{,}9982 & 48{,}5 & 20 & 2{,}35 \\
+BiLSTM & Keras & 1{,}573 & 2{,}285 & 1{,}41 & 0{,}9981 & 47{,}0 & 18 & 1{,}99 \\
+\bottomrule
+\end{tabular}

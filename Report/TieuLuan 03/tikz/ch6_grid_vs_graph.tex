@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ---- ảnh: lưới điểm ảnh, láng giềng 3x3 cố định
+  \node[tieude] at (2.0,5.0) {Ảnh: lưới đều};
+  \foreach \i in {0,...,4}{\foreach \j in {0,...,4}{
+    \pgfmathsetmacro{\v}{mod(7*\i+3*\j,10)*6+20}
+    \fill[cBlue!\v] (\i*0.8,\j*0.8) rectangle ++(0.8,0.8);
+    \draw[white, thick] (\i*0.8,\j*0.8) rectangle ++(0.8,0.8);}}
+  \draw[cRed, ultra thick, rounded corners=2pt] (0.8,0.8) rectangle (3.2,3.2);
+  \fill[cRed] (2.0,2.0) circle (0.13);
+  \node[nhan, align=center] at (2.0,-0.6) {mỗi điểm ảnh có đúng 8 láng giềng,\\thứ tự trên–dưới–trái–phải cố định};
+  % ---- mũi tên chuyển
+  \draw[muiM=cPurple, line width=2pt] (4.6,2.0) -- (6.2,2.0) node[midway, above, font=\small\bfseries, text=cPurple] {tổng quát hoá};
+  % ---- đồ thị: số láng giềng thay đổi, không thứ tự
+  \node[tieude] at (9.8,5.0) {Đồ thị: cấu trúc bất quy tắc};
+  \foreach \n/\x/\y/\c in {a/7.2/3.6/cOrange, b/8.6/4.3/cGreen, c/9.6/2.4/cRed, d/11.4/3.9/cPurple, e/12.4/2.0/cTeal,
+                           f/10.9/0.6/cPink, g/8.4/0.9/cSky, h/7.0/1.8/cYellow, i/12.9/4.4/cLime}
+    \node[cau=\c] (\n) at (\x,\y) {};
+  \foreach \u/\v in {a/b, b/c, a/c, c/d, d/e, c/f, f/g, g/h, h/a, c/g, d/i, e/i, e/f}
+    \draw[thick, gray!70] (\u) -- (\v);
+  \foreach \u in {b,a,d,f,g} \draw[cRed, ultra thick] (c) -- (\u);
+  \node[cau=cRed, minimum size=10mm] at (c) {$v$};
+  \node[nhan, align=center] at (10.0,-0.6) {nút $v$ có 5 láng giềng, nút khác có 2;\\không có hệ toạ độ hay thứ tự toàn cục};
+\end{tikzpicture}

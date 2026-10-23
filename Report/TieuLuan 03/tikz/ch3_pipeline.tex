@@ -1,0 +1,16 @@
+\begin{tikzpicture}[node distance=0.5cm and 0.6cm, every node/.style={font=\small}]
+  \node[csdl=cTeal] (k) {Kaggle /\\torchvision};
+  \node[khoi, right=of k, text width=2.4cm] (npz) {Tải \& chuẩn hoá\\\texttt{data/ch3/*.npz}\\(uint8, NHWC)};
+  \node[khoiX, right=of npz, text width=2.6cm] (split) {Chia train/val\\phân tầng 90/10\\+ test gốc};
+  \node[khoi, above right=0.6cm and 0.9cm of split, text width=3.0cm] (np) {NumPy from scratch\\CPU 6 luồng};
+  \node[khoiC, right=0.9cm of split, text width=3.0cm] (pt) {PyTorch Basic + Improved\\GPU RTX 4060};
+  \node[khoiP, below right=0.6cm and 0.9cm of split, text width=3.0cm] (tf) {TensorFlow Basic + Improved\\CPU 8 luồng};
+  \node[khoiG, right=1.0cm of pt, text width=2.6cm] (ev) {Đánh giá trên\\cùng tập test:\\Acc, P, R, F1, CM,\\thời gian};
+  \node[khoiR, right=of ev, text width=2.2cm] (dep) {\texttt{serve\_ch3}\\Web/mobile};
+  \draw[mui] (k) -- (npz); \draw[mui] (npz) -- (split);
+  \draw[mui] (split) -- (np.west); \draw[mui] (split) -- (pt); \draw[mui] (split) -- (tf.west);
+  \draw[mui] (np.east) -- (ev); \draw[mui] (pt) -- (ev); \draw[mui] (tf.east) -- (ev); \draw[mui] (ev) -- (dep);
+  \begin{scope}[on background layer]
+    \node[vung=cBlue, fit=(np)(pt)(tf), label={[font=\small\bfseries, text=cNavy]above:3 tiến trình song song}] {};
+  \end{scope}
+\end{tikzpicture}

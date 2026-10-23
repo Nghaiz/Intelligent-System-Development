@@ -1,0 +1,25 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ----- LPG
+  \node[tieude] at (4.0,4.7) {Labeled Property Graph (Neo4j, Cypher)};
+  \node[vung=cBlue, minimum width=8.8cm, minimum height=6.6cm] at (4.0,1.0) {};
+  \node[hop=cRed, text width=3.0cm, align=left, font=\small] (a) at (1.6,2.4)
+     {\textbf{:TradingDay}\\ date: 2020-03-16\\ close: 54,22\\ volume: 85{,}0M};
+  \node[hop=cGreen, text width=2.2cm, align=left, font=\small] (m) at (6.9,2.4) {\textbf{:Month}\\ id: 2020-03};
+  \node[hop=cPurple, text width=2.2cm, align=left, font=\small] (y) at (6.9,-0.6) {\textbf{:Year}\\ id: 2020};
+  \draw[mui] (a) -- node[nhan, above, font=\scriptsize] {IN\_MONTH} (m);
+  \draw[mui] (m) -- node[nhan, right, font=\footnotesize] {IN\_YEAR} (y);
+  \node[hop=cRed, text width=3.0cm, align=left, font=\small] (b) at (1.6,-0.6) {\textbf{:TradingDay}\\ date: 2020-03-17};
+  \draw[mui] (a) -- node[nhan, right, font=\footnotesize] {NEXT\_DAY} (b);
+  \node[nhan, text width=7.4cm, align=center] at (4.0,-1.8) {thuộc tính gắn trực tiếp lên nút và cạnh};
+  % ----- RDF
+  \node[tieude] at (13.0,4.7) {RDF (bộ ba, SPARQL)};
+  \node[vung=cPurple, minimum width=8.2cm, minimum height=6.6cm] at (13.0,1.0) {};
+  \node[cau=cRed, minimum size=13mm] (s) at (10.0,1.6) {\scriptsize kg:D16};
+  \node[hop=cGreen, font=\small] (o1) at (14.8,3.7) {``54,22''\textasciicircum\textasciicircum xsd:double};
+  \node[hop=cTeal, font=\small] (o2) at (14.8,1.6) {``2020-03-16''\textasciicircum\textasciicircum xsd:date};
+  \node[cau=cGreen, minimum size=13mm] (o3) at (14.8,-0.4) {\scriptsize kg:M03};
+  \draw[mui] (s) -- node[nhan, sloped, above, pos=0.68, font=\footnotesize] {kg:has\_close} (o1);
+  \draw[mui] (s) -- node[nhan, above, pos=0.55, font=\footnotesize] {kg:has\_date} (o2);
+  \draw[mui] (s) -- node[nhan, sloped, below, pos=0.55, font=\footnotesize] {kg:in\_month} (o3);
+  \node[nhan, text width=7.4cm, align=center] at (13.0,-1.8) {mọi dữ kiện là bộ ba URI; literal có kiểu XSD};
+\end{tikzpicture}

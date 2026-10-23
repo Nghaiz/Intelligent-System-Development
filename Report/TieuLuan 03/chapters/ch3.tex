@@ -1,0 +1,1346 @@
+% =====================================================================
+%  Chương 3 — Mạng nơ-ron tích chập (CNN) (làn L3)
+%  Mọi con số thực nghiệm lấy từ \SL{ch3_*}; mã trích từ src/TieuLuan 03/{tl3,scripts}/ch3_*.py và tl3/serve_ch3.py
+% =====================================================================
+\providecommand{\bonhanxet}[3]{%
+  \begin{phathien}{Quan sát -- Diễn giải -- Hàm ý cho mô hình}
+  \textbf{Quan sát.} #1\par\smallskip
+  \textbf{Diễn giải.} #2\par\smallskip
+  \textbf{Hàm ý.} #3
+  \end{phathien}}
+
+\chapter{Mạng nơ-ron tích chập (Convolutional Neural Network -- CNN)}
+\label{chap:cnn}
+
+Chương~2 xây các mô hình học máy trên dữ liệu bảng, nơi mỗi mẫu là một vector đặc trưng do con người chọn. Ảnh thì
+khác: một tấm ảnh màu $224\times224$ có hơn $150$ nghìn giá trị điểm ảnh, và ý nghĩa của nó (chữ số, chiếc áo, bàn tay)
+nằm ở \emph{cách các điểm ảnh lân cận kết hợp với nhau}, không ở từng điểm ảnh riêng lẻ. Mạng nơ-ron tích chập
+(Convolutional Neural Network, CNN) giải quyết đúng chỗ này: thay vì để con người thiết kế đặc trưng, mạng tự học các bộ
+lọc phát hiện cạnh, góc, kết cấu rồi ghép dần chúng thành các bộ phận và cả vật thể.
+
+Chương gồm hai phần. Phần lý thuyết (mục~\ref{sec:cnn-concept}--\ref{sec:cnn-advanced}) trình bày khái niệm, lịch sử,
+cấu trúc, từng phép toán của CNN kèm công thức và ví dụ số, rồi điểm qua các kiến trúc kinh điển từ LeNet-5 đến
+EfficientNet. Phần thực nghiệm (mục~\ref{sec:cnn-mnist}--\ref{sec:cnn-cifar}) áp dụng trên bốn bộ dữ liệu ảnh có độ khó
+tăng dần: chữ số viết tay MNIST, trang phục Fashion-MNIST, cử chỉ tay Rock/Paper/Scissors và ảnh vật thể CIFAR-10. Trên mỗi
+bộ, cùng một \emph{Basic CNN} được cài ba lần: tự viết bằng NumPy (from scratch, kể cả lan truyền ngược), bằng PyTorch và
+bằng TensorFlow/Keras; sau đó một \emph{Improved CNN} có khối dư, BatchNorm, Dropout, tăng cường dữ liệu và lịch học
+được cài bằng PyTorch và TensorFlow. Mọi mô hình được đánh giá trên cùng tập kiểm tra bằng accuracy, precision, recall,
+F1 macro, ma trận nhầm lẫn, thời gian huấn luyện và suy luận, và được đưa lên Web App để nhận dạng ảnh người dùng tải lên.
+
+% =====================================================================
+\section{Khái niệm về mạng nơ-ron tích chập}
+\label{sec:cnn-concept}
+
+\begin{dinhnghia}{Mạng nơ-ron tích chập}
+Mạng nơ-ron tích chập là mạng nơ-ron nhân tạo truyền thẳng trong đó ít nhất một tầng thay phép nhân ma trận đầy đủ bằng
+\emph{phép tích chập}: mỗi nơ-ron đầu ra chỉ nối với một vùng nhỏ liền kề của đầu vào (\emph{trường tiếp nhận}, receptive
+field), và cùng một bộ trọng số (\emph{kernel}, bộ lọc) được dùng lại tại mọi vị trí~\cite{ch3:lecun1998,ch3:goodfellow2016}.
+\end{dinhnghia}
+
+Hai ý tưởng trong định nghĩa trên, \emph{kết nối cục bộ} (local connectivity) và \emph{chia sẻ trọng số} (weight sharing),
+là lý do CNN thống trị thị giác máy tính. Hình~\ref{fig:ch3-fc-local} so sánh trực tiếp với mạng kết nối đầy đủ (MLP)
+ở Chương~2. Nếu nối một ảnh $224\times224\times3$ với chỉ $1.000$ nơ-ron ẩn, MLP cần khoảng $150$ triệu trọng số, mỗi
+trọng số gắn với một vị trí điểm ảnh cố định; khi con mèo dịch sang trái vài điểm ảnh, các trọng số khác hoàn toàn phải
+nhận ra nó. Một tầng tích chập $3\times3$ biến $3$ kênh thành $64$ kênh chỉ cần $(3\cdot3\cdot3+1)\cdot64=1.792$ tham số,
+bất kể ảnh lớn bao nhiêu, và một bộ lọc phát hiện ``tai mèo'' ở góc trên thì cũng phát hiện được ở góc dưới.
+
+\hinhtikz{ch3_fc_vs_local}{So sánh (a) tầng kết nối đầy đủ của MLP, mỗi nơ-ron nối với mọi điểm ảnh, với (b) tầng tích chập:
+mỗi nơ-ron chỉ nhìn ba điểm ảnh liền kề, và cùng bộ trọng số $(w_1,w_2,w_3)$ (ba màu đường nối) được dùng lại ở mọi vị trí.}{ch3-fc-local}
+
+Ba thiên kiến quy nạp (inductive bias) làm nên sức mạnh của CNN:
+\begin{itemize}
+  \item \textbf{Tính cục bộ:} điểm ảnh gần nhau tương quan mạnh hơn điểm ảnh xa nhau, nên đặc trưng sơ cấp (cạnh, góc)
+    chỉ cần nhìn vùng nhỏ.
+  \item \textbf{Bất biến/đồng biến tịnh tiến:} tích chập là phép \emph{đồng biến} với phép dịch (dịch ảnh vào thì bản đồ
+    đặc trưng dịch theo); thêm pooling, đầu ra trở nên gần \emph{bất biến} với dịch chuyển nhỏ.
+  \item \textbf{Tính phân cấp:} vật thể được ghép từ bộ phận, bộ phận ghép từ hoa văn, hoa văn ghép từ cạnh. Xếp chồng
+    nhiều tầng tích chập cho phép trường tiếp nhận lớn dần và đặc trưng trừu tượng dần.
+\end{itemize}
+
+% =====================================================================
+\section{Lịch sử phát triển của CNN}
+\label{sec:cnn-history}
+
+Hình~\ref{fig:ch3-history} tóm tắt các mốc chính. Gốc rễ của CNN nằm trong sinh học thần kinh: năm 1959 và 1962, Hubel và
+Wiesel ghi tín hiệu từ vỏ não thị giác của mèo và phát hiện hai loại tế bào~\cite{ch3:hubel1959,ch3:hubel1962}.
+\emph{Tế bào đơn giản} chỉ phản ứng với một cạnh có hướng xác định tại một vị trí nhỏ; \emph{tế bào phức hợp} phản ứng với
+cùng cạnh đó ở bất kỳ đâu trong một vùng lớn hơn. Đây chính là hình mẫu của tầng tích chập và tầng pooling ngày nay.
+
+\hinhtikz{ch3_history}{Dòng thời gian phát triển của mạng nơ-ron tích chập, từ thí nghiệm của Hubel và Wiesel (1959) đến
+ConvNeXt (2022). Hàng trên và hàng dưới xen kẽ để các mốc không chồng lên nhau.}{ch3-history}
+
+\begin{itemize}
+  \item \textbf{1980 -- Neocognitron.} Fukushima mô phỏng hai loại tế bào bằng các lớp ``S'' và ``C'' xếp xen kẽ, nhận
+    dạng được mẫu bị dịch vị trí~\cite{ch3:fukushima1980}. Mạng chưa có cách huấn luyện bằng gradient.
+  \item \textbf{1989 -- 1998, LeCun và LeNet.} LeCun kết hợp kiến trúc tích chập với lan truyền ngược để đọc mã bưu chính
+    viết tay~\cite{ch3:lecun1989}, rồi hoàn thiện thành LeNet-5 dùng trong máy đọc séc ngân hàng~\cite{ch3:lecun1998}.
+    Bộ MNIST ra đời trong cùng công trình này.
+  \item \textbf{2006 -- 2011, GPU.} Chellapilla và cộng sự đưa CNN lên GPU~\cite{ch3:chellapilla2006}; nhưng do thiếu dữ
+    liệu lớn, CNN vẫn thua các phương pháp đặc trưng thủ công (SIFT, HOG) cộng SVM.
+  \item \textbf{2012 -- AlexNet.} Krizhevsky, Sutskever và Hinton thắng ImageNet (ILSVRC) với sai số top-5 15,3\,\%, bỏ xa
+    vị trí thứ hai (26,2\,\%)~\cite{ch3:krizhevsky2012,ch3:russakovsky2015}. ReLU, Dropout, tăng cường dữ liệu và huấn
+    luyện trên hai GPU là các bí quyết; năm 2012 được xem là khởi đầu kỷ nguyên học sâu.
+  \item \textbf{2014 -- VGG và GoogLeNet} đẩy độ sâu lên 16--22 tầng bằng hai hướng: xếp chồng kernel $3\times3$ đồng
+    nhất~\cite{ch3:simonyan2015} và khối Inception đa nhánh~\cite{ch3:szegedy2015}.
+  \item \textbf{2015 -- ResNet} với kết nối tắt cho phép huấn luyện mạng 152 tầng, sai số top-5 3,57\,\%, thấp hơn mức
+    ước lượng của con người trên ImageNet~\cite{ch3:he2016}.
+  \item \textbf{2017 -- 2019} tập trung vào hiệu quả: DenseNet tái sử dụng đặc trưng~\cite{ch3:huang2017}, MobileNet dùng
+    tích chập tách được theo chiều sâu cho thiết bị di động~\cite{ch3:howard2017}, EfficientNet co giãn đồng thời độ sâu,
+    độ rộng và độ phân giải~\cite{ch3:tan2019}.
+  \item \textbf{2020 -- nay.} Vision Transformer (ViT) cho thấy cơ chế attention cũng làm tốt bài toán ảnh khi đủ dữ
+    liệu~\cite{ch3:dosovitskiy2021}; đáp lại, ConvNeXt hiện đại hóa CNN thuần và đạt độ chính xác ngang ViT~\cite{ch3:liu2022}.
+    Ngày nay hai họ kiến trúc cùng tồn tại và thường được kết hợp.
+\end{itemize}
+
+% =====================================================================
+\section{Cấu trúc và nguyên lý hoạt động của CNN}
+\label{sec:cnn-structure}
+
+\subsection{Cấu trúc của CNN}
+Một CNN phân loại ảnh điển hình gồm hai khối (Hình~\ref{fig:ch3-cnn-general}). \textbf{Khối trích chọn đặc trưng}
+(feature extractor) lặp lại nhiều lần bộ ba \emph{Tích chập $\to$ Hàm kích hoạt phi tuyến $\to$ Pooling}; sau mỗi lần lặp,
+chiều cao và chiều rộng giảm còn một nửa trong khi số kênh tăng lên, nghĩa là mạng đổi độ phân giải không gian lấy độ phong
+phú ngữ nghĩa. \textbf{Khối phân loại} (classifier) làm phẳng (flatten) tensor đặc trưng cuối thành vector, đưa qua một hoặc
+vài tầng kết nối đầy đủ và tầng Softmax để ra phân phối xác suất trên $K$ lớp.
+
+\hinhtikz{ch3_cnn_general}{Cấu trúc tổng quát của một CNN phân loại ảnh màu $32\times32\times3$: hai khối Conv + ReLU +
+MaxPool trích chọn đặc trưng (khối xanh, tím; độ dày khối biểu thị số kênh), sau đó Flatten, tầng ẩn FC 128 và Softmax
+$K$ lớp. Kích thước ghi dưới mỗi khối là kích thước tensor tại đó.}{ch3-cnn-general}
+
+\subsection{Nguyên lý hoạt động của CNN}
+Gọi $A^{(0)}=X$ là ảnh vào. Tầng tích chập thứ $\ell$ tính
+\begin{equation}
+  Z^{(\ell)} = W^{(\ell)} * A^{(\ell-1)} + b^{(\ell)}, \qquad A^{(\ell)} = \sigma\big(Z^{(\ell)}\big),
+  \label{eq:ch3-layer}
+\end{equation}
+với $*$ là phép tích chập nhiều kênh, $\sigma$ là hàm kích hoạt (thường là ReLU). Pooling giảm kích thước $A^{(\ell)}$.
+Sau $L$ tầng, vector $\mathbf{h}=\mathrm{flatten}(A^{(L)})$ đi qua tầng tuyến tính tạo \emph{logits}
+$\mathbf{z}=W_{fc}\mathbf{h}+\mathbf{b}_{fc}$ và Softmax $\mathbf{p}=\mathrm{softmax}(\mathbf{z})$. Toàn bộ tham số
+$\theta=\{W^{(\ell)},b^{(\ell)},W_{fc},\mathbf{b}_{fc}\}$ được học bằng cách cực tiểu hàm mất mát entropy chéo trên tập
+huấn luyện, gradient tính bằng lan truyền ngược (mục~\ref{sec:cnn-backprop}).
+
+Zeiler và Fergus đã trực quan hóa những gì mỗi tầng học được~\cite{ch3:zeiler2014}: tầng đầu học các bộ lọc giống bộ
+lọc Gabor phát hiện cạnh và đốm màu; tầng giữa học kết cấu và hoa văn lặp; tầng sâu phản ứng với bộ phận vật thể như mắt,
+bánh xe, chữ. Ta sẽ kiểm chứng điều này trên các mô hình của chương (Hình~\ref{fig:ch3-mnist-filters}
+và~\ref{fig:ch3-cifar10-fmaps}).
+
+\subsection{Ứng dụng}
+CNN là nền tảng của hầu hết hệ thống thị giác máy tính hiện nay: phân loại ảnh (sản phẩm thương mại điện tử, ảnh y tế
+X-quang, da liễu), phát hiện vật thể (YOLO, Faster R-CNN cho xe tự lái, camera an ninh), phân vùng ảnh (U-Net trong y
+sinh), nhận dạng khuôn mặt, đọc chữ quang học (OCR), kiểm tra lỗi sản phẩm trên dây chuyền và phân tích ảnh vệ tinh. Ngoài
+ảnh, tích chập một chiều được dùng cho âm thanh, tín hiệu điện tim và chuỗi thời gian; tích chập ba chiều cho video và ảnh
+cắt lớp CT/MRI.
+
+% =====================================================================
+\section{Các khái niệm cơ bản của CNN}
+\label{sec:cnn-basics}
+
+\subsection{Biểu diễn ảnh dưới dạng tensor}
+Máy tính lưu ảnh xám thành ma trận $H\times W$ các số nguyên $0$--$255$ (0 là đen, 255 là trắng). Ảnh màu có ba ma trận
+như vậy cho ba kênh đỏ, lục, lam (RGB), tạo tensor bậc ba $H\times W\times 3$. Khi huấn luyện, nhiều ảnh được gộp thành một
+\emph{lô} (batch) là tensor bậc bốn. PyTorch dùng thứ tự $N\times C\times H\times W$ (kênh trước), Keras/TensorFlow dùng
+$N\times H\times W\times C$ (kênh sau); bản NumPy của chương dùng thứ tự của PyTorch. Giá trị điểm ảnh thường được chia
+cho 255 để nằm trong $[0,1]$, và với mô hình cải tiến được chuẩn hóa tiếp theo từng kênh: $\hat{x}_c=(x_c-\mu_c)/\sigma_c$.
+
+\hinhtikz{ch3_rgb_tensor}{Ba cách nhìn dữ liệu ảnh: ảnh xám là ma trận số (ô càng sáng giá trị càng lớn), ảnh màu là ba
+kênh R, G, B xếp chồng, và một lô ảnh là tensor bốn chiều.}{ch3-rgb-tensor}
+
+\subsection{Kernel và phép tích chập}
+\emph{Kernel} (bộ lọc) là một ma trận trọng số nhỏ, thường $3\times3$ hoặc $5\times5$. Phép tích chập trượt kernel lên ảnh;
+tại mỗi vị trí, nhân từng phần tử của kernel với vùng ảnh bên dưới rồi cộng lại. Với đầu vào một kênh $X$ và kernel $K$
+kích thước $k\times k$:
+\begin{equation}
+  Z_{u,v} = b + \sum_{i=0}^{k-1}\sum_{j=0}^{k-1} X_{u+i,\,v+j}\, K_{i,j}.
+  \label{eq:ch3-conv1}
+\end{equation}
+Chính xác thì công thức~\eqref{eq:ch3-conv1} là \emph{tương quan chéo} (cross-correlation); tích chập toán học lật kernel
+$180^\circ$ trước khi trượt. Vì kernel là tham số được học, việc lật hay không không ảnh hưởng gì, nên mọi thư viện học sâu
+đều cài tương quan chéo và vẫn gọi là ``convolution''. Với đầu vào $C$ kênh, kernel có $C$ lát, và tổng được lấy thêm theo
+kênh:
+\begin{equation}
+  Z_{o,u,v} = b_o + \sum_{c=1}^{C}\sum_{i=0}^{k-1}\sum_{j=0}^{k-1} X_{c,\,us+i,\,vs+j}\; K_{o,c,i,j},
+  \label{eq:ch3-conv}
+\end{equation}
+trong đó $o$ chạy qua $C_{out}$ bộ lọc và $s$ là bước trượt. Hình~\ref{fig:ch3-conv-op} tính tay một vị trí: kernel phát
+hiện cạnh dọc $\left[\begin{smallmatrix}1&0&-1\\1&0&-1\\1&0&-1\end{smallmatrix}\right]$ cho giá trị âm lớn khi bên phải sáng hơn bên trái.
+
+\hinhtikz{ch3_conv_op}{Phép tích chập trên ảnh $6\times6$ với kernel phát hiện cạnh dọc $3\times3$, bước 1, không đệm:
+vùng cam nhân phần tử với kernel rồi cộng được $-3$ (ô xanh lá của feature map $4\times4$). Hộp dưới ghi công thức tổng
+quát và kích thước đầu ra.}{ch3-conv-op}
+
+\subsection{Bộ lọc và bản đồ đặc trưng}
+Mỗi tầng tích chập có $C_{out}$ bộ lọc, mỗi bộ lọc là một khối $C_{in}\times k\times k$. Kết quả trượt một bộ lọc trên toàn
+ảnh là một \emph{bản đồ đặc trưng} (feature map) hai chiều cho biết đặc trưng mà bộ lọc ấy đại diện xuất hiện mạnh ở đâu.
+Xếp $C_{out}$ bản đồ lại được tensor đầu ra $C_{out}\times H_{out}\times W_{out}$, trở thành đầu vào nhiều kênh của tầng kế
+tiếp. Số tham số của một tầng tích chập là
+\begin{equation}
+  P_{conv} = (k\cdot k\cdot C_{in} + 1)\cdot C_{out},
+\end{equation}
+không phụ thuộc kích thước ảnh. Chẳng hạn tầng Conv $3\times3$ biến 32 kênh thành 64 kênh của Basic CNN có
+$(9\cdot32+1)\cdot64=18.496$ tham số.
+
+\subsection{Bước trượt (stride)}
+Bước trượt $s$ là số điểm ảnh kernel nhảy qua mỗi lần di chuyển. $s=1$ giữ nguyên độ phân giải (nếu có đệm), $s=2$ giảm
+một nửa chiều cao và chiều rộng, là một cách giảm mẫu (downsampling) thay cho pooling, được ResNet và nhiều mạng hiện đại
+dùng.
+
+\subsection{Đệm (padding)}
+Không đệm (\emph{valid}), mỗi tầng $3\times3$ làm ảnh co mất hai điểm ảnh mỗi chiều và các điểm ảnh ở biên ít được ``nhìn''
+hơn điểm ảnh ở giữa. \emph{Zero-padding} thêm $p$ hàng/cột số 0 quanh ảnh; với $k=3$, $p=1$, $s=1$ đầu ra giữ nguyên kích
+thước (\emph{same}). Tổng quát:
+\begin{equation}
+  H_{out} = \left\lfloor \frac{H_{in} + 2p - k}{s} \right\rfloor + 1, \qquad
+  W_{out} = \left\lfloor \frac{W_{in} + 2p - k}{s} \right\rfloor + 1.
+  \label{eq:ch3-outsize}
+\end{equation}
+
+\hinhtikz{ch3_stride_padding}{(a) Zero-padding $p=1$ (viền xám) giữ đầu ra $5\times5$ với kernel $3\times3$;
+(b) bước trượt $s=2$: ba vị trí kernel liên tiếp (đỏ, tím, xanh) cách nhau hai ô, đầu ra $3\times3$;
+(c) công thức kích thước đầu ra và số tham số.}{ch3-stride-padding}
+
+\subsection{Hàm kích hoạt ReLU}
+Nếu không có hàm phi tuyến, nhiều tầng tích chập nối tiếp vẫn chỉ tương đương một phép tuyến tính. Hàm \emph{ReLU}
+(Rectified Linear Unit)~\cite{ch3:nair2010} giữ phần dương và cắt phần âm:
+\begin{equation}
+  \mathrm{ReLU}(z)=\max(0,z), \qquad \frac{d\,\mathrm{ReLU}}{dz}=\mathbf{1}[z>0].
+\end{equation}
+So với sigmoid $\sigma(z)=1/(1+e^{-z})$ và $\tanh$, ReLU có đạo hàm bằng 1 trên toàn miền dương nên gradient không bị
+``bão hòa'' khi lan qua nhiều tầng, lại tính rất rẻ. Nhược điểm là nơ-ron có thể ``chết'' khi luôn nhận đầu vào âm; các
+biến thể Leaky ReLU ($\max(\alpha z,z)$), ELU, GELU khắc phục điều này.
+
+\hinhtikz{ch3_activations}{Trái: đồ thị bốn hàm kích hoạt thường gặp. Phải: ReLU áp lên một bản đồ đặc trưng $3\times3$:
+các ô âm (đỏ) bị đưa về 0, các ô dương (xanh) giữ nguyên.}{ch3-activations}
+
+\subsection{Pooling}
+Tầng pooling giảm kích thước không gian bằng cách tóm tắt mỗi cửa sổ (thường $2\times2$, bước 2) thành một số.
+\emph{Max pooling} lấy giá trị lớn nhất, giữ lại phản ứng mạnh nhất của đặc trưng trong vùng; \emph{average pooling} lấy
+trung bình. Pooling không có tham số học, giảm 75\,\% số điểm của bản đồ, tăng trường tiếp nhận của các tầng sau và làm
+mạng bền hơn với dịch chuyển nhỏ. \emph{Global average pooling} (GAP)~\cite{ch3:lin2014} lấy trung bình cả bản đồ, biến
+tensor $C\times H\times W$ thành vector $C$ chiều, thay cho Flatten ở các mạng hiện đại (và ở Improved CNN của chương).
+
+\hinhtikz{ch3_pooling}{Max pooling và average pooling $2\times2$, bước 2 trên bản đồ $4\times4$: mỗi vùng màu cho một
+giá trị đầu ra.}{ch3-pooling}
+
+\subsection{Flatten và tầng kết nối đầy đủ}
+Sau khối trích chọn đặc trưng, tensor $C\times H\times W$ được trải phẳng thành vector $CHW$ chiều và đưa qua tầng kết nối
+đầy đủ (fully connected, Dense): $\mathbf{h}=\mathrm{ReLU}(W\mathbf{x}+\mathbf{b})$. Tầng này kết hợp các đặc trưng cục bộ
+thành quyết định toàn cục. Trong Basic CNN của chương, riêng tầng Dense 128 chiếm phần lớn tham số
+(Bảng~\ref{tab:ch3-arch-basic-gray}); đó là lý do mạng hiện đại thay Flatten bằng GAP.
+
+\subsection{Softmax}
+Tầng cuối cho $K$ \emph{logits} $z_1,\dots,z_K$ là số thực tùy ý. Softmax biến chúng thành phân phối xác suất:
+\begin{equation}
+  p_k = \mathrm{softmax}(\mathbf{z})_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}, \qquad \sum_k p_k = 1.
+\end{equation}
+Khi cài đặt, ta trừ $\max_j z_j$ khỏi mọi logit trước khi lấy mũ; kết quả không đổi nhưng tránh tràn số $e^{z}$ (Đoạn
+mã~\ref{code:ch3_scratch__softmax_cross_entropy}).
+
+\subsection{Hàm mất mát}
+Với nhãn đúng $y$, hàm mất mát entropy chéo (cross-entropy) là
+\begin{equation}
+  L = -\log p_y = -z_y + \log\sum_{j} e^{z_j}, \qquad
+  \frac{\partial L}{\partial z_k} = p_k - \mathbf{1}[k=y].
+  \label{eq:ch3-ce}
+\end{equation}
+Gradient theo logits gọn đến bất ngờ: xác suất dự đoán trừ vector one-hot. Hình~\ref{fig:ch3-softmax} minh họa với năm
+logits: nếu nhãn đúng là lớp có xác suất 0,62 thì mất mát chỉ 0,47; nếu nhãn đúng là lớp mô hình chỉ gán 0,011 thì mất
+mát vọt lên 4,47. Entropy chéo phạt rất nặng dự đoán sai mà tự tin. \emph{Label smoothing}~\cite{ch3:szegedy2016} thay
+one-hot bằng $(1-\varepsilon)$ cho lớp đúng và $\varepsilon/K$ cho các lớp khác, ngăn mô hình đẩy logits ra vô cực;
+Improved CNN dùng $\varepsilon=0{,}1$.
+
+\hinhtikz{ch3_softmax}{Softmax biến logits (trái) thành xác suất (giữa); hộp phải tính entropy chéo cho hai trường hợp
+nhãn đúng.}{ch3-softmax}
+
+\subsection{Lan truyền ngược và hạ gradient}
+\label{sec:cnn-backprop}
+Huấn luyện là bài toán cực tiểu $\mathcal{L}(\theta)=\frac{1}{N}\sum_i L_i$. Mỗi bước lấy một lô nhỏ, tính đầu ra
+(lan truyền thuận), tính gradient của mất mát theo mọi tham số bằng quy tắc dây chuyền đi ngược từ đầu ra về đầu vào
+(lan truyền ngược) và cập nhật tham số. Các công thức gradient của từng loại tầng:
+\begin{itemize}
+  \item \textbf{Tầng tích chập.} Với $\delta^{(\ell)}=\partial L/\partial Z^{(\ell)}$:
+  \begin{equation}
+    \frac{\partial L}{\partial K_{o,c,i,j}} = \sum_{u,v} \delta^{(\ell)}_{o,u,v}\, A^{(\ell-1)}_{c,u+i,v+j},\qquad
+    \frac{\partial L}{\partial b_o} = \sum_{u,v}\delta^{(\ell)}_{o,u,v},
+  \end{equation}
+  tức là tương quan chéo giữa đầu vào và gradient đầu ra; còn gradient theo đầu vào là tích chập ``đầy đủ'' của
+  $\delta^{(\ell)}$ với kernel lật $180^\circ$.
+  \item \textbf{ReLU:} nhân gradient với $\mathbf{1}[z>0]$.
+  \item \textbf{Max pooling:} chỉ chuyển gradient về ô đạt cực đại trong mỗi cửa sổ, các ô khác nhận 0.
+  \item \textbf{Tầng kết nối đầy đủ:} $\partial L/\partial W=\delta\,\mathbf{h}^\top$, $\partial L/\partial\mathbf{h}=W^\top\delta$.
+\end{itemize}
+Thuật toán tối ưu Adam~\cite{ch3:kingma2015} cập nhật mỗi tham số theo trung bình động của gradient ($m$) và của bình
+phương gradient ($v$):
+\begin{equation}
+  m_t=\beta_1 m_{t-1}+(1-\beta_1)g_t,\quad v_t=\beta_2 v_{t-1}+(1-\beta_2)g_t^2,\quad
+  \theta_t=\theta_{t-1}-\eta\,\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon},
+\end{equation}
+với $\hat m_t=m_t/(1-\beta_1^t)$, $\hat v_t=v_t/(1-\beta_2^t)$. AdamW~\cite{ch3:loshchilov2019} tách phần suy giảm trọng
+số khỏi gradient: $\theta_t\leftarrow\theta_t-\eta\lambda\theta_{t-1}$, điều chuẩn tốt hơn L2 trong Adam.
+
+\hinhtikz{ch3_backprop}{Lan truyền thuận (mũi tên xanh, trên) và lan truyền ngược (mũi tên đỏ, dưới) qua Basic CNN; hộp
+dưới ghi gradient của từng loại tầng và bước cập nhật Adam.}{ch3-backprop}
+
+Để tích chập chạy nhanh trên CPU, bản NumPy dùng kỹ thuật \emph{im2col} (Hình~\ref{fig:ch3-im2col}): trải mọi cửa sổ
+$k\times k\times C$ thành các hàng của một ma trận lớn, khi đó cả tầng tích chập là \emph{một} phép nhân ma trận mà thư
+viện BLAS tối ưu rất tốt. Lan truyền ngược dùng phép ngược \texttt{col2im}, cộng dồn gradient của các cửa sổ chồng lấn
+về đúng điểm ảnh.
+
+\hinhtikz{ch3_im2col}{Kỹ thuật im2col: mỗi cửa sổ $3\times3$ (khung màu) của ảnh $4\times4$ trở thành một hàng cùng màu
+của ma trận cột; tích chập trở thành nhân ma trận cột với vector kernel.}{ch3-im2col}
+
+% =====================================================================
+\section{Một số mô hình CNN cơ bản}
+\label{sec:cnn-classic}
+
+\subsection{LeNet-5}
+LeNet-5~\cite{ch3:lecun1998} là CNN đầu tiên được dùng thương mại, nhận ảnh xám $32\times32$ (Hình~\ref{fig:ch3-lenet5}).
+Mạng có hai tầng tích chập $5\times5$ (6 và 16 bộ lọc) xen hai tầng giảm mẫu, rồi ba tầng kết nối đầy đủ 120--84--10, tổng
+cộng khoảng 61,7 nghìn tham số, dùng hàm kích hoạt tanh. Basic CNN của chương này là hậu duệ trực tiếp của LeNet-5: cùng
+khuôn ``hai khối tích chập + pooling rồi hai tầng Dense'', chỉ thay tanh bằng ReLU, kernel $5\times5$ bằng $3\times3$ có
+đệm, subsampling có tham số bằng max pooling.
+
+\hinhtikz{ch3_lenet5}{Kiến trúc LeNet-5: C1, C3 là tích chập $5\times5$; S2, S4 là giảm mẫu; F5, F6 và tầng ra kết nối
+đầy đủ.}{ch3-lenet5}
+
+\subsection{AlexNet}
+AlexNet~\cite{ch3:krizhevsky2012} (Hình~\ref{fig:ch3-alexnet}) có năm tầng tích chập (kernel đầu $11\times11$ bước 4) và
+ba tầng kết nối đầy đủ 4.096--4.096--1.000, khoảng 60 triệu tham số. Ngoài quy mô, AlexNet phổ biến bốn kỹ thuật vẫn dùng
+đến nay: \textbf{ReLU} thay tanh giúp hội tụ nhanh gấp nhiều lần; \textbf{Dropout}~\cite{ch3:srivastava2014} ở các tầng
+kết nối đầy đủ; \textbf{tăng cường dữ liệu} bằng cắt ngẫu nhiên, lật ngang và nhiễu màu; huấn luyện song song trên
+\textbf{hai GPU}.
+
+\hinhtikz{ch3_alexnet}{Kiến trúc AlexNet (2012) với năm tầng tích chập và ba tầng kết nối đầy đủ.}{ch3-alexnet}
+
+\subsection{VGGNet}
+VGG~\cite{ch3:simonyan2015} chứng minh rằng \emph{độ sâu} quan trọng hơn kích thước kernel. Toàn mạng chỉ dùng kernel
+$3\times3$ bước 1 và max pooling $2\times2$ (Hình~\ref{fig:ch3-vgg16}). Hai tầng $3\times3$ nối tiếp có trường tiếp nhận
+$5\times5$, ba tầng có trường tiếp nhận $7\times7$, nhưng ít tham số hơn ($3\cdot 9C^2=27C^2$ so với $49C^2$) và có thêm
+hai lần phi tuyến. VGG-16 có khoảng 138 triệu tham số, phần lớn nằm ở ba tầng kết nối đầy đủ. Cấu trúc đơn giản, đồng nhất
+khiến VGG trở thành mạng trích đặc trưng phổ biến cho học chuyển giao (transfer learning).
+
+\hinhtikz{ch3_vgg16}{Kiến trúc VGG-16: năm khối gồm 2--3 tầng Conv $3\times3$ (số kênh 64--512), sau mỗi khối là max
+pooling (chấm đỏ), cuối cùng là ba tầng kết nối đầy đủ.}{ch3-vgg16}
+
+% =====================================================================
+\section{Một số mô hình CNN cải tiến}
+\label{sec:cnn-advanced}
+
+\subsection{GoogLeNet và khối Inception}
+Thay vì chọn một cỡ kernel, khối Inception~\cite{ch3:szegedy2015} chạy song song bốn nhánh: Conv $1\times1$, Conv
+$3\times3$, Conv $5\times5$ và max pooling $3\times3$, rồi ghép kết quả theo chiều kênh (Hình~\ref{fig:ch3-inception}).
+Mạng tự học nên dùng trường tiếp nhận nào cho mỗi đặc trưng. Để chi phí không bùng nổ, mỗi nhánh lớn đặt trước một Conv
+$1\times1$ ``thắt cổ chai'' giảm số kênh. GoogLeNet 22 tầng chỉ có khoảng 6,8 triệu tham số, ít hơn AlexNet gần chín lần.
+
+\hinhtikz{ch3_inception}{Khối Inception (phiên bản có giảm chiều): bốn nhánh song song với các cỡ trường tiếp nhận khác
+nhau, ghép theo kênh thành $28\times28\times256$.}{ch3-inception}
+
+\subsection{ResNet}
+Khi xếp chồng thêm tầng, mạng ``trơn'' (plain) không tốt lên mà sai số cả trên tập huấn luyện lại tăng (vấn đề suy biến,
+degradation). He và cộng sự~\cite{ch3:he2016} cho mỗi khối học phần dư $F(\mathbf{x})$ thay vì toàn bộ ánh xạ:
+\begin{equation}
+  \mathbf{y} = \mathrm{ReLU}\big(F(\mathbf{x}) + \mathbf{x}\big), \qquad
+  \frac{\partial L}{\partial \mathbf{x}} = \frac{\partial L}{\partial \mathbf{y}}\Big(1+\frac{\partial F}{\partial\mathbf{x}}\Big).
+\end{equation}
+Số hạng $1$ trong gradient là ``đường cao tốc'' đưa tín hiệu học thẳng về các tầng đầu, nên mạng 50, 101, 152 tầng vẫn
+huấn luyện được. Khi số kênh của $F(\mathbf{x})$ khác $\mathbf{x}$, lối tắt dùng Conv $1\times1$ (projection). Khối dư
+cùng BatchNorm~\cite{ch3:ioffe2015} là thành phần chính của Improved CNN trong chương (Đoạn mã~\ref{code:ch3_torch__ResBlock}).
+
+\hinhtikz{ch3_residual}{(a) Khối dư: nhánh $F(\mathbf{x})$ gồm Conv--BN--ReLU--Conv--BN, cộng với lối tắt rồi qua ReLU.
+(b) Lý do mạng rất sâu học được và so sánh định tính sai số mạng trơn với ResNet trên CIFAR-10 theo~\cite{ch3:he2016}.}{ch3-residual}
+
+\subsection{DenseNet}
+DenseNet~\cite{ch3:huang2017} đẩy ý tưởng lối tắt đến cùng: trong một \emph{khối dày đặc}, mỗi tầng nhận \emph{ghép kênh}
+của mọi tầng trước nó, $\mathbf{x}_\ell=H_\ell([\mathbf{x}_0,\dots,\mathbf{x}_{\ell-1}])$, và chỉ sinh thêm $k$ kênh mới
+(growth rate, thường 12--32). Đặc trưng được tái sử dụng tối đa, gradient đi thẳng tới mọi tầng, số tham số nhỏ hơn ResNet
+ở cùng độ chính xác. Giữa các khối, \emph{tầng chuyển tiếp} (Conv $1\times1$ + Average pooling) nén số kênh và giảm kích
+thước.
+
+\hinhtikz{ch3_dense_block}{Khối dày đặc của DenseNet với bốn tầng: mỗi mũi tên cong là một kết nối ghép kênh, khối sau
+dày hơn khối trước vì nhận thêm $k$ kênh.}{ch3-dense-block}
+
+\subsection{MobileNet}
+MobileNet~\cite{ch3:howard2017} nhắm tới điện thoại, nơi phép tính và bộ nhớ hạn chế. Tích chập chuẩn được tách thành hai
+bước (Hình~\ref{fig:ch3-depthwise}): \emph{tích chập theo chiều sâu} (depthwise) dùng một kernel $k\times k$ riêng cho
+từng kênh, và \emph{tích chập điểm} (pointwise) $1\times1$ trộn các kênh. Chi phí giảm từ $D^2k^2MN$ xuống
+$D^2k^2M+D^2MN$, tức chỉ còn tỉ lệ $\frac{1}{N}+\frac{1}{k^2}$, khoảng 8--9 lần ít phép tính với $k=3$. MobileNetV2
+thêm khối dư đảo ngược (inverted residual) và nút cổ chai tuyến tính~\cite{ch3:sandler2018}.
+
+\hinhtikz{ch3_depthwise}{(a) Tích chập chuẩn dùng $N$ kernel $k\times k\times M$; (b) tích chập tách được theo chiều sâu:
+mỗi kênh một kernel $k\times k\times1$ (đỏ, lục, lam) rồi $N$ kernel $1\times1\times M$ (tím).}{ch3-depthwise}
+
+\subsection{EfficientNet}
+Tan và Le~\cite{ch3:tan2019} quan sát rằng tăng riêng độ sâu, độ rộng hay độ phân giải đều nhanh chóng bão hòa. Họ đề xuất
+\emph{co giãn hỗn hợp} (compound scaling) theo một hệ số $\phi$: $d=\alpha^\phi$, $w=\beta^\phi$, $r=\gamma^\phi$ với ràng
+buộc $\alpha\beta^2\gamma^2\approx2$ (mỗi lần tăng $\phi$ thì FLOPs gấp đôi). Bắt đầu từ mạng gốc EfficientNet-B0 tìm bằng
+tìm kiếm kiến trúc, họ dựng chuỗi B1--B7; EfficientNet-B7 đạt 84,3\,\% top-1 trên ImageNet với 66 triệu tham số, nhỏ hơn
+khoảng 8 lần mạng tốt nhất trước đó.
+
+\hinhtikz{ch3_efficientnet}{Bốn cách co giãn một CNN: tăng bề rộng (số kênh), độ sâu (số tầng), độ phân giải ảnh vào,
+hoặc cả ba theo tỉ lệ cố định như EfficientNet.}{ch3-efficientnet}
+
+\begin{luuy}{Lý thuyết đi vào thực nghiệm như thế nào}
+Bốn thực nghiệm dưới đây dùng hai kiến trúc (Hình~\ref{fig:ch3-our-models}). \textbf{Basic CNN} là LeNet hiện đại hóa
+(mục~\ref{sec:cnn-classic}): hai khối Conv--ReLU--MaxPool và hai tầng Dense. \textbf{Improved CNN} lấy các ý tưởng của
+mục~\ref{sec:cnn-advanced}: khối dư của ResNet, BatchNorm, Dropout tăng dần theo độ sâu, Global Average Pooling thay
+Flatten, cộng các kỹ thuật huấn luyện của AlexNet và các công trình sau: tăng cường dữ liệu, AdamW, lịch học OneCycle và
+label smoothing. Quy trình chung được tóm tắt ở Hình~\ref{fig:ch3-pipeline}.
+\end{luuy}
+
+\hinhtikz{ch3_our_models}{Hai kiến trúc dùng trong mọi thực nghiệm của chương. Basic CNN giống hệt nhau ở ba bản NumPy,
+PyTorch, TensorFlow; Improved CNN có $L=3$ khối dư (MNIST, Fashion-MNIST, CIFAR-10) hoặc $L=4$ (Rock/Paper/Scissors).}{ch3-our-models}
+
+\hinhtikz{ch3_pipeline}{Quy trình thực nghiệm của chương: tải và chuẩn hóa dữ liệu một lần, ba tiến trình huấn luyện
+chạy song song (NumPy trên CPU, PyTorch trên GPU, TensorFlow trên CPU), đánh giá trên cùng tập kiểm tra, và đưa mô hình lên
+Web App qua \texttt{serve\_ch3}.}{ch3-pipeline}
+
+% =====================================================================
+\section*{Hạ tầng chung cho các thực nghiệm}
+\addcontentsline{toc}{section}{Hạ tầng chung cho các thực nghiệm}
+\label{sec:cnn-infra}
+
+Để so sánh ba framework một cách công bằng, mọi mô hình đọc \emph{cùng} một tệp dữ liệu và \emph{cùng} một phép chia.
+Kịch bản \texttt{ch3\_download.py} tải bốn bộ dữ liệu một lần và lưu thành \texttt{data/ch3/<tên>.npz} gồm bốn mảng
+\texttt{uint8} dạng NHWC (Đoạn mã~\ref{code:ch3_download__mnist_csv} và~\ref{code:ch3_download__rps}). Hàm
+\texttt{load} (Đoạn mã~\ref{code:ch3_data__load}) chia 10\,\% tập huấn luyện gốc thành tập validation theo từng lớp với hạt
+giống cố định (Đoạn mã~\ref{code:ch3_data__split_val}); tập kiểm tra gốc được giữ nguyên và chỉ dùng một lần ở bước đánh
+giá cuối. Bảng~\ref{tab:ch3-data-summary} tóm tắt bốn bộ dữ liệu.
+
+\bang{ch3_data_summary}{Bốn bộ dữ liệu ảnh của chương sau khi tải và chia tập.}{ch3-data-summary}
+
+\maNguon{ch3_download__mnist_csv}{Đọc MNIST và Fashion-MNIST từ bản CSV trên Kaggle: cột đầu là nhãn, 784 cột còn lại
+là điểm ảnh, định dạng lại thành mảng $N\times28\times28\times1$.}
+
+\maNguon{ch3_data__split_val}{Chia train/validation phân tầng theo lớp với hạt giống cố định, dùng chung cho mọi framework.}
+
+\maNguon{ch3_data__load}{Nạp một bộ dữ liệu thành ba cặp (ảnh float32 trong $[0,1]$, nhãn) cho huấn luyện, validation,
+kiểm tra.}
+
+Mọi siêu tham số theo bộ dữ liệu nằm trong \emph{một} bảng cấu hình \texttt{CFG} (Đoạn mã~\ref{code:ch3_common__CFG}),
+được ba framework đọc chung (Bảng~\ref{tab:ch3-train-cfg}). Hàm \texttt{evaluate} (Đoạn mã~\ref{code:ch3_common__evaluate})
+tính mọi chỉ số từ ma trận xác suất dự đoán, nên ba framework được chấm điểm bằng cùng một đoạn mã.
+
+\maNguon{ch3_common__CFG}{Bảng cấu hình duy nhất của chương: kích thước ảnh, độ rộng khối, cỡ lô, số epoch và mức tăng
+cường dữ liệu theo từng bộ dữ liệu.}
+
+\bang{ch3_train_cfg}{Cấu hình huấn luyện theo bộ dữ liệu (đọc từ \texttt{CFG}).}{ch3-train-cfg}
+
+\maNguon{ch3_common__evaluate}{Hàm đánh giá chung: accuracy, precision/recall/F1 macro, F1 từng lớp và ma trận nhầm lẫn.}
+
+Ba tiến trình huấn luyện (NumPy 6 luồng CPU, TensorFlow trên CPU, PyTorch trên GPU RTX 4060) chạy song song qua kịch bản
+\texttt{ch3\_train.py} (Đoạn mã~\ref{code:ch3_train__main}); mỗi lượt ghi kết quả ra tệp JSON riêng và bỏ qua lượt đã có,
+nên có thể chạy lại an toàn sau khi gián đoạn. TensorFlow từ bản 2.11 không còn hỗ trợ GPU trên Windows, vì vậy bản Keras
+chạy CPU và Improved CNN của Keras được cho ít epoch hơn (cột \emph{Ep.~TF Imp.} trong Bảng~\ref{tab:ch3-train-cfg}).
+
+\maNguon{ch3_train__main}{Điều phối huấn luyện theo framework: chạy mọi Basic CNN trước để sớm có kết quả đối chứng, rồi
+mới tới Improved CNN; bỏ qua lượt đã có kết quả.}
+
+% =====================================================================
+\section{Thực nghiệm 1 -- Nhận dạng chữ số viết tay MNIST}
+\label{sec:cnn-mnist}
+
+\subsection{Giới thiệu và khảo sát dữ liệu}
+MNIST~\cite{ch3:lecun1998} là bộ dữ liệu ``Hello World'' của thị giác máy tính: ảnh xám $28\times28$ chữ số viết tay từ
+0 đến 9, do nhân viên Cục Điều tra dân số và học sinh trung học Mỹ viết, đã được căn giữa theo khối tâm. Bài toán: cho một
+ảnh, dự đoán chữ số (phân loại 10 lớp). Bản dùng ở đây là \texttt{oddrationale/mnist-in-csv} trên Kaggle, mỗi dòng CSV gồm
+nhãn và 784 giá trị điểm ảnh. Tập huấn luyện gốc có \SL{ch3_data/mnist/train} ảnh, tập kiểm tra \SL{ch3_data/mnist/test}
+ảnh; sau khi tách validation còn \SL{ch3_mnist/split/train} ảnh huấn luyện và \SL{ch3_mnist/split/val} ảnh validation.
+Toàn bộ dữ liệu dạng \texttt{uint8} chỉ chiếm \SL{ch3_data/mnist/mb}~MB.
+
+\hinhpdf{ch3_mnist_dist}{0.95}{Số ảnh mỗi chữ số trong tập huấn luyện và tập kiểm tra MNIST.}{ch3-mnist-dist}
+
+\nhanxet{Các lớp gần cân bằng: chữ số nhiều nhất (``\SL{ch3_mnist/balance/max_class}'', \SL{ch3_mnist/balance/max_n}
+ảnh) chỉ gấp \SL{ch3_mnist/balance/ratio} lần chữ số ít nhất (``\SL{ch3_mnist/balance/min_class}'',
+\SL{ch3_mnist/balance/min_n} ảnh), tỉ lệ giữa các lớp ở tập kiểm tra giống tập huấn luyện. Vì vậy accuracy là thước đo hợp lý và không cần trọng số lớp; ta vẫn báo cáo thêm F1
+macro để không lớp nào bị che khuất.}
+
+\subsection{Tiền xử lý dữ liệu}
+Các bước tiền xử lý giữ ở mức tối thiểu để mọi framework thấy cùng một dữ liệu:
+\begin{enumerate}
+  \item Định dạng lại 784 cột thành ảnh $28\times28\times1$ và lưu \texttt{uint8} (Đoạn mã~\ref{code:ch3_download__mnist_csv}).
+  \item Chia validation phân tầng 10\,\% với hạt giống cố định (Đoạn mã~\ref{code:ch3_data__split_val}).
+  \item Chuẩn hóa về $[0,1]$ bằng cách chia 255 (Đoạn mã~\ref{code:ch3_data__load}). Basic CNN dùng trực tiếp; Improved CNN
+    chuẩn hóa thêm theo kênh $(x-\mu)/\sigma$ với $\mu,\sigma$ tính trên tập huấn luyện (Hình~\ref{fig:ch3-mnist-pixels}).
+  \item Đổi thứ tự trục: PyTorch và NumPy dùng $N\times1\times28\times28$, Keras giữ $N\times28\times28\times1$.
+  \item Không cần đổi kích thước: MNIST dùng nguyên $28\times28$ cho cả hai kiến trúc. Hàm đổi kích thước
+    \texttt{resize\_nhwc} chỉ được dùng cho Rock/Paper/Scissors (Đoạn mã~\ref{code:ch3_common__resize_nhwc}).
+\end{enumerate}
+
+\hinhpdf{ch3_mnist_pixels}{0.95}{Phân bố cường độ điểm ảnh MNIST (trái, thang log) và trung bình, độ lệch chuẩn sau khi
+đưa về $[0,1]$ (phải).}{ch3-mnist-pixels}
+
+\nhanxet{Phân bố cường độ có hai đỉnh rõ: phần lớn điểm ảnh là nền đen (giá trị 0) và một đỉnh nhỏ hơn ở 255 là lõi nét
+chữ; các giá trị trung gian là viền nét do khử răng cưa. Trung bình cường độ chỉ \SL{ch3_mnist/pixel/mean} và độ lệch
+chuẩn \SL{ch3_mnist/pixel/std} (thang $[0,1]$): ảnh rất ``thưa'', \SL{ch3_mnist/pixel/zero_fracPct}\,\% điểm ảnh bằng 0.
+Chuẩn hóa theo kênh đưa đầu vào về trung bình 0, phương sai 1, giúp BatchNorm và tốc độ học lớn của Improved CNN ổn định.}
+
+\subsection{Trực quan hóa dữ liệu}
+Hình~\ref{fig:ch3-mnist-samples} cho tám ảnh ngẫu nhiên của mỗi chữ số, Hình~\ref{fig:ch3-mnist-mean} cho ảnh trung bình
+của từng lớp.
+
+\hinhpdf{ch3_mnist_samples}{0.88}{Tám ảnh ngẫu nhiên của mỗi chữ số trong tập huấn luyện MNIST.}{ch3-mnist-samples}
+
+\hinhpdf{ch3_mnist_mean}{0.95}{Ảnh trung bình của từng chữ số MNIST (bảng màu magma: càng sáng càng nhiều mẫu có nét đi
+qua điểm đó).}{ch3-mnist-mean}
+
+\nhanxet{Cùng một chữ số được viết với độ nghiêng, độ dày và kiểu rất khác nhau (số 4 nét hở hoặc kín, số 7 có hoặc không
+có gạch ngang, số 1 thẳng hoặc nghiêng). Ảnh trung bình vẫn giữ hình dạng rõ của từng chữ số, nghĩa là dữ liệu đã được
+căn giữa tốt; các vùng nhòe rộng (số 2, 7, 9) cho biết nơi biến thể lớn nhất. Các cặp dễ nhầm có thể đoán trước: 4--9
+(cùng nét đứng bên phải), 3--5--8 (cùng các nét cong), 7--1.}
+
+\subsection{Xây dựng mô hình Basic CNN}
+\label{sec:cnn-mnist-basic}
+Basic CNN (Bảng~\ref{tab:ch3-arch-basic-gray}) có hai tầng tích chập $3\times3$ có đệm (32 và 64 bộ lọc), mỗi tầng theo
+sau bởi ReLU và max pooling $2\times2$, rồi Flatten, Dense 128 + ReLU và Dense 10 + Softmax. Mạng có
+\SL{ch3_mnist/torch_basic/params} tham số, trong đó riêng tầng Dense 128 (nhận vector \SL{ch3_mnist/flat} chiều sau
+Flatten) chiếm \SL{ch3_mnist/dense_sharePct}\,\%.
+
+\bang{ch3_arch_basic_gray}{Kiến trúc Basic CNN cho ảnh xám $28\times28$ (MNIST, Fashion-MNIST).}{ch3-arch-basic-gray}
+
+\subsubsection*{a. Basic CNN from scratch (NumPy)}
+Bản NumPy cài đặt mọi phép toán, kể cả lan truyền ngược, chỉ bằng mảng NumPy. Thành phần quan trọng nhất là \texttt{im2col}
+(Đoạn mã~\ref{code:ch3_scratch__im2col}): thay vì bốn vòng lặp lồng nhau theo $(u,v,i,j)$, ta chỉ lặp $k^2=9$ lần theo
+vị trí trong kernel, mỗi lần cắt một lát của ảnh đã đệm bằng chỉ số bước, rồi ghép thành ma trận cột. Khi đó tích chập
+(Đoạn mã~\ref{code:ch3_scratch__conv_forward}) là một phép \texttt{@} giữa ma trận cột và kernel đã trải phẳng.
+
+\maNguon{ch3_scratch__im2col}{Hàm \texttt{im2col}: trải mọi cửa sổ $k\times k$ của lô ảnh thành các hàng của một ma trận,
+chỉ lặp $k^2$ lần.}
+
+\maNguon{ch3_scratch__col2im}{Hàm \texttt{col2im}: phép ngược của im2col trong lan truyền ngược, cộng dồn gradient các
+cửa sổ chồng lấn về đúng vị trí điểm ảnh.}
+
+\maNguon{ch3_scratch__conv_forward}{Lan truyền thuận của tầng tích chập: im2col rồi nhân ma trận, giữ \texttt{cache} cho
+lan truyền ngược.}
+
+Lan truyền ngược của tầng tích chập (Đoạn mã~\ref{code:ch3_scratch__conv_backward}) cài đúng ba công thức ở
+mục~\ref{sec:cnn-backprop}: gradient theo kernel là tích ma trận giữa gradient đầu ra và ma trận cột, gradient theo bias là
+tổng gradient đầu ra, gradient theo đầu vào là tích với kernel chuyển vị rồi \texttt{col2im}. Với tầng đầu tiên, gradient
+theo ảnh vào không cần thiết nên được bỏ qua (\texttt{need\_dx=False}), bớt được một phép nhân ma trận lớn và một lần
+\texttt{col2im} mỗi lô.
+
+\maNguon{ch3_scratch__conv_backward}{Lan truyền ngược của tầng tích chập.}
+
+Lớp \texttt{ScratchCNN} gom tham số trong một từ điển, khởi tạo He~\cite{ch3:he2015} ($\mathcal{N}(0,2/\text{fan\_in})$)
+phù hợp với ReLU (Đoạn mã~\ref{code:ch3_scratch__ScratchCNN.__init__}); hàm \texttt{forward} nối các tầng và lưu
+\texttt{cache} (Đoạn mã~\ref{code:ch3_scratch__ScratchCNN.forward}).
+
+\maNguon{ch3_scratch__ScratchCNN.__init__}{Khởi tạo Basic CNN NumPy: khởi tạo He cho trọng số, bộ nhớ moment cho Adam.}
+
+\maNguon{ch3_scratch__ScratchCNN.forward}{Lan truyền thuận của Basic CNN NumPy: Conv--ReLU--Pool hai lần, Flatten,
+Dense--ReLU, Dense.}
+
+\begin{phathien}{Kiểm tra gradient số}
+Trước khi huấn luyện, lan truyền ngược tự viết được kiểm tra bằng sai phân trung tâm
+$\frac{L(\theta+\epsilon)-L(\theta-\epsilon)}{2\epsilon}$ trên một mạng nhỏ dùng float64
+(Đoạn mã~\ref{code:ch3_scratch__gradient_check}). Sai số tương đối lớn nhất giữa gradient giải tích và gradient số trên cả
+bốn ma trận trọng số là \SL{ch3_gradcheck/max}, ở mức sai số làm tròn của số thực; lan truyền ngược vì vậy đúng. Một chi tiết
+đáng chú ý: chạy lại với $\epsilon=10^{-3}$ thì sai số lớn nhất vọt lên \SL{ch3_gradcheck/eps_large_max}, không phải
+vì lan truyền ngược sai mà vì bước nhiễu vượt qua điểm gãy của ReLU và max pooling (đạo hàm không liên tục), nên
+$\epsilon$ phải nhỏ ($10^{-6}$).
+\end{phathien}
+
+Do NumPy chỉ chạy CPU và chậm hơn nhiều so với thư viện tối ưu, bản scratch huấn luyện trên tập con
+\SL{ch3_mnist/scratch/train_used} ảnh trong \SL{ch3_mnist/scratch/epochs} epoch (lô 64, Adam $10^{-3}$). Mỗi epoch mất
+trung bình \SL{ch3_mnist/scratch/epoch_time}~giây, tổng \SL{ch3_mnist/scratch/train_min}~phút.
+
+\subsubsection*{b. Basic CNN bằng PyTorch}
+Bản PyTorch (Đoạn mã~\ref{code:ch3_torch__BasicCNN}) có kiến trúc và số tham số giống hệt bản NumPy. Vòng huấn luyện
+chung \texttt{train\_torch} (Đoạn mã~\ref{code:ch3_torch__train_torch}) đưa toàn bộ dữ liệu lên GPU một lần, mỗi epoch
+xáo trộn chỉ số, chạy các lô, đo thời gian, đánh giá trên validation và giữ lại trọng số có val accuracy cao nhất. Basic
+CNN dùng Adam $\eta=10^{-3}$ hằng, entropy chéo thường, không tăng cường dữ liệu, huấn luyện \SL{ch3_mnist/cfg/ep_basic}
+epoch với lô \SL{ch3_mnist/cfg/batch}.
+
+\maNguon{ch3_torch__BasicCNN}{Basic CNN bằng PyTorch, cùng kiến trúc với bản NumPy và bản Keras.}
+
+\maDai{ch3_torch__train_torch}{Vòng huấn luyện PyTorch dùng chung cho Basic và Improved CNN.}
+
+\subsubsection*{c. Basic CNN bằng TensorFlow/Keras}
+Bản Keras dựng mô hình bằng API \texttt{Sequential} (Đoạn mã~\ref{code:ch3_keras__build_basic}) và huấn luyện bằng
+\texttt{model.fit} (Đoạn mã~\ref{code:ch3_keras__train_keras}). Để so sánh công bằng với PyTorch, một callback giữ lại trọng
+số có val accuracy tốt nhất và đo thời gian từng epoch (Đoạn mã~\ref{code:ch3_keras__BestWeights}).
+
+\maNguon{ch3_keras__build_basic}{Basic CNN bằng Keras \texttt{Sequential}.}
+
+\maNguon{ch3_keras__train_keras}{Hàm huấn luyện Keras: Adam và entropy chéo thưa cho Basic CNN; AdamW, cosine decay có
+warm-up và label smoothing cho Improved CNN.}
+
+\subsection{Xây dựng mô hình Improved CNN}
+\label{sec:cnn-mnist-improved}
+\subsubsection*{a. Những cải tiến}
+Basic CNN PyTorch đã đạt \SL{ch3_mnist/torch_basic/accPct}\,\% trên MNIST, nhưng đường cong học
+(Hình~\ref{fig:ch3-mnist-curves}) cho thấy dấu hiệu quá khớp: train accuracy tiến tới
+\SL{ch3_mnist/torch_basic/train_acc_lastPct}\,\% trong khi val loss không giảm nữa sau vài epoch. Improved CNN thêm sáu thay đổi,
+mỗi thay đổi nhắm vào một điểm yếu cụ thể:
+\begin{enumerate}
+  \item \textbf{Khối dư} (ResBlock) thay tầng tích chập đơn: mỗi khối có hai Conv $3\times3$, mạng sâu hơn (7 tầng tích
+    chập) mà vẫn dễ tối ưu (Đoạn mã~\ref{code:ch3_torch__ResBlock}).
+  \item \textbf{Batch Normalization}~\cite{ch3:ioffe2015} sau mỗi tích chập: chuẩn hóa kích hoạt theo lô, cho phép tốc
+    độ học lớn hơn và có tác dụng điều chuẩn nhẹ.
+  \item \textbf{Dropout tăng dần} 0,1--0,3 sau mỗi khối và 0,4 trước tầng ra~\cite{ch3:srivastava2014}.
+  \item \textbf{Global Average Pooling} thay Flatten: tầng Dense đầu chỉ còn $128\times256$ trọng số, mô hình nhỏ hơn
+    Basic CNN dù sâu hơn nhiều (Bảng~\ref{tab:ch3-arch-improved-mnist}).
+  \item \textbf{Tăng cường dữ liệu} trên GPU: xoay $\pm$\SL{ch3_mnist/aug/rot}$^\circ$, dịch
+    \SL{ch3_mnist/aug/shiftPct}\,\%, phóng to/thu nhỏ \SL{ch3_mnist/aug/zoomPct}\,\%; không lật vì chữ số lật ngang đổi
+    nghĩa (Đoạn mã~\ref{code:ch3_torch__gpu_augment}).
+  \item \textbf{Tối ưu tốt hơn:} AdamW (weight decay $5\cdot10^{-4}$), lịch OneCycle~\cite{ch3:smith2019} tăng tốc độ học
+    lên đỉnh $3\cdot10^{-3}$ trong 25\,\% đầu rồi giảm dần về gần 0, label smoothing 0,1, huấn luyện
+    \SL{ch3_mnist/cfg/ep_improved} epoch.
+\end{enumerate}
+
+\bang{ch3_arch_improved_mnist}{Kiến trúc Improved CNN cho MNIST và Fashion-MNIST (độ rộng 32--64--128).}{ch3-arch-improved-mnist}
+
+\hinhpdf{ch3_mnist_aug}{0.9}{Tăng cường dữ liệu MNIST: cột đầu là ảnh gốc, sáu cột sau là các biến thể ngẫu nhiên mà
+Improved CNN nhìn thấy trong các epoch khác nhau.}{ch3-mnist-aug}
+
+\subsubsection*{b. Improved CNN bằng PyTorch}
+\maNguon{ch3_torch__ResBlock}{Khối dư: Conv--BN--ReLU--Conv--BN cộng lối tắt (Conv $1\times1$ + BN khi đổi số kênh), rồi ReLU.}
+
+\maNguon{ch3_torch__ImprovedCNN}{Improved CNN bằng PyTorch: stem, các khối dư xen MaxPool và Dropout, GAP và hai tầng Dense.}
+
+Tăng cường dữ liệu được làm \emph{trên GPU theo lô} (Đoạn mã~\ref{code:ch3_torch__gpu_augment}): mọi phép xoay, dịch,
+phóng to được gộp thành một ma trận affine $2\times3$ ngẫu nhiên cho mỗi ảnh, rồi \texttt{grid\_sample} nội suy cả lô một
+lần. Cách này nhanh hơn nhiều so với biến đổi từng ảnh trên CPU qua \texttt{torchvision.transforms}.
+
+\maNguon{ch3_torch__gpu_augment}{Tăng cường dữ liệu theo lô trên GPU bằng một phép affine ngẫu nhiên và dao động độ sáng,
+độ tương phản.}
+
+\subsubsection*{c. Improved CNN bằng TensorFlow/Keras}
+Bản Keras dựng cùng kiến trúc bằng Functional API (Đoạn mã~\ref{code:ch3_keras__res_block}
+và~\ref{code:ch3_keras__build_improved}). Tăng cường dữ liệu là các tầng \texttt{Random*} đặt ngay sau đầu vào, chỉ hoạt
+động khi huấn luyện; chuẩn hóa theo kênh là tầng \texttt{Normalization}. Nhờ vậy mô hình lưu ra tệp \texttt{.keras} tự
+chứa toàn bộ tiền xử lý, Web App chỉ cần đưa ảnh $[0,1]$ vào. Lịch học là cosine decay có warm-up, tương đương OneCycle.
+TensorFlow trên Windows không dùng được GPU nên bản này huấn luyện trên CPU, chậm hơn PyTorch nhiều lần. Vì vậy mỗi bộ
+dữ liệu có một số epoch \emph{tối đa} (MNIST: \SL{ch3_mnist/cfg/ep_improved_tf}) cùng ngân sách thời gian
+(\SL{ch3_mnist/cfg/tf_budget_min} phút), lịch cosine trải đúng trên số epoch tối đa đó, và callback \texttt{BestWeights}
+(Đoạn mã~\ref{code:ch3_keras__BestWeights}) dừng sớm khi validation không cải thiện \SL{ch3_mnist/cfg/tf_patience} epoch
+liên tiếp, rồi khôi phục trọng số tốt nhất (val accuracy cao nhất, hòa thì val loss thấp hơn). Trên MNIST mô hình chạy
+\SL{ch3_mnist/tf_improved/epochs} epoch (\SL{ch3_mnist/tf_improved/stop_vn}), tốt nhất ở epoch
+\SL{ch3_mnist/tf_improved/best_epoch}.
+
+\maNguon{ch3_keras__res_block}{Khối dư bằng Keras Functional API.}
+
+\maNguon{ch3_keras__build_improved}{Improved CNN bằng Keras: tăng cường, chuẩn hóa, stem, khối dư, GAP, Dense.}
+
+\subsection{Đánh giá và so sánh mô hình}
+\label{sec:cnn-mnist-eval}
+Bảng~\ref{tab:ch3-mnist-results} tổng hợp kết quả trên \SL{ch3_data/mnist/test} ảnh kiểm tra.
+
+\bang{ch3_mnist_results}{Kết quả các mô hình trên tập kiểm tra MNIST.}{ch3-mnist-results}
+
+\hinhpdf{ch3_mnist_metrics}{0.95}{Accuracy, precision, recall và F1 macro của các mô hình trên MNIST.}{ch3-mnist-metrics}
+
+\nhanxet{Ba bản Basic CNN cùng kiến trúc cho kết quả rất sát nhau: NumPy \SL{ch3_mnist/scratch/accPct}\,\%,
+PyTorch \SL{ch3_mnist/torch_basic/accPct}\,\%, TensorFlow \SL{ch3_mnist/tf_basic/accPct}\,\%. Chênh lệch tối đa
+\SL{ch3_mnist/basic_spreadPct} điểm phần trăm đến từ khởi tạo ngẫu nhiên, thứ tự lô và việc bản NumPy chỉ học trên \SL{ch3_mnist/scratch/train_used} ảnh,
+không phải từ framework; điều này xác nhận bản tự viết đúng. Improved CNN PyTorch đạt \SL{ch3_mnist/torch_improved/accPct}\,\%,
+chỉ sai \SL{ch3_mnist/torch_improved/errors} ảnh so với \SL{ch3_mnist/torch_basic/errors} ảnh của Basic CNN PyTorch,
+tức giảm \SL{ch3_mnist/gain_torch/err_cutPct}\,\% số lỗi, dù có ít tham số hơn
+(\SL{ch3_mnist/torch_improved/params} so với \SL{ch3_mnist/torch_basic/params}). Bản Improved TensorFlow, huấn
+luyện trên CPU \SL{ch3_mnist/tf_improved/epochs} epoch, đạt \SL{ch3_mnist/tf_improved/accPct}\,\%, vượt Basic CNN
+TensorFlow \SL{ch3_mnist/gain_tf/accPct} điểm và chỉ cách bản PyTorch \SL{ch3_mnist/improved_fw_gapPct} điểm: trên MNIST,
+vài epoch là đủ để kiến trúc mới phát huy.}
+
+\hinhpdf{ch3_mnist_curves}{1.0}{Đường cong học trên MNIST: độ chính xác (trái) và hàm mất mát thang log (phải); nét liền là
+validation, nét đứt là huấn luyện.}{ch3-mnist-curves}
+
+\nhanxet{Ba bản Basic CNN đạt val accuracy \SL{ch3_mnist/scratch/val_firstPct}\,\% (NumPy),
+\SL{ch3_mnist/torch_basic/val_firstPct}\,\% (PyTorch) và \SL{ch3_mnist/tf_basic/val_firstPct}\,\% (TensorFlow) ngay sau
+epoch đầu và bão hòa chỉ sau vài epoch; sau đó train loss tiếp tục giảm trong khi val loss đi ngang hoặc tăng, dấu hiệu quá khớp điển hình của mạng không có điều chuẩn.
+Cơ chế giữ trọng số tốt nhất chọn epoch \SL{ch3_mnist/torch_basic/best_epoch} (PyTorch) và
+\SL{ch3_mnist/tf_basic/best_epoch} (TensorFlow). Đường của Improved CNN thì khác: trong nửa đầu quá trình, train
+accuracy \emph{thấp hơn} val accuracy, vì mô hình học trên ảnh đã bị biến dạng ngẫu nhiên và bị Dropout, còn validation
+dùng ảnh sạch; val accuracy tăng đều đến epoch cuối nhờ tốc độ học giảm dần của OneCycle, không có pha đi xuống. Train loss
+của Improved CNN là entropy chéo \emph{có} label smoothing nên không thể xuống dưới entropy của phân phối nhãn đã làm mịn,
+$-0{,}91\ln0{,}91-9\cdot0{,}01\ln0{,}01\approx0{,}50$ với $\varepsilon=0{,}1$, $K=10$; val loss là entropy chéo
+thường, cao hơn Basic CNN vì label smoothing cố ý giữ cho xác suất dự đoán không quá sát 1. Vì vậy với Improved CNN chỉ so
+sánh được hình dạng đường mất mát, không so được độ cao.}
+
+\hinhpdf{ch3_mnist_cm}{1.0}{Ma trận nhầm lẫn trên tập kiểm tra MNIST của Basic CNN và Improved CNN tốt nhất (số trong ô là
+số ảnh; màu là tỉ lệ theo hàng).}{ch3-mnist-cm}
+
+\hinhpdf{ch3_mnist_f1class}{0.95}{F1 theo từng chữ số của các mô hình trên MNIST.}{ch3-mnist-f1class}
+
+\nhanxet{Đường chéo áp đảo ma trận nhầm lẫn. Với Basic CNN PyTorch, hai nhầm lẫn lớn nhất là
+\SL{ch3_mnist/torch_basic/conf1} (\SL{ch3_mnist/torch_basic/conf1_n} ảnh) và \SL{ch3_mnist/torch_basic/conf2}
+(\SL{ch3_mnist/torch_basic/conf2_n} ảnh), đúng các cặp hình dạng gần nhau đã dự đoán ở phần trực quan hóa. Improved
+CNN xóa gần hết các ô ngoài đường chéo, ô lớn nhất còn lại chỉ \SL{ch3_mnist/torch_improved/conf1_n} ảnh
+(\SL{ch3_mnist/torch_improved/conf1}); chữ số
+khó nhất với mọi Basic CNN là ``\SL{ch3_mnist/torch_basic/worst_class}'' (F1 \SL{ch3_mnist/torch_basic/worst_f1Pct}\,\% ở
+bản PyTorch), dễ nhất là ``\SL{ch3_mnist/torch_basic/best_class}'' (F1 \SL{ch3_mnist/torch_basic/best_f1Pct}\,\%).}
+
+\hinhpdf{ch3_mnist_wrong}{0.95}{Các ảnh MNIST mà mô hình tốt nhất đoán sai với độ tự tin cao nhất.}{ch3-mnist-wrong}
+
+\nhanxet{Các ảnh bị đoán sai tự tin nhất phần lớn là cặp 9--4 và 7--1/2, và chữ viết thật sự mơ hồ, đến người đọc cũng có
+thể đọc khác nhãn: số 9 có vòng hở trông như số 4, số 7 chỉ có một nét sổ, nét bị đứt hoặc viết lệch khỏi khung; vài ảnh
+có thể chính là lỗi gán nhãn của bộ dữ liệu. Ở mức
+\SL{ch3_mnist/best/accPct}\,\%, mô hình đã chạm vùng
+mà lỗi còn lại chủ yếu thuộc về dữ liệu chứ không thuộc về kiến trúc.}
+
+\haihinh{ch3_mnist_filters}{32 bộ lọc Conv1}{ch3_mnist_fmaps}{Bản đồ đặc trưng Conv1, Conv2}{Bên trong Basic CNN PyTorch
+trên MNIST: bộ lọc $3\times3$ đã học (a) và bản đồ đặc trưng của một ảnh số 7 (b).}{ch3-mnist-filters}
+
+\nhanxet{Kernel $3\times3$ quá nhỏ để có hình dạng dễ đọc như kernel $11\times11$ của AlexNet, nhưng nhiều bộ lọc Conv1
+có một dải dương (đỏ) đối diện một dải âm (xanh), tức là đạo hàm theo một hướng: bộ phát hiện cạnh có hướng, giống tế bào
+đơn giản của Hubel và Wiesel. Bản đồ Conv1 vẫn giữ nguyên hình chữ số, mỗi kênh làm nổi một loại cạnh (ngang, dọc, chéo);
+bản đồ Conv2 ở độ phân giải $14\times14$ thưa hơn và trừu tượng hơn, chỉ sáng tại vài tổ hợp nét như góc gãy của số 7.}
+
+\hinhpdf{ch3_mnist_gradcam}{0.95}{Grad-CAM của Improved CNN PyTorch trên MNIST: hàng trên là ảnh và nhãn thật, hàng dưới
+là bản đồ nhiệt vùng ảnh ảnh hưởng mạnh nhất tới dự đoán (đỏ: mạnh).}{ch3-mnist-gradcam}
+
+\nhanxet{Grad-CAM~\cite{ch3:selvaraju2017} cho thấy vùng ảnh hưởng mạnh nhất nằm ở phần \emph{giữa} chữ số, nơi có cấu
+trúc phân biệt: lỗ kín của số 0 và số 9, giao điểm hai vòng của số 8, chỗ gặp nhau của hai nét cong số 3, góc gãy của
+số 7. Vùng nóng không bám sát nét mà phủ cả khoảng trống quanh nét: với số 0, chính \emph{khoảng trống bên trong} là bằng
+chứng phân biệt nó với số 1 hay số 7. Ảnh số 4 có một vết mực lạ bên trái và vùng nóng lan sang vết đó, nhắc rằng mô hình
+có thể bị nhiễu bởi chi tiết ngoài chữ số. Do khối dư cuối chỉ có độ phân giải $3\times3$, bản đồ nhiệt thô; đó là đánh đổi
+quen thuộc của Grad-CAM giữa độ sâu ngữ nghĩa và độ chi tiết không gian.}
+
+\subsection{Triển khai hệ thống}
+\label{sec:cnn-mnist-deploy}
+Mô hình được đưa vào Web App của tiểu luận qua mô-đun \texttt{serve\_ch3} (mục~\ref{sec:cnn-serve}). Với MNIST, người dùng
+có thể \emph{vẽ trực tiếp} chữ số lên khung canvas hoặc tải ảnh lên. Ảnh vẽ tay khác ảnh MNIST ở hai điểm: nét to, nằm lệch,
+không căn giữa. Hàm \texttt{\_mnist\_center} (Đoạn mã~\ref{code:serve_ch3___mnist_center}) tái tạo đúng quy trình chuẩn
+hóa gốc của MNIST: cắt khung chứa nét, co cạnh dài về 20 điểm ảnh, đặt khối tâm vào giữa ô $28\times28$. Thiếu bước này,
+một chữ số vẽ nhỏ ở góc khung sẽ trông rất khác mọi ảnh huấn luyện, và độ chính xác \SL{ch3_mnist/best/accPct}\,\% đo
+trên tập kiểm tra không còn đại diện cho ảnh người dùng.
+
+\maNguon{serve_ch3___mnist_center}{Chuẩn hóa nét vẽ tay về dạng MNIST trước khi đưa vào mô hình.}
+
+\maNguon{serve_ch3__predict}{Hàm suy luận của Web App: nạp lười mô hình, tiền xử lý ảnh, trả nhãn, xác suất top-5, thông tin
+mô hình và thời gian suy luận.}
+
+\anhUI{ch3_mnist_web}{Giao diện Web App nhận dạng chữ số MNIST trên máy tính: khung vẽ hoặc tải ảnh, chọn mô hình, kết
+quả kèm xác suất top-5.}{ch3-mnist-web}
+
+\anhMobile{ch3_mnist_mobile}{Giao diện nhận dạng chữ số MNIST trên điện thoại.}{ch3-mnist-mobile}
+
+% =====================================================================
+\section{Thực nghiệm 2 -- Phân loại trang phục Fashion-MNIST}
+\label{sec:cnn-fashion}
+
+\subsection{Giới thiệu và khảo sát dữ liệu}
+Khi các mô hình đơn giản đã vượt 99\,\% trên MNIST, bộ dữ liệu này không còn phân biệt được phương pháp tốt và phương pháp
+rất tốt. Zalando Research tạo Fashion-MNIST~\cite{ch3:xiao2017} làm ``bản thay thế trực tiếp'': cùng ảnh xám $28\times28$,
+cùng \SL{ch3_data/fashion/train} ảnh huấn luyện và \SL{ch3_data/fashion/test} ảnh kiểm tra, cùng 10 lớp, nhưng là ảnh
+sản phẩm thời trang: áo phông, quần dài, áo len, váy liền, áo khoác, xăng-đan, sơ mi, giày thể thao, túi xách và bốt cổ
+ngắn. Bản dùng ở đây là \texttt{zalando-research/fashionmnist} trên Kaggle, đọc bằng cùng hàm của MNIST
+(Đoạn mã~\ref{code:ch3_download__mnist_csv}). Các lớp cân bằng tuyệt đối (Hình~\ref{fig:ch3-fashion-dist}).
+
+\hinhpdf{ch3_fashion_dist}{0.95}{Số ảnh mỗi lớp trong tập huấn luyện và tập kiểm tra Fashion-MNIST.}{ch3-fashion-dist}
+
+\subsection{Tiền xử lý dữ liệu}
+Quy trình tiền xử lý giống MNIST: chia validation phân tầng \SL{ch3_fashion/split/val} ảnh, đưa về $[0,1]$, đổi thứ tự trục
+theo framework. Khác biệt nằm ở thống kê điểm ảnh (Hình~\ref{fig:ch3-fashion-pixels}): ảnh trang phục có nhiều vùng xám
+trung gian (vải, hoa văn) chứ không chỉ đen--trắng như nét chữ, trung bình \SL{ch3_fashion/pixel/mean} so với
+\SL{ch3_mnist/pixel/mean} của MNIST, và tỉ lệ điểm ảnh bằng 0 chỉ \SL{ch3_fashion/pixel/zero_fracPct}\,\%. Improved CNN
+chuẩn hóa theo kênh bằng $\mu,\sigma$ của tập huấn luyện (Đoạn mã~\ref{code:ch3_data__channel_stats}); kịch bản huấn luyện
+lấy cùng dữ liệu cho mọi framework qua \texttt{data\_for} (Đoạn mã~\ref{code:ch3_train__data_for}).
+
+\maNguon{ch3_data__channel_stats}{Trung bình và độ lệch chuẩn theo kênh trên tập huấn luyện.}
+
+\maNguon{ch3_train__data_for}{Lấy dữ liệu đã chia và đổi kích thước theo kiến trúc, dùng chung cho ba framework.}
+
+\hinhpdf{ch3_fashion_pixels}{0.95}{Phân bố cường độ điểm ảnh Fashion-MNIST và thống kê trên thang $[0,1]$.}{ch3-fashion-pixels}
+
+\subsection{Trực quan hóa dữ liệu}
+\hinhpdf{ch3_fashion_samples}{0.95}{Tám ảnh ngẫu nhiên của mỗi lớp Fashion-MNIST.}{ch3-fashion-samples}
+
+\hinhpdf{ch3_fashion_mean}{0.95}{Ảnh trung bình của từng lớp Fashion-MNIST.}{ch3-fashion-mean}
+
+\nhanxet{Ảnh trung bình phân rõ ba nhóm hình dáng: \emph{áo} (áo phông, áo len, áo khoác, sơ mi) có thân và tay áo;
+\emph{giày} (xăng-đan, giày thể thao, bốt) nằm ngang ở nửa dưới; và các lớp riêng biệt (quần dài hai ống, váy liền hình
+thang, túi xách hình chữ nhật). Bốn lớp áo có ảnh trung bình gần như trùng nhau, khác biệt chỉ nằm ở chi tiết như cổ áo,
+khuy, độ dài tay. Có thể dự đoán trước: quần, túi, giày sẽ dễ; nhóm áo, đặc biệt \emph{sơ mi}, sẽ là nguồn lỗi chính.}
+
+\subsection{Xây dựng mô hình Basic CNN}
+Cả ba bản Basic CNN giữ nguyên kiến trúc của MNIST (Bảng~\ref{tab:ch3-arch-basic-gray}) và chỉ tăng số epoch lên
+\SL{ch3_fashion/cfg/ep_basic}. Mục này trình bày các thành phần còn lại của bản NumPy và phần suy luận của PyTorch.
+
+\subsubsection*{a. Basic CNN from scratch (NumPy)}
+ReLU và đạo hàm của nó chỉ là một phép so sánh (Đoạn mã~\ref{code:ch3_scratch__relu_forward}
+và~\ref{code:ch3_scratch__relu_backward}). Max pooling $2\times2$ được cài bằng cách \emph{định dạng lại} tensor
+$N\times C\times H\times W$ thành $N\times C\times\frac{H}{2}\times2\times\frac{W}{2}\times2$ rồi lấy cực đại theo hai trục
+kích thước 2, không cần vòng lặp (Đoạn mã~\ref{code:ch3_scratch__maxpool_forward}). Lan truyền ngược dùng mặt nạ đánh
+dấu ô cực đại; nếu một cửa sổ có nhiều ô bằng nhau cùng cực đại, gradient được chia đều cho chúng
+(Đoạn mã~\ref{code:ch3_scratch__maxpool_backward}).
+
+\maNguon{ch3_scratch__relu_forward}{Lan truyền thuận của ReLU.}
+
+\maNguon{ch3_scratch__relu_backward}{Lan truyền ngược của ReLU: chỉ cho gradient đi qua nơi $z>0$.}
+
+\maNguon{ch3_scratch__maxpool_forward}{Max pooling $2\times2$ vectơ hóa bằng định dạng lại tensor, giữ mặt nạ vị trí cực đại.}
+
+\maNguon{ch3_scratch__maxpool_backward}{Lan truyền ngược của max pooling: phân gradient về ô cực đại theo mặt nạ.}
+
+Hàm \texttt{softmax\_cross\_entropy} (Đoạn mã~\ref{code:ch3_scratch__softmax_cross_entropy}) trả cùng lúc mất mát trung
+bình, xác suất và gradient theo logits $(\mathbf{p}-\mathbf{y})/N$ theo công thức~\eqref{eq:ch3-ce}; hàm
+\texttt{backward} của \texttt{ScratchCNN} (Đoạn mã~\ref{code:ch3_scratch__ScratchCNN.backward}) đi ngược đúng thứ tự
+các tầng của \texttt{forward}.
+
+\maNguon{ch3_scratch__softmax_cross_entropy}{Softmax ổn định số (trừ max) và entropy chéo, trả kèm gradient theo logits.}
+
+\maNguon{ch3_scratch__ScratchCNN.backward}{Lan truyền ngược toàn mạng Basic CNN NumPy.}
+
+Bản NumPy học trên \SL{ch3_fashion/scratch/train_used} ảnh trong \SL{ch3_fashion/scratch/epochs} epoch, mỗi epoch
+\SL{ch3_fashion/scratch/epoch_time}~giây.
+
+\subsubsection*{b. Basic CNN bằng PyTorch}
+Mô hình và vòng huấn luyện giống Thực nghiệm~1 (Đoạn mã~\ref{code:ch3_torch__BasicCNN}, \ref{code:ch3_torch__train_torch}).
+Khi suy luận, ảnh NHWC được đổi sang NCHW (Đoạn mã~\ref{code:ch3_torch__to_tensor}) và đi qua mô hình theo lô ở chế độ
+\texttt{eval} và \texttt{no\_grad} (Đoạn mã~\ref{code:ch3_torch__predict_proba}); cỡ lô suy luận tự giảm với ảnh lớn
+để không tràn bộ nhớ GPU.
+
+\maNguon{ch3_torch__to_tensor}{Đổi lô ảnh NHWC NumPy sang tensor NCHW của PyTorch.}
+
+\maNguon{ch3_torch__predict_proba}{Suy luận theo lô: chế độ eval, tắt gradient, chuẩn hóa theo kênh nếu có, trả xác suất.}
+
+\subsubsection*{c. Basic CNN bằng TensorFlow/Keras}
+Bản Keras dùng lại \texttt{build\_basic} và \texttt{train\_keras} (Đoạn mã~\ref{code:ch3_keras__build_basic},
+\ref{code:ch3_keras__train_keras}). Để có cùng quy tắc chọn mô hình với PyTorch, callback \texttt{BestWeights}
+(Đoạn mã~\ref{code:ch3_keras__BestWeights}) ghi lại trọng số tại epoch có val accuracy cao nhất và khôi phục chúng khi
+kết thúc, đồng thời đo thời gian từng epoch để so sánh tốc độ. Với Improved CNN, cùng callback này còn dừng sớm theo
+\texttt{patience} và theo ngân sách thời gian.
+
+\maNguon{ch3_keras__BestWeights}{Callback Keras giữ trọng số tốt nhất trên validation, đo thời gian mỗi epoch và dừng sớm
+theo patience hoặc ngân sách thời gian.}
+
+\subsection{Xây dựng mô hình Improved CNN}
+\subsubsection*{a. Những cải tiến}
+Improved CNN dùng cùng kiến trúc với MNIST (Bảng~\ref{tab:ch3-arch-improved-mnist}). Khác biệt nằm ở tăng cường dữ liệu
+và thời gian huấn luyện:
+\begin{itemize}
+  \item \textbf{Lật ngang} được bật: một chiếc áo hay chiếc giày lật trái--phải vẫn là chính nó, khác hẳn chữ số.
+  \item Xoay nhẹ $\pm$\SL{ch3_fashion/aug/rot}$^\circ$, dịch \SL{ch3_fashion/aug/shiftPct}\,\%, phóng
+    \SL{ch3_fashion/aug/zoomPct}\,\%; biên độ nhỏ hơn MNIST vì sản phẩm trong ảnh luôn được chụp thẳng, căn giữa
+    (Hình~\ref{fig:ch3-fashion-aug}).
+  \item Huấn luyện \SL{ch3_fashion/cfg/ep_improved} epoch (PyTorch) vì bài toán khó hơn và tăng cường dữ liệu làm mỗi epoch
+    ``dễ'' hơn để quá khớp chậm lại.
+\end{itemize}
+
+\hinhpdf{ch3_fashion_aug}{0.9}{Tăng cường dữ liệu cho Fashion-MNIST: lật ngang, xoay nhẹ, dịch và phóng to/thu nhỏ.}{ch3-fashion-aug}
+
+\subsubsection*{b. Improved CNN bằng PyTorch}
+Mô hình là \texttt{ImprovedCNN} với độ rộng 32--64--128 (Đoạn mã~\ref{code:ch3_torch__ImprovedCNN}), huấn luyện bằng
+\texttt{train\_torch} ở chế độ \texttt{improved=True}: AdamW, OneCycle, label smoothing và \texttt{gpu\_augment} cho từng lô.
+
+\subsubsection*{c. Improved CNN bằng TensorFlow/Keras}
+Mô hình dựng bằng \texttt{build\_improved} (Đoạn mã~\ref{code:ch3_keras__build_improved}), huấn luyện trên CPU tối đa
+\SL{ch3_fashion/cfg/ep_improved_tf} epoch với cùng cơ chế dừng sớm như MNIST; thực tế chạy
+\SL{ch3_fashion/tf_improved/epochs} epoch (\SL{ch3_fashion/tf_improved/stop_vn}), tốt nhất ở epoch
+\SL{ch3_fashion/tf_improved/best_epoch}.
+
+\subsection{Đánh giá và so sánh mô hình}
+\bang{ch3_fashion_results}{Kết quả các mô hình trên tập kiểm tra Fashion-MNIST.}{ch3-fashion-results}
+
+\hinhpdf{ch3_fashion_metrics}{0.95}{Accuracy, precision, recall và F1 macro của các mô hình trên Fashion-MNIST.}{ch3-fashion-metrics}
+
+\nhanxet{Fashion-MNIST khó hơn MNIST rõ rệt: cùng một Basic CNN chỉ còn \SL{ch3_fashion/torch_basic/accPct}\,\%
+(PyTorch) và \SL{ch3_fashion/tf_basic/accPct}\,\% (TensorFlow), chênh nhau \SL{ch3_fashion/fw_spreadPct} điểm phần
+trăm, tức là hai framework cho cùng một mô hình; bản NumPy chỉ học trên \SL{ch3_fashion/scratch/train_used} ảnh trong
+\SL{ch3_fashion/scratch/epochs} epoch nên thấp hơn một chút (\SL{ch3_fashion/scratch/accPct}\,\%). Improved CNN PyTorch đạt \SL{ch3_fashion/torch_improved/accPct}\,\%,
+tăng \SL{ch3_fashion/gain_torch/accPct} điểm so với Basic; con số trông nhỏ nhưng tương ứng bớt
+\SL{ch3_fashion/gain_torch/errors_cut} ảnh sai, tức \SL{ch3_fashion/gain_torch/err_cutPct}\,\% số lỗi. Đáng chú ý
+Improved CNN có \emph{ít} tham số hơn (\SL{ch3_fashion/torch_improved/params} so với
+\SL{ch3_fashion/torch_basic/params}): \SL{ch3_fashion/dense_sharePct}\,\% tham số của Basic CNN nằm ở tầng Dense sau
+Flatten, còn Improved CNN thay tầng đó bằng Global Average Pooling. Bản Improved TensorFlow là ngoại lệ đáng chú ý:
+dù đã chạy đủ \SL{ch3_fashion/tf_improved/epochs} epoch tối đa trên CPU (lịch cosine giảm hết) và không bị dừng sớm, nó chỉ
+đạt \SL{ch3_fashion/tf_improved/accPct}\,\%, chênh \SL{ch3_fashion/gain_tf/accPct} điểm so với Basic CNN TensorFlow và kém
+bản PyTorch \SL{ch3_fashion/improved_fw_gapPct} điểm. Val accuracy vẫn tăng tới tận epoch cuối (epoch tốt nhất là
+\SL{ch3_fashion/tf_improved/best_epoch}), tức giới hạn nằm ở số epoch chạy được trên CPU chứ không ở kiến trúc: với tăng
+cường dữ liệu và label smoothing, mỗi epoch ``khó'' hơn nên mô hình cần nhiều epoch hơn hẳn Basic CNN mới vượt qua nó,
+như bản PyTorch \SL{ch3_fashion/cfg/ep_improved} epoch đã cho thấy. Precision, recall và F1 macro gần trùng accuracy vì mười lớp cân bằng tuyệt đối
+(\SL{ch3_fashion/balance/max_n} ảnh mỗi lớp).}
+
+\hinhpdf{ch3_fashion_curves}{1.0}{Đường cong học trên Fashion-MNIST.}{ch3-fashion-curves}
+
+\nhanxet{Hai Basic CNN cho thấy dấu hiệu quá khớp điển hình: độ chính xác huấn luyện (nét đứt) tiếp tục tăng tới
+\SL{ch3_fashion/tf_basic/train_acc_lastPct}\,\% (TensorFlow) trong khi val accuracy dừng ở khoảng
+\SL{ch3_fashion/tf_basic/val_bestPct}\,\%; hàm mất mát validation của bản TensorFlow chạm đáy
+\SL{ch3_fashion/tf_basic/val_loss_min} rồi \emph{đi lên} ở các epoch cuối, nên callback giữ trọng số của epoch
+\SL{ch3_fashion/tf_basic/best_epoch}. Improved CNN có dáng đường cong ngược lại: đường huấn luyện nằm \emph{dưới}
+đường validation gần suốt quá trình vì khi huấn luyện ảnh bị tăng cường và Dropout đang bật; loss huấn luyện dừng quanh
+\SL{ch3_fashion/torch_improved/train_loss_last} chứ không về gần 0 là do label smoothing (mức sàn lý thuyết khoảng 0,5 với
+$\varepsilon=0{,}1$, $K=10$). Val accuracy dao động mạnh trong những epoch đầu khi learning rate của OneCycle đang ở
+đỉnh, rồi ổn định dần khi learning rate giảm, đạt cao nhất \SL{ch3_fashion/torch_improved/val_bestPct}\,\% ở epoch
+\SL{ch3_fashion/torch_improved/best_epoch}.}
+
+\hinhpdf{ch3_fashion_cm}{1.0}{Ma trận nhầm lẫn trên tập kiểm tra Fashion-MNIST của Basic CNN và Improved CNN tốt nhất.}{ch3-fashion-cm}
+
+\hinhpdf{ch3_fashion_f1class}{0.95}{F1 theo từng lớp Fashion-MNIST.}{ch3-fashion-f1class}
+
+\nhanxet{Các ô ngoài đường chéo tập trung trong nhóm \emph{áo phần thân trên}: áo phông, áo len, áo khoác và sơ mi.
+Nhầm lẫn lớn nhất của Basic CNN PyTorch là \SL{ch3_fashion/gain_torch/pair} với \SL{ch3_fashion/gain_torch/pair_before}
+ảnh, kế đến là \SL{ch3_fashion/torch_basic/conf2} (\SL{ch3_fashion/torch_basic/conf2_n} ảnh). Improved CNN giảm ô
+\SL{ch3_fashion/gain_torch/pair} xuống \SL{ch3_fashion/gain_torch/pair_after} ảnh, nhưng ô đối xứng
+\SL{ch3_fashion/torch_improved/conf1} lại thành lớn nhất (\SL{ch3_fashion/torch_improved/conf1_n} ảnh): mô hình chỉ dời
+ranh giới giữa hai lớp, không xóa được sự mơ hồ của chúng. ``\SL{ch3_fashion/torch_improved/worst_class}'' vẫn là lớp
+khó nhất ở mọi mô hình (F1 \SL{ch3_fashion/torch_basic/worst_f1Pct}\,\% với Basic PyTorch,
+\SL{ch3_fashion/torch_improved/worst_f1Pct}\,\% với Improved), vì ở $28\times28$ điểm ảnh cổ áo và hàng cúc của sơ mi gần
+như biến mất. Nhóm giày dép (xăng-đan, giày thể thao, bốt cổ ngắn) nhầm với nhau chứ không nhầm sang quần áo, còn quần
+dài và túi xách gần như tuyệt đối (F1 cao nhất \SL{ch3_fashion/torch_improved/best_f1Pct}\,\%).}
+
+\hinhpdf{ch3_fashion_wrong}{0.95}{Các ảnh Fashion-MNIST mà mô hình tốt nhất đoán sai với độ tự tin cao nhất.}{ch3-fashion-wrong}
+
+\nhanxet{Phần lớn ảnh sai thuộc đúng các cặp ở ma trận nhầm lẫn và nhiều ảnh mơ hồ thật sự: một ``áo phông'' có cổ và
+vạt như sơ mi, một ``áo khoác'' kẻ ô giống hệt sơ mi flannel, một ``xăng-đan'' kín mũi giống giày thể thao, một ``váy
+liền'' được chụp chồng hai chiếc. Với những ảnh này nhãn của bộ dữ liệu là quy ước của người bán chứ không phải đặc điểm
+nhìn thấy được. Cũng cần chú ý độ tự tin: Improved CNN huấn luyện với label smoothing nên ngay cả ảnh sai tự tin nhất
+cũng chỉ ở mức \SL{ch3_fashion/torch_improved/wrong_conf_maxPct}\,\% (trung bình trên các ảnh sai
+\SL{ch3_fashion/torch_improved/wrong_conf_meanPct}\,\%), trong khi Basic CNN có ảnh sai với xác suất
+\SL{ch3_fashion/torch_basic/wrong_conf_maxPct}\,\%. Mô hình ``khiêm tốn'' hơn có ích khi triển khai: ngưỡng xác suất
+thấp là tín hiệu để hỏi lại người dùng.}
+
+\haihinh{ch3_fashion_filters}{32 bộ lọc Conv1}{ch3_fashion_fmaps}{Bản đồ đặc trưng Conv1, Conv2}{Bên trong Basic CNN PyTorch
+trên Fashion-MNIST: bộ lọc đã học (a) và bản đồ đặc trưng của một ảnh (b).}{ch3-fashion-filters}
+
+\hinhpdf{ch3_fashion_gradcam}{0.95}{Grad-CAM của Improved CNN PyTorch trên Fashion-MNIST.}{ch3-fashion-gradcam}
+
+\nhanxet{Bản đồ nhiệt bám vào các chi tiết phân biệt lớp thay vì phủ đều hình bóng: khe giữa hai ống quần, phần bo gấu
+của áo len, đường mở giữa thân áo khoác, quai của túi xách, cổ và gót của bốt, các khoảng hở trên quai xăng-đan. Với sơ
+mi, vùng nóng nằm dọc mép tay áo, phù hợp với việc cổ áo đã mờ ở độ phân giải này. Ảnh đầu tiên là trường hợp sai: chiếc
+``áo phông'' có tay dài và mô hình nhìn vào cổ áo cùng dải ngang ở thân để đoán ``áo len''. Grad-CAM vì vậy không chỉ
+minh họa mà còn giúp giải thích lỗi: nhãn đoán sai nhưng vùng mô hình nhìn vào là hợp lý.}
+
+\subsection{Triển khai hệ thống}
+Web App dùng chung hàm \texttt{predict} (Đoạn mã~\ref{code:serve_ch3__predict}). Ảnh người dùng chụp quần áo thường có
+\emph{nền sáng}, ngược với Fashion-MNIST (vật sáng trên nền đen). Hàm tiền xử lý (Đoạn mã~\ref{code:serve_ch3__preprocess})
+xét độ sáng trung bình của viền ảnh: nếu viền sáng hơn 0,5 thì đảo màu; sau đó ảnh được đệm thành hình vuông để giữ tỉ lệ
+và thu về $28\times28$ bằng nội suy diện tích. Với ảnh màu (Rock/Paper/Scissors, CIFAR-10), hàm cắt vùng vuông ở giữa và
+giữ nguyên màu.
+
+\maNguon{serve_ch3__preprocess}{Tiền xử lý ảnh người dùng cho đúng phân phối dữ liệu huấn luyện của từng bộ dữ liệu.}
+
+\anhUI{ch3_fashion_web}{Giao diện Web App phân loại trang phục Fashion-MNIST trên máy tính.}{ch3-fashion-web}
+
+\anhMobile{ch3_fashion_mobile}{Giao diện phân loại trang phục trên điện thoại.}{ch3-fashion-mobile}
+
+% =====================================================================
+\section{Thực nghiệm 3 -- Phân loại cử chỉ Rock/Paper/Scissors}
+\label{sec:cnn-rps}
+
+\subsection{Giới thiệu tập dữ liệu}
+Hai thực nghiệm đầu dùng ảnh xám nhỏ, có hàng chục nghìn mẫu. Thực nghiệm này đổi cả ba yếu tố: ảnh \emph{màu}, kích
+thước \emph{lớn} và \emph{rất ít} dữ liệu. Bộ Rock/Paper/Scissors của Laurence Moroney~\cite{ch3:moroney2019} (bản
+\texttt{sanikamal/rock-paper-scissors-dataset} trên Kaggle) gồm ảnh bàn tay ra dấu búa (rock), bao (paper), kéo
+(scissors) trên nền trắng, kích thước gốc $300\times300$. Điểm đặc biệt: ảnh được \emph{dựng bằng đồ họa máy tính} (CGI) với
+nhiều màu da, giới tính, tư thế khác nhau; tập huấn luyện có \SL{ch3_data/rps/train} ảnh, tập kiểm tra
+\SL{ch3_data/rps/test} ảnh được dựng với \emph{những bàn tay khác}. Vì vậy đây không chỉ là bài toán phân loại mà còn là
+bài toán \emph{tổng quát hóa sang phân phối mới}. Các lớp cân bằng tuyệt đối, \SL{ch3_rps/balance/max_n} ảnh mỗi lớp ở
+tập huấn luyện (Hình~\ref{fig:ch3-rps-dist}).
+
+\hinhpdf{ch3_rps_dist}{0.8}{Số ảnh mỗi lớp trong tập huấn luyện và tập kiểm tra Rock/Paper/Scissors.}{ch3-rps-dist}
+
+\subsection{Tiền xử lý dữ liệu}
+\begin{enumerate}
+  \item \textbf{Chuyển RGBA sang RGB và thu nhỏ} về $128\times128$ khi tải (Đoạn mã~\ref{code:ch3_download__rps}), giảm dung
+    lượng còn \SL{ch3_data/rps/mb}~MB mà vẫn đủ chi tiết ngón tay.
+  \item \textbf{Đổi kích thước theo kiến trúc}: Basic CNN nhận $\SL{ch3_rps/cfg/basic_size}\times\SL{ch3_rps/cfg/basic_size}$
+    (bản NumPy chạy được trong thời gian hợp lý), Improved CNN nhận
+    $\SL{ch3_rps/cfg/improved_size}\times\SL{ch3_rps/cfg/improved_size}$. Hàm \texttt{resize\_nhwc} dùng nội suy diện tích
+    (BOX) của PIL, cho ảnh thu nhỏ ít răng cưa (Đoạn mã~\ref{code:ch3_common__resize_nhwc}).
+  \item \textbf{Chia validation} \SL{ch3_rps/split/val} ảnh phân tầng, chuẩn hóa $[0,1]$, chuẩn hóa theo kênh cho Improved CNN.
+  \item \textbf{Cỡ lô nhỏ} \SL{ch3_rps/cfg/batch}: với \SL{ch3_rps/split/train} ảnh huấn luyện, mỗi epoch chỉ có \SL{ch3_rps/steps}
+    bước cập nhật.
+\end{enumerate}
+
+\maNguon{ch3_download__rps}{Tải Rock/Paper/Scissors, chuyển RGBA sang RGB và thu nhỏ về $128\times128$.}
+
+\maNguon{ch3_common__resize_nhwc}{Đổi kích thước một lô ảnh NHWC bằng nội suy diện tích.}
+
+\hinhpdf{ch3_rps_pixels}{0.95}{Phân bố cường độ ba kênh màu R, G, B của Rock/Paper/Scissors và trung bình, độ lệch chuẩn
+theo kênh.}{ch3-rps-pixels}
+
+\nhanxet{Cả ba kênh dồn về phía 255: nền trắng chiếm phần lớn ảnh, trung bình cường độ tới \SL{ch3_rps/pixel/mean}.
+Kênh đỏ có trung bình cao nhất (\SL{ch3_rps/pixel/mean_r} so với \SL{ch3_rps/pixel/mean_b} của kênh lam) do màu da.
+Thông tin phân loại chỉ nằm trong vùng bàn tay, phần còn lại là nền trắng không mang thông tin.}
+
+\subsection{Trực quan hóa dữ liệu}
+\hinhpdf{ch3_rps_samples}{0.95}{Sáu ảnh ngẫu nhiên của mỗi cử chỉ trong tập huấn luyện Rock/Paper/Scissors.}{ch3-rps-samples}
+
+\hinhpdf{ch3_rps_mean}{0.95}{Ảnh trung bình của ba cử chỉ.}{ch3-rps-mean}
+
+\nhanxet{Ảnh trung bình cho thấy bàn tay luôn đi vào từ cạnh dưới và nằm khoảng giữa ảnh. ``Bao'' có năm ngón xòe rõ;
+``búa'' là khối tròn đặc; ``kéo'' có hai ngón dựng chữ V nhưng phần dưới (lòng bàn tay, ngón co) giống ``búa''. Có thể dự
+đoán kéo sẽ hay bị nhầm với búa khi hai ngón khép lại. Biến thiên màu da và góc xoay cổ tay lớn: mô hình cần học hình dạng,
+không được dựa vào màu.}
+
+\subsection{Xây dựng mô hình Basic CNN}
+Với ảnh $64\times64\times3$, Basic CNN có \SL{ch3_rps/torch_basic/params} tham số (Bảng~\ref{tab:ch3-arch-basic-rgb} cho
+bản $32\times32$), trong đó tầng Dense nhận vector \SL{ch3_rps/flat} chiều chiếm \SL{ch3_rps/dense_sharePct}\,\%. Với chỉ
+\SL{ch3_rps/split/train} ảnh, mỗi ảnh huấn luyện ``gánh'' tới \SL{ch3_rps/params_per_sample} tham số: điều kiện lý tưởng để quá khớp.
+
+\subsubsection*{a. Basic CNN from scratch (NumPy)}
+Bản NumPy cập nhật tham số bằng Adam tự viết (Đoạn mã~\ref{code:ch3_scratch__ScratchCNN.adam_step}); vòng huấn luyện
+xáo trộn dữ liệu mỗi epoch, cập nhật theo lô 64 và đánh giá validation sau mỗi epoch (Đoạn mã~\ref{code:ch3_scratch__train_scratch}).
+Kịch bản \texttt{run\_scratch} (Đoạn mã~\ref{code:ch3_train__run_scratch}) chọn tập con khi bộ dữ liệu lớn (MNIST,
+Fashion-MNIST, CIFAR-10); với Rock/Paper/Scissors bản NumPy dùng toàn bộ \SL{ch3_rps/split/train} ảnh trong
+\SL{ch3_rps/cfg/scratch_ep} epoch.
+
+\maNguon{ch3_scratch__ScratchCNN.adam_step}{Bước cập nhật Adam tự viết, có hiệu chỉnh độ lệch moment.}
+
+\maDai{ch3_scratch__train_scratch}{Vòng huấn luyện Basic CNN NumPy theo lô nhỏ, ghi lịch sử loss/accuracy và thời gian.}
+
+\maNguon{ch3_train__run_scratch}{Huấn luyện, đánh giá và lưu Basic CNN NumPy cho một bộ dữ liệu.}
+
+\subsubsection*{b. Basic CNN bằng PyTorch}
+Kịch bản \texttt{run\_torch} (Đoạn mã~\ref{code:ch3_train__run_torch}) gom toàn bộ quy trình PyTorch: lấy dữ liệu đúng kích
+thước, giới hạn bộ nhớ GPU, huấn luyện, khởi động (warm-up) rồi đo thời gian suy luận trên tập kiểm tra, lưu trọng số và
+tệp mô tả (kích thước ảnh, độ rộng, $\mu,\sigma$ chuẩn hóa) mà Web App cần để dựng lại mô hình.
+
+\maDai{ch3_train__run_torch}{Quy trình huấn luyện và lưu một mô hình PyTorch (Basic hoặc Improved).}
+
+\subsubsection*{c. Basic CNN bằng TensorFlow/Keras}
+Bản Keras dùng chung \texttt{build\_basic} với đầu vào $64\times64\times3$, huấn luyện \SL{ch3_rps/cfg/ep_basic} epoch.
+
+\subsection{Xây dựng mô hình Improved CNN}
+\subsubsection*{a. Những cải tiến}
+Rock/Paper/Scissors là nơi các cải tiến có ý nghĩa nhất, vì vấn đề chính là ít dữ liệu và lệch phân phối:
+\begin{itemize}
+  \item \textbf{Tăng cường mạnh}: lật ngang (tay trái/phải), xoay $\pm$\SL{ch3_rps/aug/rot}$^\circ$ (cổ tay nghiêng), dịch
+    \SL{ch3_rps/aug/shiftPct}\,\%, phóng \SL{ch3_rps/aug/zoomPct}\,\%, và dao động độ sáng/tương phản
+    \SL{ch3_rps/aug/colorPct}\,\% để mô hình không dựa vào màu da (Hình~\ref{fig:ch3-rps-aug}). Biên của ảnh sau biến đổi
+    affine được lấp bằng phản chiếu (\emph{reflection}) để không tạo viền đen lạ trên nền trắng.
+  \item \textbf{Ảnh lớn hơn và mạng sâu hơn}: $\SL{ch3_rps/cfg/improved_size}\times\SL{ch3_rps/cfg/improved_size}$ với bốn
+    khối dư 32--64--128--256 (Bảng~\ref{tab:ch3-arch-improved-rps}); GAP giữ số tham số ở mức vừa phải dù sâu hơn.
+  \item AdamW, OneCycle, label smoothing như các thực nghiệm trước, \SL{ch3_rps/cfg/ep_improved} epoch.
+\end{itemize}
+
+\bang{ch3_arch_improved_rps}{Kiến trúc Improved CNN cho Rock/Paper/Scissors (ảnh $96\times96$, bốn khối dư).}{ch3-arch-improved-rps}
+
+\hinhpdf{ch3_rps_aug}{0.95}{Tăng cường dữ liệu cho Rock/Paper/Scissors: lật, xoay, dịch, phóng và đổi độ sáng, độ tương
+phản.}{ch3-rps-aug}
+
+\subsubsection*{b. Improved CNN bằng PyTorch}
+Dùng \texttt{ImprovedCNN} với \texttt{widths=(32, 64, 128, 256)} (Đoạn mã~\ref{code:ch3_torch__ImprovedCNN}); tăng cường
+qua \texttt{gpu\_augment} có thêm nhánh độ sáng/tương phản (Đoạn mã~\ref{code:ch3_torch__gpu_augment}).
+
+\subsubsection*{c. Improved CNN bằng TensorFlow/Keras}
+Các tầng tăng cường của Keras (Đoạn mã~\ref{code:ch3_keras__augmentation}) được chọn theo cấu hình: \texttt{RandomFlip},
+\texttt{RandomRotation}, \texttt{RandomTranslation}, \texttt{RandomZoom}, \texttt{RandomContrast} và
+\texttt{RandomBrightness}; mô hình huấn luyện trên CPU tối đa \SL{ch3_rps/cfg/ep_improved_tf} epoch, thực tế chạy
+\SL{ch3_rps/tf_improved/epochs} epoch (\SL{ch3_rps/tf_improved/stop_vn}), tốt nhất ở epoch \SL{ch3_rps/tf_improved/best_epoch}.
+
+\maNguon{ch3_keras__augmentation}{Khối tăng cường dữ liệu Keras dựng theo cấu hình của từng bộ dữ liệu.}
+
+\subsection{Đánh giá và so sánh mô hình}
+\bang{ch3_rps_results}{Kết quả các mô hình trên tập kiểm tra Rock/Paper/Scissors (\SL{ch3_data/rps/test} ảnh).}{ch3-rps-results}
+
+\hinhpdf{ch3_rps_metrics}{0.95}{Accuracy, precision, recall và F1 macro trên Rock/Paper/Scissors.}{ch3-rps-metrics}
+
+\nhanxet{Đây là thí nghiệm mà Improved CNN tạo khác biệt lớn nhất: \SL{ch3_rps/torch_improved/accPct}\,\% so với
+\SL{ch3_rps/torch_basic/accPct}\,\% của Basic CNN PyTorch, tăng \SL{ch3_rps/gain_torch/accPct} điểm phần trăm và bớt
+\SL{ch3_rps/gain_torch/err_cutPct}\,\% số lỗi (\SL{ch3_rps/torch_basic/errors} ảnh sai còn
+\SL{ch3_rps/torch_improved/errors}). Ba bản Basic CNN cùng kiến trúc lại lệch nhau tới \SL{ch3_rps/basic_spreadPct}
+điểm (TensorFlow \SL{ch3_rps/tf_basic/accPct}\,\%, NumPy \SL{ch3_rps/scratch/accPct}\,\%; riêng PyTorch và TensorFlow đã
+cách nhau \SL{ch3_rps/fw_spreadPct} điểm), khác hẳn MNIST và Fashion-MNIST nơi chúng gần như trùng nhau. Khi
+tập huấn luyện chỉ có \SL{ch3_rps/split/train} ảnh mà mô hình có \SL{ch3_rps/torch_basic/params} tham số
+(\SL{ch3_rps/params_per_sample} tham số cho mỗi ảnh, \SL{ch3_rps/dense_sharePct}\,\% trong tầng Dense), kết quả phụ thuộc
+mạnh vào khởi tạo ngẫu nhiên và thứ tự lô: mô hình quá khớp theo những cách khác nhau. Improved CNN cũng vượt xa
+Basic ở bản TensorFlow: chạy \SL{ch3_rps/tf_improved/epochs} epoch trên CPU, nó đạt \SL{ch3_rps/tf_improved/accPct}\,\%,
+hơn Basic CNN TensorFlow \SL{ch3_rps/gain_tf/accPct} điểm. Bản này vẫn kém bản PyTorch
+\SL{ch3_rps/improved_fw_gapPct} điểm, một phần vì trọng số được giữ lại (epoch \SL{ch3_rps/tf_improved/best_epoch}) được
+chọn theo validation, mà ở bộ dữ liệu này validation không phản ánh tập kiểm tra (xem đường cong học bên dưới). Bài học là trên dữ liệu nhỏ, một
+lần chạy duy nhất không đủ để so sánh hai cấu hình.}
+
+\hinhpdf{ch3_rps_curves}{1.0}{Đường cong học trên Rock/Paper/Scissors.}{ch3-rps-curves}
+
+\nhanxet{Đường cong học của bộ dữ liệu này \emph{đánh lừa}: các mô hình đều đạt val accuracy gần tuyệt đối chỉ sau vài
+epoch (Basic CNN PyTorch đạt \SL{ch3_rps/torch_basic/val_bestPct}\,\%, ngay epoch đầu đã \SL{ch3_rps/torch_basic/val_firstPct}\,\%;
+Improved TensorFlow cao nhất \SL{ch3_rps/tf_improved/val_bestPct}\,\%), trong khi accuracy trên tập kiểm tra thấp hơn nhiều. Nguyên nhân là tập validation được tách ngẫu
+nhiên từ tập huấn luyện, gồm các ảnh CGI của \emph{cùng} những bàn tay, cùng tư thế, chỉ khác góc xoay một chút; còn tập
+kiểm tra dùng bàn tay của những người mẫu khác. Validation vì vậy không đo được khả năng tổng quát hóa và callback chọn
+epoch tốt nhất gần như ngẫu nhiên. Hàm mất mát của hai Basic CNN giảm tuyến tính trên thang log xuống tới
+\SL{ch3_rps/torch_basic/train_loss_last}: mô hình đã thuộc lòng từng ảnh huấn luyện. Improved CNN thì loss huấn luyện
+dừng ở \SL{ch3_rps/torch_improved/train_loss_last} (label smoothing cộng tăng cường mạnh), và val accuracy tụt mạnh ở
+epoch đầu cũng như dao động ở các epoch kế tiếp, lúc learning rate đang ở đỉnh, trước khi ổn định.}
+
+\hinhpdf{ch3_rps_cm}{0.9}{Ma trận nhầm lẫn trên tập kiểm tra Rock/Paper/Scissors.}{ch3-rps-cm}
+
+\hinhpdf{ch3_rps_f1class}{0.8}{F1 theo từng cử chỉ.}{ch3-rps-f1class}
+
+\nhanxet{Lỗi của Basic CNN PyTorch dồn vào lớp ``\SL{ch3_rps/torch_basic/worst_class}'' (F1
+\SL{ch3_rps/torch_basic/worst_f1Pct}\,\%): nhầm lớn nhất là \SL{ch3_rps/gain_torch/pair} với
+\SL{ch3_rps/gain_torch/pair_before} ảnh, rồi \SL{ch3_rps/torch_basic/conf2} (\SL{ch3_rps/torch_basic/conf2_n} ảnh). Một
+bàn tay ``kéo'' với ngón cái và ba ngón gập lại có phần thân giống hệt nắm đấm, chỉ khác hai ngón duỗi mảnh; mô hình
+chưa học được chi tiết đó thì chỉ nhìn thấy khối bàn tay. Improved CNN đưa ô
+\SL{ch3_rps/gain_torch/pair} về \SL{ch3_rps/gain_torch/pair_after}, đoán đúng hết lớp ``búa'' và ``kéo''; toàn bộ lỗi còn
+lại là một ô duy nhất \SL{ch3_rps/torch_improved/conf1} với \SL{ch3_rps/torch_improved/conf1_n} ảnh.}
+
+\hinhpdf{ch3_rps_wrong}{0.95}{Các ảnh Rock/Paper/Scissors bị mô hình tốt nhất đoán sai với độ tự tin cao nhất.}{ch3-rps-wrong}
+
+\nhanxet{Mười hai ảnh sai tự tin nhất gần như là một: cùng một bàn tay ``bao'' của một người mẫu, chỉ khác góc xoay nhỏ,
+các ngón khép sát nhau nên nhìn trực diện giống hai ngón duỗi của ``kéo''. Như vậy
+\SL{ch3_rps/torch_improved/errors} lỗi của mô hình tốt nhất thực chất là \emph{một} kiểu bàn tay mà tập huấn luyện
+chưa có, không phải chừng ấy lỗi độc lập. Độ tự tin trên những ảnh này chỉ từ khoảng một nửa tới
+\SL{ch3_rps/torch_improved/wrong_conf_maxPct}\,\% (trung bình \SL{ch3_rps/torch_improved/wrong_conf_meanPct}\,\%), thấp
+hơn hẳn mức \SL{ch3_rps/torch_improved/conf_meanPct}\,\% trung bình trên toàn tập kiểm tra, trong khi Basic CNN có ảnh
+sai với xác suất \SL{ch3_rps/torch_basic/wrong_conf_maxPct}\,\%. Thêm vài bàn tay có ngón khép sát vào tập huấn luyện,
+hoặc đặt ngưỡng xác suất để hệ thống trả lời ``chưa chắc chắn'', sẽ xử lý được nhóm lỗi này.}
+
+\haihinh{ch3_rps_filters}{32 bộ lọc Conv1 (RGB)}{ch3_rps_fmaps}{Bản đồ đặc trưng}{Bên trong Basic CNN PyTorch trên
+Rock/Paper/Scissors: bộ lọc màu đã học (a) và bản đồ đặc trưng (b).}{ch3-rps-filters}
+
+\hinhpdf{ch3_rps_gradcam}{0.95}{Grad-CAM của Improved CNN PyTorch trên Rock/Paper/Scissors.}{ch3-rps-gradcam}
+
+\nhanxet{Với ``bao'' và ``kéo'', vùng nóng nằm đúng ở các ngón tay: đầu bốn ngón duỗi của ``bao'', hai ngón chữ V của
+``kéo''. Cổ tay và nền trắng, giống nhau ở cả ba lớp, gần như không đóng góp. Riêng ``búa'' cho bản đồ khác hẳn: ngoài nắm
+đấm, vùng ảnh hưởng còn lan lên khoảng trống \emph{phía trên} nắm tay. Đó là một lý giải hợp lý chứ không phải lỗi: điều
+phân biệt ``búa'' với hai lớp còn lại chính là việc \emph{không có} ngón tay nào ở vùng phía trên.}
+
+\subsection{Triển khai hệ thống}
+Mô hình được nạp lười một lần cho mỗi cặp (bộ dữ liệu, mô hình) qua \texttt{\_load} (Đoạn mã~\ref{code:serve_ch3___load}),
+dựng lại đúng kiến trúc từ tệp mô tả JSON và chạy trên CPU để Web App không tranh GPU với các tiến trình khác. Ảnh ví dụ
+hiển thị sẵn trên giao diện là một ảnh thật của tập kiểm tra, được ghi ra đĩa một lần (Đoạn mã~\ref{code:serve_ch3___example}).
+
+\maDai{serve_ch3___load}{Nạp mô hình NumPy, PyTorch hoặc Keras cho Web App, trả hàm dự đoán và kích thước ảnh vào.}
+
+\maNguon{serve_ch3___example}{Ghi một ảnh kiểm tra thật làm ví dụ cho Web App.}
+
+\anhUI{ch3_rps_web}{Giao diện Web App nhận dạng cử chỉ Rock/Paper/Scissors trên máy tính.}{ch3-rps-web}
+
+\anhMobile{ch3_rps_mobile}{Giao diện nhận dạng cử chỉ trên điện thoại.}{ch3-rps-mobile}
+
+% =====================================================================
+\section{Thực nghiệm 4 -- Phân loại ảnh vật thể CIFAR-10}
+\label{sec:cnn-cifar}
+
+\subsection{Giới thiệu và khảo sát dữ liệu}
+CIFAR-10~\cite{ch3:krizhevsky2009} gồm \SL{ch3_data/cifar10/train} ảnh huấn luyện và \SL{ch3_data/cifar10/test} ảnh kiểm
+tra, ảnh màu $32\times32$ thuộc 10 lớp: máy bay, ô tô, chim, mèo, hươu, chó, ếch, ngựa, tàu thủy, xe tải. Đây là bài khó
+nhất trong chương: ảnh tự nhiên chụp ở mọi góc, nền phức tạp, vật thể chiếm tỉ lệ khung hình khác nhau, và độ phân giải
+thấp tới mức nhiều ảnh khó nhận ra bằng mắt. Dữ liệu được tải bằng \texttt{torchvision} từ bản gốc của Đại học Toronto
+(Đoạn mã~\ref{code:ch3_download__cifar10}). Mỗi lớp có đúng \SL{ch3_cifar10/balance/max_n} ảnh huấn luyện.
+
+\maNguon{ch3_download__cifar10}{Tải CIFAR-10 qua torchvision.}
+
+\hinhpdf{ch3_cifar10_dist}{0.95}{Số ảnh mỗi lớp trong tập huấn luyện và kiểm tra CIFAR-10.}{ch3-cifar10-dist}
+
+\subsection{Tiền xử lý dữ liệu}
+Ảnh giữ nguyên $32\times32\times3$; tách \SL{ch3_cifar10/split/val} ảnh validation; chuẩn hóa $[0,1]$ và theo kênh cho
+Improved CNN. Bản NumPy học trên tập con \SL{ch3_cifar10/cfg/scratch_n} ảnh.
+
+\hinhpdf{ch3_cifar10_pixels}{0.95}{Phân bố cường độ theo kênh của CIFAR-10.}{ch3-cifar10-pixels}
+
+\subsection{Trực quan hóa dữ liệu}
+\hinhpdf{ch3_cifar10_samples}{0.95}{Tám ảnh ngẫu nhiên của mỗi lớp CIFAR-10.}{ch3-cifar10-samples}
+
+\hinhpdf{ch3_cifar10_mean}{0.95}{Ảnh trung bình của từng lớp CIFAR-10.}{ch3-cifar10-mean}
+
+\nhanxet{Khác với ba bộ trước, ảnh trung bình của CIFAR-10 gần như chỉ còn là \emph{màu nền}: máy bay và tàu thủy có
+nền xanh lam (trời, biển), chim, hươu và ếch có nền xanh lục ngả vàng (cỏ, lá, đất), ô tô và xe tải có khối tối nằm
+ngang ở nửa dưới, mèo và chó chỉ còn một vệt nâu cam ở giữa. Hình dạng vật
+thể bị nhòe hẳn vì vị trí, tư thế, kích thước thay đổi quá nhiều. Mô hình dễ học ``lối tắt'' theo màu nền, nên các cặp có
+nền giống nhau như máy bay--tàu thủy, mèo--chó, ô tô--xe tải sẽ là nguồn nhầm lẫn chính.}
+
+\subsection{Xây dựng mô hình Basic CNN}
+\subsubsection*{a. Basic CNN from scratch (NumPy)}
+Với ảnh màu $32\times32$, Basic CNN có \SL{ch3_cifar10/torch_basic/params} tham số (Bảng~\ref{tab:ch3-arch-basic-rgb}).
+Sau huấn luyện, \texttt{predict\_proba} suy luận theo lô 200 ảnh để giới hạn bộ nhớ của ma trận im2col
+(Đoạn mã~\ref{code:ch3_scratch__ScratchCNN.predict_proba}). Hàm kiểm tra gradient đã nhắc ở Thực nghiệm~1 được trình bày
+đầy đủ ở Đoạn mã~\ref{code:ch3_scratch__gradient_check}.
+
+\bang{ch3_arch_basic_rgb}{Kiến trúc Basic CNN cho ảnh màu $32\times32$ (CIFAR-10).}{ch3-arch-basic-rgb}
+
+\maNguon{ch3_scratch__ScratchCNN.predict_proba}{Suy luận theo lô của Basic CNN NumPy.}
+
+\maDai{ch3_scratch__gradient_check}{Kiểm tra gradient số của lan truyền ngược tự viết bằng sai phân trung tâm.}
+
+\subsubsection*{b. Basic CNN bằng PyTorch}
+Cùng \texttt{BasicCNN} với \texttt{in\_ch=3}, \SL{ch3_cifar10/cfg/ep_basic} epoch.
+
+\subsubsection*{c. Basic CNN bằng TensorFlow/Keras}
+Kịch bản \texttt{run\_tf} (Đoạn mã~\ref{code:ch3_train__run_tf}) là bản tương ứng của \texttt{run\_torch}: dựng mô hình,
+huấn luyện, đo thời gian suy luận, lưu tệp \texttt{.keras}; hàm \texttt{finish} (Đoạn mã~\ref{code:ch3_train__finish})
+gom mọi chỉ số vào một bản ghi và \texttt{save\_result} (Đoạn mã~\ref{code:ch3_common__save_result}) lưu bản ghi cùng ma
+trận xác suất dự đoán.
+
+\maNguon{ch3_train__run_tf}{Quy trình huấn luyện và lưu một mô hình Keras.}
+
+\maNguon{ch3_train__finish}{Gom chỉ số đánh giá, thời gian và lịch sử huấn luyện vào một bản ghi kết quả.}
+
+\maNguon{ch3_common__save_result}{Lưu bản ghi kết quả (JSON) và xác suất dự đoán trên tập kiểm tra (.npy).}
+
+\subsection{Xây dựng mô hình Improved CNN}
+\subsubsection*{a. Những cải tiến}
+CIFAR-10 cần mạng rộng hơn: ba khối dư 64--128--256 (Bảng~\ref{tab:ch3-arch-improved-cifar10}). Tăng cường dữ liệu theo
+cách kinh điển của CIFAR: lật ngang và dịch tối đa \SL{ch3_cifar10/aug/shiftPct}\,\% (tương đương đệm 4 điểm ảnh rồi cắt
+ngẫu nhiên), cộng dao động màu nhẹ \SL{ch3_cifar10/aug/colorPct}\,\%; không xoay vì ảnh nhỏ, xoay làm mất thông tin ở
+góc. Huấn luyện \SL{ch3_cifar10/cfg/ep_improved} epoch (PyTorch).
+
+\bang{ch3_arch_improved_cifar10}{Kiến trúc Improved CNN cho CIFAR-10 (độ rộng 64--128--256).}{ch3-arch-improved-cifar10}
+
+\hinhpdf{ch3_cifar10_aug}{0.9}{Tăng cường dữ liệu cho CIFAR-10: lật ngang, dịch, dao động độ sáng và độ tương phản.}{ch3-cifar10-aug}
+
+\subsubsection*{b. Improved CNN bằng PyTorch}
+\texttt{ImprovedCNN(3, 10, (64, 128, 256))} huấn luyện bằng \texttt{train\_torch}. Để giải thích quyết định của mô hình, ta
+dùng Grad-CAM (Đoạn mã~\ref{code:ch3_torch__GradCAM}): hai \emph{hook} lưu kích hoạt và gradient của khối dư cuối, trọng số
+mỗi kênh là trung bình gradient, bản đồ nhiệt là tổ hợp có trọng số của các kênh qua ReLU rồi nội suy lên kích thước ảnh.
+Kịch bản vẽ hình chọn một ảnh mỗi lớp và chồng bản đồ nhiệt lên ảnh (Đoạn mã~\ref{code:ch3_figures__fig_gradcam}).
+
+\maNguon{ch3_torch__GradCAM}{Cài đặt Grad-CAM bằng forward hook và backward hook của PyTorch.}
+
+\maDai{ch3_figures__fig_gradcam}{Vẽ Grad-CAM của Improved CNN cho một ảnh mỗi lớp.}
+
+\subsubsection*{c. Improved CNN bằng TensorFlow/Keras}
+Dùng \texttt{build\_improved} với độ rộng 64--128--256, huấn luyện trên CPU tối đa \SL{ch3_cifar10/cfg/ep_improved_tf}
+epoch trong ngân sách \SL{ch3_cifar10/cfg/tf_budget_min} phút; thực tế chạy \SL{ch3_cifar10/tf_improved/epochs} epoch
+(\SL{ch3_cifar10/tf_improved/stop_vn}), tốt nhất ở epoch \SL{ch3_cifar10/tf_improved/best_epoch}.
+
+\subsection{Đánh giá và so sánh mô hình}
+\bang{ch3_cifar10_results}{Kết quả các mô hình trên tập kiểm tra CIFAR-10.}{ch3-cifar10-results}
+
+\hinhpdf{ch3_cifar10_metrics}{0.95}{Accuracy, precision, recall và F1 macro trên CIFAR-10.}{ch3-cifar10-metrics}
+
+\nhanxet{Trên CIFAR-10 khoảng cách giữa hai kiến trúc lớn nhất chương: Basic CNN dừng ở
+\SL{ch3_cifar10/torch_basic/accPct}\,\% (PyTorch), \SL{ch3_cifar10/tf_basic/accPct}\,\% (TensorFlow) và
+\SL{ch3_cifar10/scratch/accPct}\,\% (NumPy, học trên \SL{ch3_cifar10/cfg/scratch_n} ảnh), còn Improved CNN PyTorch đạt
+\SL{ch3_cifar10/torch_improved/accPct}\,\%, tăng \SL{ch3_cifar10/gain_torch/accPct} điểm phần trăm: số ảnh sai giảm từ
+\SL{ch3_cifar10/torch_basic/errors} xuống \SL{ch3_cifar10/torch_improved/errors}
+(\SL{ch3_cifar10/gain_torch/err_cutPct}\,\% số lỗi). Bản Improved TensorFlow, chạy
+\SL{ch3_cifar10/tf_improved/epochs} epoch trên CPU, đạt \SL{ch3_cifar10/tf_improved/accPct}\,\%: hơn Basic CNN TensorFlow
+\SL{ch3_cifar10/gain_tf/accPct} điểm nhưng kém bản PyTorch (\SL{ch3_cifar10/cfg/ep_improved} epoch trên GPU)
+\SL{ch3_cifar10/improved_fw_gapPct} điểm. Val accuracy của nó vẫn đi lên ở epoch cuối (epoch tốt nhất là
+\SL{ch3_cifar10/tf_improved/best_epoch}), nên khoảng cách này do ngân sách huấn luyện trên CPU chứ không do framework hay
+kiến trúc. Khác với ba bộ trước, ở đây Improved CNN có \emph{nhiều} tham
+số hơn Basic (\SL{ch3_cifar10/torch_improved/params} so với \SL{ch3_cifar10/torch_basic/params}) vì dùng độ rộng
+64--128--256; ảnh tự nhiên cần nhiều bộ lọc hơn hẳn chữ số hay trang phục.}
+
+\hinhpdf{ch3_cifar10_curves}{1.0}{Đường cong học trên CIFAR-10.}{ch3-cifar10-curves}
+
+\nhanxet{Hai Basic CNN quá khớp rất sớm: hàm mất mát validation chạm đáy \SL{ch3_cifar10/torch_basic/val_loss_min}
+(PyTorch) quanh epoch \SL{ch3_cifar10/torch_basic/best_epoch} rồi tăng trở lại, trong khi độ chính xác huấn luyện tiếp
+tục lên \SL{ch3_cifar10/torch_basic/train_acc_lastPct}\,\%, bỏ xa val accuracy cao nhất
+(\SL{ch3_cifar10/torch_basic/val_bestPct}\,\%). Improved CNN vẫn còn đi lên ở epoch cuối: val accuracy
+cao nhất \SL{ch3_cifar10/torch_improved/val_bestPct}\,\% đạt ở epoch \SL{ch3_cifar10/torch_improved/best_epoch} trên
+tổng số \SL{ch3_cifar10/torch_improved/epochs}, loss validation giảm đều tới \SL{ch3_cifar10/torch_improved/val_loss_min}.
+Đường cong chưa bão hòa cho thấy huấn luyện lâu hơn (hoặc mạng rộng hơn như ResNet-18) còn có thể nâng thêm độ chính
+xác; giới hạn ở đây là thời gian chứ không phải quá khớp.}
+
+\hinhpdf{ch3_cifar10_cm}{1.0}{Ma trận nhầm lẫn trên tập kiểm tra CIFAR-10 của Basic CNN và Improved CNN tốt nhất.}{ch3-cifar10-cm}
+
+\hinhpdf{ch3_cifar10_f1class}{0.95}{F1 theo từng lớp CIFAR-10.}{ch3-cifar10-f1class}
+
+\nhanxet{Ma trận nhầm lẫn chia rõ hai khối: \emph{phương tiện} (máy bay, ô tô, tàu thủy, xe tải) và \emph{động vật}
+(chim, mèo, hươu, chó, ếch, ngựa); nhầm lẫn chủ yếu xảy ra bên trong mỗi khối, đúng như dự đoán từ ảnh trung bình.
+Cặp khó nhất là mèo--chó: Basic CNN PyTorch nhầm \SL{ch3_cifar10/torch_basic/conf1} \SL{ch3_cifar10/torch_basic/conf1_n}
+ảnh và \SL{ch3_cifar10/torch_basic/conf2} \SL{ch3_cifar10/torch_basic/conf2_n} ảnh; các cặp ô tô--xe tải và máy
+bay--tàu thủy (cùng nền trời, nền nước) xếp ngay sau. Improved CNN đưa ô \SL{ch3_cifar10/gain_torch/pair} từ
+\SL{ch3_cifar10/gain_torch/pair_before} xuống \SL{ch3_cifar10/gain_torch/pair_after} ảnh, nhưng nhầm lẫn lớn nhất của nó
+vẫn là cặp này (\SL{ch3_cifar10/torch_improved/conf1}, \SL{ch3_cifar10/torch_improved/conf1_n} ảnh). Theo F1 từng lớp,
+``\SL{ch3_cifar10/torch_improved/worst_class}'' khó nhất ở mọi mô hình
+(\SL{ch3_cifar10/torch_basic/worst_f1Pct}\,\% với Basic, \SL{ch3_cifar10/torch_improved/worst_f1Pct}\,\% với Improved),
+``\SL{ch3_cifar10/torch_improved/best_class}'' dễ nhất (\SL{ch3_cifar10/torch_improved/best_f1Pct}\,\%).}
+
+\hinhpdf{ch3_cifar10_wrong}{0.95}{Các ảnh CIFAR-10 mà mô hình tốt nhất đoán sai với độ tự tin cao nhất.}{ch3-cifar10-wrong}
+
+\nhanxet{Các lỗi tự tin nhất cho thấy mô hình dựa nhiều vào \emph{bối cảnh}: hai chiếc tàu thủy chụp trên nền trời và
+mặt nước phẳng bị đoán là máy bay, một con ếch và một con mèo trên nền trơn sáng/tối cũng thành máy bay, một con vẹt
+xanh lục bị đoán là ếch. Một số ảnh mơ hồ ngay cả với người: chiếc ``ô tô'' bán tải gần như là xe tải, ảnh ``mèo'' thứ
+hai trông giống một con ếch xanh, ảnh ``mèo'' đầu tiên mờ đến mức không nhận ra. Độ tự tin cao nhất trên ảnh sai là
+\SL{ch3_cifar10/torch_improved/wrong_conf_maxPct}\,\%, nhưng trung bình trên mọi ảnh sai chỉ
+\SL{ch3_cifar10/torch_improved/wrong_conf_meanPct}\,\%, thấp hơn rõ so với
+\SL{ch3_cifar10/torch_improved/conf_meanPct}\,\% trung bình trên toàn tập kiểm tra; xác suất dự đoán vì vậy vẫn là tín
+hiệu hữu ích để phát hiện ảnh khó.}
+
+\hinhpdf{ch3_cifar10_filters}{0.95}{32 bộ lọc màu $3\times3$ của tầng Conv1 (Basic CNN PyTorch) trên CIFAR-10.}{ch3-cifar10-filters}
+
+\hinhpdf{ch3_cifar10_fmaps}{0.95}{Bản đồ đặc trưng Conv1 và Conv2 của Basic CNN PyTorch cho một ảnh mèo CIFAR-10.}{ch3-cifar10-fmaps}
+
+\nhanxet{Với ảnh màu, bộ lọc Conv1 vừa phát hiện cạnh vừa phát hiện \emph{màu}: một số bộ lọc gần như đồng màu (chỉ
+phản ứng với vùng xanh lam hay vùng nâu đỏ), số khác là cạnh có hướng giữa hai màu đối lập. Bản đồ Conv1 của ảnh mèo vẫn
+giữ được đường viền con mèo và tách nền trên, nền dưới thành các kênh khác nhau. Ở Conv2, sau ReLU nhiều kênh gần như tắt
+hẳn với ảnh này và các kênh còn lại chỉ sáng ở vài vị trí rời rạc: biểu diễn trở nên thưa và mang tính chọn lọc, mỗi kênh
+chỉ đáp ứng với một tổ hợp đặc trưng cụ thể.}
+
+\hinhpdf{ch3_cifar10_gradcam}{0.95}{Grad-CAM của Improved CNN PyTorch trên CIFAR-10.}{ch3-cifar10-gradcam}
+
+\nhanxet{Với các ảnh đoán đúng, vùng nóng phủ lên chính vật thể: thân và đầu xe ô tô, thân con hươu, đầu con ngựa (bỏ
+qua người đứng cạnh), thân tàu và xe bồn. Ba ảnh trong mẫu ngẫu nhiên này bị đoán sai và Grad-CAM giải thích được cả ba:
+chiếc thủy phi cơ đậu trên mặt nước có vùng nóng ở phần thân thấp, mờ, nên bị đoán là ếch; ảnh mèo đặt trên nền trời xanh
+có vùng nóng ở phần tai nhọn hướng lên trời và bị đoán là máy bay; ảnh chó nằm cạnh hàng rào trắng có vùng nóng chỉ gói
+trong phần đầu nhỏ, phần thân bị che khuất, và bị đoán là mèo. Ảnh chim cho thấy mô hình dùng được cả vật thể có màu gần trùng với nền.}
+
+\subsection{Triển khai hệ thống}
+\label{sec:cnn-serve}
+Bốn thực nghiệm dùng chung mô-đun \texttt{tl3/serve\_ch3.py} theo hợp đồng của Web App: từ điển \texttt{SPECS} khai báo
+mỗi bộ dữ liệu (tiêu đề, loại đầu vào ảnh, danh sách mô hình đã huấn luyện, ảnh ví dụ, tên lớp), và hàm
+\texttt{predict(exp\_id, payload, model\_id)} nhận một \texttt{PIL.Image}, trả nhãn, xác suất top-5 và thời gian suy luận
+(Đoạn mã~\ref{code:serve_ch3__SPECS}). Danh sách mô hình chỉ gồm các mô hình đã có tệp trọng số, mô hình mặc định là
+Improved CNN PyTorch. Web App hiển thị thêm ảnh đúng như mô hình nhìn thấy sau tiền xử lý, giúp người dùng hiểu vì sao
+một ảnh chụp tối hoặc lệch có thể bị đoán sai.
+
+\maNguon{serve_ch3__SPECS}{Khai báo bốn thực nghiệm ảnh cho Web App: đầu vào, mô hình, tên lớp và ảnh ví dụ.}
+
+\anhUI{ch3_cifar10_web}{Giao diện Web App phân loại ảnh CIFAR-10 trên máy tính.}{ch3-cifar10-web}
+
+\anhMobile{ch3_cifar10_mobile}{Giao diện phân loại ảnh CIFAR-10 trên điện thoại.}{ch3-cifar10-mobile}
+
+% =====================================================================
+\section{Tổng hợp và so sánh bốn thực nghiệm}
+\label{sec:cnn-summary}
+
+Kết quả của 4 bộ dữ liệu $\times$ 5 mô hình được gom bởi kịch bản \texttt{ch3\_collect.py}
+(Đoạn mã~\ref{code:ch3_collect__summarize}) và tổng hợp ở Bảng~\ref{tab:ch3-overview}, Hình~\ref{fig:ch3-overview-acc}.
+
+\maDai{ch3_collect__summarize}{Gom kết quả huấn luyện của một bộ dữ liệu thành tệp chỉ số cho báo cáo.}
+
+\bang{ch3_overview}{Độ chính xác trên tập kiểm tra của mọi mô hình trên bốn bộ dữ liệu.}{ch3-overview}
+
+\hinhpdf{ch3_overview_acc}{1.0}{Bản đồ nhiệt độ chính xác: bốn bộ dữ liệu (hàng) $\times$ năm mô hình (cột); số in đậm là
+mô hình tốt nhất của bộ dữ liệu.}{ch3-overview-acc}
+
+\bang{ch3_gain}{Mức cải thiện của Improved CNN so với Basic CNN trong cùng framework.}{ch3-gain}
+
+\nhanxet{Mức cải thiện của Improved CNN tăng theo độ khó của bài toán. Trong PyTorch, độ chính xác tăng
+\SL{ch3_mnist/gain_torch/accPct} điểm trên MNIST, \SL{ch3_fashion/gain_torch/accPct} điểm trên Fashion-MNIST,
+\SL{ch3_rps/gain_torch/accPct} điểm trên Rock/Paper/Scissors và \SL{ch3_cifar10/gain_torch/accPct} điểm trên CIFAR-10.
+Đo bằng tỉ lệ lỗi được loại bỏ thì bức tranh khác: MNIST giảm \SL{ch3_mnist/gain_torch/err_cutPct}\,\% số lỗi, ngang
+CIFAR-10 (\SL{ch3_cifar10/gain_torch/err_cutPct}\,\%) và Rock/Paper/Scissors (\SL{ch3_rps/gain_torch/err_cutPct}\,\%), còn
+Fashion-MNIST chỉ \SL{ch3_fashion/gain_torch/err_cutPct}\,\%, vì phần lớn lỗi còn lại của nó nằm ở các cặp áo mà nhãn tự
+thân đã mơ hồ. Với TensorFlow, Improved CNN huấn luyện trên CPU với số epoch tối đa nhỏ hơn nhiều
+(\SL{ch3_mnist/cfg/ep_improved_tf}, \SL{ch3_fashion/cfg/ep_improved_tf}, \SL{ch3_rps/cfg/ep_improved_tf} và
+\SL{ch3_cifar10/cfg/ep_improved_tf} epoch theo cùng thứ tự), dừng sớm theo validation và khôi phục trọng số tốt nhất;
+không lượt nào phải dừng sớm, tức cả bốn đều dùng hết số epoch cho phép. Mức chênh so với Basic TensorFlow
+(\SL{ch3_mnist/gain_tf/accPct}, \SL{ch3_fashion/gain_tf/accPct}, \SL{ch3_rps/gain_tf/accPct} và
+\SL{ch3_cifar10/gain_tf/accPct} điểm) cho thấy kiến trúc mới vẫn vượt rõ trên ba bộ dữ liệu, kể cả CIFAR-10; ngoại lệ duy
+nhất là Fashion-MNIST, nơi \SL{ch3_fashion/tf_improved/epochs} epoch chưa đủ để vượt Basic CNN. Khoảng cách tới bản PyTorch
+(\SL{ch3_mnist/improved_fw_gapPct}, \SL{ch3_fashion/improved_fw_gapPct}, \SL{ch3_rps/improved_fw_gapPct} và
+\SL{ch3_cifar10/improved_fw_gapPct} điểm) tăng theo độ khó của bộ dữ liệu và phản ánh số epoch chạy được, không phải khác
+biệt giữa hai framework: với cùng số epoch, hai bản Basic chỉ chênh \SL{ch3_mnist/fw_spreadPct},
+\SL{ch3_fashion/fw_spreadPct} và \SL{ch3_cifar10/fw_spreadPct} điểm trên MNIST, Fashion-MNIST và CIFAR-10.}
+
+\hinhpdf{ch3_overview_time}{1.0}{Thời gian huấn luyện của các mô hình (giây, thang log).}{ch3-overview-time}
+
+\hinhpdf{ch3_overview_infer}{1.0}{Thời gian suy luận trung bình mỗi ảnh (ms, thang log).}{ch3-overview-infer}
+
+\hinhpdf{ch3_overview_params}{1.0}{Số tham số của các mô hình (thang log).}{ch3-overview-params}
+
+\nhanxet{Cùng một Basic CNN, mỗi epoch PyTorch trên GPU nhanh hơn bản NumPy khoảng
+\SL{ch3_mnist/speedup_torch_vs_numpy} lần (MNIST) và nhanh hơn TensorFlow trên CPU khoảng
+\SL{ch3_mnist/speedup_torch_vs_tf} lần (MNIST) đến \SL{ch3_rps/speedup_torch_vs_tf} lần (Rock/Paper/Scissors). Chênh lệch
+với NumPy không đến từ thuật toán, vì im2col cũng biến tích chập thành nhân ma trận, mà từ phần cứng: GPU chạy hàng nghìn
+phép nhân song song và các nhân tính toán của cuDNN đã được tối ưu sẵn. Thời gian suy luận mỗi ảnh trải từ
+\SL{ch3_mnist/torch_basic/infer_ms} ms (Basic CNN PyTorch trên GPU, MNIST) đến \SL{ch3_rps/tf_improved/infer_ms} ms
+(Improved CNN TensorFlow trên CPU, ảnh $96\times96$) và \SL{ch3_rps/scratch/infer_ms} ms (NumPy, ảnh $64\times64$); mọi
+mức này đều đủ cho Web App trả lời tức thì một ảnh người dùng gửi lên. Về kích thước, Improved CNN cho ảnh xám có ít tham số hơn Basic CNN nhờ
+Global Average Pooling thay cho tầng Dense lớn, nhưng tốn thời gian huấn luyện hơn nhiều vì sâu hơn, chạy nhiều epoch hơn
+và mỗi lô phải qua tăng cường dữ liệu.}
+
+\begin{phathien}{Kết luận chương}
+\begin{itemize}
+  \item \textbf{Hiểu từ gốc.} Basic CNN viết bằng NumPy, với lan truyền ngược tự cài đặt và đã qua kiểm tra gradient (sai
+    số tương đối lớn nhất \SL{ch3_gradcheck/max}), đạt độ chính xác ngang bản PyTorch và TensorFlow cùng kiến trúc trên
+    MNIST (\SL{ch3_mnist/scratch/accPct}\,\% so với \SL{ch3_mnist/torch_basic/accPct}\,\%). Framework không làm mô hình
+    ``thông minh'' hơn; nó làm mô hình nhanh hơn và dễ mở rộng hơn.
+  \item \textbf{Kiến trúc quan trọng hơn khi bài khó.} Batch Normalization, khối dư, Global Average Pooling, tăng cường dữ
+    liệu và lịch học OneCycle gần như không cần trên MNIST, nhưng mang lại \SL{ch3_cifar10/gain_torch/accPct} điểm phần
+    trăm trên CIFAR-10 (đạt \SL{ch3_cifar10/torch_improved/accPct}\,\%) và \SL{ch3_rps/gain_torch/accPct} điểm trên Rock/Paper/Scissors.
+  \item \textbf{Dữ liệu quyết định giới hạn.} Lỗi còn lại trên Fashion-MNIST là các cặp áo mà nhãn mơ hồ; trên
+    Rock/Paper/Scissors gần như toàn bộ lỗi là một kiểu bàn tay chưa có trong tập huấn luyện; trên CIFAR-10 mô hình vẫn dựa vào nền.
+    Validation lấy từ cùng phân phối với tập huấn luyện (Rock/Paper/Scissors) có thể báo kết quả hoàn hảo trong khi tập
+    kiểm tra cho thấy điều ngược lại.
+  \item \textbf{Giải thích được mô hình.} Bộ lọc, bản đồ đặc trưng và Grad-CAM cho thấy CNN học đúng thứ bậc mà lý thuyết
+    mô tả: cạnh và màu ở tầng đầu, tổ hợp thưa ở tầng sau, và các vùng phân biệt lớp ở tầng cuối; Grad-CAM còn giải thích
+    được nhiều lỗi cụ thể.
+  \item \textbf{Triển khai.} Bốn mô hình tốt nhất được phục vụ qua một mô-đun chung \texttt{serve\_ch3.py} với cùng tiền xử
+    lý như lúc huấn luyện; Web App trả nhãn, xác suất top-5 và ảnh đầu vào mà mô hình thực sự nhìn thấy.
+\end{itemize}
+\end{phathien}

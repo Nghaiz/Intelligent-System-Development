@@ -1,0 +1,30 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \fill[cGreen!6, rounded corners=10pt, draw=cGreen!60!black, thick,
+        blur shadow={shadow blur steps=6, shadow opacity=25}] (-0.4,-1.6) rectangle (9.6,2.4);
+  \node[font=\small\bfseries\sffamily, text=cGreen!50!black] at (8.6,2.05) {Ô SimpleRNN};
+  % đầu vào
+  \node[khoiX, minimum width=12mm] (hp) at (-2.2,0.4) {$h_{t-1}$};
+  \node[khoiC, minimum width=12mm] (x) at (2.6,-2.8) {$x_t$};
+  % phép nhân trọng số
+  \node[khoi, minimum width=16mm] (whh) at (1.0,0.4) {$W_{hh}\,h_{t-1}$};
+  \node[khoiC, minimum width=16mm] (wxh) at (2.6,-0.8) {$W_{xh}\,x_t$};
+  \node[cau=cOrange] (plus) at (4.3,0.4) {$+$};
+  \node[khoiT, minimum width=10mm] (b) at (4.3,1.7) {$b_h$};
+  \node[khoiR, minimum width=14mm] (tanh) at (6.2,0.4) {$\tanh$};
+  \node[cau=cGreen, minimum size=11mm] (h) at (8.3,0.4) {$h_t$};
+  % đầu ra
+  \node[khoiP, minimum width=18mm] (y) at (8.3,3.5) {$\hat y_t = W_{hy}h_t + b_y$};
+  \node[khoiX, minimum width=12mm] (hn) at (11.3,0.4) {$h_t \to t{+}1$};
+  \draw[mui] (hp) -- (whh);
+  \draw[mui] (x) -- (wxh);
+  \draw[mui] (whh) -- (plus);
+  \draw[mui] (wxh) -| (plus);
+  \draw[mui] (b) -- (plus);
+  \draw[mui] (plus) -- node[above, nhan] {$a_t$} (tanh);
+  \draw[mui] (tanh) -- (h);
+  \draw[mui] (h) -- (y);
+  \draw[muiM=cRed] (h) -- (hn);
+  \node[nhan, align=center, text width=9.5cm] at (4.6,-2.9) {};
+  \node[font=\normalsize, text=cNavy, align=left] at (4.6,-4.0)
+    {$h_t = \tanh\!\big(W_{xh}x_t + W_{hh}h_{t-1} + b_h\big),\quad \hat y_t = W_{hy}h_t + b_y$};
+\end{tikzpicture}

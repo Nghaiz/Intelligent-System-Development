@@ -1,0 +1,25 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \i/\t in {1/{age}, 2/{bmi}, 3/{HbA1c}, 4/{glucose}, 5/{\dots}}{
+    \node[cau=cSky, minimum size=10mm] (x\i) at (0,4.6-1.15*\i) {$x_{\i}$};
+    \node[nhan, anchor=east] at (-0.65,4.6-1.15*\i) {\t};
+  }
+  \node[cau=cOrange, minimum size=16mm] (z) at (4.2,1.15) {$\Sigma$};
+  % nhãn trọng số đặt gần nút vào (pos=0.3) để năm nhãn không chụm lại sát nút Σ
+  \foreach \i in {1,...,5}{\draw[mui, cNavy!70] (x\i) -- node[pos=0.3, fill=white, inner sep=1pt, font=\small] {$w_{\i}$} (z);}
+  \node[cau=cGreen, minimum size=9mm] (b) at (4.2,3.6) {$b$};
+  \draw[mui] (b) -- (z);
+  \node[khoiP, minimum width=2.2cm, minimum height=1.6cm] (s) at (8.9,1.15) {};
+  \begin{scope}[shift={(8.0,0.55)}]
+    \draw[very thick, cPurple!80!black] (0,0) .. controls (0.9,0) and (0.9,1.2) .. (1.8,1.2);
+  \end{scope}
+  \node[font=\small\bfseries, text=cPurple!80!black, fill=white, fill opacity=0.7, text opacity=1, inner sep=1pt]
+    at (8.45,1.6) {$\sigma(z)$};
+  \draw[mui] (z) -- node[above, font=\small] {$z=\mathbf{w}^\top\mathbf{x}+b$} (s);
+  \node[khoiR, minimum width=2.4cm] (p) at (12.6,1.15) {$p=P(y{=}1\mid\mathbf{x})$};
+  \draw[mui] (s) -- (p);
+  \node[khoiT, minimum width=2.2cm] (yh) at (12.6,-0.6) {$\hat{y}=\mathbf{1}[p\geq\tau]$};
+  \draw[mui] (p) -- (yh);
+  \node[font=\small, align=left, anchor=north west, text width=8.6cm, draw=cOrange, rounded corners, fill=cOrange!6, inner sep=6pt]
+    at (1.4,-1.9) {Huấn luyện: cực tiểu Binary Cross-Entropy\\
+    $\mathcal{L}=-\frac{1}{n}\sum_i\big[y_i\log p_i+(1-y_i)\log(1-p_i)\big]+\lambda\lVert\mathbf{w}\rVert^2$};
+\end{tikzpicture}

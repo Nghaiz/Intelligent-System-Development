@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % --- tiêu biến: thanh 3D thấp dần ---
+  \node[tieude] at (4.2,4.4) {Gradient biến mất: $\|J\|<1$};
+  \foreach \i/\hh in {0/3.4,1/2.2,2/1.45,3/0.95,4/0.62,5/0.4,6/0.26,7/0.17} {
+    \khoibaD{\i*1.05}{0}{0.7}{\hh}{0.6}{cSky}
+  }
+  \draw[mui] (8.6,-0.3) -- (-0.2,-0.3) node[left, nhan] {};
+  \node[nhan] at (4.1,-0.75) {lan truyền ngược: $t = T, T{-}1, \dots, T{-}7$};
+  \node[font=\small, text=cNavy, align=center] at (4.2,-1.5)
+    {$\displaystyle \Big\|\frac{\partial h_T}{\partial h_{t}}\Big\| \le \prod_{k=t+1}^{T}\big\|\mathrm{diag}(1-h_k^2)\,W_{hh}\big\| \approx \gamma^{\,T-t}\to 0$};
+  % --- bùng nổ: thanh 3D cao dần ---
+  \begin{scope}[shift={(10,0)}]
+    \node[tieude, text=cRed] at (4.2,4.4) {Gradient bùng nổ: $\|J\|>1$};
+    \foreach \i/\hh in {0/0.2,1/0.3,2/0.45,3/0.7,4/1.05,5/1.6,6/2.4,7/3.6} {
+      \khoibaD{\i*1.05}{0}{0.7}{\hh}{0.6}{cRed}
+    }
+    \draw[mui] (8.6,-0.3) -- (-0.2,-0.3);
+    \node[nhan] at (4.1,-0.75) {lan truyền ngược: $t = T, \dots, T{-}7$};
+    \node[font=\small, text=cRed!70!black, align=center] at (4.2,-1.5)
+      {$\gamma>1 \Rightarrow \gamma^{\,T-t}\to\infty$ \quad cắt chuẩn: $g \leftarrow g\cdot\min\!\big(1,\tfrac{c}{\|g\|}\big)$};
+  \end{scope}
+  \node[khoiG, align=center] at (4.2,-3.0) {LSTM / GRU: đường cell state cộng tính,\\ cổng giữ $\partial c_t/\partial c_{t-1}=f_t\approx 1$};
+  \node[khoiR, align=center] at (14.2,-3.0) {Gradient clipping, khởi tạo trực giao,\\ learning rate nhỏ, chuẩn hoá};
+\end{tikzpicture}

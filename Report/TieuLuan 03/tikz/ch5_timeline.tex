@@ -1,0 +1,31 @@
+\begin{tikzpicture}[x=1.12cm,y=1cm]
+  % dải thời gian 3D
+  \shade[top color=cBlue!25, bottom color=cBlue!60] (0,0) rectangle (16,0.45);
+  \fill[cBlue!75!black] (0,0.45) -- (0.25,0.65) -- (16.25,0.65) -- (16,0.45) -- cycle;
+  \fill[cBlue!90!black] (16,0) -- (16.25,0.2) -- (16.25,0.65) -- (16,0.45) -- cycle;
+  % mốc: x, năm, tên, màu, trên(1)/dưới(-1), độ cao
+  \foreach \x/\y/\t/\c/\s/\h in {
+      0.4/1968/{Mạng ngữ nghĩa\\(Quillian)}/cSlate/1/1.6,
+      1.5/1984/{Dự án Cyc\\(Lenat)}/cBrown/-1/1.6,
+      2.6/2001/{Semantic Web\\RDF, OWL}/cPurple/1/2.9,
+      3.7/2007/{DBpedia,\\Freebase}/cIndigo/-1/2.9,
+      4.8/2012/{Google\\Knowledge Graph}/cRed/1/1.6,
+      5.9/2012/{Wikidata}/cOrange/-1/1.6,
+      7.0/2013/{TransE --\\nhúng KG}/cTeal/1/2.9,
+      8.1/2017/{Transformer}/cGreen/-1/2.9,
+      9.2/2020/{DPR, REALM,\\RAG (Lewis)}/cBlue/1/1.6,
+      10.3/2022/{RETRO,\\ChatGPT}/cPink/-1/1.6,
+      11.4/2023/{ReAct,\\Self-RAG}/cIndigo/1/2.9,
+      12.6/2024/{GraphRAG\\(Microsoft)}/cPurple/-1/2.9,
+      13.8/2025/{Agentic RAG,\\MCP}/cRed/1/1.6,
+      15.0/2026/{KG + LLM\\hợp nhất}/cGreen/-1/1.6}{
+    \ifnum\s=1
+      \draw[\c, very thick] (\x,0.65) -- (\x,\h);
+      \node[hop=\c, anchor=south, text width=1.95cm] at (\x,\h) {\textbf{\y}\\ \footnotesize\t};
+    \else
+      \draw[\c, very thick] (\x,0) -- (\x,-\h);
+      \node[hop=\c, anchor=north, text width=1.95cm] at (\x,-\h) {\textbf{\y}\\ \footnotesize\t};
+    \fi
+    \fill[\c, draw=white, thick] (\x,0.22) circle (0.13);
+  }
+\end{tikzpicture}

@@ -1,0 +1,800 @@
+% =====================================================================
+%  Chương 5 — Knowledge Graph và RAG (làn L5)
+% =====================================================================
+\chapter{Knowledge Graph và RAG}
+\label{chap:ch5}
+
+\section{Mở đầu}
+\label{sec:ch5-mo-dau}
+
+Bốn chương trước xem xét các mô hình \emph{học} một ánh xạ từ dữ liệu: hồi quy và phân loại trên bảng, mạng tích chập trên ảnh, mạng hồi quy trên chuỗi. Các mô hình này cất tri thức trong hàng triệu tham số, nên khi người dùng hỏi \emph{vì sao} mô hình kết luận như vậy, hoặc hỏi một dữ kiện cụ thể như \textit{``giá đóng cửa của cổ phiếu Google ngày 16/03/2020 là bao nhiêu?''}, mô hình không có chỗ nào để tra lại. Mô hình ngôn ngữ lớn (Large Language Model -- LLM) làm vấn đề này rõ hơn: chúng diễn đạt trôi chảy nhưng có thể ``bịa'' số liệu một cách tự tin (hiện tượng ảo giác -- hallucination) \cite{ch5:ji2023}, và tri thức của chúng dừng ở thời điểm kết thúc huấn luyện.
+
+Hai hướng tiếp cận trong chương này trả lời đúng hai điểm yếu đó. \textbf{Đồ thị tri thức} (Knowledge Graph -- KG) lưu tri thức dưới dạng tường minh: thực thể, quan hệ, thuộc tính, có thể tra cứu, kiểm tra và suy luận \cite{ch5:hogan2021}. \textbf{Sinh tăng cường truy xuất} (Retrieval-Augmented Generation -- RAG) để mô hình ngôn ngữ đọc bằng chứng được truy xuất từ một kho tri thức ngoài trước khi trả lời, nhờ đó câu trả lời có nguồn và tri thức cập nhật được mà không cần huấn luyện lại \cite{ch5:lewis2020}. Kết hợp hai hướng (GraphRAG, Agentic RAG) là xu hướng chính của các hệ thống hỏi đáp hiện nay \cite{ch5:pan2024,ch5:edge2024}.
+
+Chương được tổ chức như sau. Mục~\ref{sec:ch5-kg} trình bày cơ sở lý thuyết của cơ sở tri thức (Knowledge Base -- KB) và KG: mô hình bộ ba, thành phần, mô hình dữ liệu LPG và RDF, quy trình xây dựng từ dữ liệu bảng, suy luận và nhúng đồ thị, các phương pháp truy xuất. Mục~\ref{sec:ch5-rag} trình bày RAG: kiến trúc, chiến lược truy xuất, chia đoạn, nhúng, tái xếp hạng, sinh có căn cứ, các thế hệ RAG, đánh giá, rủi ro và tác tử chọn công cụ. Mục~\ref{sec:ch5-thiet-ke} mô tả hệ thống thực nghiệm. Ba mục tiếp theo xây KB, KG và chatbot RAG cho ba bộ dữ liệu giống bài mẫu: hồ sơ bệnh tiểu đường, giá cổ phiếu Google và giá vàng (FINAL\_USO). Khác với bài mẫu chỉ dừng ở việc in kết quả truy xuất, mỗi bộ dữ liệu ở đây có một \textbf{bộ câu hỏi đánh giá có đáp án} để đo định lượng chất lượng truy xuất (Recall@k, MRR, nDCG) và độ chính xác của câu trả lời cuối cùng do LLM chạy cục bộ sinh ra. Mục~\ref{sec:ch5-tong-hop} so sánh tổng hợp và mục~\ref{sec:ch5-trien-khai} triển khai ba chatbot lên Web App.
+
+\subsection{Lịch sử phát triển của KG và RAG}
+\label{sec:ch5-lich-su}
+
+Ý tưởng biểu diễn tri thức bằng đồ thị có trước máy tính cá nhân. Năm 1968, Quillian đề xuất \textbf{mạng ngữ nghĩa} (semantic network) như một mô hình trí nhớ: khái niệm là nút, liên hệ ngữ nghĩa là cạnh, và việc ``hiểu'' một từ là lan truyền kích hoạt trên mạng \cite{ch5:quillian1968}. Thập niên 1970--1980 chứng kiến các hệ khung (frame), kịch bản và hệ chuyên gia dựa trên luật; dự án Cyc (1984) cố gắng mã hoá bằng tay hàng triệu tri thức thường thức và cho thấy chi phí khổng lồ của việc nhập tri thức thủ công.
+
+Năm 2001, Berners-Lee, Hendler và Lassila công bố tầm nhìn \textbf{Web ngữ nghĩa} (Semantic Web) \cite{ch5:bernerslee2001}: dữ liệu trên Web được mô tả bằng bộ ba RDF, lược đồ RDFS và bản thể học OWL để máy có thể hiểu và liên kết. Từ đó ra đời các KG mở quy mô lớn trích từ Wikipedia và cộng đồng: DBpedia \cite{ch5:auer2007} và Freebase \cite{ch5:bollacker2008} (2007--2008), Wikidata \cite{ch5:vrandecic2014} (2012). Năm 2012, Google giới thiệu \textbf{Knowledge Graph} với khẩu hiệu ``things, not strings'' \cite{ch5:singhal2012} -- tìm kiếm chuyển từ khớp chuỗi sang hiểu thực thể -- và thuật ngữ ``knowledge graph'' trở nên phổ biến. Năm 2013, TransE \cite{ch5:bordes2013} mở ra hướng \textbf{nhúng đồ thị tri thức} (KG embedding), biểu diễn thực thể và quan hệ thành vector để dự đoán liên kết còn thiếu.
+
+Nhánh thứ hai bắt nguồn từ truy xuất thông tin. TF-IDF \cite{ch5:salton1988} và BM25 \cite{ch5:robertson2009} là nền tảng của máy tìm kiếm suốt ba thập niên. Sau khi Transformer (2017) xuất hiện, truy xuất \textbf{dày} (dense retrieval) bằng bi-encoder như DPR \cite{ch5:karpukhin2020} vượt BM25 trên nhiều bộ hỏi đáp mở. Năm 2020, REALM \cite{ch5:guu2020} và RAG \cite{ch5:lewis2020} ghép bộ truy xuất với mô hình sinh thành một hệ thống huấn luyện đầu cuối; RETRO (2022) cho thấy mô hình nhỏ có truy xuất từ kho hàng nghìn tỷ token có thể sánh với mô hình lớn hơn nhiều lần \cite{ch5:borgeaud2022}. Khi ChatGPT phổ biến (cuối 2022), RAG trở thành kiến trúc mặc định để đưa tri thức doanh nghiệp vào LLM. Năm 2023, ReAct \cite{ch5:yao2023} cho LLM xen kẽ suy nghĩ và hành động (gọi công cụ), Self-RAG \cite{ch5:asai2024} để mô hình tự quyết định khi nào truy xuất và tự phê bình; năm 2024, Microsoft công bố GraphRAG \cite{ch5:edge2024} dùng đồ thị thực thể và tóm tắt cộng đồng để trả lời câu hỏi tổng quát trên cả kho tài liệu. Hai nhánh KG và RAG vì vậy hội tụ: đồ thị cung cấp cấu trúc và độ chính xác, LLM cung cấp khả năng hiểu và diễn đạt ngôn ngữ tự nhiên \cite{ch5:pan2024}.
+
+\hinhtikz{ch5_timeline}{Dòng thời gian phát triển của đồ thị tri thức và sinh tăng cường truy xuất (1968--2026).}{ch5-timeline}
+
+\nhanxet{Dòng thời gian cho thấy hai nhánh phát triển độc lập trong hơn bốn thập niên -- biểu diễn tri thức (phía KG) và truy xuất thông tin (phía RAG) -- rồi hội tụ sau năm 2020 khi LLM cần một nguồn tri thức tường minh, có thể kiểm chứng. Các mốc 2023--2025 (ReAct, Self-RAG, GraphRAG, Agentic RAG) đều là cách tổ chức lại hai thành phần cũ chứ không phải thuật toán mới hoàn toàn.}
+
+\subsection{Vai trò và ý nghĩa trong trí tuệ nhân tạo}
+\label{sec:ch5-vai-tro}
+
+KG và RAG giải quyết bốn nhu cầu mà mô hình học sâu thuần tuý đáp ứng kém:
+\begin{itemize}
+  \item \textbf{Tính đúng của dữ kiện.} Câu hỏi tra cứu (ngày, mã hồ sơ, chỉ số) có duy nhất một đáp án; KG trả về giá trị lưu trong nút thay vì để mô hình ``nhớ'' xấp xỉ.
+  \item \textbf{Tính cập nhật.} Thêm tài liệu vào kho hoặc thêm bộ ba vào đồ thị là đủ để hệ thống biết tri thức mới; không phải huấn luyện lại hàng tỷ tham số.
+  \item \textbf{Khả năng giải thích và kiểm chứng.} Mỗi câu trả lời đi kèm nguồn (tài liệu [1], [2]\dots{} hoặc đường đi trên đồ thị), người dùng có thể đối chiếu.
+  \item \textbf{Suy luận đa bước và có cấu trúc.} Câu hỏi ``tỷ lệ mắc tiểu đường của phụ nữ 60--79 tuổi có tăng huyết áp'' cần giao ba tập điều kiện -- việc đồ thị làm tự nhiên, còn tìm kiếm văn bản thì khó.
+\end{itemize}
+Trong thực tế, KG là xương sống của máy tìm kiếm (Google, Bing), trợ lý ảo, hệ gợi ý (sản phẩm -- người dùng -- thuộc tính), y sinh (thuốc -- gen -- bệnh) và tài chính (doanh nghiệp -- chủ sở hữu -- giao dịch, phát hiện gian lận). RAG là kiến trúc phổ biến nhất để triển khai LLM trong doanh nghiệp: chatbot nội bộ trên tài liệu quy trình, trợ lý pháp lý, hỗ trợ khách hàng, phân tích báo cáo tài chính. Với các lĩnh vực nhạy cảm như y tế và tài chính -- hai lĩnh vực của chương này -- yêu cầu có nguồn và không bịa số liệu là bắt buộc.
+
+% ---------------------------------------------------------------------
+\section{Knowledge Graph -- Knowledge Base (KG -- KB)}
+\label{sec:ch5-kg}
+
+\subsection{Knowledge Base: khái niệm, mục tiêu và dạng biểu diễn}
+
+\begin{dinhnghia}{Định nghĩa 5.1 -- Cơ sở tri thức}
+\textbf{Cơ sở tri thức} (Knowledge Base -- KB) là một kho lưu trữ tri thức có tổ chức, kèm cơ chế truy cập, sao cho tri thức có thể được tìm kiếm, tái sử dụng, kiểm tra nguồn và cập nhật. Khác với cơ sở dữ liệu thông thường chỉ chứa dữ kiện, KB thường kèm \emph{ngữ nghĩa} (định nghĩa khái niệm, luật, quan hệ giữa khái niệm) và \emph{siêu dữ liệu} (nguồn, thời điểm, độ tin cậy).
+\end{dinhnghia}
+
+Một KB tốt cần có định danh bản ghi ổn định, siêu dữ liệu về nguồn và thời gian, cách biểu diễn nhất quán và cơ chế truy xuất phù hợp loại câu hỏi. Có ba dạng biểu diễn thường gặp (Hình~\ref{fig:ch5-kb-kg}):
+\begin{itemize}
+  \item \textbf{KB dạng bảng/quan hệ}: dữ kiện là các dòng có lược đồ cố định; truy vấn chính xác bằng SQL; phù hợp phép lọc, đếm, trung bình.
+  \item \textbf{KB dạng văn bản}: mỗi bản ghi hoặc đoạn văn là một tài liệu; truy xuất bằng từ khoá (TF-IDF, BM25); phù hợp câu hỏi tự nhiên.
+  \item \textbf{KB dạng vector}: lưu embedding của tài liệu; truy xuất theo độ tương đồng ngữ nghĩa; hiểu được đồng nghĩa và cách diễn đạt khác.
+\end{itemize}
+KG là dạng biểu diễn thứ tư -- và mạnh nhất về cấu trúc -- trong đó tri thức là mạng các thực thể nối bằng quan hệ có tên.
+
+\hinhtikz{ch5_kb_vs_kg}{KB với ba dạng biểu diễn (bảng, văn bản, vector) và KG -- mạng thực thể, quan hệ, khái niệm.}{ch5-kb-kg}
+
+\nhanxet{Cùng một hồ sơ bệnh nhân có thể nằm ở cả bốn dạng: một dòng bảng, một câu mô tả, một vector 384 chiều và một nút \texttt{Person} nối tới các khái niệm ``Nữ'', ``60--79 tuổi'', ``tăng huyết áp''. Hệ thống ở chương này giữ đồng thời cả bốn để mỗi kiểu câu hỏi dùng được biểu diễn phù hợp nhất.}
+
+\subsection{Knowledge Graph: định nghĩa và mô hình bộ ba}
+
+\begin{dinhnghia}{Định nghĩa 5.2 -- Đồ thị tri thức}
+Một \textbf{đồ thị tri thức} là đồ thị có hướng, có nhãn $G = (\mathcal{E}, \mathcal{R}, \mathcal{T})$, trong đó $\mathcal{E}$ là tập thực thể (và giá trị), $\mathcal{R}$ là tập quan hệ và $\mathcal{T} \subseteq \mathcal{E} \times \mathcal{R} \times \mathcal{E}$ là tập \textbf{bộ ba} (triple) $(h, r, t)$ -- đọc là ``chủ thể $h$ có quan hệ $r$ với đối tượng $t$'' \cite{ch5:hogan2021}. Đồ thị thường đi kèm một \textbf{bản thể học} (ontology) quy định lớp, thuộc tính và ràng buộc.
+\end{dinhnghia}
+
+Bộ ba là đơn vị tri thức nhỏ nhất (Hình~\ref{fig:ch5-triple}). Chủ thể luôn là thực thể; đối tượng có thể là thực thể khác (tạo cạnh nối hai nút) hoặc một giá trị cụ thể (literal: số, ngày, chuỗi). Ví dụ $(\texttt{Person\_P000000}, \texttt{has\_hba1c\_level}, 6{,}6)$ nói rằng hồ sơ P000000 có HbA1c 6,6\%. Trong bài mẫu, mỗi bản ghi được định danh \texttt{Person\_i}, \texttt{TradingDay\_i} hoặc \texttt{MarketDay\_i}; ở đây dùng định danh ổn định theo mã hồ sơ hoặc theo ngày (\texttt{TradingDay\_2020-03-16}) để liên kết thực thể từ câu hỏi chính xác hơn.
+
+\hinhtikz{ch5_triple}{Giải phẫu bộ ba (chủ thể, quan hệ, đối tượng) và ví dụ của ba miền dữ liệu trong chương.}{ch5-triple}
+
+\subsection{Thành phần cấu thành Knowledge Graph}
+
+Một KG đầy đủ gồm các thành phần sau:
+\begin{itemize}
+  \item \textbf{Thực thể} (entity): đối tượng cụ thể có định danh duy nhất -- một bệnh nhân, một ngày giao dịch.
+  \item \textbf{Khái niệm/lớp} (class): nhóm thực thể có chung tính chất -- \texttt{AgeGroup\_60--79}, \texttt{BMI\_béo phì}, \texttt{Month\_2020-03}. Nút khái niệm là ``trục'' nối nhiều thực thể, giúp truy vấn theo nhóm.
+  \item \textbf{Quan hệ} (relation/predicate): cạnh có tên và có hướng -- \texttt{in\_age\_group}, \texttt{next\_day}, \texttt{in\_month}.
+  \item \textbf{Thuộc tính} (attribute/literal): giá trị gắn vào thực thể -- tuổi, BMI, giá đóng cửa.
+  \item \textbf{Bản thể học} (ontology): lược đồ định nghĩa lớp, quan hệ hợp lệ, miền và đối miền, quan hệ phân cấp (\texttt{subClassOf}) và luật (ví dụ: HbA1c $\ge 6{,}5\%$ \emph{chỉ báo} tiểu đường theo ADA \cite{ch5:ada2024}).
+  \item \textbf{Siêu dữ liệu}: nguồn, thời gian, độ tin cậy của từng dữ kiện.
+\end{itemize}
+Hình~\ref{fig:ch5-kg-diabetes} là lược đồ KG tiểu đường xây ở mục~\ref{sec:ch5-dia}: một nút hồ sơ mang các thuộc tính số và nối tới tám nút khái niệm; tầng ontology (cạnh nét đứt) mã hoá tri thức nền từ ADA và WHO \cite{ch5:who2000}, không suy ra từ dữ liệu.
+
+\hinhtikz{ch5_kg_diabetes}{Lược đồ KG tiểu đường: thực thể hồ sơ, thuộc tính số, tám nút khái niệm và tầng ontology.}{ch5-kg-diabetes}
+
+\subsection{Mô hình dữ liệu và ngôn ngữ truy vấn: LPG và RDF}
+
+Hai mô hình dữ liệu đồ thị phổ biến là \textbf{đồ thị thuộc tính có nhãn} (Labeled Property Graph -- LPG) và \textbf{RDF} (Resource Description Framework) (Hình~\ref{fig:ch5-lpg-rdf}) \cite{ch5:angles2018}.
+\begin{itemize}
+  \item \textbf{LPG} (Neo4j, Amazon Neptune, TigerGraph): nút và cạnh đều có nhãn và một tập cặp khoá--giá trị. Truy vấn bằng Cypher \cite{ch5:francis2018} theo mẫu hình, ví dụ \texttt{MATCH (d:TradingDay)-[:IN\_MONTH]->(:Month \{id:'2020-03'\}) RETURN d.close}. Mô hình gọn, trực quan, thích hợp duyệt đồ thị và phân tích mạng.
+  \item \textbf{RDF} (chuẩn W3C): mọi dữ kiện là một bộ ba URI -- URI -- URI/literal có kiểu XSD. Truy vấn bằng SPARQL \cite{ch5:sparql2013}. RDF hỗ trợ liên kết dữ liệu giữa các tổ chức (Linked Data), suy luận theo RDFS/OWL; nhược điểm là thuộc tính của cạnh phải biểu diễn gián tiếp (reification).
+\end{itemize}
+Trong thực nghiệm, đồ thị chính được lưu bằng NetworkX \cite{ch5:hagberg2008} theo kiểu LPG (thuộc tính số gắn lên nút), đồng thời một phần đồ thị chứng khoán được xuất sang RDF và truy vấn bằng SPARQL (mục~\ref{sec:ch5-stock-kg}) để minh hoạ hai mô hình tương đương nhau về nội dung.
+
+\hinhtikz{ch5_lpg_rdf}{Cùng một dữ kiện giao dịch biểu diễn theo LPG (thuộc tính gắn lên nút) và theo RDF (bộ ba URI, literal có kiểu).}{ch5-lpg-rdf}
+
+\subsection{Quy trình xây dựng KB/KG từ dữ liệu bảng}
+\label{sec:ch5-quy-trinh}
+
+KG có thể được xây theo ba cách \cite{ch5:paulheim2017}: \emph{con người tuyển chọn} (Cyc, WordNet -- chất lượng cao nhưng đắt), \emph{máy tự động} trích xuất từ văn bản (NELL, Knowledge Vault -- rộng nhưng nhiễu) và \emph{lai} (Wikidata -- cộng đồng sửa, máy hỗ trợ). Vòng đời chung gồm thu thập nguồn, trích xuất thực thể và quan hệ, liên kết thực thể (entity linking), hợp nhất và chuẩn hoá, kiểm chứng chất lượng, rồi suy luận để hoàn thiện (Hình~\ref{fig:ch5-lifecycle}).
+
+\hinhtikz{ch5_kg_lifecycle}{Vòng đời xây dựng đồ thị tri thức và lựa chọn của chương này cho dữ liệu bảng.}{ch5-lifecycle}
+
+Với dữ liệu bảng có cấu trúc -- trường hợp của cả ba bộ dữ liệu -- bước trích xuất đơn giản hơn nhiều vì mỗi cột đã là một thuộc tính có tên. Quy trình áp dụng trong chương (Hình~\ref{fig:ch5-pipeline}) gồm:
+\begin{enumerate}
+  \item \textbf{Khảo sát và làm sạch}: kiểm tra giá trị thiếu, bản ghi trùng, ngoại lệ, ý nghĩa và đơn vị của từng cột (bước bài mẫu nhấn mạnh với tệp FINAL\_USO).
+  \item \textbf{Xác định định danh bản ghi}: chọn khoá chính (ngày giao dịch) hoặc tạo mã ổn định (P000000\dots{}); không bỏ siêu dữ liệu quan trọng như ngày, nguồn.
+  \item \textbf{Văn bản hoá} (4a): mỗi dòng thành một câu mô tả giữ đủ tên thuộc tính và giá trị, kèm khái niệm suy ra; thêm \emph{tài liệu tổng hợp} theo nhóm/tháng/năm cho câu hỏi tổng quát; lập chỉ mục TF-IDF, BM25 và vector.
+  \item \textbf{Sinh bộ ba} (4b): ánh xạ cột $\to$ quan hệ theo luật; giá trị phân loại thành nút khái niệm, giá trị số thành thuộc tính; thêm tầng ontology.
+  \item \textbf{Kiểm tra chất lượng}: đếm nút, cạnh, loại nút; truy vấn mẫu; một ngày không có trong dữ liệu phải trả về ``không có phiên'', không được thay bằng 0 (lưu ý mà bài mẫu nêu).
+\end{enumerate}
+
+\hinhtikz{ch5_pipeline}{Quy trình chuyển dữ liệu bảng thành kho tài liệu có chỉ mục (nhánh 4a) và đồ thị tri thức (nhánh 4b).}{ch5-pipeline}
+
+\subsection{Suy luận, nhúng đồ thị và học kết hợp thần kinh -- ký hiệu}
+
+KG cho phép hai kiểu suy luận. \textbf{Suy luận ký hiệu} áp dụng luật logic, chẳng hạn
+\begin{align*}
+  &(x,\ \texttt{hba1c\_class},\ \texttt{HbA1c\_ngưỡng chẩn đoán})\ \wedge\\
+  &(\texttt{HbA1c\_ngưỡng chẩn đoán},\ \texttt{indicates},\ \texttt{Diabetes\_yes})\\
+  &\Rightarrow\ x \text{ \emph{có dấu hiệu} tiểu đường};
+\end{align*}
+các bộ suy luận RDFS/OWL thực hiện bao đóng như vậy một cách chặt chẽ. \textbf{Suy luận dựa trên nhúng} học vector cho thực thể và quan hệ để chấm điểm mức hợp lý của bộ ba chưa có. Mô hình kinh điển TransE \cite{ch5:bordes2013} đòi hỏi
+\begin{equation}
+  \mathbf{h} + \mathbf{r} \approx \mathbf{t}, \qquad f(h,r,t) = \lVert \mathbf{h} + \mathbf{r} - \mathbf{t} \rVert_{1/2},
+\end{equation}
+và được huấn luyện bằng hàm mất mát biên (margin ranking) so bộ ba đúng với bộ ba bị làm hỏng $(h', r, t')$:
+\begin{equation}
+  \mathcal{L} = \sum_{(h,r,t) \in \mathcal{T}} \ \sum_{(h',r,t') \in \mathcal{T}'} \max\bigl(0,\ \gamma + f(h,r,t) - f(h',r,t')\bigr).
+\end{equation}
+Các biến thể sau (TransR, DistMult, ComplEx, RotatE) khắc phục giới hạn của TransE với quan hệ một--nhiều và đối xứng. Hướng \textbf{thần kinh -- ký hiệu} (neuro-symbolic) kết hợp hai kiểu: mạng nơ-ron đồ thị (Chương~6) học biểu diễn, còn luật và ràng buộc của ontology bảo đảm tính nhất quán.
+
+\hinhtikz{ch5_transe}{Ý tưởng TransE: quan hệ là một phép tịnh tiến trong không gian nhúng, $\mathbf{h} + \mathbf{r} \approx \mathbf{t}$.}{ch5-transe}
+
+\subsection{Truy xuất tri thức: TF-IDF, BM25, embedding và đồ thị}
+\label{sec:ch5-truy-xuat}
+
+\paragraph{TF-IDF.} Mỗi tài liệu $d$ và câu hỏi $q$ được biểu diễn thành vector thưa trên từ vựng; trọng số của từ $t$ \cite{ch5:salton1988,ch5:manning2008}:
+\begin{equation}
+  w_{t,d} = \bigl(1 + \log \mathrm{tf}_{t,d}\bigr) \cdot \log \frac{1 + N}{1 + \mathrm{df}_t} + 1, \qquad
+  \mathrm{sim}(q,d) = \frac{\mathbf{w}_q^\top \mathbf{w}_d}{\lVert\mathbf{w}_q\rVert\,\lVert\mathbf{w}_d\rVert},
+\end{equation}
+trong đó $N$ là số tài liệu, $\mathrm{df}_t$ số tài liệu chứa $t$; từ hiếm có trọng số cao. Vì tiếng Việt là ngôn ngữ đơn lập, ``từ'' ở đây là âm tiết kèm cặp âm tiết liền kề (bigram) để xấp xỉ từ ghép như ``đường huyết'', ``đóng cửa''.
+
+\paragraph{BM25.} Hàm xếp hạng xác suất Okapi BM25 \cite{ch5:robertson2009} bão hoà tần suất từ và chuẩn hoá theo độ dài tài liệu:
+\begin{equation}
+  \mathrm{BM25}(q,d) = \sum_{t \in q} \mathrm{IDF}(t) \cdot
+  \frac{\mathrm{tf}_{t,d}\,(k_1 + 1)}{\mathrm{tf}_{t,d} + k_1\bigl(1 - b + b\,\frac{|d|}{\overline{|d|}}\bigr)},
+\end{equation}
+với trọng số nghịch đảo tần suất tài liệu
+\begin{equation}
+  \mathrm{IDF}(t) = \log\frac{N - \mathrm{df}_t + 0{,}5}{\mathrm{df}_t + 0{,}5},
+\end{equation}
+với $k_1 = 1{,}5$ và $b = 0{,}75$ trong thực nghiệm.
+
+\paragraph{Embedding (truy xuất dày).} Một bi-encoder $E$ ánh xạ văn bản thành vector đặc $\mathbf{e} \in \mathbb{R}^{m}$ đã chuẩn hoá; độ liên quan là cosin $\mathrm{sim}(q,d) = E(q)^\top E(d)$ \cite{ch5:reimers2019,ch5:karpukhin2020}. Bài mẫu dùng \texttt{all-MiniLM-L6-v2} (chỉ tiếng Anh); ở đây dùng ba mô hình \emph{đa ngôn ngữ} vì tài liệu và câu hỏi là tiếng Việt: \texttt{paraphrase-multilingual-MiniLM-L12-v2} (384 chiều), \texttt{multilingual-e5-small} (384 chiều) và \texttt{multilingual-e5-base} (768 chiều) \cite{ch5:wang2022e5}. Họ e5 được huấn luyện tương phản với tiền tố \texttt{query:}/\texttt{passage:}. Hình~\ref{fig:ch5-vector3d} so sánh hai loại không gian.
+
+\hinhtikz{ch5_vector3d}{Truy xuất dày (vector đặc, cosin) và truy xuất thưa (vector theo từ vựng, đa số bằng 0).}{ch5-vector3d}
+
+\paragraph{Truy xuất đồ thị.} Câu hỏi được \textbf{liên kết thực thể}: nhận diện ngày (``16/03/2020'', ``ngày 16 tháng 3 năm 2020''), tháng, năm, giới tính, nhóm tuổi, tình trạng tăng huyết áp, mã hồ sơ, các chỉ số số học, rồi ánh xạ thành nút KG. Từ nút, hệ thống duyệt cạnh để lấy thuộc tính (tra cứu), giao các tập láng giềng của nút khái niệm (lọc nhóm) hoặc đi theo \texttt{in\_month} $\to$ \texttt{in\_year} (tổng hợp theo giai đoạn). Kết quả là dữ kiện chính xác chứ không phải ``tài liệu tương tự''.
+
+\subsection{Ưu điểm, hạn chế và tiêu chí thiết kế}
+
+\begin{table}[H]\centering\small
+\caption{So sánh các dạng biểu diễn và truy xuất tri thức}\label{tab:ch5-kb-compare}
+\begin{tabular}{L{2.6cm}L{4.4cm}L{4.4cm}L{3.2cm}}
+\toprule
+Phương pháp & Ưu điểm & Hạn chế & Câu hỏi phù hợp \\
+\midrule
+TF-IDF, BM25 & nhanh, giải thích được, khớp chính xác số và mã & không hiểu đồng nghĩa, nhạy định dạng (16/03 khác 16 tháng 3) & có từ khoá, mã, số \\
+Embedding & hiểu ngữ nghĩa, đồng nghĩa, đa ngôn ngữ & khó phân biệt số gần nhau, cần GPU, khó giải thích & diễn đạt tự do \\
+Đồ thị & chính xác, suy luận nhiều bước, lọc nhóm & cần liên kết thực thể, lược đồ phải thiết kế trước & dữ kiện, nhóm, quan hệ \\
+Lai (RRF) + rerank & bù khuyết điểm từng nguồn & chậm hơn, nhiều thành phần & tổng quát \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Từ đó rút ra các tiêu chí thiết kế cho một KB/KG phục vụ hỏi đáp: (1) định danh ổn định, khớp với cách người dùng gọi tên (ngày, mã); (2) tài liệu văn bản giữ tên thuộc tính để từ khoá trong câu hỏi khớp được; (3) có tầng khái niệm để lọc nhóm; (4) có tài liệu tổng hợp vì một bản ghi đơn lẻ không trả lời được câu hỏi xu hướng; (5) đánh giá định lượng trên bộ câu hỏi có đáp án trước khi triển khai.
+
+% ---------------------------------------------------------------------
+\section{RAG -- Sinh tăng cường truy xuất}
+\label{sec:ch5-rag}
+
+\subsection{Khái niệm và mục tiêu của RAG}
+
+\begin{dinhnghia}{Định nghĩa 5.3 -- RAG}
+\textbf{Retrieval-Augmented Generation} là kiến trúc trong đó một bộ truy xuất $p_\eta(z \mid x)$ chọn các tài liệu $z$ liên quan tới đầu vào $x$ từ kho tri thức ngoài, rồi bộ sinh $p_\theta(y \mid x, z)$ tạo câu trả lời $y$ dựa trên cả $x$ và $z$ \cite{ch5:lewis2020}:
+\begin{equation}
+  p(y \mid x) \approx \sum_{z \in \mathrm{top}\text{-}k\,(p_\eta(\cdot \mid x))} p_\eta(z \mid x)\; p_\theta(y \mid x, z).
+\end{equation}
+\end{dinhnghia}
+
+Ba bước \emph{retrieve -- augment -- generate}: truy xuất bằng chứng; \emph{tăng cường} lời nhắc (prompt) bằng bằng chứng đó; mô hình ngôn ngữ \emph{sinh} câu trả lời chỉ dựa trên bằng chứng. Mục tiêu là đưa tri thức cập nhật, chuyên ngành, riêng tư vào LLM; giảm ảo giác; cho phép trích dẫn nguồn; và tách rời tri thức (kho dữ liệu) khỏi năng lực ngôn ngữ (mô hình), nhờ đó mỗi phần cập nhật độc lập. Trong bài mẫu (dungvt), phần ``hybrid'' chỉ in đồng thời tài liệu và bộ ba mà ``chưa hợp nhất thành một thứ hạng chung hoặc sinh câu trả lời ngôn ngữ tự nhiên''; chương này hiện thực đủ cả ba bước.
+
+\subsection{Kiến trúc và luồng xử lý}
+
+Hình~\ref{fig:ch5-rag-arch} mô tả kiến trúc RAG đầy đủ dùng trong thực nghiệm, gồm ba làn. \textbf{Nạp tri thức} (ngoại tuyến): đọc nguồn, làm sạch, văn bản hoá, chia đoạn, mã hoá embedding, lập chỉ mục thưa và dựng đồ thị. \textbf{Truy xuất} (trực tuyến): liên kết thực thể trong câu hỏi, truy xuất song song bằng BM25, embedding và đồ thị, hợp nhất thứ hạng bằng RRF, tái xếp hạng bằng cross-encoder. \textbf{Sinh}: dựng prompt có căn cứ với bằng chứng đánh số, LLM cục bộ sinh câu trả lời có trích dẫn, kiểm chứng trích dẫn và số liệu.
+
+\hinhtikz{ch5_rag_arch}{Kiến trúc RAG ba làn: nạp tri thức, truy xuất lai và sinh có căn cứ.}{ch5-rag-arch}
+
+\subsection{Các chiến lược truy xuất trong RAG}
+
+\begin{itemize}
+  \item \textbf{Thưa} (sparse -- TF-IDF, BM25): khớp mặt chữ; mạnh với mã, số, tên riêng.
+  \item \textbf{Dày} (dense -- bi-encoder): khớp ngữ nghĩa; mạnh với diễn đạt khác.
+  \item \textbf{Đồ thị}: khớp thực thể; mạnh với dữ kiện và lọc nhóm.
+  \item \textbf{Lai} (hybrid): hợp nhất nhiều nguồn. Cách đơn giản và bền vững nhất là \textbf{Reciprocal Rank Fusion} \cite{ch5:cormack2009} -- chỉ dùng thứ hạng nên không cần chuẩn hoá thang điểm giữa BM25 (không chặn trên), cosin ($[-1,1]$) và điểm đồ thị:
+  \begin{equation}
+    \mathrm{RRF}(d) = \sum_{r \in \mathcal{R}} \frac{w_r}{k + \mathrm{rank}_r(d)}, \qquad k = 60.
+  \end{equation}
+  \item \textbf{Biến đổi truy vấn}: viết lại câu hỏi, sinh nhiều truy vấn (multi-query), HyDE (sinh câu trả lời giả định rồi truy xuất bằng nó).
+\end{itemize}
+
+\hinhtikz{ch5_rrf}{Hợp nhất thứ hạng RRF từ ba nguồn BM25, dense và đồ thị (trọng số đồ thị $w_G = 2$).}{ch5-rrf}
+
+\nhanxet{Trong ví dụ, tài liệu d1 đứng hạng 2 ở BM25 nhưng hạng 1 ở cả dense và đồ thị nên vượt lên đầu. d9 chỉ xuất hiện ở đồ thị nhưng nhờ trọng số $w_G = 2$ vẫn ngang d3. Đây là lý do nhánh đồ thị được đặt trọng số lớn hơn: khi liên kết thực thể thành công, kết quả đồ thị gần như chắc chắn đúng.}
+
+\subsection{Chia đoạn, embedding và tái xếp hạng}
+
+\paragraph{Chia đoạn (chunking).} Văn bản dài được cắt thành đoạn để vừa cửa sổ của bộ mã hoá và để bằng chứng tập trung. Các chiến lược (Hình~\ref{fig:ch5-chunking}): cố định theo số ký tự/token (có chồng lấn), đệ quy theo ranh giới đoạn--câu--từ, theo cấu trúc tài liệu (tiêu đề), theo ngữ nghĩa (cắt khi độ tương đồng giữa hai câu liền kề giảm mạnh) và cha--con (truy xuất đoạn nhỏ, trả về đoạn cha lớn). Với dữ liệu bảng, mỗi dòng đã là một đơn vị nghĩa trọn vẹn, nên chương này dùng ``một bản ghi = một tài liệu'' và bổ sung tài liệu tổng hợp thay vì cắt nhỏ.
+
+\hinhtikz{ch5_chunking}{Năm chiến lược chia đoạn và lựa chọn ``một bản ghi = một tài liệu'' cho dữ liệu bảng.}{ch5-chunking}
+
+\paragraph{Embedding.} Mô hình nhúng quyết định trần chất lượng của truy xuất dày. Với tiếng Việt cần mô hình đa ngôn ngữ; mô hình lớn hơn (e5-base) thường tốt hơn nhưng mã hoá chậm hơn và tốn bộ nhớ gấp đôi. Vector được chuẩn hoá L2 và lưu dạng \texttt{float16} để giảm một nửa dung lượng.
+
+\paragraph{Tái xếp hạng (reranking).} Bi-encoder mã hoá câu hỏi và tài liệu \emph{độc lập}, nên không ``nhìn'' được tương tác chi tiết giữa chúng. \textbf{Cross-encoder} đưa cặp (câu hỏi, tài liệu) qua cùng một Transformer với chú ý chéo và xuất một điểm liên quan \cite{ch5:nogueira2019}; chính xác hơn nhưng phải chạy lại cho từng cặp. Vì vậy dùng hai giai đoạn (Hình~\ref{fig:ch5-bi-cross}): bộ truy xuất nhanh lấy $n$ ứng viên, cross-encoder \texttt{bge-reranker-v2-m3} \cite{ch5:chen2024bge} xếp lại.
+
+\hinhtikz{ch5_bi_cross}{Bi-encoder (giai đoạn 1, mã hoá độc lập) và cross-encoder (giai đoạn 2, chú ý chéo trên từng cặp).}{ch5-bi-cross}
+
+\subsection{Xây dựng prompt và sinh câu trả lời có căn cứ}
+
+Bằng chứng được đánh số $[1], \dots, [k]$ và đặt trước câu hỏi; lời nhắc hệ thống yêu cầu mô hình \emph{chỉ} dùng bằng chứng, trích dẫn số hiệu cho mỗi ý quan trọng, và nói rõ ``không đủ thông tin'' khi bằng chứng thiếu (Đoạn mã~\ref{code:llm__SYSTEM_GROUNDED}, \ref{code:llm__grounded_prompt}). Mô hình sinh là Qwen2.5-1.5B-Instruct \cite{ch5:qwen2024} chạy cục bộ trên GPU, giải mã tham lam (greedy) để kết quả tái lập được; không dữ liệu nào rời khỏi máy.
+
+\maNguon{llm__SYSTEM_GROUNDED}{Lời nhắc hệ thống cho bước sinh có căn cứ}
+\maNguon{llm__grounded_prompt}{Dựng prompt có bằng chứng đánh số}
+\maNguon{llm__LocalLLM.chat}{Sinh câu trả lời bằng LLM cục bộ (Qwen2.5-1.5B, bf16, tham lam)}
+
+\subsection{Các thế hệ RAG: từ Naive tới Agentic}
+
+Gao và cộng sự \cite{ch5:gao2023} phân RAG thành các thế hệ (Hình~\ref{fig:ch5-rag-evo}):
+\begin{itemize}
+  \item \textbf{Naive RAG}: truy xuất top-$k$ bằng một bộ truy xuất, ghép vào prompt, sinh. Đơn giản nhưng dễ lấy sai bằng chứng và thiếu kiểm soát.
+  \item \textbf{Advanced RAG}: tối ưu \emph{trước} truy xuất (viết lại truy vấn, liên kết thực thể) và \emph{sau} truy xuất (lai, rerank, nén ngữ cảnh).
+  \item \textbf{Modular RAG}: tách thành mô-đun thay thế được -- định tuyến, tìm kiếm, bộ nhớ, hợp nhất -- và ghép theo luồng tuỳ bài toán.
+  \item \textbf{Graph RAG}: dùng đồ thị thực thể -- quan hệ; GraphRAG của Microsoft \cite{ch5:edge2024,ch5:lucene} còn phân cộng đồng (Leiden) và tóm tắt từng cộng đồng để trả lời câu hỏi ``toàn cục'' trên cả kho. Giới hạn: tốn chi phí dựng đồ thị bằng LLM, đồ thị có thể sai khi trích xuất tự động, và câu hỏi tra cứu đơn giản không cần đến cộng đồng.
+  \item \textbf{Agentic RAG}: một tác tử LLM lập kế hoạch, quyết định có truy xuất hay không, chọn công cụ (đồ thị, SQL, máy tính, tìm kiếm), tự phê bình và lặp \cite{ch5:yao2023,ch5:asai2024}.
+\end{itemize}
+
+\hinhtikz{ch5_rag_evolution}{Năm thế hệ RAG: độ phức tạp, khả năng suy luận và chi phí tăng dần.}{ch5-rag-evo}
+
+\subsection{RAG và tinh chỉnh (fine-tuning)}
+
+Tinh chỉnh cập nhật trọng số để mô hình học \emph{hành vi} (định dạng, giọng văn, kỹ năng miền ổn định); RAG bổ sung \emph{tri thức} lúc suy luận. Tinh chỉnh không phù hợp với dữ kiện thay đổi hằng ngày (giá cổ phiếu) vì phải huấn luyện lại và không cho trích nguồn; RAG không dạy được mô hình một kỹ năng mới. Hai cách bổ sung cho nhau (Hình~\ref{fig:ch5-rag-ft}); bài toán của chương -- tra cứu dữ kiện có nguồn trên dữ liệu bảng -- thuộc góc phần tư RAG.
+
+\hinhtikz{ch5_rag_vs_ft}{Chọn giữa prompt engineering, RAG, fine-tuning và kết hợp theo hai trục nhu cầu.}{ch5-rag-ft}
+
+\subsection{Đánh giá RAG}
+\label{sec:ch5-danh-gia-rag}
+
+Đánh giá RAG gồm hai tầng. \textbf{Tầng truy xuất} dùng các độ đo xếp hạng của truy xuất thông tin (Hình~\ref{fig:ch5-eval-metrics}) \cite{ch5:manning2008,ch5:jarvelin2002}. Với tập câu hỏi $Q$, tập tài liệu đúng $G_q$ và danh sách trả về $L_q$:
+\begin{align}
+  \mathrm{Recall@}k &= \frac{1}{|Q|}\sum_{q} \frac{|G_q \cap L_q[1..k]|}{|G_q|}, \qquad
+  \mathrm{MRR} = \frac{1}{|Q|}\sum_{q} \frac{1}{\mathrm{rank}_q}, \\
+  \mathrm{nDCG@}k &= \frac{\mathrm{DCG@}k}{\mathrm{IDCG@}k}, \qquad \mathrm{DCG@}k = \sum_{i=1}^{k} \frac{\mathrm{rel}_i}{\log_2(i+1)},
+\end{align}
+trong đó $\mathrm{rank}_q$ là hạng của tài liệu đúng đầu tiên (MRR bằng 0 nếu không có trong top-10). \textbf{Tầng sinh} đo độ chính xác của câu trả lời (so với đáp án), độ trung thành với bằng chứng (faithfulness), mức liên quan của câu trả lời và độ phủ ngữ cảnh; khung RAGAS \cite{ch5:es2024ragas} dùng LLM làm giám khảo cho các độ đo này. Thực nghiệm của chương có đáp án số học chính xác nên chấm tự động: một câu trả lời đúng khi chứa đúng giá trị (sai lệch $\le 0{,}5\%$ do làm tròn) hoặc đúng nhãn mắc/không mắc.
+
+\hinhtikz{ch5_eval_metrics}{Minh hoạ Recall@k, MRR và nDCG@10 trên một danh sách có tài liệu đúng ở hạng 2.}{ch5-eval-metrics}
+
+\subsection{Rủi ro và biện pháp giảm thiểu}
+
+\begin{table}[H]\centering\small
+\caption{Rủi ro của hệ thống KG--RAG và biện pháp áp dụng trong chương}\label{tab:ch5-risk}
+\begin{tabular}{L{3.4cm}L{5.6cm}L{5.6cm}}
+\toprule
+Rủi ro & Biểu hiện & Biện pháp \\
+\midrule
+Truy xuất sai & bằng chứng không chứa đáp án, LLM vẫn trả lời & lai + rerank, đánh giá Recall@k, nhánh đồ thị chính xác \\
+Ảo giác & LLM thêm số không có trong bằng chứng & prompt có căn cứ, trích dẫn bắt buộc, tác tử trả số trực tiếp từ KG \\
+Hiểu sai dữ liệu & coi cột Close của FINAL\_USO là giá vàng giao ngay & khảo sát ý nghĩa cột, ghi rõ đơn vị trong tài liệu \\
+Giá trị thiếu & ngày nghỉ bị hiểu là giá 0 & trả ``không có phiên'', chỉ ra phiên gần nhất \\
+Định dạng & ``16/03/2020'' khác ``16 tháng 3'' & liên kết thực thể nhiều mẫu, embedding đa ngôn ngữ \\
+Riêng tư & dữ liệu y tế gửi ra API ngoài & mọi mô hình chạy cục bộ \\
+Diễn giải quá mức & dùng chatbot thay chẩn đoán/khuyến nghị đầu tư & cảnh báo trên giao diện, chỉ trả dữ kiện \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Tác tử chọn công cụ}
+\label{sec:ch5-agent-theory}
+
+Không phải câu hỏi nào cũng nên đi qua RAG. Với câu \textit{``giá đóng cửa ngày 16/03/2020''}, tra thẳng nút \texttt{TradingDay\_2020-03-16} vừa nhanh vừa chắc chắn đúng; để LLM đọc năm tài liệu ``gần giống'' rồi chép số là thêm cơ hội sai. Ngược lại, câu \textit{``cổ phiếu Google biến động thế nào trong đại dịch?''} không nêu ngày cụ thể và cần tổng hợp ngôn ngữ. Kiến trúc \textbf{tác tử chọn công cụ} (như bài tham khảo của lucnvm) đặt một bộ định tuyến phía trước (Hình~\ref{fig:ch5-agent-router}): câu có thực thể cụ thể đi tới công cụ chính xác (\texttt{kg\_lookup}, \texttt{kg\_aggregate}, \texttt{pandas\_calc}); câu mở đi tới \texttt{rag\_search} + LLM. Mỗi bước được ghi theo khuôn ReAct \cite{ch5:yao2023}: \textsc{Thought} -- \textsc{Action} -- \textsc{Observation} -- \textsc{Answer}, để người dùng thấy hệ thống đã làm gì. Ở đây bộ định tuyến là luật tất định (dựa trên liên kết thực thể) chứ không để LLM 1,5B tự chọn, vì mô hình nhỏ gọi công cụ thiếu ổn định; LLM chỉ dùng ở bước tổng hợp ngôn ngữ.
+
+\hinhtikz{ch5_agent_router}{Tác tử định tuyến: liên kết thực thể quyết định công cụ chính xác hay RAG + LLM.}{ch5-agent-router}
+
+% ---------------------------------------------------------------------
+\section{Thiết kế hệ thống thực nghiệm}
+\label{sec:ch5-thiet-ke}
+
+\subsection{Mục tiêu và kiến trúc tổng thể}
+
+Thực nghiệm có ba mục tiêu: (1) xây KB và KG cho ba bộ dữ liệu bảng khác bản chất (hồ sơ y tế không có thời gian, chuỗi giá một tài sản, bảng đa tài sản 81 cột); (2) so sánh định lượng mười cấu hình truy xuất trên cùng bộ câu hỏi có đáp án; (3) dựng chatbot trả lời bằng ngôn ngữ tự nhiên, có nguồn, và đo độ chính xác của \emph{câu trả lời cuối} -- phần bài mẫu chưa làm. Hình~\ref{fig:ch5-system-arch} là kiến trúc năm tầng; toàn bộ mô hình (ba bi-encoder, cross-encoder, LLM) chạy cục bộ, không gọi API bên ngoài.
+
+\hinhtikz{ch5_system_arch}{Kiến trúc năm tầng của hệ thống KG--RAG trong chương.}{ch5-system-arch}
+
+\subsection{Môi trường và phân công CPU -- GPU}
+
+\begin{table}[H]\centering\small
+\caption{Thành phần phần mềm và nơi chạy}\label{tab:ch5-env}
+\begin{tabular}{L{4.2cm}L{6.4cm}L{3.6cm}}
+\toprule
+Thành phần & Thư viện / mô hình & Thiết bị \\
+\midrule
+Đọc, làm sạch, văn bản hoá & pandas, NumPy & CPU \\
+TF-IDF (băm đặc trưng) & scikit-learn \texttt{HashingVectorizer} + \texttt{TfidfTransformer} & CPU \\
+BM25 & \texttt{rank\_bm25} (Okapi, $k_1{=}1{,}5$, $b{=}0{,}75$) & CPU \\
+Đồ thị tri thức, RDF & NetworkX \texttt{DiGraph}, rdflib (Turtle, SPARQL) & CPU \\
+Bi-encoder & MiniLM-L12 đa ngữ, multilingual-e5-small/base & GPU (fp16) \\
+Cross-encoder & bge-reranker-v2-m3 (bf16, tối đa 384 token) & GPU \\
+Mô hình sinh & Qwen2.5-1.5B-Instruct (bf16, tham lam) & GPU \\
+Biểu đồ, bảng & matplotlib, \texttt{tl3.texfmt} & CPU \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Việc nhẹ (TF-IDF, BM25, đồ thị) chạy trên CPU giới hạn 4 luồng. Việc GPU nặng (mã hoá 96.000 tài liệu tiểu đường, chạy LLM) giữ một khoá GPU dùng chung để không tranh bộ nhớ 8 GB với các chương khác; kho nhỏ (khoảng 2.000 tài liệu) mã hoá như việc nhẹ với giới hạn 30\% bộ nhớ GPU.
+
+\subsection{Bộ câu hỏi đánh giá tự sinh có đáp án}
+\label{sec:ch5-qa}
+
+Bài mẫu minh hoạ truy xuất bằng ba câu hỏi viết tay mỗi miền và nhận xét định tính. Để so sánh định lượng, câu hỏi ở đây được \emph{sinh tự động từ chính dữ liệu}, nên mỗi câu biết trước tài liệu đúng (\texttt{gold}) và đáp án số (Đoạn mã~\ref{code:ch5_qa__market_questions}, \ref{code:ch5_qa__diabetes_questions}). Có năm loại câu hỏi: tra cứu bản ghi (một ngày, một hồ sơ), tổng hợp nhóm (tỷ lệ mắc của một nhóm bệnh nhân), tổng hợp tháng, tổng hợp năm và chỉ báo thị trường (giá dầu, S\&P 500\dots{} của FINAL\_USO). Mỗi loại có hai kiểu diễn đạt: \textbf{khớp} -- dùng đúng tên thuộc tính và định dạng ngày như tài liệu (``giá đóng cửa \dots{} ngày 16/03/2020'') -- và \textbf{diễn đạt lại} -- dùng từ đồng nghĩa và định dạng khác (``giá chốt phiên \dots{} vào ngày 16 tháng 3 năm 2020''). Kiểu thứ hai kiểm tra khả năng hiểu ngữ nghĩa thay vì khớp mặt chữ. Bộ câu hỏi dùng hạt giống cố định 42 để tái lập.
+
+\bang{ch5_qa_counts}{Số câu hỏi đánh giá theo miền và loại}{ch5-qa-counts}
+\bang{ch5_qa_examples}{Ví dụ câu hỏi tự sinh, đáp án và tài liệu đúng}{ch5-qa-examples}
+
+\maNguon{ch5_qa__market_questions}{Sinh câu hỏi tra cứu ngày, tháng, năm và chỉ báo cho hai miền thị trường}
+\maDai{ch5_qa__diabetes_questions}{Sinh câu hỏi hồ sơ (cân bằng nhãn) và câu hỏi nhóm cho miền tiểu đường}
+
+Câu trả lời của LLM là văn bản tự do, nên việc chấm cần trích số theo định dạng Việt (``1.234,56'') lẫn Anh (``1234.56'') và so với đáp án với dung sai làm tròn; với câu hỏi hồ sơ, cần nhận diện kết luận ``mắc'' hay ``không mắc'' (kể cả phủ định ``không mắc'').
+
+\maNguon{ch5_qa__parse_numbers}{Trích mọi số trong câu trả lời theo cả định dạng Việt và Anh}
+\maNguon{ch5_qa__predicted_label}{Nhận diện kết luận mắc / không mắc trong câu trả lời}
+\maNguon{ch5_qa__is_correct}{Chấm một câu trả lời: đúng nhãn, hoặc chứa giá trị sai lệch $\le 0{,}5\%$}
+
+\subsection{Các bộ truy xuất}
+
+Mọi bộ truy xuất có chung giao diện \texttt{search(q, k)} trả về danh sách (chỉ số tài liệu, điểm), nên có thể ghép tự do. Tách từ dùng biểu thức \verb|\w+| trên chữ thường: tiếng Việt tách theo âm tiết, số ``25,19'' thành hai token như nhau ở câu hỏi và tài liệu.
+
+\maNguon{ch5_retrieval__tokenize}{Tách âm tiết tiếng Việt}
+\maNguon{ch5_retrieval__topk}{Lấy $k$ điểm cao nhất bằng \texttt{argpartition} (nhanh trên 96.000 tài liệu)}
+\maNguon{ch5_retrieval__TfidfRetriever}{TF-IDF với âm tiết + bigram và băm đặc trưng}
+
+TF-IDF dùng \emph{hashing trick}: thay vì giữ từ điển (với 96.000 tài liệu và bigram, từ điển chiếm vài GB), mỗi n-gram được băm vào một trong $2^{20}$ cột; va chạm băm hiếm và gần như không ảnh hưởng xếp hạng.
+
+\maNguon{ch5_retrieval__BM25Retriever}{BM25 Okapi}
+\maNguon{ch5_retrieval__Embedder}{Bộ mã hoá câu với tiền tố \texttt{query:}/\texttt{passage:} của họ e5}
+\maNguon{ch5_retrieval__DenseRetriever}{Truy xuất dày: tích vô hướng với ma trận embedding đã chuẩn hoá}
+\maNguon{ch5_retrieval__GraphRetriever}{Truy xuất đồ thị: liên kết thực thể $\to$ nút KG $\to$ tài liệu}
+\maNguon{ch5_retrieval__HybridRRF}{Hợp nhất thứ hạng RRF có trọng số}
+\maNguon{ch5_retrieval__Reranker}{Cross-encoder bge-reranker-v2-m3 chấm lại cặp (câu hỏi, tài liệu)}
+\maNguon{ch5_retrieval__RerankPipeline}{Truy xuất hai giai đoạn: lấy rộng $n$ ứng viên rồi xếp lại}
+
+Độ đo được cài đặt đúng theo công thức ở mục~\ref{sec:ch5-danh-gia-rag}, liên quan nhị phân, tính trên top-10:
+
+\maNguon{ch5_retrieval__rank_metrics}{Recall@k, MRR@10 và nDCG@10}
+
+\subsection{Quy trình đánh giá}
+
+Kịch bản đánh giá dựng mười cấu hình trên cùng chỉ mục đã lưu (Đoạn mã~\ref{code:ch5_eval_retrieval__build}). Lớp \texttt{Memo} ghi nhớ kết quả của bộ truy xuất gốc để các tổ hợp RRF dùng lại mà không tính hai lần, đồng thời giữ độ trễ đo ở lần chạy đầu. Ngoài mười cấu hình, kịch bản quét hai siêu tham số: trọng số nhánh đồ thị $w_G \in \{0;\ 0{,}5;\ 1;\ 2;\ 4\}$ trong RRF và số ứng viên $n \in \{5, 10, 20, 40\}$ đưa vào cross-encoder.
+
+\maNguon{ch5_eval_retrieval__build}{Dựng mười cấu hình truy xuất từ chỉ mục đã lưu}
+\maNguon{ch5_eval_retrieval__evaluate}{Chạy một bộ truy xuất trên bộ câu hỏi và ghi độ đo từng câu}
+
+Ở tầng câu trả lời, bốn hệ được so sánh trên một tập con cân bằng (tối đa 8 câu mỗi cặp loại -- kiểu, Đoạn mã~\ref{code:ch5_eval_agent__subset}): \textbf{LLM thuần} (không truy xuất, đo mức ``nhớ'' của mô hình), \textbf{Naive RAG} (dense e5-small top-5), \textbf{Advanced RAG} (RRF BM25 + dense + KG rồi rerank, top-5) và \textbf{tác tử chọn công cụ}. Cả bốn dùng cùng LLM và cùng lời nhắc có căn cứ.
+
+\maNguon{ch5_eval_agent__subset}{Chọn tập con câu hỏi cân bằng theo loại và kiểu diễn đạt}
+
+% ---------------------------------------------------------------------
+\section{Thực nghiệm 1: KB, KG và chatbot cho dữ liệu bệnh tiểu đường}
+\label{sec:ch5-dia}
+
+\subsection{Mô tả và khảo sát dữ liệu}
+
+Bộ \texttt{diabetes\_prediction\_dataset.csv} \cite{ch5:kaggle_diabetes} gồm 100.000 hồ sơ với tám thuộc tính và nhãn \texttt{diabetes}. Giống bài mẫu, bước đầu tiên là bỏ bản ghi trùng lặp: còn \SL{ch5_kb_diabetes/n_rows} hồ sơ. Mỗi hồ sơ được gán mã ổn định \texttt{P000000}, \texttt{P000001}\dots{} theo thứ tự sau khi bỏ trùng, để câu hỏi và tài liệu dùng chung một định danh (Đoạn mã~\ref{code:ch5_data__load_diabetes}). Bảng~\ref{tab:ch5-datasets} tóm tắt ba bộ dữ liệu của chương và Bảng~\ref{tab:ch5-dia-cols} mô tả từng cột.
+
+\bang{ch5_datasets}{Ba bộ dữ liệu của chương và quy mô kho tài liệu}{ch5-datasets}
+\bang{ch5_dia_columns}{Các cột của bộ dữ liệu tiểu đường (sau khi bỏ trùng)}{ch5-dia-cols}
+
+\maNguon{ch5_data__load_diabetes}{Đọc, bỏ trùng, gán mã hồ sơ và suy ra bốn khái niệm}
+
+Ngoài giá trị gốc, mỗi hồ sơ được gắn bốn \textbf{khái niệm suy ra} theo chuẩn y khoa: nhóm tuổi, phân loại BMI theo WHO \cite{ch5:who2000}, phân loại HbA1c theo ADA \cite{ch5:ada2024} và nhóm đường huyết. Các khái niệm này về sau trở thành nút trung tâm của KG, cho phép trả lời câu hỏi theo nhóm.
+
+\maNguon{ch5_data__hba1c_class}{Phân loại HbA1c theo ngưỡng ADA}
+\maNguon{ch5_data__bmi_class}{Phân loại BMI theo WHO}
+
+\hinhpdf{ch5_dia_overview}{0.98}{Phân bố nhãn và tỷ lệ mắc tiểu đường theo nhóm tuổi.}{ch5-dia-overview}
+\hinhpdf{ch5_dia_rates}{0.98}{Tỷ lệ mắc tiểu đường theo các khái niệm suy ra (HbA1c, BMI, đường huyết, hút thuốc).}{ch5-dia-rates}
+\bang{ch5_dia_groups}{Số hồ sơ và tỷ lệ mắc theo nút khái niệm của KG}{ch5-dia-groups}
+\hinhpdf{ch5_dia_heat}{0.98}{Tỷ lệ mắc theo giới tính $\times$ tăng huyết áp $\times$ nhóm tuổi -- chính là các tài liệu tổng hợp nhóm.}{ch5-dia-heat}
+
+\begin{phathien}{Phát hiện từ khảo sát dữ liệu tiểu đường}
+\begin{itemize}
+  \item Dữ liệu mất cân bằng: tỷ lệ mắc chung chỉ \SL{ch5_facts/dia_prevPct}\% (\SL{ch5_facts/dia_pos} trên \SL{ch5_facts/dia_rows} hồ sơ; đã bỏ \SL{ch5_facts/dia_dups} dòng trùng). Vì vậy câu hỏi hồ sơ được lấy \emph{cân bằng} hai nhãn, nếu không một hệ luôn trả ``không mắc'' đã đạt độ chính xác rất cao mà không cần đọc dữ liệu.
+  \item Hai khái niệm HbA1c và đường huyết phân tách nhãn rất mạnh (Bảng~\ref{tab:ch5-dia-groups}): nhóm HbA1c ``ngưỡng chẩn đoán'' và đường huyết ``từ 200'' có tỷ lệ mắc cao vượt trội. Đây là tín hiệu mà tầng ontology mã hoá bằng quan hệ \texttt{indicates}.
+  \item Tuổi tăng thì tỷ lệ mắc tăng đều; từ 20 tuổi trở lên, tăng huyết áp làm tỷ lệ mắc tăng ở mọi nhóm tuổi của cả hai giới (Hình~\ref{fig:ch5-dia-heat}).
+  \item Cột \texttt{smoking\_history} có giá trị ``No Info'' chiếm tỷ lệ lớn -- giá trị thiếu được mã hoá thành một hạng mục, không được ngầm hiểu là ``không hút''.
+\end{itemize}
+\end{phathien}
+
+\subsection{Xây dựng Knowledge Base}
+
+Mỗi hồ sơ được văn bản hoá thành một câu tiếng Việt giữ đủ tên thuộc tính, giá trị và khái niệm suy ra (Đoạn mã~\ref{code:ch5_data__diabetes_doc}). So với bài mẫu (câu tiếng Anh ``Patient profile: gender Female, age 80.0 years old\dots''), câu tiếng Việt khớp trực tiếp với câu hỏi tiếng Việt, và việc đưa khái niệm (``nhóm tuổi 60--79'', ``tiền tiểu đường'') vào văn bản giúp cả BM25 lẫn embedding khớp câu hỏi theo nhóm.
+
+\maNguon{ch5_data__diabetes_doc}{Văn bản hoá một hồ sơ tiểu đường}
+
+\begin{ketqua}{Ba tài liệu bản ghi đầu tiên của KB tiểu đường}
+\input{generated/ch5_doc_diabetes}
+\end{ketqua}
+
+Một tài liệu bản ghi không trả lời được câu hỏi ``tỷ lệ mắc của phụ nữ 60--79 tuổi có tăng huyết áp''. Vì vậy KB bổ sung \SL{ch5_kb_diabetes/n_summaries} \textbf{tài liệu tổng hợp nhóm}: mỗi tổ hợp giới $\times$ nhóm tuổi $\times$ tăng huyết áp và mỗi giá trị của hút thuốc, HbA1c, BMI, đường huyết, giới tính, bệnh tim. Tổng cộng kho có \SL{ch5_kb_diabetes/n_docs} tài liệu.
+
+\maDai{ch5_data__diabetes_summaries}{Sinh tài liệu tổng hợp theo nhóm bệnh nhân}
+
+\subsection{Xây dựng Knowledge Graph}
+
+Bộ ba được sinh theo luật ánh xạ cột (Đoạn mã~\ref{code:ch5_kg__diabetes_triples}): chín quan hệ dữ kiện \texttt{has\_*} (giá trị số trở thành thuộc tính của nút), năm quan hệ khái niệm nối tới nút nhóm tuổi, BMI, HbA1c, đường huyết, trạng thái bệnh, cộng quan hệ \texttt{has\_condition} khi có tăng huyết áp hoặc bệnh tim. Tầng ontology gồm tám bộ ba tri thức nền (Hình~\ref{fig:ch5-kg-diabetes}). Hàm \texttt{build\_graph} đặt đối tượng chuỗi thành nút và cạnh, còn đối tượng số thành thuộc tính của nút (mô hình LPG), nhờ đó đồ thị gọn hơn hẳn so với coi mỗi giá trị số là một nút.
+
+\maNguon{ch5_kg__diabetes_triples}{Sinh bộ ba dữ kiện, khái niệm và tầng ontology cho KG tiểu đường}
+\maNguon{ch5_kg__build_graph}{Dựng đồ thị có hướng: chuỗi thành cạnh, số thành thuộc tính nút}
+
+\begin{ketqua}{Các bộ ba của hồ sơ P000000 và tầng ontology}
+\input{generated/ch5_tri_diabetes}
+\end{ketqua}
+
+KG tiểu đường có \SL{ch5_kb_diabetes/graph/nodes} nút, \SL{ch5_kb_diabetes/graph/edges} cạnh và \SL{ch5_kb_diabetes/graph/n_literals} thuộc tính số gắn trên nút, dựng trong \SL{ch5_kb_diabetes/build_kg_s} giây. Bảng~\ref{tab:ch5-rel-dia} cho thấy phân bố quan hệ: mỗi quan hệ khái niệm xuất hiện đúng một lần cho mỗi hồ sơ, nên các nút khái niệm có bậc vào hàng chục nghìn (Bảng~\ref{tab:ch5-hub-dia}).
+
+\bang{ch5_rel_diabetes}{Phân bố quan hệ và loại nút -- KG tiểu đường}{ch5-rel-dia}
+\bang{ch5_hub_diabetes}{Các nút khái niệm có bậc vào lớn nhất -- KG tiểu đường}{ch5-hub-dia}
+\hinhpdf{ch5_kg_sub_diabetes}{0.96}{Đồ thị con quanh vài hồ sơ: hồ sơ (xanh) nối tới các nút khái niệm dùng chung và tầng ontology.}{ch5-kg-sub-dia}
+
+\paragraph{Liên kết thực thể và truy vấn nhóm.} Câu hỏi nhóm được phân tích bằng luật (Đoạn mã~\ref{code:ch5_kg__link_diabetes}) thành tập điều kiện $\{$giới, nhóm tuổi, tăng huyết áp, hút thuốc, phân loại HbA1c, BMI$\}$. Tập hồ sơ thoả mọi điều kiện là \emph{giao các tập láng giềng vào} của các nút khái niệm tương ứng (Đoạn mã~\ref{code:ch5_kg__persons_matching}); câu trả lời được tính trực tiếp trên thuộc tính của các nút đó. Câu hỏi hồ sơ nêu mã (``hồ sơ P012345'') liên kết thẳng tới nút; câu hỏi nêu bộ chỉ số (tuổi, BMI, HbA1c, đường huyết) được lọc chính xác trên thuộc tính.
+
+\maNguon{ch5_kg__link_diabetes}{Liên kết thực thể cho câu hỏi tiểu đường}
+\maNguon{ch5_kg__persons_matching}{Giao tập láng giềng vào của các nút khái niệm}
+\maDai{ch5_domain__Domain._facts_diabetes}{Công cụ chính xác của miền tiểu đường: tra hồ sơ hoặc tổng hợp nhóm trên KG}
+
+\subsection{Kết quả truy xuất}
+
+\bang{ch5_ret_diabetes}{Chất lượng truy xuất -- miền tiểu đường}{ch5-ret-dia}
+
+\nhanxet{Với câu hỏi hồ sơ dạng khớp, câu hỏi chứa đúng bộ số tuổi, BMI, HbA1c, đường huyết giống tài liệu, nên TF-IDF và BM25 tìm rất tốt (MRR \SL{ch5_retrieval/sl/diabeteslex/tfidf/mrrPct}\% và \SL{ch5_retrieval/sl/diabeteslex/bm25/mrrPct}\%). Khi câu hỏi diễn đạt lại (``chỉ số khối cơ thể'', ``glucose máu'', ``đái tháo đường''), hai bộ thưa giảm còn \SL{ch5_retrieval/sl/diabetespara/tfidf/mrrPct}\% và \SL{ch5_retrieval/sl/diabetespara/bm25/mrrPct}\%, còn nhánh đồ thị -- lọc chính xác trên thuộc tính số -- vẫn đạt \SL{ch5_retrieval/sl/diabetespara/graph/mrrPct}\%. Embedding mạnh ở câu hỏi nhóm (tài liệu tổng hợp có câu chữ gần câu hỏi) nhưng yếu ở câu hỏi hồ sơ vì không phân biệt được ``HbA1c 6,6'' với ``HbA1c 6,1''. Trên kho 96.000 tài liệu, BM25 cài bằng \texttt{rank\_bm25} (vòng lặp Python) mất trung bình \SL{ch5_retrieval/sl/diabetes/bm25/ms} ms mỗi truy vấn, chậm hơn TF-IDF dạng ma trận thưa (\SL{ch5_retrieval/sl/diabetes/tfidf/ms} ms) và đồ thị (\SL{ch5_retrieval/sl/diabetes/graph/ms} ms).}
+
+\subsection{Chatbot hỏi đáp tiểu đường}
+
+\bang{ch5_answers_diabetes}{Câu trả lời của bốn hệ trên câu hỏi mẫu -- miền tiểu đường}{ch5-ans-dia}
+
+\input{generated/ch5_trace_diabetes_1}
+\input{generated/ch5_trace_diabetes_2}
+\input{generated/ch5_trace_diabetes_3}
+\input{generated/ch5_trace_diabetes_4}
+\input{generated/ch5_trace_diabetes_5}
+
+\nhanxet{Trên \SL{ch5_agent_diabetes/n_questions} câu hỏi có đáp án, LLM thuần đạt \SL{ch5_agent_diabetes/systems/llm_only/accPct}\%, nhưng con số này gây hiểu lầm: với câu hỏi hồ sơ dạng có/không, mô hình luôn nghiêng về ``có thể mắc tiểu đường'', nên độ chính xác \SL{ch5_agent_diabetes/systems/llm_only/acc_recordPct}\% đúng bằng tỷ lệ hồ sơ dương tính trong tập con; với câu hỏi tỷ lệ theo nhóm, nó không đúng câu nào. Naive RAG đạt \SL{ch5_agent_diabetes/systems/naive_rag/accPct}\%: tốt với câu hỏi nhóm (\SL{ch5_agent_diabetes/systems/naive_rag/acc_groupPct}\%) vì tài liệu tổng hợp có câu chữ gần câu hỏi, kém hơn với câu hỏi hồ sơ (\SL{ch5_agent_diabetes/systems/naive_rag/acc_recordPct}\%) -- khi không tìm được đúng hồ sơ, LLM trả lời ``không đủ thông tin'' thay vì bịa. Advanced RAG đưa tài liệu đúng vào nguồn ở \SL{ch5_agent_diabetes/systems/advanced_rag/gold_in_sourcesPct}\% câu và nâng câu hỏi hồ sơ lên \SL{ch5_agent_diabetes/systems/advanced_rag/acc_recordPct}\%, nhưng câu hỏi nhóm lại giảm còn \SL{ch5_agent_diabetes/systems/advanced_rag/acc_groupPct}\%, nên tổng chỉ đạt \SL{ch5_agent_diabetes/systems/advanced_rag/accPct}\%. Các tài liệu tổng hợp nhóm có khuôn câu gần như trùng nhau (cùng giới, khác nhóm tuổi hoặc tình trạng huyết áp); khi nhiều tài liệu như vậy cùng nằm trong năm nguồn, LLM 1,5B chép sai tỷ lệ dù tài liệu đúng có mặt. Tác tử đúng \SL{ch5_agent_diabetes/systems/agent/accPct}\%: \SL{ch5_agent_diabetes/tool_use/kg_lookup} câu hồ sơ đi qua \texttt{kg\_lookup} (lọc chính xác trên bốn chỉ số), \SL{ch5_agent_diabetes/tool_use/kg_aggregate} câu nhóm đi qua \texttt{kg\_aggregate} (giao tập láng giềng vào), độ trễ trung bình \SL{ch5_agent_diabetes/systems/agent/ms} ms.}
+
+\begin{luuy}{Ba câu hỏi mở và giới hạn của liên kết thực thể bằng luật}
+Ví dụ 3 không nêu điều kiện nào nên đi vào RAG. Bằng chứng tìm được là đúng loại -- tài liệu tổng hợp theo đường huyết, HbA1c và giới tính -- và đã chứa câu trả lời (nhóm đường huyết từ 200 mg/dL và HbA1c ngưỡng chẩn đoán có tỷ lệ mắc vượt trội), nhưng LLM lại kết luận ``giới tính và độ tuổi'' và còn so sánh ngược hai con số của nam và nữ. Ví dụ 4 lộ ra một lỗi thật của bộ liên kết: cụm ``chưa từng hút'' chứa chuỗi con ``từng hút'', và vì luật khớp chuỗi con theo thứ tự, nhóm được chọn là ``từng hút'' thay vì ``chưa từng hút''. Cùng lỗi này làm nhánh đồ thị trượt đúng một câu hỏi nhóm hút thuốc, cộng với câu ``BMI bình thường'' mà luật không xử lý (``bình thường'' là nhãn chung của cả BMI lẫn HbA1c), nên MRR của nhánh đồ thị trên câu hỏi khớp miền này là \SL{ch5_retrieval/sl/diabeteslex/graph/mrrPct}\% chứ không phải 100\%. Ví dụ 5 hỏi so sánh hai nhóm HbA1c nhưng công cụ chỉ tổng hợp một nhóm. Cả ba cho thấy bộ định tuyến luật tốt cho câu hỏi tra cứu và tổng hợp đơn, nhưng câu hỏi so sánh hoặc mở cần một bước phân tích câu hỏi mạnh hơn (LLM trích thực thể, khớp cụm dài nhất trước) và bước tính toán tường minh.
+\end{luuy}
+
+% ---------------------------------------------------------------------
+\section{Thực nghiệm 2: KB, KG và chatbot cho giá cổ phiếu Google}
+\label{sec:ch5-stock}
+
+\subsection{Mô tả và khảo sát dữ liệu}
+
+Đề bài và bài mẫu dùng bộ ``Google Stock Prices (2015--2024)'' trên Kaggle. Khi thực hiện, không tìm thấy bộ dữ liệu có đúng tên đó (tệp bài mẫu trích, \texttt{GoogleStock Price.csv}, chỉ có một bản sao không rõ nguồn). Vì vậy chương dùng bộ \texttt{GoogleStock\_Dataset\_V2.csv} của Kaggle \cite{ch5:kaggle_google} -- giá Alphabet theo ngày đã \emph{điều chỉnh chia tách} cổ phiếu 20:1 năm 2022 -- và lọc đúng giai đoạn tương ứng: \SL{ch5_facts/stock_rows} phiên từ \SL{ch5_facts/stock_first} đến \SL{ch5_facts/stock_last}. Việc điều chỉnh chia tách quan trọng: nếu không, giá trước tháng 7/2022 cao gấp 20 lần giá sau đó, và mọi câu hỏi ``thay đổi bao nhiêu phần trăm'' qua mốc này đều sai.
+
+\bang{ch5_stock_columns}{Các cột của dữ liệu giá cổ phiếu Alphabet}{ch5-stock-cols}
+\maNguon{ch5_data__load_stock}{Đọc giá Alphabet, tính lợi suất ngày, kiểu biến động và mã ngày}
+\maNguon{ch5_data__movement}{Phân loại biến động ngày thành năm nút khái niệm}
+
+\hinhpdf{ch5_stock_price}{0.98}{Giá đóng cửa và khối lượng trung bình tháng của cổ phiếu Alphabet 2015--2024.}{ch5-stock-price}
+\hinhpdf{ch5_returns}{0.98}{Phân bố lợi suất ngày của cổ phiếu Alphabet và quỹ vàng GLD.}{ch5-returns}
+
+\begin{phathien}{Phát hiện từ khảo sát dữ liệu cổ phiếu}
+\begin{itemize}
+  \item Giá đóng cửa thấp nhất \SL{ch5_facts/stock_min} USD (ngày \SL{ch5_facts/stock_mindate}) và cao nhất \SL{ch5_facts/stock_max} USD (ngày \SL{ch5_facts/stock_maxdate}).
+  \item Phiên giảm mạnh nhất \SL{ch5_facts/stock_worst}\% ngày \SL{ch5_facts/stock_worstdate}; phiên tăng mạnh nhất \SL{ch5_facts/stock_best}\% ngày \SL{ch5_facts/stock_bestdate}. Độ lệch chuẩn lợi suất ngày là \SL{ch5_facts/stock_vol}\%.
+  \item Phân bố lợi suất có đuôi dày (Hình~\ref{fig:ch5-returns}): các phiên biến động mạnh tập trung vào đầu đại dịch (3/2020) và đợt giảm năm 2022.
+  \item Dữ liệu chỉ có ngày giao dịch: cuối tuần và ngày lễ không có dòng. Một câu hỏi về Chủ nhật phải được trả lời ``không có phiên'' chứ không được bịa giá.
+\end{itemize}
+\end{phathien}
+
+\subsection{Xây dựng Knowledge Base}
+
+Mỗi phiên giao dịch thành một tài liệu giữ ngày (kèm thứ trong tuần), giá mở, cao, thấp, đóng cửa, khối lượng và mức thay đổi. Ngoài \SL{ch5_kb_stock/n_records} tài liệu bản ghi, KB có \SL{ch5_kb_stock/n_summaries} \textbf{tài liệu tổng hợp theo tháng và năm} (phiên đầu, phiên cuối, thay đổi, cao nhất, thấp nhất, trung bình, độ biến động) để trả lời câu hỏi về giai đoạn -- loại câu hỏi bài mẫu ghi nhận là ``kết quả có thể chưa đúng trọng tâm'' khi chỉ có tài liệu theo ngày.
+
+\maNguon{ch5_data__stock_doc}{Văn bản hoá một phiên giao dịch}
+\maDai{ch5_data___period_doc}{Tài liệu tổng hợp một giai đoạn (tháng hoặc năm)}
+\maNguon{ch5_data__period_summaries}{Sinh tài liệu tổng hợp cho mọi tháng và năm}
+
+\begin{ketqua}{Tài liệu bản ghi quanh phiên 16/03/2020}
+\input{generated/ch5_doc_stock}
+\end{ketqua}
+
+\maNguon{ch5_data__build_corpus}{Dựng kho tài liệu (bản ghi + tổng hợp) cho một miền}
+
+\subsection{Xây dựng Knowledge Graph}
+\label{sec:ch5-stock-kg}
+
+Lược đồ KG thị trường (Hình~\ref{fig:ch5-kg-market}) có ba lớp thực thể -- ngày giao dịch, tháng, năm -- và lớp khái niệm biến động. Mỗi ngày mang thuộc tính OHLCV và lợi suất, thuộc về một tháng (\texttt{in\_month}), tháng thuộc về năm (\texttt{in\_year}), ngày nối với phiên kế tiếp (\texttt{next\_day}) và với một trong năm nút biến động (\texttt{has\_movement}). Cạnh \texttt{next\_day} biến chuỗi thời gian thành một đường đi, cho phép duyệt ``phiên trước/phiên sau'' trên đồ thị.
+
+\hinhtikz{ch5_kg_market}{Lược đồ KG thị trường: ngày -- tháng -- năm, chuỗi \texttt{next\_day} và nút khái niệm biến động.}{ch5-kg-market}
+
+\maNguon{ch5_kg__market_triples}{Sinh bộ ba cho dữ liệu thị trường}
+
+\begin{ketqua}{Các bộ ba của nút TradingDay\_2020-03-16}
+\input{generated/ch5_tri_stock}
+\end{ketqua}
+
+KG cổ phiếu có \SL{ch5_kb_stock/graph/nodes} nút và \SL{ch5_kb_stock/graph/edges} cạnh. Nút khái niệm ``đi ngang'' và ``tăng'' có bậc vào lớn nhất (Bảng~\ref{tab:ch5-hub-stock}); Hình~\ref{fig:ch5-moves} cho thấy số phiên thuộc mỗi nút biến động ở hai miền thị trường.
+
+\bang{ch5_rel_stock}{Phân bố quan hệ và loại nút -- KG cổ phiếu}{ch5-rel-stock}
+\bang{ch5_hub_stock}{Các nút có bậc vào lớn nhất -- KG cổ phiếu}{ch5-hub-stock}
+\hinhpdf{ch5_moves}{0.98}{Số phiên thuộc mỗi nút khái niệm biến động (bậc vào của nút).}{ch5-moves}
+\hinhpdf{ch5_kg_sub_stock}{0.96}{Đồ thị con tháng 3/2020: chuỗi \texttt{next\_day}, nút tháng và các nút biến động.}{ch5-kg-sub-stock}
+
+\paragraph{Biểu diễn RDF và truy vấn SPARQL.} Để minh hoạ mô hình RDF, các bộ ba của tháng 3/2020 được xuất sang Turtle bằng rdflib (\SL{ch5_kb_stock/rdf_demo/n_rdf_triples} bộ ba RDF): thực thể và khái niệm thành URI trong không gian tên \texttt{kg:}, giá trị số thành literal có kiểu \texttt{xsd:double}, ngày thành \texttt{xsd:date}. Truy vấn SPARQL dưới đây tìm các phiên trong tháng 3/2020 giảm hơn 4\%.
+
+\maNguon{ch5_kg__to_rdf}{Chuyển bộ ba sang đồ thị RDF có kiểu dữ liệu XSD}
+\maNguon{ch5_build__rdf_demo}{Xuất Turtle và chạy truy vấn SPARQL minh hoạ}
+
+\begin{ketqua}{Đoạn đầu tệp Turtle sinh ra}
+\input{generated/ch5_turtle}
+\end{ketqua}
+\begin{ketqua}{Truy vấn SPARQL}
+\input{generated/ch5_sparql_query}
+\end{ketqua}
+\bang{ch5_sparql}{Kết quả truy vấn SPARQL: các phiên tháng 3/2020 giảm hơn 4\%}{ch5-sparql}
+
+\paragraph{Liên kết thực thể thời gian.} Câu hỏi thị trường xoay quanh thời gian. Bộ liên kết nhận ba định dạng ngày (``16/03/2020'', ``ngày 16 tháng 3 năm 2020'', ``2020-03-16''), tháng (``tháng 3/2020'') và năm (``năm 2020''), rồi ánh xạ tới nút \texttt{TradingDay\_\dots}, tài liệu \texttt{M-2020-03} hoặc \texttt{M-2020}. Công cụ chính xác chọn trường giá từ từ khoá trong câu hỏi và trả giá trị từ nút; nếu ngày không có phiên, công cụ nói rõ và chỉ ra phiên gần nhất trước đó.
+
+\maNguon{ch5_kg__DATE_PATTERNS}{Ba mẫu ngày được nhận diện}
+\maNguon{ch5_kg__link_dates}{Trích ngày trong câu hỏi}
+\maNguon{ch5_kg__link_periods}{Trích tháng và năm trong câu hỏi}
+\maNguon{ch5_kg__verbalize}{Diễn đạt các cạnh của một nút thành bằng chứng dạng văn bản}
+\maDai{ch5_domain__Domain._facts_market}{Công cụ chính xác của hai miền thị trường: tra ngày, so sánh hai ngày, tổng hợp giai đoạn}
+
+\hinhpdf{ch5_emb_tsne}{0.9}{t-SNE của embedding e5-small cho kho tài liệu cổ phiếu: tài liệu cùng năm nằm gần nhau, tài liệu tổng hợp tách nhóm riêng.}{ch5-emb-tsne}
+
+\subsection{Kết quả truy xuất}
+
+\bang{ch5_ret_stock}{Chất lượng truy xuất -- miền cổ phiếu Google}{ch5-ret-stock}
+
+\nhanxet{Kho cổ phiếu là trường hợp khó cho truy xuất văn bản: \SL{ch5_kb_stock/n_records} tài liệu có \emph{cùng một khuôn câu}, chỉ khác nhau ở ngày và các con số. Vì vậy:
+\begin{itemize}
+  \item TF-IDF (có bigram, nên cặp ``16 03'' trong ngày là một đặc trưng hiếm) đạt MRR \SL{ch5_retrieval/sl/stocklex/tfidf/mrrPct}\% với câu hỏi khớp nhưng chỉ \SL{ch5_retrieval/sl/stockpara/tfidf/mrrPct}\% khi ngày được viết ``ngày 16 tháng 3 năm 2020''. BM25 chỉ dùng âm tiết đơn nên các token ``16'', ``03'', ``2020'' xuất hiện ở hàng trăm tài liệu và mất sức phân biệt (MRR \SL{ch5_retrieval/sl/stock/bm25/mrrPct}\%).
+  \item Embedding gần như không phân biệt được các con số: MiniLM gần bằng 0 (\SL{ch5_retrieval/sl/stock/minilm/mrrPct}\%), e5-small khá hơn (\SL{ch5_retrieval/sl/stock/esmall/mrrPct}\%) và bền hơn với câu diễn đạt lại (\SL{ch5_retrieval/sl/stockpara/esmall/mrrPct}\%).
+  \item Nhánh đồ thị đọc ngày bằng liên kết thực thể nên đúng tuyệt đối (MRR \SL{ch5_retrieval/sl/stock/graph/mrrPct}\%) với mọi cách viết ngày đã hỗ trợ; RRF có nhánh đồ thị đạt \SL{ch5_retrieval/sl/stock/rrfg/mrrPct}\%.
+  \item Đáng chú ý, cross-encoder \emph{làm giảm} chất lượng với câu hỏi khớp (\SL{ch5_retrieval/sl/stocklex/rrfg/mrrPct}\% $\to$ \SL{ch5_retrieval/sl/stocklex/rrfgrr/mrrPct}\%): mô hình chấm ``mức liên quan ngữ nghĩa'', mà các phiên liền kề có ngữ nghĩa gần như y hệt, nên nó đẩy tài liệu đúng do đồ thị tìm được xuống dưới một phiên khác.
+\end{itemize}}
+
+\subsection{Chatbot hỏi đáp cổ phiếu}
+
+\bang{ch5_answers_stock}{Câu trả lời của bốn hệ trên câu hỏi mẫu -- miền cổ phiếu}{ch5-ans-stock}
+
+\input{generated/ch5_trace_stock_1}
+\input{generated/ch5_trace_stock_2}
+\input{generated/ch5_trace_stock_3}
+\input{generated/ch5_trace_stock_4}
+
+\nhanxet{Trên \SL{ch5_agent_stock/n_questions} câu hỏi có đáp án (tối đa 8 câu cho mỗi cặp loại câu hỏi -- kiểu diễn đạt), LLM thuần không trả lời đúng câu nào (\SL{ch5_agent_stock/systems/llm_only/accPct}\%): gần như mọi câu trả lời đều nói rằng mô hình không có số liệu giá cụ thể -- hành vi đúng mực, nhưng không giúp được người hỏi. Naive RAG (dense e5-small, top-5) đạt \SL{ch5_agent_stock/systems/naive_rag/accPct}\%, sát với tỷ lệ câu có tài liệu đúng trong nguồn (\SL{ch5_agent_stock/systems/naive_rag/gold_in_sourcesPct}\%). Advanced RAG đưa tài liệu đúng vào nguồn ở \SL{ch5_agent_stock/systems/advanced_rag/gold_in_sourcesPct}\% câu và đạt \SL{ch5_agent_stock/systems/advanced_rag/accPct}\%; phần sai tập trung ở câu hỏi năm (đúng \SL{ch5_agent_stock/systems/advanced_rag/acc_yearPct}\%) -- cross-encoder đẩy bản ghi ngày lên trên tài liệu tổng hợp năm, đúng hiện tượng đã thấy ở Bảng~\ref{tab:ch5-ret-stock}. Một số câu sai dù tài liệu đúng đã có trong nguồn: LLM đọc nhầm lợi suất của một phiên thành mức thay đổi của cả tháng. Tác tử định tuyến đúng \SL{ch5_agent_stock/systems/agent/accPct}\%: mọi câu đều nêu ngày hoặc giai đoạn, nên bộ định tuyến chuyển \SL{ch5_agent_stock/tool_use/kg_lookup} câu tới \texttt{kg\_lookup}, \SL{ch5_agent_stock/tool_use/pandas_calc} câu tới \texttt{pandas\_calc} và không câu nào phải gọi LLM; độ trễ trung bình chỉ \SL{ch5_agent_stock/systems/agent/ms} ms so với \SL{ch5_agent_stock/systems/advanced_rag/ms} ms của Advanced RAG.}
+
+\begin{luuy}{Giới hạn của bộ định tuyến bằng luật}
+Hai vết cuối cho thấy hai giới hạn. Ở ví dụ 3, câu ``biến động thế nào trong đại dịch năm 2020'' được định tuyến đúng tới \texttt{pandas\_calc}, nhưng luật chọn trường hiểu ``biến động'' là độ lệch chuẩn lợi suất, nên câu trả lời bỏ qua mức thay đổi cả năm vốn có sẵn trong cùng quan sát. Ở ví dụ 4, câu ``năm nào tăng trưởng tốt nhất'' không nêu thực thể nên đi vào RAG; cả năm tài liệu tìm được đều là bản ghi ngày và LLM ghép các con số rời rạc thành một kết luận sai. Đáp án đúng là năm \SL{ch5_facts/stock_best_yearRaw} (tăng \SL{ch5_facts/stock_best_year_chg}\%), chỉ tìm được khi so sánh toàn bộ tài liệu tổng hợp năm -- một phép ``arg max trên nhiều thực thể'' mà cả truy xuất top-$k$ lẫn luật hiện tại đều không hỗ trợ. Một công cụ text-to-SQL, hoặc LLM lớn hơn ở bước chọn công cụ và chọn trường, sẽ khắc phục cả hai trường hợp.
+\end{luuy}
+
+% ---------------------------------------------------------------------
+\section{Thực nghiệm 3: KB, KG và chatbot cho dữ liệu vàng (FINAL\_USO)}
+\label{sec:ch5-gold}
+
+\subsection{Mô tả và khảo sát dữ liệu: ý nghĩa thật của các cột}
+
+Tệp \texttt{FINAL\_USO.csv} \cite{ch5:kaggle_gold} có \SL{ch5_facts/gold_rows} dòng từ \SL{ch5_facts/gold_first} đến \SL{ch5_facts/gold_last} và \SL{ch5_facts/gold_cols} cột. Bài mẫu đã lưu ý tên tệp dễ gây nhầm và nhóm cột \texttt{USO\_*} là quỹ dầu. Khảo sát kỹ hơn cho thấy thêm hai điều quan trọng cho việc dựng KB đúng:
+\begin{itemize}
+  \item Nhóm \texttt{Open}, \texttt{High}, \texttt{Low}, \texttt{Close}, \texttt{Adj Close}, \texttt{Volume} \emph{không phải giá vàng giao ngay} mà là giá quỹ \textbf{SPDR Gold Shares (GLD)}: ngày cuối cùng \texttt{Close} bằng \SL{ch5_facts/gold_close_last} USD -- khớp giá GLD -- trong khi vàng giao ngay khi đó khoảng 1.280 USD/ounce. Mọi tài liệu và câu trả lời vì vậy ghi ``quỹ vàng GLD'' với đơn vị USD/chứng chỉ quỹ.
+  \item Một số cột có đơn vị hoặc mã hoá bất thường: \texttt{SF\_Price} (bạc) có giá trị cỡ \SL{ch5_facts/gold_sf_last} -- không thể là USD/ounce, nhiều khả năng là đơn vị khác (ví dụ rupee/kg); \texttt{RHO\_PRICE} (rhodi) có \SL{ch5_facts/gold_rho_zero} ô bằng 0, tức giá trị thiếu được ghi là 0. Hai cột này bị loại khỏi tài liệu để tránh LLM chép một con số sai đơn vị.
+\end{itemize}
+
+\bang{ch5_gold_columns}{Các nhóm cột của FINAL\_USO.csv, ý nghĩa và đơn vị}{ch5-gold-cols}
+\maNguon{ch5_data__GOLD_COLS}{Bảng ý nghĩa và đơn vị các cột FINAL\_USO được đưa vào tài liệu}
+\maNguon{ch5_data__load_gold}{Đọc FINAL\_USO, tính lợi suất và mã ngày}
+
+\hinhpdf{ch5_gold_price}{0.98}{Quỹ vàng GLD và các chỉ báo thị trường, chuẩn hoá về 100 tại ngày đầu.}{ch5-gold-price}
+\hinhpdf{ch5_gold_corr}{0.9}{Ma trận tương quan lợi suất ngày giữa quỹ vàng và các chỉ báo.}{ch5-gold-corr}
+
+\begin{phathien}{Phát hiện từ khảo sát dữ liệu vàng}
+\begin{itemize}
+  \item GLD thấp nhất \SL{ch5_facts/gold_min} USD (ngày \SL{ch5_facts/gold_mindate}), cao nhất \SL{ch5_facts/gold_max} USD (ngày \SL{ch5_facts/gold_maxdate}); độ lệch chuẩn lợi suất ngày \SL{ch5_facts/gold_vol}\%, thấp hơn cổ phiếu Google.
+  \item Lợi suất GLD tương quan dương mạnh với quỹ cổ phiếu mỏ vàng GDX (hệ số \SL{ch5_facts/corr_gld_gdx}), tương quan âm với chỉ số USD (\SL{ch5_facts/corr_gld_usdi}) và gần như không tương quan với S\&P 500 (\SL{ch5_facts/corr_gld_spy}) -- đúng vai trò ``tài sản trú ẩn'' của vàng.
+  \item Tương quan với quỹ dầu USO là \SL{ch5_facts/corr_gld_uso}: vàng và dầu cùng là hàng hoá nhưng không cùng nhịp.
+\end{itemize}
+\end{phathien}
+
+\subsection{Xây dựng Knowledge Base}
+
+Tài liệu một ngày gồm giá GLD (mở, cao, thấp, đóng cửa, khối lượng, thay đổi) và chín chỉ báo thị trường cùng ngày, mỗi chỉ báo kèm tên tiếng Việt và đơn vị. Như miền cổ phiếu, KB có thêm tài liệu tổng hợp tháng và năm; tổng cộng \SL{ch5_kb_gold/n_docs} tài liệu.
+
+\maNguon{ch5_data__gold_doc}{Văn bản hoá một ngày của FINAL\_USO kèm chỉ báo thị trường}
+
+\begin{ketqua}{Hai tài liệu bản ghi cuối cùng của KB vàng}
+\input{generated/ch5_doc_gold}
+\end{ketqua}
+
+\subsection{Xây dựng Knowledge Graph}
+
+KG vàng dùng lại lược đồ thị trường (thực thể \texttt{MarketDay\_\dots}) và thêm chín quan hệ chỉ báo (\texttt{has\_brent}, \texttt{has\_sp500\_close}, \texttt{has\_usd\_index}\dots). Vì giá trị chỉ báo là số, chúng được lưu thành thuộc tính của nút ngày, nên đồ thị có \SL{ch5_kb_gold/graph/nodes} nút, \SL{ch5_kb_gold/graph/edges} cạnh nhưng tới \SL{ch5_kb_gold/graph/n_literals} thuộc tính số.
+
+\maNguon{ch5_kg__gold_triples}{Bộ ba thị trường cộng chín quan hệ chỉ báo cho FINAL\_USO}
+
+\begin{ketqua}{Mười sáu bộ ba đầu của nút MarketDay ngày cuối}
+\input{generated/ch5_tri_gold}
+\end{ketqua}
+
+\bang{ch5_rel_gold}{Phân bố quan hệ và loại nút -- KG vàng}{ch5-rel-gold}
+\hinhpdf{ch5_kg_sub_gold}{0.96}{Đồ thị con của KG vàng quanh một tháng: nút ngày, chuỗi \texttt{next\_day} và nút biến động.}{ch5-kg-sub-gold}
+
+\paragraph{Lớp \texttt{Domain} -- gói một miền tri thức.} Ba miền được gói trong cùng một lớp: kho tài liệu, DataFrame, KG, bộ liên kết thực thể và công cụ chính xác. Tác tử và Web App chỉ làm việc với giao diện này nên thêm một miền mới chỉ cần viết hàm văn bản hoá, sinh bộ ba và liên kết thực thể.
+
+\maNguon{ch5_domain__Domain.link}{Liên kết thực thể của một miền: câu hỏi $\to$ id tài liệu / nút}
+\maNguon{ch5_domain__Domain.numeric_filters}{Trích các chỉ số số học nêu trong câu hỏi hồ sơ}
+\maNguon{ch5_domain__Domain.facts}{Điểm vào công cụ chính xác theo miền}
+
+\subsection{Kết quả truy xuất}
+
+\bang{ch5_ret_gold}{Chất lượng truy xuất -- miền vàng}{ch5-ret-gold}
+
+\nhanxet{Miền vàng có thêm hai loại câu hỏi mà văn bản giúp được nhiều hơn. Câu hỏi chỉ báo (``giá dầu Brent ngày\dots'') chứa tên chỉ báo đặc thù, nên TF-IDF và e5 xử lý khá tốt; câu hỏi tổng hợp năm và tháng khớp với tài liệu tổng hợp có câu mở đầu ``Tổng hợp \dots{} giai đoạn 2013'', nơi e5-base vượt e5-small. Khác với miền cổ phiếu, rerank ở đây \emph{có lợi}: RRF không đồ thị tăng từ \SL{ch5_retrieval/sl/gold/rrf/mrrPct}\% lên \SL{ch5_retrieval/sl/gold/rrfrr/mrrPct}\% MRR, và cấu hình đầy đủ RRF + KG + rerank đạt \SL{ch5_retrieval/sl/gold/rrfgrr/mrrPct}\%. Tài liệu vàng dài hơn và chứa nhiều tên chỉ báo, nên cross-encoder có nhiều tín hiệu ngữ nghĩa để khớp với câu hỏi hơn là chỉ dựa vào con số.}
+
+\subsection{Chatbot hỏi đáp vàng}
+
+\bang{ch5_answers_gold}{Câu trả lời của bốn hệ trên câu hỏi mẫu -- miền vàng}{ch5-ans-gold}
+
+\input{generated/ch5_trace_gold_1}
+\input{generated/ch5_trace_gold_2}
+\input{generated/ch5_trace_gold_3}
+\input{generated/ch5_trace_gold_4}
+\input{generated/ch5_trace_gold_5}
+
+\nhanxet{Miền vàng cho bức tranh khác miền cổ phiếu. LLM thuần vẫn không đúng câu nào (\SL{ch5_agent_gold/systems/llm_only/accPct}\%). Naive RAG đạt \SL{ch5_agent_gold/systems/naive_rag/accPct}\% nhưng chênh lệch rất lớn giữa câu khớp (\SL{ch5_agent_gold/systems/naive_rag/acc_lexPct}\%) và câu diễn đạt lại (\SL{ch5_agent_gold/systems/naive_rag/acc_paraPct}\%) -- hệ quả trực tiếp của việc truy xuất dày sụp khi câu hỏi viết ngày khác dạng tài liệu (Bảng~\ref{tab:ch5-ret-gold}). Advanced RAG đưa tài liệu đúng vào nguồn ở \SL{ch5_agent_gold/systems/advanced_rag/gold_in_sourcesPct}\% câu và đạt \SL{ch5_agent_gold/systems/advanced_rag/accPct}\%: ở miền này rerank có lợi, trái với miền cổ phiếu. Các câu Advanced RAG còn sai đều đã có tài liệu đúng trong nguồn; LLM lấy nhầm con số, chẳng hạn trả giá thấp nhất của phiên đầu năm thay cho giá thấp nhất cả năm. Tác tử đúng \SL{ch5_agent_gold/systems/agent/accPct}\% với \SL{ch5_agent_gold/tool_use/kg_lookup} câu qua \texttt{kg\_lookup} và \SL{ch5_agent_gold/tool_use/pandas_calc} câu qua \texttt{pandas\_calc}, kể cả câu hỏi về chỉ báo khác (S\&P 500, dầu Brent, chỉ số USD\ldots) nhờ bảng ánh xạ tên chỉ báo sang cột trong công cụ chính xác (Đoạn mã~\ref{code:ch5_domain__Domain._facts_market}); độ trễ \SL{ch5_agent_gold/systems/agent/ms} ms so với \SL{ch5_agent_gold/systems/advanced_rag/ms} ms.}
+
+\begin{luuy}{Câu hỏi mở trên miền vàng}
+Hai vết cuối là hai kiểu thất bại khác nhau. Ví dụ 4 hỏi đồng thời ``giá vàng và giá dầu'' trong năm 2015; bộ định tuyến nhận ra năm và gọi \texttt{pandas\_calc}, nhưng công cụ chỉ tổng hợp cột GLD nên phần giá dầu bị bỏ qua mà không có cảnh báo. Ví dụ 5 hỏi ``năm nào tăng mạnh nhất''; RAG đã tìm được tài liệu tổng hợp năm 2017 -- đúng năm cần tìm -- ở hạng 4, nhưng LLM 1,5B lại chọn năm 2013 dựa trên lợi suất của một phiên, trong khi 2013 thực ra là năm giảm mạnh nhất (\SL{ch5_facts/gold_worst_year_chg}\%). Đáp án đúng là năm \SL{ch5_facts/gold_best_yearRaw} (tăng \SL{ch5_facts/gold_best_year_chg}\%). Truy xuất đúng là điều kiện cần nhưng chưa đủ: câu hỏi so sánh cần bằng chứng đầy đủ (mọi năm) và một bước tính toán tường minh, không nên giao cho LLM nhỏ ``đọc và so sánh'' trong ngữ cảnh.
+\end{luuy}
+
+% ---------------------------------------------------------------------
+\section{So sánh tổng hợp ba thực nghiệm}
+\label{sec:ch5-tong-hop}
+
+\subsection{Quy mô kho tri thức}
+
+\bang{ch5_kb_stats}{Quy mô KB, KG và thời gian dựng của ba miền}{ch5-kb-stats}
+
+\hinhpdf{ch5_kg_stats}{0.98}{Quy mô ba đồ thị (thang log) và phân bố quan hệ của KG tiểu đường.}{ch5-kg-stats}
+\hinhpdf{ch5_doc_len}{0.96}{Phân bố độ dài tài liệu của ba kho tri thức (số từ tách theo khoảng trắng; cột cuối gộp các tài liệu từ 120 từ trở lên).}{ch5-doclen-build}
+\hinhpdf{ch5_build_time}{0.96}{Thời gian dựng các thành phần của ba kho tri thức (thang log).}{ch5-build-time}
+\hinhpdf{ch5_kg_degree}{0.9}{Phân bố bậc vào của ba KG (log--log).}{ch5-kg-degree}
+
+\nhanxet{KG tiểu đường lớn hơn hai KG thị trường khoảng bốn mươi lần về số nút, nhưng cấu trúc lại ``nông'': hầu hết cạnh nối hồ sơ tới vài chục nút khái niệm, nên phân bố bậc vào rất lệch (Hình~\ref{fig:ch5-kg-degree}). Hai KG thị trường có cấu trúc chuỗi (\texttt{next\_day}) cộng phân cấp thời gian. Mã hoá embedding chiếm phần lớn thời gian dựng với kho lớn; chỉ mục thưa và đồ thị chỉ mất vài giây đến vài chục giây trên CPU.}
+
+\subsection{Chất lượng truy xuất}
+
+\bang{ch5_ret_all}{Chất lượng truy xuất của mười cấu hình, gộp ba miền}{ch5-ret-all}
+\hinhpdf{ch5_ret_overall}{0.98}{Recall@1, Recall@10, MRR và nDCG@10 của mười cấu hình truy xuất.}{ch5-ret-overall}
+\hinhpdf{ch5_ret_domain}{0.98}{MRR@10 theo miền và bộ truy xuất.}{ch5-ret-domain}
+
+\begin{ketqua}{Kết luận chính về truy xuất}
+\normalfont
+\begin{itemize}
+  \item Bộ truy xuất đơn lẻ tốt nhất là đồ thị (MRR \SL{ch5_retrieval/sl/all/graph/mrrPct}\%), nhưng nó chỉ hoạt động khi liên kết thực thể nhận ra được thực thể; với câu hỏi mở, nó không trả về gì.
+  \item Trong các bộ truy xuất văn bản, TF-IDF có bigram tốt nhất (\SL{ch5_retrieval/sl/all/tfidf/mrrPct}\%), hơn BM25 âm tiết đơn (\SL{ch5_retrieval/sl/all/bm25/mrrPct}\%) và cả ba mô hình embedding (MiniLM \SL{ch5_retrieval/sl/all/minilm/mrrPct}\%, e5-small \SL{ch5_retrieval/sl/all/esmall/mrrPct}\%, e5-base \SL{ch5_retrieval/sl/all/ebase/mrrPct}\%) -- vì đáp án nằm trong các con số và ngày mà embedding khó phân biệt.
+  \item RRF BM25 + Dense + KG đạt \SL{ch5_retrieval/sl/all/rrfg/mrrPct}\%, gần bằng đồ thị nhưng vẫn trả kết quả cho câu hỏi đồ thị không hiểu. Bỏ nhánh KG, RRF chỉ còn \SL{ch5_retrieval/sl/all/rrf/mrrPct}\%.
+  \item Rerank kéo RRF không đồ thị từ \SL{ch5_retrieval/sl/all/rrf/mrrPct}\% lên \SL{ch5_retrieval/sl/all/rrfrr/mrrPct}\%, nhưng đặt sau RRF có KG thì lại giảm (\SL{ch5_retrieval/sl/all/rrfgrr/mrrPct}\%), chủ yếu ở miền cổ phiếu.
+\end{itemize}
+\end{ketqua}
+
+\bang{ch5_ret_style}{MRR theo kiểu diễn đạt câu hỏi}{ch5-ret-style}
+\hinhpdf{ch5_ret_style}{0.98}{Recall@1 với câu hỏi khớp và câu hỏi diễn đạt lại.}{ch5-ret-style}
+\bang{ch5_ret_type}{MRR theo loại câu hỏi}{ch5-ret-type}
+\hinhpdf{ch5_ret_type}{0.98}{Recall@1 theo loại câu hỏi.}{ch5-ret-type}
+
+\nhanxet{Bảng~\ref{tab:ch5-ret-style} cho thấy mặt trái của truy xuất thưa: chuyển từ câu hỏi khớp sang câu hỏi diễn đạt lại, MRR của TF-IDF giảm mạnh ở cả ba miền, trong khi nhánh đồ thị không đổi vì bộ liên kết đã chuẩn hoá các cách viết ngày và tên chỉ số về cùng một nút. Truy xuất dày giảm ít hơn ở miền tiểu đường và còn tăng ở miền cổ phiếu (e5-small: \SL{ch5_retrieval/sl/stocklex/esmall/mrrPct}\% $\to$ \SL{ch5_retrieval/sl/stockpara/esmall/mrrPct}\%), nhưng cũng sụp ở câu diễn đạt lại của miền vàng (\SL{ch5_retrieval/sl/goldpara/esmall/mrrPct}\%), nơi câu hỏi viết ngày theo dạng khác hẳn tài liệu (dạng ISO hoặc ``ngày 21 tháng 4 năm 2017'' so với ``21/04/2017'' trong tài liệu). Theo loại câu hỏi (Bảng~\ref{tab:ch5-ret-type}), embedding mạnh ở câu hỏi nhóm và chỉ báo, BM25 mạnh ở câu hỏi nhóm -- nơi câu chữ của câu hỏi giống câu chữ tài liệu tổng hợp -- nhưng cả hai yếu ở câu hỏi tháng, năm và hồ sơ. Câu hỏi tháng/năm cũng là nơi rerank đặt sau RRF có đồ thị gây hại rõ nhất: cross-encoder ưu tiên tài liệu bản ghi ngày có nhiều từ trùng với câu hỏi hơn tài liệu tổng hợp đúng mà nhánh đồ thị đã đưa lên đầu.}
+
+\hinhpdf{ch5_ret_dense}{0.9}{So sánh ba mô hình embedding đa ngôn ngữ trên ba miền.}{ch5-ret-dense}
+\hinhpdf{ch5_ret_recall}{0.96}{Đường Recall@k của sáu bộ truy xuất tiêu biểu.}{ch5-ret-recall-lat}
+\hinhpdf{ch5_ret_latency}{0.96}{Đánh đổi giữa chất lượng (MRR@10) và độ trễ trung bình của mười cấu hình truy xuất.}{ch5-ret-latency}
+
+\nhanxet{Trong ba mô hình nhúng, e5-small tốt nhất về MRR trung bình (\SL{ch5_retrieval/sl/all/esmall/mrrPct}\%) dù nhỏ hơn e5-base một nửa; e5-base chỉ vượt ở câu hỏi tổng hợp tháng/năm. MiniLM-L12 (huấn luyện cho câu đồng nghĩa ngắn, tối đa 128 token) gần như thất bại với tài liệu dài đầy số. Về độ trễ, truy xuất dày trên CPU tốn chủ yếu ở bước mã hoá câu hỏi (\SL{ch5_retrieval/sl/all/esmall/ms} ms với e5-small, \SL{ch5_retrieval/sl/all/ebase/ms} ms với e5-base); rerank thêm vài trăm mili-giây mỗi câu.}
+
+\subsection{Ảnh hưởng của trọng số đồ thị và số ứng viên rerank}
+
+\bang{ch5_ret_sweep}{Quét trọng số nhánh đồ thị $w_G$ và số ứng viên rerank $n$}{ch5-ret-sweep}
+\hinhpdf{ch5_ret_sweep}{0.98}{MRR theo $w_G$ (trái) và Recall@1 theo $n$ (phải).}{ch5-ret-sweep}
+
+\nhanxet{Tăng trọng số đồ thị $w_G$ từ 0 lên 1 cải thiện MRR rất mạnh ở cả ba miền; từ 2 trở lên đường cong gần như bão hoà, nên chọn $w_G = 2$ là hợp lý: đồ thị thắng khi đúng, nhưng các nguồn khác vẫn đủ trọng lượng khi đồ thị không có kết quả. Với rerank, $n = 5$ ứng viên quá ít -- tài liệu đúng thường chưa lọt vào top-5 của RRF; từ $n = 20$ trở lên chất lượng tăng chậm trong khi độ trễ tiếp tục tăng theo $n$.}
+
+\subsection{Chất lượng câu trả lời và tác tử}
+
+\bang{ch5_agent}{Độ chính xác câu trả lời và độ trễ của bốn hệ hỏi đáp}{ch5-agent}
+\hinhpdf{ch5_agent_acc}{0.98}{Độ chính xác đáp án của bốn hệ trên ba miền.}{ch5-agent-acc}
+\bang{ch5_agent_type}{Độ chính xác theo loại câu hỏi}{ch5-agent-type}
+\hinhpdf{ch5_agent_type}{0.98}{Độ chính xác theo loại câu hỏi (trái) và công cụ tác tử đã chọn (phải).}{ch5-agent-type-fig}
+\bang{ch5_tools}{Số lần tác tử chọn mỗi công cụ}{ch5-tools}
+\hinhpdf{ch5_agent_latency}{0.96}{Độ trễ một câu hỏi của bốn hệ hỏi đáp (thang log).}{ch5-agent-lat-src}
+\hinhpdf{ch5_agent_goldsrc}{0.96}{Quan hệ giữa tỷ lệ câu có tài liệu đúng trong nguồn và tỷ lệ trả lời đúng.}{ch5-agent-goldsrc}
+
+\begin{ketqua}{Kết luận chính về chất lượng câu trả lời}
+\normalfont
+\begin{itemize}
+  \item \textbf{LLM thuần gần như vô dụng với dữ kiện cụ thể}: \SL{ch5_agent_stock/systems/llm_only/accPct}\% ở miền cổ phiếu, \SL{ch5_agent_gold/systems/llm_only/accPct}\% ở miền vàng; \SL{ch5_agent_diabetes/systems/llm_only/accPct}\% ở miền tiểu đường chỉ đến từ việc luôn trả lời ``có thể mắc'' cho câu hỏi có/không.
+  \item \textbf{RAG là bước cải thiện lớn nhất}: Naive RAG đạt \SL{ch5_agent_diabetes/systems/naive_rag/accPct}\%, \SL{ch5_agent_stock/systems/naive_rag/accPct}\% và \SL{ch5_agent_gold/systems/naive_rag/accPct}\% (tiểu đường, cổ phiếu, vàng). Advanced RAG tăng mạnh ở hai miền thị trường (\SL{ch5_agent_stock/systems/advanced_rag/accPct}\% và \SL{ch5_agent_gold/systems/advanced_rag/accPct}\%) nhưng giảm ở miền tiểu đường (\SL{ch5_agent_diabetes/systems/advanced_rag/accPct}\%).
+  \item \textbf{Truy xuất đúng là điều kiện cần, chưa phải điều kiện đủ}: với Naive RAG, độ chính xác bám sát tỷ lệ câu có tài liệu đúng trong nguồn (các điểm nằm gần đường chéo ở Hình~\ref{fig:ch5-agent-goldsrc}); với Advanced RAG ở miền tiểu đường, tài liệu đúng luôn có mặt mà độ chính xác vẫn thấp hơn nhiều -- phần thiếu nằm ở khả năng đọc số của LLM 1,5B.
+  \item \textbf{Tác tử định tuyến đúng 100\% ở cả ba miền} với độ trễ từ vài mili-giây đến vài trăm mili-giây thay vì hơn mười giây, vì mọi câu có đáp án đều nêu thực thể mà bộ liên kết nhận ra và công cụ chính xác không cần LLM. Đây là cận trên: bộ câu hỏi tự sinh dùng đúng các mẫu câu bộ liên kết được thiết kế để hiểu, còn các vết suy luận ở ba thực nghiệm cho thấy câu hỏi mở và câu so sánh vẫn là điểm yếu.
+\end{itemize}
+\end{ketqua}
+
+\subsection{Đối chiếu với bài mẫu}
+
+\begin{table}[H]\centering\small
+\caption{Đối chiếu phạm vi thực nghiệm với bài mẫu}\label{tab:ch5-vs-mau}
+\begin{tabular}{L{4.0cm}L{5.2cm}L{5.6cm}}
+\toprule
+Hạng mục & Bài mẫu & Chương này \\
+\midrule
+Văn bản hoá & câu tiếng Anh, chỉ bản ghi & câu tiếng Việt, bản ghi + tổng hợp nhóm/tháng/năm \\
+Bộ ba & quan hệ \texttt{has\_*}, giá trị số là nút & thêm nút khái niệm, ontology, \texttt{next\_day}; số là thuộc tính \\
+Truy xuất & TF-IDF, BM25, MiniLM (tiếng Anh) & thêm 3 mô hình đa ngữ, đồ thị, RRF, rerank \\
+Hybrid & in song song, chưa hợp nhất & RRF có trọng số + cross-encoder \\
+Sinh câu trả lời & không có & LLM cục bộ, có trích dẫn, tác tử chọn công cụ \\
+Đánh giá & 3 câu hỏi/miền, định tính & bộ câu hỏi tự sinh, Recall@k, MRR, nDCG, độ chính xác đáp án \\
+Dữ liệu vàng & lưu ý cột USO là quỹ dầu & xác định thêm Close là quỹ GLD, phát hiện SF, RHO bất thường \\
+Triển khai & không có & Web App và giao diện di động cho ba chatbot \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Triển khai chatbot lên Web App}
+\label{sec:ch5-trien-khai}
+
+Ba chatbot được triển khai trong Web App chung của tiểu luận qua mô-đun \texttt{tl3/serve\_ch5.py}. Mô-đun khai báo \texttt{SPECS} (tiêu đề, kiểu ``chat'', ô câu hỏi, lựa chọn chế độ, câu hỏi ví dụ) và hàm \texttt{predict} nhận câu hỏi, chạy tác tử của miền tương ứng và trả về câu trả lời có trích dẫn, danh sách nguồn kèm điểm, công cụ đã dùng và vết suy luận từng bước. Miền, chỉ mục và LLM được nạp lười ở câu hỏi đầu tiên rồi giữ trong bộ nhớ, nên các câu sau chỉ tốn thời gian truy xuất và sinh.
+
+\maNguon{serve_ch5__SPECS}{Khai báo ba chatbot cho Web App}
+\maNguon{serve_ch5__predict}{Hàm suy luận: câu hỏi $\to$ câu trả lời, nguồn, công cụ, vết suy luận}
+\maNguon{ch5_agent__Retrievers}{Lắp các bộ truy xuất của tác tử từ chỉ mục đã lưu}
+\maNguon{ch5_agent__Ch5Agent.rag}{Một lượt RAG: truy xuất, đánh số bằng chứng, sinh có trích dẫn}
+\maNguon{ch5_agent__Ch5Agent.plan}{Bước THOUGHT: liên kết thực thể quyết định công cụ}
+\maNguon{ch5_agent__Ch5Agent.run}{Vòng lặp tác tử: định tuyến, gọi công cụ, quay về RAG khi cần}
+
+Giao diện có ba chế độ: \texttt{auto} (tác tử tự định tuyến), \texttt{graph} (buộc dùng công cụ chính xác trên KG) và \texttt{rag} (buộc dùng RAG). Bảng nguồn dưới câu trả lời liệt kê tài liệu và điểm rerank; khung vết suy luận hiển thị lần lượt THOUGHT, ACTION, OBSERVATION, ANSWER như các hộp vết ở trên.
+
+\anhUI{ch5_diabetes_web}{Chatbot tri thức tiểu đường trên Web App (desktop): câu hỏi nhóm được trả lời bằng công cụ \texttt{kg\_aggregate}.}{ch5-ui-dia}
+\anhUI{ch5_stock_web}{Chatbot cổ phiếu Google (desktop): câu hỏi giá ngày 16/03/2020, nguồn và vết suy luận.}{ch5-ui-stock}
+\anhUI{ch5_gold_web}{Chatbot quỹ vàng GLD (desktop): câu hỏi tổng hợp năm 2013.}{ch5-ui-gold}
+
+\begin{figure}[!htbp]\centering
+\begin{minipage}[t]{0.32\linewidth}\centering
+  \IfFileExists{assets/ui/ch5_diabetes_mobile.png}{\tikzexternaldisable\resizebox{\linewidth}{!}{\khungdienthoai{ch5_diabetes_mobile}}\tikzexternalenable}{\fbox{\parbox[c][4cm][c]{0.9\linewidth}{\centering chưa chụp}}\PackageWarning{solieu}{Thieu so lieu 'ui/ch5_diabetes_mobile'}}
+  \par\small (a) Tiểu đường
+\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering
+  \IfFileExists{assets/ui/ch5_stock_mobile.png}{\tikzexternaldisable\resizebox{\linewidth}{!}{\khungdienthoai{ch5_stock_mobile}}\tikzexternalenable}{\fbox{\parbox[c][4cm][c]{0.9\linewidth}{\centering chưa chụp}}\PackageWarning{solieu}{Thieu so lieu 'ui/ch5_stock_mobile'}}
+  \par\small (b) Cổ phiếu Google
+\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering
+  \IfFileExists{assets/ui/ch5_gold_mobile.png}{\tikzexternaldisable\resizebox{\linewidth}{!}{\khungdienthoai{ch5_gold_mobile}}\tikzexternalenable}{\fbox{\parbox[c][4cm][c]{0.9\linewidth}{\centering chưa chụp}}\PackageWarning{solieu}{Thieu so lieu 'ui/ch5_gold_mobile'}}
+  \par\small (c) Vàng
+\end{minipage}
+\caption{Ba chatbot trên khung điện thoại 390 px.}\label{fig:ch5-ui-mobile}
+\end{figure}
+
+\anhMobile{ch5_stock_mobile}{Chatbot cổ phiếu Google trên điện thoại: câu trả lời, nguồn và vết suy luận xếp dọc.}{ch5-ui-stock-mobile}
+
+\begin{luuy}{Giới hạn sử dụng}
+Chatbot tiểu đường chỉ tra cứu và thống kê trên một bộ dữ liệu công khai; không dùng để chẩn đoán. Chatbot cổ phiếu và vàng chỉ trả dữ kiện lịch sử; không phải khuyến nghị đầu tư.
+\end{luuy}
+
+% ---------------------------------------------------------------------
+\section{Kết luận chương}
+\label{sec:ch5-ket-luan}
+
+Chương đã trình bày cơ sở lý thuyết của cơ sở tri thức, đồ thị tri thức và sinh tăng cường truy xuất, rồi hiện thực trọn vẹn ba hệ hỏi đáp trên ba bộ dữ liệu bảng. Các kết luận chính:
+\begin{enumerate}
+  \item \textbf{Biểu diễn quyết định chất lượng.} Văn bản hoá bằng tiếng Việt, giữ tên thuộc tính và khái niệm suy ra, cộng tài liệu tổng hợp theo nhóm và giai đoạn, là điều kiện để các bộ truy xuất trả lời được câu hỏi nhóm và câu hỏi xu hướng mà bản ghi đơn lẻ không chứa.
+  \item \textbf{Không có bộ truy xuất đơn lẻ nào tốt nhất mọi nơi.} Truy xuất thưa mạnh với câu hỏi khớp mặt chữ, truy xuất dày thường bền hơn khi câu hỏi diễn đạt lại, còn đồ thị chính xác tuyệt đối khi liên kết thực thể thành công nhưng im lặng khi không nhận ra thực thể. Hợp nhất RRF có trọng số cho nhánh đồ thị đạt gần mức của đồ thị mà vẫn trả kết quả cho câu hỏi mở. Tái xếp hạng bằng cross-encoder có lợi rõ khi chưa có đồ thị (nhất là miền vàng), nhưng đặt sau RRF có đồ thị thì có thể đẩy tài liệu tổng hợp đúng xuống -- nên chọn cấu hình theo miền và đo lại, không mặc định thêm rerank (mục~\ref{sec:ch5-tong-hop}).
+  \item \textbf{Truy xuất đúng là điều kiện cần, chưa phải điều kiện đủ, của trả lời đúng.} LLM nhỏ chạy cục bộ gần như không biết dữ kiện của các bộ dữ liệu; RAG đưa đúng bằng chứng vào là cải thiện lớn nhất, nhưng ngay cả khi tài liệu đúng luôn có trong nguồn, LLM 1,5B vẫn có thể chép sai con số. Với câu hỏi có thực thể cụ thể, tác tử trả số trực tiếp từ KG vừa chính xác tuyệt đối trên bộ câu hỏi đánh giá vừa nhanh hơn từ hàng chục đến hàng nghìn lần so với để LLM chép số từ bằng chứng; điểm yếu còn lại của nó là câu hỏi mở và câu hỏi so sánh.
+  \item \textbf{Hiểu đúng dữ liệu trước khi dựng tri thức.} Cột \texttt{Close} của FINAL\_USO là quỹ GLD, giá Google phải được điều chỉnh chia tách, giá trị thiếu không được thay bằng 0 -- các lỗi này không thuật toán truy xuất nào sửa được.
+\end{enumerate}
+Hạn chế còn lại: liên kết thực thể dựa trên luật nên chỉ phủ các mẫu câu đã thiết kế; bộ câu hỏi tự sinh có cấu trúc đều đặn hơn câu hỏi thật của người dùng; LLM 1,5B tham số đôi khi diễn đạt sai số dù bằng chứng đúng. Hướng mở rộng là dùng LLM lớn hơn hoặc tinh chỉnh để trích thực thể, thêm nhánh text-to-SQL/Cypher cho câu hỏi tổng hợp tuỳ ý, và đánh giá với người dùng thật. Chương~6 tiếp tục với học sâu trên đồ thị -- cách học biểu diễn trực tiếp từ cấu trúc đồ thị mà chương này mới chỉ khai thác bằng luật và duyệt cạnh.

@@ -1,0 +1,26 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % trái: nút trung tâm, độ dày cạnh = hệ số attention
+  \node[tieude] at (2.6,6.0) {Láng giềng có trọng số khác nhau};
+  \node[cau=cRed, minimum size=11mm] (v) at (2.6,2.6) {$h_v$};
+  \foreach \a/\w/\c/\t [count=\k] in {90/4.5/cBlue/0{,}41, 160/2.4/cOrange/0{,}22, 220/1.2/cGreen/0{,}11,
+                                     300/0.8/cPurple/0{,}07, 20/2.0/cTeal/0{,}19}{
+    \node[cau=\c] (u\k) at ($(v)+(\a:2.2)$) {$h_{\k}$};
+    \draw[line width=\w pt, \c!80!black, -{Stealth[length=3mm]}] (u\k) -- (v)
+      node[pos=0.45, fill=white, inner sep=1pt, font=\small] {$\t$};}
+  \node[nhan, align=center] at (2.6,-0.3) {số trên cạnh: $\alpha_{vu}$, tổng bằng 1 (minh hoạ)};
+  % phải: cách tính alpha
+  \node[tieude] at (10.6,6.0) {Tính hệ số attention $\alpha_{vu}$};
+  \node[khoi] (wv) at (7.6,4.2) {$W h_v$};
+  \node[khoi] (wu) at (9.4,4.2) {$W h_u$};
+  \node[khoiC, minimum width=3.6cm] (cat) at (8.5,2.9) {ghép $[\,Wh_v \,\|\, Wh_u\,]$};
+  \node[khoiP] (a) at (8.5,1.7) {$\mathbf a^{\top}(\cdot)$, LeakyReLU};
+  \node[khoiR, text width=3.6cm] (sm) at (8.5,0.3) {$\alpha_{vu}=\dfrac{\exp e_{vu}}{\sum_{k\in\mathcal N(v)}\exp e_{vk}}$};
+  \draw[mui] (wv) -- (cat); \draw[mui] (wu) -- (cat); \draw[mui] (cat) -- (a); \draw[mui] (a) -- (sm);
+  % đa đầu
+  \foreach \k/\c in {0/cBlue, 1/cOrange, 2/cGreen}{
+    \node[hop=\c, minimum width=1.4cm, minimum height=0.7cm] (hd\k) at (12.4+\k*0.0,4.0-\k*1.1) {đầu \the\numexpr\k+1\relax};
+    \draw[muiM=\c!80!black] (sm.east) -- (hd\k.west);}
+  \node[khoiT, text width=3.6cm] (cc) at (15.2,2.9) {$\Vert_{k=1}^{K}\,\sigma\!\big(\textstyle\sum_u \alpha^{k}_{vu}W^{k}h_u\big)$};
+  \foreach \k in {0,1,2} \draw[mui] (hd\k.east) -- (cc.west);
+  \node[nhan, align=center] at (14.4,0.9) {lớp ẩn: ghép $K=8$ đầu;\\lớp ra: lấy trung bình};
+\end{tikzpicture}

@@ -1,0 +1,31 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ---------- dạng gập (folded) ----------
+  \node[cau=cGreen, minimum size=12mm] (h) at (0,0) {$h$};
+  \node[khoiC, minimum width=10mm] (x) at (0,-2.2) {$x_t$};
+  \node[khoiP, minimum width=10mm] (y) at (0,2.2) {$y_t$};
+  \draw[mui] (x) -- node[right, nhan] {$W_{xh}$} (h);
+  \draw[mui] (h) -- node[right, nhan] {$W_{hy}$} (y);
+  \draw[muiM=cRed] (h.east) .. controls +(1.6,0.9) and +(1.6,-0.9) .. node[pos=0.3, above, nhan, text=cRed] {$W_{hh}$} (h.east);
+  \node[tieude] at (0,3.3) {Dạng gập};
+  % ---------- dấu bằng ----------
+  \node[font=\Huge\bfseries, text=cNavy] at (2.75,0) {$=$};
+  % ---------- dạng mở theo thời gian ----------
+  \foreach \t/\lab [count=\i] in {1/1, 2/2, 3/3, 4/T} {
+    \pgfmathsetmacro{\xx}{2.6+2.7*\i}
+    \node[cau=cGreen, minimum size=12mm] (h\i) at (\xx,0) {$h_{\lab}$};
+    \node[khoiC, minimum width=10mm] (x\i) at (\xx,-2.2) {$x_{\lab}$};
+    \node[khoiP, minimum width=10mm] (y\i) at (\xx,2.2) {$y_{\lab}$};
+    \draw[mui] (x\i) -- (h\i);
+    \draw[mui] (h\i) -- (y\i);
+  }
+  \node[khoiX, minimum width=10mm] (h0) at (3.9,0) {$h_0$};
+  \draw[muiM=cRed] (h0) -- (h1);
+  \draw[muiM=cRed] (h1) -- node[above, nhan, text=cRed] {$W_{hh}$} (h2);
+  \draw[muiM=cRed] (h2) -- node[above, nhan, text=cRed] {$W_{hh}$} (h3);
+  \draw[muiM=cRed, dashed] (h3) -- node[above, nhan, text=cRed] {$\cdots$} (h4);
+  \node[tieude] at (9.35,3.3) {Dạng mở theo thời gian (unfold)};
+  \begin{scope}[on background layer]
+    \node[vung=cGreen, fit=(x1)(y4)(h1)(h4)] {};
+  \end{scope}
+  \node[nhan, align=center] at (9.35,-3.35) {Cùng một bộ trọng số $W_{xh}, W_{hh}, W_{hy}$ được dùng chung ở mọi bước thời gian};
+\end{tikzpicture}

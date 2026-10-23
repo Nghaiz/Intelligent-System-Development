@@ -1,0 +1,43 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % đồ thị 5 nút
+  \node[tieude] at (1.5,4.1) {Đồ thị $G=(V,E)$};
+  \node[cau=cBlue] (n1) at (0.3,3.0) {1};
+  \node[cau=cOrange] (n2) at (2.4,3.2) {2};
+  \node[cau=cGreen] (n3) at (1.4,1.6) {3};
+  \node[cau=cPurple] (n4) at (0.2,0.2) {4};
+  \node[cau=cRed] (n5) at (2.8,0.4) {5};
+  \foreach \u/\v in {n1/n2, n1/n3, n2/n3, n3/n4, n3/n5, n2/n5} \draw[very thick, cSlate] (\u) -- (\v);
+  % ma trận kề
+  \begin{scope}[xshift=4.1cm, yshift=0.2cm]
+    \node[tieude] at (1.25,3.9) {Ma trận kề $A$};
+    \foreach \r [count=\i from 0] in {{0,1,1,0,0},{1,0,1,0,1},{1,1,0,1,1},{0,0,1,0,0},{0,1,1,0,0}}{
+      \foreach \val [count=\j from 0] in \r {
+        \ifnum\val=1 \fill[cBlue!55] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55);
+        \else \fill[cBlue!6] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55); \fi
+        \draw[white] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55);
+        \node[font=\small] at (\j*0.55+0.275,3.1-\i*0.55+0.275) {\val};}}
+  \end{scope}
+  % ma trận bậc
+  \begin{scope}[xshift=8.2cm, yshift=0.2cm]
+    \node[tieude] at (1.25,3.9) {Ma trận bậc $D$};
+    \foreach \d [count=\i from 0] in {2,3,4,1,2}{
+      \foreach \j in {0,...,4}{
+        \ifnum\i=\j \fill[cOrange!60] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55);
+          \node[font=\small] at (\j*0.55+0.275,3.1-\i*0.55+0.275) {\d};
+        \else \fill[cOrange!6] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55); \fi
+        \draw[white] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55);}}
+  \end{scope}
+  % Laplacian
+  \begin{scope}[xshift=12.6cm, yshift=0.2cm]
+    \node[tieude] at (1.25,3.9) {Laplacian $L=D-A$};
+    \foreach \r [count=\i from 0] in {{2,-1,-1,0,0},{-1,3,-1,0,-1},{-1,-1,4,-1,-1},{0,0,-1,1,0},{0,-1,-1,0,2}}{
+      \foreach \val [count=\j from 0] in \r {
+        \ifnum\i=\j \fill[cGreen!55] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55);
+        \else \ifnum\val<0 \fill[cRed!35] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55);
+        \else \fill[cGreen!5] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55); \fi\fi
+        \draw[white] (\j*0.55,3.1-\i*0.55) rectangle ++(0.55,0.55);
+        \node[font=\small] at (\j*0.55+0.275,3.1-\i*0.55+0.275) {$\val$};}}
+  \end{scope}
+  \node[nhan, align=center] at (7.8,-0.55) {$A$ đối xứng vì đồ thị vô hướng; $D_{ii}=\sum_j A_{ij}$;
+    $L$ có tổng mỗi hàng bằng 0 và trị riêng nhỏ nhất bằng 0};
+\end{tikzpicture}

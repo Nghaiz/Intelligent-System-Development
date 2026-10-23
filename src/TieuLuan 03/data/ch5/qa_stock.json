@@ -1,0 +1,1146 @@
+[
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 02/03/2020 là bao nhiêu?",
+  "gold": [
+   "D2020-03-02"
+  ],
+  "answer": 69.45549774169922,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto000",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 09/12/2015 là bao nhiêu?",
+  "gold": [
+   "D2015-12-09"
+  ],
+  "answer": 37.58050155639648,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto001",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 07/09/2016 là bao nhiêu?",
+  "gold": [
+   "D2016-09-07"
+  ],
+  "answer": 39.13650131225586,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto002",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 22/11/2023 là bao nhiêu?",
+  "gold": [
+   "D2023-11-22"
+  ],
+  "answer": 139.10000610351562,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto003",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 31/01/2022 là bao nhiêu?",
+  "gold": [
+   "D2022-01-31"
+  ],
+  "answer": 134.197998046875,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto004",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 08/11/2019 là bao nhiêu?",
+  "gold": [
+   "D2019-11-08"
+  ],
+  "answer": 65.26399993896484,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto005",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 31/12/2018 là bao nhiêu?",
+  "gold": [
+   "D2018-12-31"
+  ],
+  "answer": 51.78049850463867,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto006",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của cổ phiếu Google (Alphabet) ngày 05/07/2019 là bao nhiêu?",
+  "gold": [
+   "D2019-07-05"
+  ],
+  "answer": 25286000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto007",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 01/07/2015 là bao nhiêu?",
+  "gold": [
+   "D2015-07-01"
+  ],
+  "answer": 26.09199905395508,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto008",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của cổ phiếu Google (Alphabet) ngày 09/08/2017 là bao nhiêu?",
+  "gold": [
+   "D2017-08-09"
+  ],
+  "answer": 23842000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto009",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của cổ phiếu Google (Alphabet) ngày 05/05/2017 là bao nhiêu?",
+  "gold": [
+   "D2017-05-05"
+  ],
+  "answer": 46.2599983215332,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "sto010",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 02/08/2019 là bao nhiêu?",
+  "gold": [
+   "D2019-08-02"
+  ],
+  "answer": 59.699501037597656,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto011",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 08/03/2023 là bao nhiêu?",
+  "gold": [
+   "D2023-03-08"
+  ],
+  "answer": 94.6500015258789,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto012",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 17/12/2015 là bao nhiêu?",
+  "gold": [
+   "D2015-12-17"
+  ],
+  "answer": 37.47150039672852,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto013",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/04/2017 là bao nhiêu?",
+  "gold": [
+   "D2017-04-27"
+  ],
+  "answer": 43.68000030517578,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto014",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 07/05/2019 là bao nhiêu?",
+  "gold": [
+   "D2019-05-07"
+  ],
+  "answer": 59.02349853515625,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto015",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của cổ phiếu Google (Alphabet) ngày 31/08/2016 là bao nhiêu?",
+  "gold": [
+   "D2016-08-31"
+  ],
+  "answer": 24972000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto016",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của cổ phiếu Google (Alphabet) ngày 05/03/2018 là bao nhiêu?",
+  "gold": [
+   "D2018-03-05"
+  ],
+  "answer": 24044000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto017",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 20/07/2022 là bao nhiêu?",
+  "gold": [
+   "D2022-07-20"
+  ],
+  "answer": 114.6999969482422,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto018",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của cổ phiếu Google (Alphabet) ngày 12/09/2018 là bao nhiêu?",
+  "gold": [
+   "D2018-09-12"
+  ],
+  "answer": 25910000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto019",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 05/05/2020 là bao nhiêu?",
+  "gold": [
+   "D2020-05-05"
+  ],
+  "answer": 66.89600372314453,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto020",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của cổ phiếu Google (Alphabet) ngày 07/09/2018 là bao nhiêu?",
+  "gold": [
+   "D2018-09-07"
+  ],
+  "answer": 28026000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto021",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của cổ phiếu Google (Alphabet) ngày 14/03/2018 là bao nhiêu?",
+  "gold": [
+   "D2018-03-14"
+  ],
+  "answer": 57.071998596191406,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "sto022",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 27/08/2020 là bao nhiêu?",
+  "gold": [
+   "D2020-08-27"
+  ],
+  "answer": 82.68399810791016,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto023",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của cổ phiếu Google (Alphabet) ngày 17/06/2020 là bao nhiêu?",
+  "gold": [
+   "D2020-06-17"
+  ],
+  "answer": 71.56900024414062,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "sto024",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Khối lượng giao dịch của cổ phiếu Google (Alphabet) ngày 27/10/2020 là bao nhiêu?",
+  "gold": [
+   "D2020-10-27"
+  ],
+  "answer": 24580000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto025",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 25/02/2015 là bao nhiêu?",
+  "gold": [
+   "D2015-02-25"
+  ],
+  "answer": 27.236223220825195,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto026",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 13/08/2015 là bao nhiêu?",
+  "gold": [
+   "D2015-08-13"
+  ],
+  "answer": 32.8224983215332,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto027",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 13/09/2017 là bao nhiêu?",
+  "gold": [
+   "D2017-09-13"
+  ],
+  "answer": 46.53300094604492,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto028",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của cổ phiếu Google (Alphabet) ngày 03/06/2022 là bao nhiêu?",
+  "gold": [
+   "D2022-06-03"
+  ],
+  "answer": 113.66799926757812,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "sto029",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 09/05/2017 là bao nhiêu?",
+  "gold": [
+   "D2017-05-09"
+  ],
+  "answer": 46.875,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto030",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 14/04/2015 là bao nhiêu?",
+  "gold": [
+   "D2015-04-14"
+  ],
+  "answer": 26.804906845092773,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto031",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 01/03/2016 là bao nhiêu?",
+  "gold": [
+   "D2016-03-01"
+  ],
+  "answer": 35.180999755859375,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto032",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá mở cửa của cổ phiếu Google (Alphabet) ngày 17/10/2016 là bao nhiêu?",
+  "gold": [
+   "D2016-10-17"
+  ],
+  "answer": 38.9900016784668,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto033",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 15/12/2021 là bao nhiêu?",
+  "gold": [
+   "D2021-12-15"
+  ],
+  "answer": 147.51724243164062,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto034",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 11/01/2023 là bao nhiêu?",
+  "gold": [
+   "D2023-01-11"
+  ],
+  "answer": 92.26000213623048,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto035",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 11/02/2020 là bao nhiêu?",
+  "gold": [
+   "D2020-02-11"
+  ],
+  "answer": 75.43949890136719,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto036",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá thấp nhất của cổ phiếu Google (Alphabet) ngày 12/11/2020 là bao nhiêu?",
+  "gold": [
+   "D2020-11-12"
+  ],
+  "answer": 87.27999877929688,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "sto037",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá đóng cửa của cổ phiếu Google (Alphabet) ngày 12/05/2016 là bao nhiêu?",
+  "gold": [
+   "D2016-05-12"
+  ],
+  "answer": 35.66550064086914,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto038",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "lex",
+  "question": "Giá cao nhất của cổ phiếu Google (Alphabet) ngày 18/12/2018 là bao nhiêu?",
+  "gold": [
+   "D2018-12-18"
+  ],
+  "answer": 52.4739990234375,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto039",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của cổ phiếu Google (Alphabet) vào 2016-10-31.",
+  "gold": [
+   "D2016-10-31"
+  ],
+  "answer": 39.84299850463867,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto040",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của cổ phiếu Google (Alphabet) vào 2021-09-01.",
+  "gold": [
+   "D2021-09-01"
+  ],
+  "answer": 145.8419952392578,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto041",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào ngày 31 tháng 8 năm 2022.",
+  "gold": [
+   "D2022-08-31"
+  ],
+  "answer": 25898000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto042",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá thấp nhất của cổ phiếu Google (Alphabet) vào ngày 9 tháng 11 năm 2018.",
+  "gold": [
+   "D2018-11-09"
+  ],
+  "answer": 52.65549850463867,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "sto043",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào 2023-01-18.",
+  "gold": [
+   "D2023-01-18"
+  ],
+  "answer": 19641600.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto044",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào 2022-11-15.",
+  "gold": [
+   "D2022-11-15"
+  ],
+  "answer": 31831000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto045",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào ngày 4 tháng 8 năm 2016.",
+  "gold": [
+   "D2016-08-04"
+  ],
+  "answer": 22806000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto046",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 7 tháng 10 năm 2019.",
+  "gold": [
+   "D2019-10-07"
+  ],
+  "answer": 60.38399887084961,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto047",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá mở cửa của cổ phiếu Google (Alphabet) vào 2015-02-17.",
+  "gold": [
+   "D2015-02-17"
+  ],
+  "answer": 27.266639709472656,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto048",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 28 tháng 6 năm 2016.",
+  "gold": [
+   "D2016-06-28"
+  ],
+  "answer": 34.00199890136719,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto049",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của cổ phiếu Google (Alphabet) vào 2020-11-24.",
+  "gold": [
+   "D2020-11-24"
+  ],
+  "answer": 88.44400024414062,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto050",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của cổ phiếu Google (Alphabet) vào 2015-03-26.",
+  "gold": [
+   "D2015-03-26"
+  ],
+  "answer": 27.868486404418945,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto051",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của cổ phiếu Google (Alphabet) vào ngày 30 tháng 11 năm 2018.",
+  "gold": [
+   "D2018-11-30"
+  ],
+  "answer": 54.77849960327149,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto052",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá cao nhất của cổ phiếu Google (Alphabet) vào 2016-02-04.",
+  "gold": [
+   "D2016-02-04"
+  ],
+  "answer": 36.34999847412109,
+  "field": "High",
+  "answer_type": "number",
+  "qid": "sto053",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá mở cửa của cổ phiếu Google (Alphabet) vào 2019-11-13.",
+  "gold": [
+   "D2019-11-13"
+  ],
+  "answer": 64.70349884033203,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto054",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá chốt phiên của cổ phiếu Google (Alphabet) vào ngày 23 tháng 1 năm 2015.",
+  "gold": [
+   "D2015-01-23"
+  ],
+  "answer": 26.92358016967773,
+  "field": "Close",
+  "answer_type": "number",
+  "qid": "sto055",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào ngày 6 tháng 1 năm 2016.",
+  "gold": [
+   "D2016-01-06"
+  ],
+  "answer": 38940000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto056",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết giá mở cửa của cổ phiếu Google (Alphabet) vào 2021-06-04.",
+  "gold": [
+   "D2021-06-04"
+  ],
+  "answer": 121.1259994506836,
+  "field": "Open",
+  "answer_type": "number",
+  "qid": "sto057",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết mức giá thấp nhất của cổ phiếu Google (Alphabet) vào 2022-12-19.",
+  "gold": [
+   "D2022-12-19"
+  ],
+  "answer": 88.92500305175781,
+  "field": "Low",
+  "answer_type": "number",
+  "qid": "sto058",
+  "domain": "stock"
+ },
+ {
+  "type": "record",
+  "style": "para",
+  "question": "Cho biết khối lượng khớp lệnh của cổ phiếu Google (Alphabet) vào ngày 14 tháng 8 năm 2018.",
+  "gold": [
+   "D2018-08-14"
+  ],
+  "answer": 26962000.0,
+  "field": "Volume",
+  "answer_type": "number",
+  "qid": "sto059",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 4/2022, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2022-04"
+  ],
+  "answer": 128.61052360534669,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto060",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 6/2018, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2018-06"
+  ],
+  "answer": 59.314300537109375,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto061",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 12/2023, cổ phiếu Google (Alphabet) có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2023-12"
+  ],
+  "answer": 129.39999389648438,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "sto062",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 3/2023, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2023-03"
+  ],
+  "answer": 107.51000213623048,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto063",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 4/2023, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2023-04"
+  ],
+  "answer": 109.62999725341795,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto064",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 8/2015, cổ phiếu Google (Alphabet) có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2015-08"
+  ],
+  "answer": 28.252500534057617,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "sto065",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 6/2017, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2017-06"
+  ],
+  "answer": 47.68834079395641,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto066",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 10/2023, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2023-10"
+  ],
+  "answer": 135.3540909507058,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto067",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 5/2015, cổ phiếu Google (Alphabet) có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2015-05"
+  ],
+  "answer": 26.05425071716309,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "sto068",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 8/2023, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2023-08"
+  ],
+  "answer": 138.39999389648438,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto069",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 5/2018, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2018-05"
+  ],
+  "answer": 55.53749847412109,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto070",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 4/2019, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2019-04"
+  ],
+  "answer": 61.311309814453125,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto071",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 11/2017, cổ phiếu Google (Alphabet) thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2017-11"
+  ],
+  "answer": -0.3988339339388913,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "sto072",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 9/2015, cổ phiếu Google (Alphabet) thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2015-09"
+  ],
+  "answer": 1.7782159910344708,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "sto073",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 4/2017, cổ phiếu Google (Alphabet) thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2017-04"
+  ],
+  "answer": 8.038873107857004,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "sto074",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 1/2021, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2021-01"
+  ],
+  "answer": 96.74299621582033,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto075",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 8/2022, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2022-08"
+  ],
+  "answer": 123.26000213623048,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto076",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 12/2021, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2021-12"
+  ],
+  "answer": 145.65211417458275,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto077",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 4/2020, cổ phiếu Google (Alphabet) thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2020-04"
+  ],
+  "answer": 21.98223768805918,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "sto078",
+  "domain": "stock"
+ },
+ {
+  "type": "month",
+  "style": "lex",
+  "question": "Trong tháng 3/2019, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2019-03"
+  ],
+  "answer": 58.95988137381418,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto079",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2021, cổ phiếu Google (Alphabet) có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2021"
+  ],
+  "answer": 84.94999694824219,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "sto080",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2022, cổ phiếu Google (Alphabet) có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2022"
+  ],
+  "answer": 83.44999694824219,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "sto081",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2019, cổ phiếu Google (Alphabet) thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2019"
+  ],
+  "answer": 27.840509652458945,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "sto082",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2017, cổ phiếu Google (Alphabet) có giá thấp nhất là bao nhiêu?",
+  "gold": [
+   "M-2017"
+  ],
+  "answer": 38.790000915527344,
+  "field": "low",
+  "answer_type": "number",
+  "qid": "sto083",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2023, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2023"
+  ],
+  "answer": 119.61186019897461,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto084",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2015, cổ phiếu Google (Alphabet) có giá cao nhất là bao nhiêu?",
+  "gold": [
+   "M-2015"
+  ],
+  "answer": 38.999000549316406,
+  "field": "high",
+  "answer_type": "number",
+  "qid": "sto085",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2020, cổ phiếu Google (Alphabet) có giá đóng cửa trung bình là bao nhiêu?",
+  "gold": [
+   "M-2020"
+  ],
+  "answer": 74.07019058046605,
+  "field": "mean",
+  "answer_type": "number",
+  "qid": "sto086",
+  "domain": "stock"
+ },
+ {
+  "type": "year",
+  "style": "lex",
+  "question": "Trong năm 2018, cổ phiếu Google (Alphabet) thay đổi bao nhiêu phần trăm?",
+  "gold": [
+   "M-2018"
+  ],
+  "answer": -2.7596272213358253,
+  "field": "chg",
+  "answer_type": "number",
+  "qid": "sto087",
+  "domain": "stock"
+ }
+]

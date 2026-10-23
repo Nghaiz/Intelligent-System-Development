@@ -1,0 +1,46 @@
+\begin{tikzpicture}[x=1cm,y=1cm,
+    op/.style={circle, draw=black!70, thick, fill=white, minimum size=7mm, inner sep=0pt, font=\normalsize\bfseries},
+    gate/.style={rectangle, rounded corners=3pt, draw=#1!60!black, thick, top color=#1!25, bottom color=#1!65,
+                 minimum width=11mm, minimum height=8mm, font=\small\bfseries,
+                 blur shadow={shadow blur steps=4, shadow opacity=25}}]
+  % thân ô
+  \fill[cYellow!10, rounded corners=12pt, draw=cOrange!70!black, very thick,
+        blur shadow={shadow blur steps=6, shadow opacity=25}] (0,-1.05) rectangle (11,5.2);
+  \node[font=\small\bfseries\sffamily, text=cOrange!60!black] at (1.2,4.85) {Ô LSTM};
+  % đường cell state
+  \draw[line width=3pt, cNavy, -{Stealth[length=3.5mm]}] (-1.6,4.2) node[left, font=\normalsize] {$c_{t-1}$} -- (12.6,4.2)
+        node[right, font=\normalsize] {$c_t$};
+  \node[op] (mf) at (2.6,4.2) {$\times$};
+  \node[op] (pa) at (6.2,4.2) {$+$};
+  % cổng
+  \node[gate=cRed]    (f) at (2.6,1.4) {$\sigma$};
+  \node[gate=cGreen]  (i) at (4.4,1.4) {$\sigma$};
+  \node[gate=cBlue]   (g) at (6.2,1.4) {$\tanh$};
+  \node[gate=cPurple] (o) at (8.0,1.4) {$\sigma$};
+  \node[font=\small\bfseries, text=cRed]    at (2.6,-0.55) {$f_t$ quên};
+  \node[font=\small\bfseries, text=cGreen!60!black] at (4.4,-0.55) {$i_t$ vào};
+  \node[font=\small\bfseries, text=cBlue]   at (6.2,-0.55) {$\tilde c_t$ ứng viên};
+  \node[font=\small\bfseries, text=cPurple] at (8.0,-0.55) {$o_t$ ra};
+  \node[op] (mi) at (6.2,2.9) {$\times$};
+  \node[op] (mo) at (9.6,2.2) {$\times$};
+  \node[gate=cTeal, minimum width=9mm] (tc) at (9.6,3.35) {$\tanh$};
+  % đầu vào chung
+  \draw[line width=2pt, black!70] (-1.6,-0.1) node[left, font=\normalsize] {$h_{t-1}$} -- (8.0,-0.1);
+  \node[khoiC, minimum width=10mm] (x) at (1.2,-2.0) {$x_t$};
+  \draw[line width=2pt, black!70] (x.north) |- (1.6,-0.1);
+  \foreach \n in {f,i,g,o} { \draw[mui, black!70] (\n |- 0,-0.1) -- (\n.south); }
+  % nối
+  \draw[mui, cRed] (f) -- (mf);
+  \draw[mui, cGreen!60!black] (i) |- (mi);
+  \draw[mui, cBlue] (g) -- (mi);
+  \draw[mui] (mi) -- (pa);
+  \draw[mui, cTeal] (10.4,4.2) -- (10.4,3.35) -- (tc.east);
+  \draw[mui, cTeal] (tc) -- (mo);
+  \draw[mui, cPurple] (o) |- (mo);
+  \draw[line width=2pt, -{Stealth[length=3mm]}, black!80] (mo) -- (9.6,-0.1) -- (12.6,-0.1) node[right, font=\normalsize] {$h_t$};
+  \draw[line width=2pt, -{Stealth[length=3mm]}, black!80] (10.8,-0.1) -- (10.8,6.2) node[above, font=\normalsize] {$h_t$ (đầu ra)};
+  % công thức
+  \node[align=left, font=\small, anchor=north west, text=cNavy] at (-1.4,-2.8) {%
+    $f_t=\sigma(W_f[h_{t-1},x_t]+b_f)$\qquad $i_t=\sigma(W_i[h_{t-1},x_t]+b_i)$\qquad $\tilde c_t=\tanh(W_c[h_{t-1},x_t]+b_c)$\\[3pt]
+    $c_t=f_t\odot c_{t-1}+i_t\odot\tilde c_t$\qquad $o_t=\sigma(W_o[h_{t-1},x_t]+b_o)$\qquad $h_t=o_t\odot\tanh(c_t)$};
+\end{tikzpicture}

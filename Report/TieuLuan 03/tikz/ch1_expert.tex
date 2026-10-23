@@ -1,0 +1,23 @@
+\begin{tikzpicture}[node distance=1.2cm]
+  \node[cau=cSlate, minimum size=14mm, align=center, font=\small\bfseries] (u) at (0,0) {Người\\dùng};
+  \node[khoiP, minimum width=3.0cm, minimum height=1.3cm, right=1.2cm of u] (ui) {Giao diện\\hỏi -- đáp};
+  \node[khoiC, minimum width=3.4cm, minimum height=1.6cm, right=1.5cm of ui] (ie) {\textbf{Máy suy diễn}\\suy diễn tiến / lùi};
+  \node[csdl=cTeal, minimum width=3.4cm, minimum height=2.3cm, font=\small] (kb) at (13.4,2.4) {\textbf{Cơ sở tri thức}\\luật IF--THEN\\hệ số chắc chắn};
+  \node[csdl=cBlue, minimum width=3.4cm, minimum height=2.1cm, font=\small] (wm) at (13.4,-2.4) {\textbf{Bộ nhớ làm việc}\\sự kiện của ca\\đang xét};
+  \node[khoiG, minimum width=3.0cm, below=1.5cm of ui] (ex) {Mô-đun giải thích\\``vì sao? -- như thế nào?''};
+  \node[khoiR, minimum width=3.0cm] (ke) at (8.2,4.6) {Kỹ sư tri thức};
+  \node[cau=cIndigo, minimum size=18mm, align=center, font=\small\bfseries] (ex2) at (1.6,4.6) {Chuyên\\gia};
+  \draw[mui, <->] (u) -- (ui);
+  \draw[mui, <->] (ui) -- (ie);
+  \draw[mui, <->] (ie) -- (kb);
+  \draw[mui, <->] (ie) -- (wm);
+  \draw[muiM=cGreen!60!black] (ie) |- (ex);
+  \draw[muiM=cGreen!60!black] (ex) -| (u);
+  \draw[muiM=cRed!70!black] (ex2) -- node[above, font=\small] {phỏng vấn, quan sát} (ke);
+  \draw[muiM=cRed!70!black] (ke) -| node[pos=0.3, above, font=\small] {mã hoá luật} (kb);
+  \begin{scope}[on background layer]
+    \node[vung=cOrange, fit=(ie)(kb)(wm), label={[font=\small\bfseries, text=cOrange!50!black]below:Lõi hệ chuyên gia}] {};
+  \end{scope}
+  \node[font=\ttfamily\small, text=cTeal!40!black, align=left, anchor=north west, draw=cTeal!50, fill=white, rounded corners=2pt]
+    at (0.0,-3.6) {IF nhiễm khuẩn gram âm AND hình que\\THEN tác nhân là E.~coli (CF = 0,6)};
+\end{tikzpicture}

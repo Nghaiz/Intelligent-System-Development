@@ -1,0 +1,603 @@
+% =====================================================================
+%  Chương 6 — Học sâu trên đồ thị (làn L6)
+% =====================================================================
+\chapter{Học sâu trên đồ thị (Deep Graph Learning)}
+\label{chap:gnn}
+
+Chương~5 dùng đồ thị tri thức như một \emph{kho} để truy vấn và truy xuất: cạnh được viết ra bởi quy tắc và
+được đọc lại bằng phép duyệt. Chương này đi theo hướng ngược lại: đồ thị trở thành \emph{đầu vào của một mô hình học}.
+Mạng nơ-ron đồ thị (Graph Neural Network -- GNN) học biểu diễn cho nút, cạnh hoặc cả đồ thị bằng cách để mỗi nút
+liên tục trao đổi thông tin với láng giềng. Ta lần lượt đi từ lý do dữ liệu quan hệ cần một kiến trúc riêng, cách biểu
+diễn đồ thị bằng ma trận, khung truyền thông điệp tổng quát, ba kiến trúc kinh điển GCN, GraphSAGE, GAT, các giới hạn
+khi chồng nhiều lớp, rồi kiểm chứng toàn bộ bằng thực nghiệm trên hai mạng trích dẫn Cora và CiteSeer. Ba lớp GNN đều
+được \emph{tự cài} bằng PyTorch thuần (không dùng lớp có sẵn), sau đó đối chiếu với thư viện PyTorch Geometric
+\cite{ch6:fey2019pyg} để chắc rằng cài đặt đúng.
+
+Thuật ngữ ``Deep Graph'' ở đây chỉ học sâu trên dữ liệu đồ thị, không đồng nghĩa với Knowledge Graph: KG là một cách
+tổ chức tri thức, còn GNN là một họ mô hình học. Một KG có thể được truy vấn bằng SPARQL mà không cần GNN, và một GNN
+có thể học trên mạng trích dẫn vốn không được xây như một ontology. Hai hướng gặp nhau ở các bài toán như hoàn thiện
+KG (dự đoán cạnh còn thiếu), được trình bày ở mục~\ref{sec:gnn-link}.
+
+% ---------------------------------------------------------------------
+\section{Từ dữ liệu dạng lưới đến dữ liệu quan hệ}
+\label{sec:gnn-grid}
+
+CNN ở Chương~3 thành công vì ảnh có cấu trúc rất đặc biệt: một lưới đều, mỗi điểm ảnh có đúng tám láng
+giềng xếp theo thứ tự cố định trên--dưới--trái--phải. Nhờ thứ tự đó, một kernel $3\times3$ biết trọng số nào nhân với
+láng giềng nào và có thể dùng chung trên mọi vị trí. RNN ở Chương~4 cũng dựa vào một thứ tự: trục thời
+gian. Rất nhiều dữ liệu thực tế không có thứ tự như vậy: mạng xã hội, mạng trích dẫn khoa học, phân tử hoá học, mạng
+giao thông, đồ thị người dùng -- sản phẩm, hay chính đồ thị tri thức. Ở đó, mỗi nút có số láng giềng khác nhau và
+không có hệ toạ độ chung (Hình~\ref{fig:ch6-grid}).
+
+\hinhtikz{ch6_grid_vs_graph}{Ảnh là trường hợp riêng của đồ thị: lưới đều với láng giềng có thứ tự. Đồ thị tổng quát
+có số láng giềng thay đổi và không có thứ tự toàn cục}{ch6-grid}
+
+Từ quan sát này suy ra yêu cầu cốt lõi với mọi mô hình trên đồ thị. Gọi $P$ là một ma trận hoán vị (đánh số lại các
+nút). Đồ thị không thay đổi khi ta đánh số lại, nên:
+\begin{itemize}
+  \item một hàm dự đoán cho \emph{từng nút} phải \textbf{đồng biến hoán vị} (permutation equivariant):
+        $f(PX, PAP^{\top}) = P\,f(X, A)$ -- đánh số lại đầu vào thì đầu ra đánh số lại theo đúng cách đó;
+  \item một hàm dự đoán cho \emph{cả đồ thị} phải \textbf{bất biến hoán vị} (permutation invariant):
+        $g(PX, PAP^{\top}) = g(X, A)$.
+\end{itemize}
+Một mạng kết nối đầy đủ nhận vector ghép các đặc trưng nút theo thứ tự chỉ số sẽ vi phạm cả hai tính chất: hoán đổi
+nhãn hai nút là đổi đầu ra. Đây là lý do cần các phép tổng hợp không phụ thuộc thứ tự như tổng, trung bình, lấy cực
+đại -- nền tảng của khung truyền thông điệp ở mục~\ref{sec:gnn-mp}.
+
+\begin{dinhnghia}{Định nghĩa: Đồ thị có thuộc tính}
+Một đồ thị có thuộc tính là bộ $G=(V,E,X)$ với tập nút $V$ ($|V|=N$), tập cạnh $E\subseteq V\times V$ và ma trận
+đặc trưng nút $X\in\mathbb R^{N\times d}$ (hàng $x_v$ là đặc trưng của nút $v$). Láng giềng của $v$ là
+$\mathcal N(v)=\{u:(u,v)\in E\}$, bậc của $v$ là $d_v=|\mathcal N(v)|$. Cạnh có thể mang thêm đặc trưng $e_{uv}$
+(loại quan hệ, trọng số, khoảng cách).
+\end{dinhnghia}
+
+% ---------------------------------------------------------------------
+\section{Biểu diễn đồ thị bằng ma trận}
+\label{sec:gnn-matrix}
+
+Máy tính làm việc với đồ thị qua ba ma trận cơ bản (Hình~\ref{fig:ch6-repr}):
+\begin{itemize}
+  \item \textbf{Ma trận kề} $A\in\{0,1\}^{N\times N}$, $A_{uv}=1$ nếu có cạnh $u$--$v$. Đồ thị vô hướng cho $A$ đối
+        xứng. Thực tế $A$ rất thưa (Cora có hơn hai nghìn bảy trăm nút nhưng mỗi nút chỉ khoảng bốn láng giềng), nên
+        được lưu dưới dạng danh sách cạnh \texttt{edge\_index} kích thước $2\times|E|$ hoặc ma trận thưa COO/CSR.
+  \item \textbf{Ma trận bậc} $D=\mathrm{diag}(d_1,\dots,d_N)$ với $d_v=\sum_u A_{vu}$.
+  \item \textbf{Ma trận Laplacian} $L=D-A$ và dạng chuẩn hoá $L_{\text{sym}}=I-D^{-1/2}AD^{-1/2}$.
+\end{itemize}
+
+\hinhtikz{ch6_graph_repr}{Một đồ thị năm nút và ba ma trận biểu diễn nó: ma trận kề, ma trận bậc và Laplacian}{ch6-repr}
+
+Laplacian có ý nghĩa trực quan quan trọng. Với một tín hiệu vô hướng $f\in\mathbb R^N$ gán cho các nút,
+\begin{equation}
+  f^{\top}Lf=\sum_{(u,v)\in E}(f_u-f_v)^2 ,
+  \label{eq:ch6-dirichlet}
+\end{equation}
+tức là tổng bình phương chênh lệch giữa hai đầu mọi cạnh. Đại lượng này (năng lượng Dirichlet) nhỏ khi tín hiệu
+``trơn'' trên đồ thị -- các nút kề nhau có giá trị gần nhau. $L$ đối xứng nửa xác định dương, có phân tích riêng
+$L=U\Lambda U^{\top}$; các vector riêng $U$ đóng vai trò ``các sóng Fourier'' của đồ thị, trị riêng nhỏ ứng với tần
+số thấp (biến thiên chậm), trị riêng lớn ứng với tần số cao. Phép biến đổi Fourier đồ thị của $f$ là $\hat f=U^{\top}f$.
+Đây là cầu nối giữa xử lý tín hiệu và GNN: lọc tín hiệu trên đồ thị nghĩa là nhân phổ $\hat f$ với một hàm $g(\Lambda)$,
+\begin{equation}
+  g_\theta \star f = U\,g_\theta(\Lambda)\,U^{\top} f .
+  \label{eq:ch6-spectral}
+\end{equation}
+Tính trực tiếp~\eqref{eq:ch6-spectral} cần phân tích riêng $O(N^3)$ và bộ lọc không cục bộ. ChebNet
+\cite{ch6:defferrard2016} xấp xỉ $g_\theta$ bằng đa thức Chebyshev bậc $K$ của $L$, khiến bộ lọc chỉ phụ thuộc láng
+giềng trong $K$ bước và tính được bằng phép nhân ma trận thưa. GCN ở mục~\ref{sec:gnn-gcn} là trường hợp $K=1$ với
+một số đơn giản hoá thêm.
+
+Bảng~\ref{tab:ch6-repr-cost} so sánh các cách lưu đồ thị. Toàn bộ mã của chương dùng \texttt{edge\_index} cho
+GraphSAGE và GAT, và ma trận thưa chuẩn hoá $\hat A$ cho GCN.
+
+\begin{table}[H]\centering\caption{Các cách lưu cấu trúc đồ thị và chi phí}\label{tab:ch6-repr-cost}
+{\small\begin{tabular}{L{3.6cm}L{2.6cm}L{3.0cm}L{5.0cm}}
+\toprule
+Cách lưu & Bộ nhớ & Tìm láng giềng & Dùng khi \\
+\midrule
+Ma trận kề đầy đủ & $O(N^2)$ & $O(N)$ & đồ thị nhỏ, dày; minh hoạ \\
+Danh sách cạnh (COO, \texttt{edge\_index}) & $O(|E|)$ & quét $O(|E|)$ & truyền thông điệp bằng \texttt{scatter}/\texttt{index\_add} \\
+Ma trận thưa CSR & $O(N+|E|)$ & $O(d_v)$ & nhân $\hat A H$ nhanh trên GPU/CPU \\
+Danh sách kề & $O(N+|E|)$ & $O(d_v)$ & lấy mẫu láng giềng (GraphSAGE) \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Khung truyền thông điệp}
+\label{sec:gnn-mp}
+
+Gilmer và cộng sự \cite{ch6:gilmer2017} chỉ ra rằng hầu hết GNN đều là trường hợp riêng của khung
+\textbf{truyền thông điệp} (Message Passing Neural Network -- MPNN). Ở lớp $\ell$, mỗi nút $v$ có biểu diễn $h_v^{(\ell)}$
+(khởi đầu $h_v^{(0)}=x_v$) và được cập nhật qua hai bước:
+\begin{align}
+  m_v^{(\ell)} &= \bigoplus_{u\in\mathcal N(v)} \psi^{(\ell)}\!\big(h_u^{(\ell)}, h_v^{(\ell)}, e_{uv}\big)
+  && \text{(AGGREGATE -- tổng hợp thông điệp)} \label{eq:ch6-agg}\\
+  h_v^{(\ell+1)} &= \phi^{(\ell)}\!\big(h_v^{(\ell)}, m_v^{(\ell)}\big)
+  && \text{(UPDATE -- cập nhật)} \label{eq:ch6-upd}
+\end{align}
+trong đó $\psi$ tạo thông điệp trên từng cạnh, $\bigoplus$ là phép tổng hợp \emph{không phụ thuộc thứ tự} (tổng,
+trung bình, max, hoặc tổng có trọng số attention), $\phi$ là một mạng nhỏ (thường là lớp tuyến tính + phi tuyến).
+Vì $\bigoplus$ không quan tâm thứ tự láng giềng và $\psi,\phi$ dùng chung cho mọi nút, mỗi lớp tự động đồng biến hoán
+vị. Hình~\ref{fig:ch6-mp} minh hoạ hai lớp truyền chồng lên nhau.
+
+\hinhtikz{ch6_message_passing}{Truyền thông điệp qua hai lớp: ở mỗi lớp, nút đỏ tổng hợp biểu diễn của láng giềng ở
+lớp dưới. Sau $L$ lớp, trường tiếp nhận (receptive field) của một nút là toàn bộ láng giềng trong $L$ bước}{ch6-mp}
+
+Ba hệ quả quan trọng rút ra từ khung này:
+\begin{enumerate}
+  \item \textbf{Trường tiếp nhận tăng theo số lớp}: sau $L$ lớp, $h_v^{(L)}$ phụ thuộc mọi nút cách $v$ không quá $L$
+        cạnh. Đây là ``chiều sâu'' của GNN, tương tự việc chồng lớp tích chập mở rộng vùng nhìn của CNN.
+  \item \textbf{Chia sẻ tham số}: số tham số không phụ thuộc số nút, nên cùng một mô hình áp dụng được cho đồ thị
+        lớn hơn hoặc đồ thị mới -- nền tảng của học \emph{quy nạp} (inductive).
+  \item \textbf{Giới hạn biểu đạt}: Xu và cộng sự \cite{ch6:xu2019gin} chứng minh MPNN không mạnh hơn phép thử đẳng cấu
+        Weisfeiler--Lehman một chiều; hai nút có cây láng giềng giống nhau sẽ luôn nhận cùng biểu diễn. Tổng hợp bằng
+        \emph{tổng} (đơn ánh trên đa tập) đạt đúng giới hạn đó, còn trung bình và max yếu hơn.
+\end{enumerate}
+
+Về cài đặt, phép~\eqref{eq:ch6-agg} được hiện thực bằng thao tác \texttt{scatter}: gom thông điệp trên từng cạnh
+$(u\to v)$ về chỉ số đích $v$. Trong PyTorch, \texttt{torch.zeros(N,d).index\_add\_(0, dst, msg)} tính tổng thông điệp
+của mọi nút trong một lệnh duy nhất, không cần vòng lặp Python -- toàn bộ các lớp tự cài ở mục~\ref{sec:gnn-exp} đều
+dựa trên thao tác này.
+
+% ---------------------------------------------------------------------
+\section{Ba kiến trúc GNN tiêu biểu}
+\label{sec:gnn-arch}
+
+\subsection{GCN -- mạng tích chập đồ thị}
+\label{sec:gnn-gcn}
+
+Kipf và Welling \cite{ch6:kipf2017} đi từ bộ lọc phổ~\eqref{eq:ch6-spectral}, giới hạn đa thức Chebyshev ở bậc một và
+giả định trị riêng lớn nhất xấp xỉ 2, thu được bộ lọc $g_\theta\star f\approx\theta\,(I+D^{-1/2}AD^{-1/2})f$. Toán tử
+$I+D^{-1/2}AD^{-1/2}$ có trị riêng trong $[0,2]$, chồng nhiều lớp dễ làm bùng nổ hoặc triệt tiêu gradient; tác giả dùng
+``mẹo chuẩn hoá lại'' (renormalization trick): thêm khuyên vào mọi nút, $\tilde A=A+I$, $\tilde D_{vv}=\sum_u\tilde A_{vu}$,
+và định nghĩa lớp GCN cho ma trận đặc trưng nhiều kênh:
+\begin{equation}
+  H^{(\ell+1)}=\sigma\!\Big(\underbrace{\tilde D^{-1/2}\tilde A\tilde D^{-1/2}}_{\hat A}\,H^{(\ell)}\,W^{(\ell)}\Big).
+  \label{eq:ch6-gcn}
+\end{equation}
+Viết theo từng nút, \eqref{eq:ch6-gcn} chính là một trường hợp của truyền thông điệp:
+\begin{equation}
+  h_v^{(\ell+1)}=\sigma\Big(\sum_{u\in\mathcal N(v)\cup\{v\}}\frac{1}{\sqrt{\tilde d_u\tilde d_v}}\,W^{(\ell)\top}h_u^{(\ell)}\Big).
+\end{equation}
+Hệ số $1/\sqrt{\tilde d_u\tilde d_v}$ làm hai việc: nút bậc cao không có biểu diễn lớn bất thường chỉ vì nhiều láng
+giềng, và thông điệp từ một ``nút trung tâm'' (hub) có nhiều cạnh bị giảm trọng số. Hình~\ref{fig:ch6-gcn} tách lớp GCN
+thành hai bước: \emph{truyền} (nhân $\hat A$) và \emph{biến đổi} (nhân $W$). Thứ tự hai phép nhân có thể đổi; khi
+$d'<d$, tính $\hat A(HW)$ rẻ hơn $(\hat AH)W$ -- cài đặt ở Đoạn mã~\ref{code:ch6_gnn__GCNLayer} dùng cách này.
+
+\hinhtikz{ch6_gcn_layer}{Một lớp GCN: trộn đặc trưng theo ma trận kề chuẩn hoá $\hat A$ rồi biến đổi tuyến tính dùng chung}{ch6-gcn}
+
+Nhìn từ góc độ tín hiệu, $\hat A$ là một \emph{bộ lọc thông thấp}: mỗi lần nhân, đặc trưng của nút được thay bằng
+trung bình có trọng số với láng giềng, các thành phần tần số cao (chênh lệch giữa nút kề) bị suy giảm. Trên đồ thị
+\emph{đồng tính} (homophily cao -- nút kề thường cùng nhãn) như mạng trích dẫn, làm trơn như vậy chính là điều ta
+muốn: nhãn của một bài báo được ``bỏ phiếu'' bởi các bài nó trích dẫn. Nhưng lặp lại quá nhiều lần, mọi nút trong một
+thành phần liên thông hội tụ về cùng một vector -- hiện tượng over-smoothing ở mục~\ref{sec:gnn-depth}.
+
+\subsection{GraphSAGE -- học quy nạp bằng lấy mẫu và tổng hợp}
+\label{sec:gnn-sage}
+
+GCN gốc là \emph{chuyển dẫn} (transductive): $\hat A$ của toàn đồ thị phải có sẵn lúc huấn luyện, và mỗi bước cần đặc
+trưng của mọi nút. Hamilton và cộng sự \cite{ch6:hamilton2017} đề xuất GraphSAGE (SAmple and aggreGatE) để học các
+\emph{hàm} sinh biểu diễn, áp dụng được cho nút chưa từng thấy:
+\begin{align}
+  m_v^{(\ell)} &= \mathrm{AGG}^{(\ell)}\big(\{h_u^{(\ell)} : u\in\mathcal S(v)\}\big),\\
+  h_v^{(\ell+1)} &= \sigma\big(W_{\text{self}}^{(\ell)}h_v^{(\ell)} + W_{\text{neigh}}^{(\ell)}m_v^{(\ell)}\big),
+  \qquad h_v^{(\ell+1)}\leftarrow h_v^{(\ell+1)}/\lVert h_v^{(\ell+1)}\rVert_2 \;(\text{tuỳ chọn}).
+\end{align}
+Hai khác biệt so với GCN: (i) \textbf{tách nhánh nút gốc} -- $W_{\text{self}}$ riêng cho chính $v$ thay vì trộn $v$
+vào trung bình như một láng giềng, giữ lại thông tin riêng của nút; (ii) \textbf{lấy mẫu} $\mathcal S(v)$ -- mỗi lớp
+chỉ lấy tối đa $k_\ell$ láng giềng ngẫu nhiên, nên chi phí một nút bị chặn bởi $\prod_\ell k_\ell$ bất kể bậc thật, cho
+phép huấn luyện theo mini-batch trên đồ thị hàng trăm triệu nút (PinSage của Pinterest \cite{ch6:ying2018pinsage} là ví
+dụ triển khai). Hàm tổng hợp có thể là trung bình (mean), max-pooling sau một lớp MLP, hoặc LSTM trên hoán vị ngẫu
+nhiên của láng giềng (Hình~\ref{fig:ch6-sage}).
+
+\hinhtikz{ch6_sage_sampling}{GraphSAGE: lấy mẫu láng giềng có giới hạn ở mỗi bước, tổng hợp từ ngoài vào trong, rồi
+kết hợp với nhánh riêng của nút gốc}{ch6-sage}
+
+Cora và CiteSeer đủ nhỏ để dùng toàn bộ láng giềng, nên phần thực nghiệm cài biến thể \emph{mean} không lấy mẫu
+(Đoạn mã~\ref{code:ch6_gnn__SAGELayer}); điểm khác GCN còn lại là nhánh $W_{\text{self}}$, làm số tham số tăng gấp đôi.
+
+\subsection{GAT -- trọng số láng giềng học được bằng attention}
+\label{sec:gnn-gat}
+
+GCN gán trọng số cố định $1/\sqrt{\tilde d_u\tilde d_v}$, chỉ phụ thuộc bậc. Nhưng không phải láng giềng nào cũng hữu
+ích như nhau: một bài báo về mạng nơ-ron có thể trích dẫn cả một bài về lý thuyết xác suất. Veličković và cộng sự
+\cite{ch6:velickovic2018} để mô hình tự học trọng số bằng cơ chế attention tương tự Transformer, nhưng chỉ trên láng
+giềng thực:
+\begin{align}
+  e_{vu} &= \mathrm{LeakyReLU}\big(\mathbf a^{\top}[\,W h_v \,\Vert\, W h_u\,]\big), \\
+  \alpha_{vu} &= \mathrm{softmax}_{u\in\mathcal N(v)\cup\{v\}}(e_{vu})
+               = \frac{\exp(e_{vu})}{\sum_{k\in\mathcal N(v)\cup\{v\}}\exp(e_{vk})},\\
+  h_v' &= \big\Vert_{k=1}^{K}\,\sigma\Big(\sum_{u\in\mathcal N(v)\cup\{v\}}\alpha_{vu}^{k}W^{k}h_u\Big).
+\end{align}
+Chuẩn hoá softmax phải thực hiện \emph{riêng cho từng nút đích} -- nếu dùng một softmax chung cho mọi cạnh, trọng số
+của một nút sẽ phụ thuộc vào các cạnh không liên quan. Cài đặt ở Đoạn mã~\ref{code:ch6_gnn__scatter_softmax} trừ giá
+trị lớn nhất cục bộ của từng nút trước khi lấy mũ để tránh tràn số. Dùng $K$ đầu attention độc lập rồi ghép lại
+(multi-head) giúp ổn định huấn luyện; ở lớp đầu ra, các đầu được lấy trung bình thay vì ghép
+(Hình~\ref{fig:ch6-gat}).
+
+\hinhtikz{ch6_gat_attention}{GAT: mỗi cạnh có hệ số $\alpha_{vu}$ học được từ đặc trưng hai đầu; nhiều đầu attention
+độc lập được ghép ở lớp ẩn}{ch6-gat}
+
+Cần thận trọng khi diễn giải: trọng số attention cao chỉ cho biết láng giềng đó đóng góp nhiều vào tổng có trọng số,
+\emph{không} phải giải thích nhân quả cho quyết định. Mục~\ref{sec:gnn-exp-attn} kiểm tra điều này trên một nút cụ thể.
+
+\subsection{So sánh ba kiến trúc}
+
+\begin{table}[H]\centering\caption{So sánh GCN, GraphSAGE và GAT}\label{tab:ch6-arch}
+{\small\begin{tabular}{L{3.0cm}L{3.9cm}L{3.9cm}L{3.9cm}}
+\toprule
+ & GCN & GraphSAGE & GAT \\
+\midrule
+Trọng số láng giềng & cố định $1/\sqrt{\tilde d_u\tilde d_v}$ & đều (mean) hoặc học qua pooling/LSTM & học được $\alpha_{vu}$, mỗi đầu một bộ \\
+Nút gốc & như một láng giềng (khuyên) & nhánh $W_{\text{self}}$ riêng & khuyên, có attention riêng \\
+Chế độ học & chuyển dẫn & quy nạp, mini-batch & quy nạp (cục bộ) \\
+Tham số / lớp & $d\,d'$ & $2\,d\,d'$ & $K(d\,d'+2d')$ \\
+Chi phí / lớp & $O(|E|d'+Nd\,d')$ & $O(N k\,d')$ khi lấy mẫu $k$ & $O(K(|E|d'+Nd\,d'))$ \\
+Điểm mạnh & đơn giản, nhanh, mạnh khi homophily cao & đồ thị rất lớn, nút mới & láng giềng nhiễu, bậc chênh lệch \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Các tác vụ học trên đồ thị}
+\label{sec:gnn-tasks}
+
+Cùng một bộ mã hoá GNN có thể phục vụ ba mức tác vụ, khác nhau ở chỗ ``đơn vị'' được dự đoán và cách chia tập
+(Hình~\ref{fig:ch6-tasks}):
+\begin{itemize}
+  \item \textbf{Mức nút} -- dự đoán nhãn của từng nút từ biểu diễn $h_v^{(L)}$ qua một lớp softmax. Trong thiết lập
+        \emph{bán giám sát chuyển dẫn} của Cora, mô hình thấy toàn bộ cấu trúc và đặc trưng, nhưng hàm mất mát chỉ tính
+        trên vài nút có nhãn; nhãn của nút test bị giấu hoàn toàn.
+  \item \textbf{Mức cạnh} -- dự đoán xác suất tồn tại (hoặc loại) của cạnh $(u,v)$ từ cặp $(z_u,z_v)$. Phải \emph{xoá}
+        cạnh test khỏi đồ thị đầu vào, nếu không mô hình chỉ việc ``nhìn thấy'' đáp án qua truyền thông điệp (rò rỉ).
+  \item \textbf{Mức đồ thị} -- dự đoán tính chất của cả đồ thị bằng một phép gộp bất biến hoán vị
+        (readout: tổng/trung bình/max của mọi $h_v$). Đồ thị test phải tách khỏi đồ thị train.
+\end{itemize}
+
+\hinhtikz{ch6_tasks}{Ba mức tác vụ học trên đồ thị và ví dụ ứng dụng của từng mức}{ch6-tasks}
+
+% ---------------------------------------------------------------------
+\section{Over-smoothing, nút thắt và giới hạn độ sâu}
+\label{sec:gnn-depth}
+
+Với CNN, chồng thêm lớp (cùng nối tắt như ResNet) gần như luôn có lợi. GNN thì khác: các mô hình tốt nhất trên Cora chỉ
+có hai lớp, và thêm lớp thường làm kết quả \emph{giảm}. Li và cộng sự \cite{ch6:li2018} chỉ ra nguyên nhân chính: mỗi
+lớp GCN là một bước làm trơn Laplacian; lặp $k$ lần, $\hat A^k X$ hội tụ về một không gian con chỉ phụ thuộc bậc của
+nút, mọi nút trong cùng thành phần liên thông trở nên không phân biệt được (Hình~\ref{fig:ch6-smooth}). Hiện tượng này
+gọi là \textbf{over-smoothing}.
+
+\hinhtikz{ch6_oversmoothing}{Over-smoothing: sau mỗi lớp truyền, biểu diễn các nút (màu) bị trộn với láng giềng; quá
+nhiều lớp làm ba cụm hoà thành một}{ch6-smooth}
+
+Để đo mức làm trơn, Chen và cộng sự \cite{ch6:chen2020mad} đề xuất \textbf{MAD} (Mean Average Distance) -- khoảng cách
+cosine trung bình giữa biểu diễn các cặp nút:
+\begin{equation}
+  \mathrm{MAD}(H)=\frac{1}{N(N-1)}\sum_{u\neq v}\Big(1-\frac{h_u^{\top}h_v}{\lVert h_u\rVert\,\lVert h_v\rVert}\Big).
+\end{equation}
+MAD tiến về 0 nghĩa là mọi nút đã có cùng hướng biểu diễn. Phần thực nghiệm đo MAD theo số lớp, đồng thời thử một
+biện pháp giảm nhẹ là \textbf{nối tắt} (residual) $h^{(\ell+1)}\leftarrow h^{(\ell+1)}+h^{(\ell)}$.
+
+Over-smoothing không phải giới hạn duy nhất:
+\begin{itemize}
+  \item \textbf{Nút thắt thông tin} (over-squashing) \cite{ch6:alon2021}: số nút trong trường tiếp nhận tăng theo hàm
+        mũ của số lớp, nhưng tất cả bị nén vào một vector kích thước cố định; thông tin từ nút ở xa bị ``ép'' qua vài
+        cạnh cầu nối.
+  \item \textbf{Đồ thị dị tính} (heterophily): khi láng giềng thường \emph{khác} nhãn (mạng hẹn hò, mạng giao dịch gian
+        lận), phép làm trơn thông thấp phản tác dụng; cần tách nhánh nút gốc như GraphSAGE hoặc dùng bộ lọc thông cao.
+  \item \textbf{Nút bậc cao và đồ thị lớn}: chi phí bộ nhớ của một lớp tỷ lệ với $|E|$; với hàng tỷ cạnh phải lấy mẫu
+        hoặc phân vùng đồ thị.
+\end{itemize}
+
+\begin{table}[H]\centering\caption{Các giới hạn của GNN sâu và cách kiểm tra}\label{tab:ch6-limits}
+{\small\begin{tabular}{L{3.2cm}L{4.8cm}L{6.4cm}}
+\toprule
+Vấn đề & Hệ quả & Cách đánh giá / giảm nhẹ \\
+\midrule
+Over-smoothing & biểu diễn nút giống nhau sau nhiều lớp & đo MAD theo số lớp; nối tắt, DropEdge, PairNorm \\
+Over-squashing & mất thông tin từ nút ở xa & đo độ nhạy Jacobian; nối lại đồ thị (rewiring) \\
+Heterophily & làm trơn trộn lẫn nhãn khác nhau & thống kê homophily; tách nhánh nút gốc \\
+Đồ thị thay đổi & biểu diễn cũ thiếu cạnh mới & đánh giá theo thời gian; mô hình quy nạp \\
+Nút bậc rất cao & bộ nhớ, độ trễ tăng mạnh & phân bố bậc; lấy mẫu láng giềng \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+% ---------------------------------------------------------------------
+\section{Ứng dụng của học sâu trên đồ thị}
+\label{sec:gnn-apps}
+
+\begin{itemize}
+  \item \textbf{Đồ thị tri thức}: R-GCN \cite{ch6:schlichtkrull2018} mở rộng GCN với ma trận trọng số riêng cho từng
+        loại quan hệ, dùng để phân loại thực thể và hoàn thiện KG (dự đoán bộ ba còn thiếu). Với KG y tế/tài chính ở
+        Chương~5, mô hình như vậy có thể đề xuất cạnh ``thuốc -- tương tác -- thuốc'' chưa được ghi,
+        nhưng đề xuất đó vẫn phải được kiểm chứng bằng nguồn trước khi đưa vào kho.
+  \item \textbf{Hệ gợi ý}: đồ thị hai phía người dùng -- sản phẩm; PinSage \cite{ch6:ying2018pinsage} xử lý đồ thị ba tỷ
+        nút bằng lấy mẫu láng giềng theo bước đi ngẫu nhiên.
+  \item \textbf{Hoá học và dược học}: phân tử là đồ thị nguyên tử -- liên kết; MPNN \cite{ch6:gilmer2017} dự đoán tính
+        chất lượng tử, các mô hình tương tự sàng lọc ứng viên thuốc.
+  \item \textbf{Giao thông, mạng xã hội, phát hiện gian lận}: dự báo lưu lượng trên đồ thị đường, phát hiện tài khoản
+        bất thường qua mẫu giao dịch.
+\end{itemize}
+Khảo sát của Wu và cộng sự \cite{ch6:wu2021survey} phân loại đầy đủ các họ GNN (phổ, không gian, tự mã hoá, theo thời
+gian); phần còn lại của chương tập trung vào nhánh không gian vì đây là nhánh được dùng rộng rãi nhất.
+
+% =====================================================================
+\section{Thực nghiệm: phân loại nút trên mạng trích dẫn}
+\label{sec:gnn-exp}
+
+\subsection{Dữ liệu và thiết lập}
+
+Hai bộ dữ liệu chuẩn Planetoid \cite{ch6:sen2008,ch6:yang2016} được dùng: mỗi nút là một bài báo khoa học, đặc trưng là
+vector túi từ (bag-of-words) nhị phân trên từ điển của bộ dữ liệu, cạnh là quan hệ trích dẫn (coi như vô hướng), nhãn là
+lĩnh vực của bài. Phép chia chuẩn chỉ cho 20 nút có nhãn mỗi lớp để huấn luyện, 500 nút validation và 1.000 nút test --
+đây là bài toán \emph{bán giám sát chuyển dẫn}: mô hình thấy toàn bộ đồ thị và đặc trưng, nhưng chỉ thấy nhãn của khoảng
+5\,\% số nút (Bảng~\ref{tab:ch6-datasets}).
+
+\bang{ch6_datasets}{Thống kê hai mạng trích dẫn Cora và CiteSeer}{ch6-datasets}
+
+Hai thống kê quyết định GNN có lợi hay không. Thứ nhất, \textbf{homophily cạnh} -- tỷ lệ cạnh nối hai bài cùng lĩnh vực
+-- là \SL{ch6_data/Cora/homophilyPct}\,\% trên Cora và \SL{ch6_data/CiteSeer/homophilyPct}\,\% trên CiteSeer: láng giềng
+phần lớn cùng nhãn, nên ``hỏi ý kiến láng giềng'' là chiến lược tốt. Thứ hai, đồ thị \textbf{rất thưa}: bậc trung bình
+chỉ \SL{ch6_data/Cora/deg_mean} (Cora) và \SL{ch6_data/CiteSeer/deg_mean} (CiteSeer), CiteSeer có
+\SL{ch6_data/CiteSeer/isolated} nút cô lập không có cạnh nào -- với những nút này GNN không hơn gì MLP. Phân bố bậc lệch
+mạnh (Hình~\ref{fig:ch6-degree}): đa số bài chỉ có 1--4 trích dẫn, vài bài là ``hub'' với hàng chục đến
+\SL{ch6_data/Cora/deg_max} cạnh. Các lớp cũng không cân bằng (Hình~\ref{fig:ch6-class}).
+
+\hinhpdf{ch6_class_dist}{1}{Số nút theo lớp: Cora (7 lĩnh vực máy học) và CiteSeer (6 lĩnh vực khoa học máy tính)}{ch6-class}
+\hinhpdf{ch6_degree_hist}{1}{Phân bố bậc nút (thang log): đuôi dài, đa số nút có rất ít láng giềng}{ch6-degree}
+
+\subsection{Quy trình và mô hình so sánh}
+
+Hình~\ref{fig:ch6-pipeline} tóm tắt quy trình: nạp đồ thị và chuẩn hoá đặc trưng theo hàng, dựng toán tử đồ thị ($\hat A$
+cho GCN, \texttt{edge\_index} cho GraphSAGE/GAT), huấn luyện bằng entropy chéo chỉ trên nút train, chọn epoch có accuracy
+validation cao nhất (dừng sớm sau 50 epoch không cải thiện) và báo cáo accuracy test tại epoch đó. Năm mô hình được so
+sánh:
+\begin{itemize}
+  \item \textbf{LogReg}: hồi quy logistic trên vector từ, không dùng cạnh (scikit-learn).
+  \item \textbf{MLP}: hai lớp ẩn 64 chiều, dropout 0,5 -- cùng kiến trúc với GCN nhưng \emph{bỏ đồ thị}; đây là phép đối
+        chứng trực tiếp cho giá trị của cạnh.
+  \item \textbf{GCN} \cite{ch6:kipf2017}: hai lớp, 64 chiều ẩn, dropout 0,5, Adam lr 0,01, weight decay $5\cdot10^{-4}$.
+  \item \textbf{GraphSAGE-mean} \cite{ch6:hamilton2017}: cùng cấu hình, tổng hợp trung bình đủ láng giềng.
+  \item \textbf{GAT} \cite{ch6:velickovic2018}: lớp 1 có 8 đầu $\times$ 8 chiều (ghép), lớp 2 một đầu, ELU, dropout 0,6
+        cho cả đặc trưng và hệ số attention -- đúng cấu hình của bài báo gốc.
+\end{itemize}
+Mỗi cấu hình chạy với 5 hạt giống (0--4) và báo cáo trung bình $\pm$ độ lệch chuẩn. Ba lớp GNN được tự cài bằng PyTorch
+thuần với các phép \texttt{index\_add\_}, \texttt{scatter\_reduce} và nhân ma trận thưa; PyTorch Geometric
+\cite{ch6:fey2019pyg} chỉ dùng để tải dữ liệu và để đối chiếu.
+
+\hinhtikz{ch6_pipeline}{Quy trình thực nghiệm phân loại nút: từ đồ thị và đặc trưng đến mô hình, chọn epoch theo
+validation và các phân tích sau huấn luyện}{ch6-pipeline}
+
+\maNguon{ch6_gnn__load_planetoid}{Nạp Cora/CiteSeer với phép chia chuẩn và chuẩn hoá đặc trưng theo hàng}
+\maNguon{ch6_gnn__gcn_norm_adj}{Ma trận kề chuẩn hoá $\hat A=\tilde D^{-1/2}(A+I)\tilde D^{-1/2}$ dạng thưa}
+\maNguon{ch6_gnn__GCNLayer}{Lớp GCN tự cài: biến đổi tuyến tính trước, rồi nhân ma trận thưa $\hat A$}
+\maNguon{ch6_gnn__SAGELayer}{Lớp GraphSAGE-mean: nhánh nút gốc và nhánh trung bình láng giềng bằng \texttt{index\_add\_}}
+\maNguon{ch6_gnn__scatter_softmax}{Softmax theo từng nút đích trên các cạnh -- phần lõi của GAT}
+\maNguon{ch6_gnn__GATLayer}{Lớp GAT nhiều đầu: điểm cạnh, softmax theo láng giềng, tổng có trọng số}
+
+Cài đặt GAT tách vector attention $a=[a_{\text{src}}\,\|\,a_{\text{dst}}]$ thành hai nửa nên điểm của cạnh $(u\to v)$ là
+$a_{\text{src}}^{\top}Wh_u + a_{\text{dst}}^{\top}Wh_v$ -- tính một lần cho mọi nút rồi chỉ việc lấy chỉ số theo cạnh, không
+phải ghép vector trên từng cạnh. Hàm \texttt{scatter\_softmax} trừ giá trị lớn nhất \emph{của từng nút đích} trước khi lấy
+mũ để tránh tràn số. Khuyên tự nối được thêm vào để nút cũng ``chú ý'' tới chính nó.
+
+\maDai{ch6_gnn__GNN}{Mô hình chung: chồng $L$ lớp cùng loại, phi tuyến và dropout giữa các lớp, tuỳ chọn nối tắt}
+\maDai{ch6_gnn__train_node}{Huấn luyện bán giám sát: loss trên nút train, chọn epoch theo accuracy validation, dừng sớm}
+\maNguon{ch6_run__node_classification}{Vòng thực nghiệm chính: 5 mô hình $\times$ 5 hạt giống $\times$ 2 bộ dữ liệu}
+\maNguon{ch6_run__train_one}{Huấn luyện 5 hạt giống cho một cặp (bộ dữ liệu, mô hình) trong tiến trình con riêng}
+
+Việc tách mỗi cặp (bộ dữ liệu, mô hình) ra một tiến trình con là bài học thực tế: trên máy dùng chung với các làn huấn
+luyện khác, tiến trình chạy liên tục nhiều giờ từng chết do lỗi truy cập bộ nhớ native ở đúng một điểm (lớp dropout của
+GCN trên CiteSeer) trong khi cùng mã đó chạy riêng thì không lỗi. Mỗi cặp xong được lưu thành một tệp, nên một lần chết
+chỉ mất phần đang chạy.
+
+\subsection{Kết quả phân loại nút}
+\label{sec:gnn-exp-node}
+
+\bang{ch6_node}{Accuracy test (\%, trung bình $\pm$ độ lệch chuẩn qua 5 hạt giống), số tham số và thời gian huấn luyện
+trên CPU}{ch6-node}
+
+\hinhpdf{ch6_acc_bars}{1}{Accuracy test của năm mô hình trên hai bộ dữ liệu; thanh lỗi là độ lệch chuẩn qua 5 hạt giống}{ch6-acc}
+
+Bảng~\ref{tab:ch6-node} và Hình~\ref{fig:ch6-acc} trả lời câu hỏi chính: \emph{cạnh có giá trị không?} Trên Cora, cùng
+một kiến trúc hai lớp nhưng thêm phép truyền theo đồ thị, GCN đạt \SL{ch6_node/Cora/gcn/test_meanPct}\,\% so với
+\SL{ch6_node/Cora/mlp/test_meanPct}\,\% của MLP -- hơn \SL{ch6_summary/Cora/gain_gcn_mlpPct} điểm phần trăm. Trên
+CiteSeer, mức tăng là \SL{ch6_summary/CiteSeer/gain_gcn_mlpPct} điểm. Mô hình tốt nhất là \SL{ch6_summary/Cora/best} trên
+Cora (\SL{ch6_summary/Cora/best_accPct}\,\%) và \SL{ch6_summary/CiteSeer/best} trên CiteSeer
+(\SL{ch6_summary/CiteSeer/best_accPct}\,\%), nhưng khoảng cách giữa GCN và GAT nhỏ, cùng cỡ với độ lệch chuẩn giữa các hạt
+giống (Hình~\ref{fig:ch6-seed}). Kết luận thực dụng: phần lớn lợi ích đến từ việc \emph{dùng đồ thị}, không phải từ cách
+tổng hợp tinh vi; GraphSAGE, với nhánh nút gốc riêng và gấp đôi tham số, thấp hơn GCN một chút trên cả hai bộ -- trên đồ
+thị đồng tính với rất ít nhãn, trộn nút gốc vào trung bình (như GCN) là một dạng điều chuẩn có ích.
+
+Một chi tiết đáng chú ý: trên CiteSeer, hồi quy logistic (\SL{ch6_node/CiteSeer/logreg/test_meanPct}\,\%) \emph{tốt hơn}
+MLP (\SL{ch6_node/CiteSeer/mlp/test_meanPct}\,\%). Với 120 nút có nhãn và 3.703 đặc trưng, MLP 64 chiều ẩn quá khớp; mô
+hình tuyến tính có điều chuẩn L2 ổn định hơn. GNN tránh được việc này không phải nhờ nhiều tham số hơn (GCN có đúng số
+tham số của MLP) mà nhờ \emph{mỗi nút nhận thêm thông tin từ láng giềng}, tương đương với tăng dữ liệu theo cấu trúc.
+
+\hinhpdf{ch6_curves}{1}{Đường học trên Cora (hạt giống 0): loss huấn luyện và accuracy validation theo epoch}{ch6-curves}
+
+Đường học (Hình~\ref{fig:ch6-curves}) cho thấy loss trên 140 nút train của mọi mô hình về gần 0 rất nhanh, nhưng accuracy
+validation của MLP dừng ở mức thấp: mô hình đã thuộc lòng tập train mà không tổng quát hoá. GCN và GAT đạt đỉnh validation
+sau vài chục epoch rồi đi ngang -- dừng sớm theo validation là cần thiết, vì tiếp tục huấn luyện chỉ làm tăng quá khớp.
+
+\hinhpdf{ch6_seed_box}{1}{Phân bố accuracy test qua 5 hạt giống của từng mô hình (mỗi chấm là một lần chạy)}{ch6-seed}
+\hinhpdf{ch6_time_params}{1}{Số tham số và thời gian một lần huấn luyện trên CPU của bốn mô hình học sâu}{ch6-time}
+
+Về chi phí (Hình~\ref{fig:ch6-time}), số tham số của GCN bằng MLP, GraphSAGE gấp đôi (hai ma trận $W_{\text{self}}$,
+$W_{\text{neigh}}$), GAT gần bằng GCN dù có 8 đầu vì mỗi đầu chỉ 8 chiều. Thời gian đo trên CPU của một máy đang chạy song
+song nhiều tiến trình khác, nên chỉ nên đọc như thứ tự độ lớn: trên đồ thị cỡ vài nghìn nút, một lần huấn luyện GNN mất
+cỡ một đến vài phút trên CPU, và GAT đắt hơn GCN vì phải tính hệ số trên từng cạnh của từng đầu.
+
+\hinhpdf{ch6_confusion}{0.78}{Ma trận nhầm lẫn của GCN trên tập test Cora (hạt giống 0)}{ch6-confusion}
+
+Ma trận nhầm lẫn (Hình~\ref{fig:ch6-confusion}, macro-F1 \SL{ch6_extra/confusion/macro_f1}) cho thấy các lỗi tập trung
+ở những lớp mang tính ``nền'' và hay được trích dẫn chéo: bài \emph{Lý thuyết} bị nhầm sang \emph{Lập luận theo tình
+huống}, bài \emph{Học luật} bị nhầm sang \emph{Lý thuyết}. Các lớp có cộng đồng trích dẫn riêng rõ ràng như mạng nơ-ron
+hay thuật toán di truyền được nhận đúng nhiều nhất. Khi cả từ vựng lẫn láng giềng đều pha trộn giữa các lĩnh vực, cả đặc
+trưng lẫn cấu trúc đều không đủ để phân biệt.
+
+\subsection{Đối chiếu với thư viện PyTorch Geometric}
+
+Để chắc rằng các lớp tự cài đúng, cùng kiến trúc và siêu tham số được dựng lại bằng \texttt{GCNConv} và \texttt{GATConv}
+của PyTorch Geometric (3 hạt giống). Bảng~\ref{tab:ch6-link-pyg} (nửa dưới) cho thấy chênh lệch accuracy trung bình trên
+Cora là \SL{ch6_summary/pyg/diff_gcnPct} điểm với GCN và \SL{ch6_summary/pyg/diff_gatPct} điểm với GAT -- nhỏ hơn độ lệch
+chuẩn giữa các hạt giống. Phần chênh nhỏ của GCN đến từ chi tiết cài đặt (thứ tự khởi tạo tham số, vòng lặp huấn luyện 300
+epoch không dừng sớm của bản PyG), không phải từ công thức.
+
+\maNguon{ch6_run__pyg_crosscheck}{Đối chiếu với GCNConv/GATConv của PyTorch Geometric trên cùng siêu tham số}
+
+% ---------------------------------------------------------------------
+\section{Phân tích: độ sâu, cấu trúc và biểu diễn}
+\label{sec:gnn-analysis}
+
+\subsection{Over-smoothing khi chồng nhiều lớp}
+
+Mục~\ref{sec:gnn-depth} dự đoán rằng chồng nhiều lớp truyền sẽ làm biểu diễn các nút giống nhau. Thực nghiệm huấn luyện
+GCN từ 1 đến 8 lớp (64 chiều ẩn, 3 hạt giống), từ 3 lớp trở lên có thêm phiên bản nối tắt, và đo MAD của biểu diễn ẩn ở
+lớp áp chót (Bảng~\ref{tab:ch6-depth}, Hình~\ref{fig:ch6-depth}).
+
+\bang{ch6_depth}{Accuracy test và MAD của GCN theo số lớp, có và không có nối tắt (Cora)}{ch6-depth}
+\hinhpdf{ch6_depth}{1}{Accuracy (trục trái) và MAD của biểu diễn ẩn (trục phải) theo số lớp GCN trên Cora; dải mờ là
+độ lệch chuẩn qua 3 hạt giống}{ch6-depth}
+
+Hai lớp là tốt nhất (\SL{ch6_summary/depth/best_accPct}\,\%). Một lớp chỉ nhìn láng giềng trực tiếp nên thiếu thông tin;
+từ ba lớp trở đi accuracy giảm dần, rồi \emph{sụp đổ} ở 6--8 lớp: GCN 8 lớp không nối tắt chỉ còn
+\SL{ch6_summary/depth/acc8Pct}\,\%, thấp hơn cả việc luôn đoán lớp phổ biến nhất, và MAD của nó chỉ còn \SL{ch6_summary/depth/mad8} --
+mọi nút gần như có cùng một hướng biểu diễn. Đây đúng là over-smoothing cộng với khó tối ưu của mạng sâu: tín hiệu và
+gradient đi qua quá nhiều phép trung bình. Nối tắt giữ lại một phần biểu diễn cũ ở mỗi lớp nên chặn được sự sụp đổ:
+ở 8 lớp, bản nối tắt đạt \SL{ch6_summary/depth/acc8_resPct}\,\%, hơn \SL{ch6_summary/depth/res_gain8Pct} điểm. Tuy vậy
+nó vẫn không vượt được GCN 2 lớp -- trên Cora, thêm lớp không mang lại thông tin mới đủ để bù chi phí.
+
+\hinhpdf{ch6_propagation}{1}{MAD của $\hat A^k X$ khi lan truyền đặc trưng thô $k$ lần, không có tham số học}{ch6-prop}
+
+Để tách over-smoothing khỏi việc huấn luyện, Hình~\ref{fig:ch6-prop} lặp phép nhân $\hat A$ lên đặc trưng thô mà không có
+trọng số nào: MAD giảm đơn điệu từ \SL{ch6_depth/propagation/0/mad} (đặc trưng gốc) xuống \SL{ch6_depth/propagation/7/mad}
+sau 64 lần. Đây là bản chất lọc thông thấp của $\hat A$ (mục~\ref{sec:gnn-gcn}): mỗi lần nhân, thành phần ``khác biệt''
+giữa nút kề bị san bằng thêm, và giới hạn của $\hat A^k X$ khi $k\to\infty$ chỉ còn phụ thuộc bậc của nút. Mô hình có học
+bù được một phần nhờ các ma trận $W$, nhưng không bù được mãi.
+
+\maNguon{ch6_gnn__mad}{Độ đo MAD: khoảng cách cosine trung bình giữa biểu diễn các cặp nút}
+\maNguon{ch6_run__depth_study}{Thí nghiệm độ sâu: GCN 1--8 lớp, có/không nối tắt, và lan truyền thuần không học}
+
+\subsection{Giá trị của cấu trúc đồ thị}
+
+GNN thắng MLP vì cạnh mang thông tin, nhưng thông tin đó là gì? Thí nghiệm can thiệp vào cạnh rồi huấn luyện lại GCN:
+\emph{bỏ} ngẫu nhiên một tỷ lệ cạnh, hoặc \emph{nối lại} -- giữ nguyên số cạnh nhưng thay một đầu bằng một nút ngẫu nhiên
+(Bảng~\ref{tab:ch6-perturb}, Hình~\ref{fig:ch6-perturb}).
+
+\bang{ch6_perturb}{Accuracy GCN trên Cora khi bỏ hoặc nối lại ngẫu nhiên một phần cạnh, và homophily của đồ thị sau can
+thiệp}{ch6-perturb}
+\hinhpdf{ch6_perturb}{0.95}{Accuracy GCN theo tỷ lệ cạnh bị can thiệp; đường chấm là MLP không dùng cạnh}{ch6-perturb}
+
+Kết quả cho thấy hai điều. Bỏ cạnh làm accuracy giảm từ từ (\SL{ch6_summary/perturb/fullPct}\,\% $\to$
+\SL{ch6_summary/perturb/drop50Pct}\,\% khi bỏ một nửa) và khi bỏ hết thì GCN chỉ còn
+\SL{ch6_summary/perturb/drop100Pct}\,\% -- trở về mức của MLP, đúng như dự đoán vì $\hat A$ khi đó chỉ còn khuyên tự nối.
+Nhưng \emph{cạnh sai còn tệ hơn không có cạnh}: nối lại toàn bộ cạnh ngẫu nhiên kéo homophily xuống
+\SL{ch6_summary/perturb/homo_shuf100Pct}\,\% và accuracy xuống \SL{ch6_summary/perturb/shuf100Pct}\,\%, thấp hơn hẳn
+MLP (chênh lệch \SL{ch6_summary/perturb/shuf100_vs_mlpPct} điểm). Mô hình vẫn ``tin'' láng giềng và trung bình hoá đặc trưng của các bài
+báo không liên quan, làm hỏng chính đặc trưng của nút. Bài học thực tế: trước khi dùng GNN, hãy kiểm tra homophily và chất
+lượng cạnh; một đồ thị nhiễu có thể làm mô hình kém hơn việc bỏ qua đồ thị.
+
+\maNguon{ch6_gnn__homophily}{Homophily cạnh: tỷ lệ cạnh nối hai nút cùng nhãn}
+\maNguon{ch6_run__edge_perturbation}{Can thiệp vào cấu trúc: bỏ cạnh hoặc nối lại đầu cạnh ngẫu nhiên, huấn luyện lại GCN}
+
+\subsection{Nút nào được lợi từ đồ thị?}
+
+\hinhpdf{ch6_degree_acc}{1}{Accuracy test trên Cora theo nhóm bậc của nút: MLP, GCN và GAT}{ch6-degree-acc}
+
+Chia nút test theo bậc (Hình~\ref{fig:ch6-degree-acc}): MLP gần như không đổi theo bậc vì nó không nhìn cạnh, còn GCN và
+GAT tốt dần khi nút có nhiều láng giềng. Với nút chỉ có một láng giềng, GCN hơn MLP \SL{ch6_summary/degree/low_gainPct}
+điểm; với nút từ 9 láng giềng trở lên, mức hơn là \SL{ch6_summary/degree/high_gainPct} điểm. Nhiều láng giềng nghĩa là
+nhiều ``phiếu bầu'' hơn, và trên đồ thị đồng tính, đa số phiếu thường đúng. Ngược lại, đây cũng là điểm yếu: nút mới, ít
+liên kết (bài báo vừa xuất bản, người dùng mới) nhận được ít lợi ích nhất -- bài toán ``khởi đầu lạnh'' quen thuộc của hệ
+gợi ý.
+
+\subsection{Không gian biểu diễn}
+
+\hinhpdf{ch6_tsne}{1}{t-SNE của đặc trưng thô (trái), biểu diễn ẩn của GCN (giữa) và của GAT (phải) trên Cora, tô màu
+theo nhãn thật}{ch6-tsne}
+
+Hình~\ref{fig:ch6-tsne} chiếu ba không gian về hai chiều bằng t-SNE \cite{ch6:maaten2008}. Đặc trưng túi từ thô gần như
+không tách lớp (hệ số silhouette theo cosine \SL{ch6_extra/tsne/raw/silhouette}); sau một lớp GCN, các lớp thành cụm rõ
+(silhouette \SL{ch6_extra/tsne/gcn/silhouette}), GAT tương tự (\SL{ch6_extra/tsne/gat/silhouette}). Lưu ý rằng mô hình
+chỉ thấy nhãn của 140 nút: cụm hình thành được là nhờ lan truyền đặc trưng qua cạnh, không phải nhờ giám sát dày đặc.
+
+\subsection{GAT thực sự ``chú ý'' vào đâu?}
+\label{sec:gnn-exp-attn}
+
+\hinhpdf{ch6_gat_attn}{1}{Hệ số attention lớp 1 (trung bình 8 đầu; chấm đen là từng đầu) của GAT cho các láng giềng của
+một nút test bậc vừa trên Cora}{ch6-gat-attn}
+
+Mục~\ref{sec:gnn-gat} cảnh báo rằng hệ số attention không nhất thiết là lời giải thích. Hình~\ref{fig:ch6-gat-attn} lấy
+nút test \SL{ch6_extra/gat_attention/node} có \SL{ch6_summary/gat/n_neighbors} láng giềng (kể cả chính nó). Kết quả bất
+ngờ nhưng có tính đại diện: các hệ số gần như \emph{bằng nhau} (lớn nhất chỉ \SL{ch6_summary/gat/max_alpha}, xấp xỉ
+$1/8$), và cả tám đầu cho cùng một phân bố. Trên Cora, GAT học được attention gần đều -- tức là gần với một phép trung bình
+như GCN -- và điều đó giải thích vì sao hai mô hình có accuracy gần như nhau. Nhận xét này trùng với các phân tích sau
+bài báo gốc: trên đồ thị đồng tính, ít nhiễu, chẳng có láng giềng nào cần bị ``tắt'', nên attention không có gì để học.
+Nó cũng cho thấy không nên đọc một bản đồ attention như lời giải thích mà không kiểm tra xem nó có khác đều hay không.
+
+\maNguon{ch6_run__gat_attention}{Trích hệ số attention của GAT cho các láng giềng của một nút}
+
+% ---------------------------------------------------------------------
+\section{Dự đoán liên kết bằng Graph Auto-Encoder}
+\label{sec:gnn-link}
+
+Bài toán mức cạnh hỏi: \emph{hai nút chưa nối có nên được nối không?} -- chính là hoàn thiện đồ thị tri thức hay gợi ý
+trích dẫn. Graph Auto-Encoder \cite{ch6:kipf2016gae} dùng một GCN hai lớp làm bộ mã hoá ra vector $z_v$ cho mỗi nút và bộ
+giải mã đơn giản $\hat p(u,v)=\sigma(z_u^{\top}z_v)$ (Hình~\ref{fig:ch6-gae}). Cạnh của Cora được chia 85/5/10\,\% thành
+train/validation/test (\SL{ch6_link/train_edges} cạnh train, \SL{ch6_link/test_edges} cạnh test); bộ mã hoá chỉ thấy cạnh
+train, mỗi epoch lấy ngẫu nhiên số mẫu âm (cặp không nối) bằng số cạnh dương, và loss là entropy chéo nhị phân.
+
+\hinhtikz{ch6_gae}{Graph Auto-Encoder: bộ mã hoá GCN tạo biểu diễn nút, bộ giải mã tích vô hướng chấm điểm từng cặp
+nút}{ch6-gae}
+
+\maNguon{ch6_gnn__GAE}{Graph Auto-Encoder: bộ mã hoá GCN hai lớp và bộ giải mã tích vô hướng}
+\maDai{ch6_run__link_prediction}{Huấn luyện GAE: chia cạnh, lấy mẫu âm mỗi epoch, chọn mô hình theo AUC validation}
+
+\bang{ch6_link_pyg}{Dự đoán liên kết bằng GAE (3 hạt giống) và đối chiếu lớp tự cài với PyTorch Geometric}{ch6-link-pyg}
+\hinhpdf{ch6_link_curve}{1}{Loss huấn luyện và AUC validation của GAE theo epoch (hạt giống 0)}{ch6-link}
+
+GAE đạt AUC test \SL{ch6_link/test_auc_meanPct}\,\% và AP \SL{ch6_link/test_ap_meanPct}\,\%
+(Bảng~\ref{tab:ch6-link-pyg}): với một cặp (cạnh thật, cặp ngẫu nhiên), mô hình xếp cạnh thật cao hơn trong khoảng chín
+trên mười trường hợp, dù không có nhãn chủ đề nào được dùng. AUC validation tăng nhanh trong khoảng 100 epoch đầu rồi tăng chậm dần
+(Hình~\ref{fig:ch6-link}). Cần đọc con số này đúng bối cảnh: mẫu âm là cặp ngẫu nhiên nên phần lớn rất dễ loại (hai bài
+khác hẳn chủ đề); trong ứng dụng thật, như hoàn thiện KG ở Chương~5, mẫu âm khó hơn nhiều và mọi cạnh được đề xuất vẫn
+phải được kiểm chứng bằng nguồn.
+
+% ---------------------------------------------------------------------
+\section{Triển khai mô hình lên Web App}
+\label{sec:gnn-deploy}
+
+Mô hình GCN, GraphSAGE, GAT và MLP huấn luyện trên Cora (hạt giống 0) được lưu và phục vụ qua \texttt{tl3/serve\_ch6.py}.
+Trải nghiệm \texttt{ch6\_cora} có kiểu ``graph'': người dùng nhập mã một bài báo (nút 0--2707) và chọn mô hình; hàm
+\texttt{predict} trả về chủ đề dự đoán, phân bố xác suất trên 7 chủ đề, nhãn thật, nút thuộc tập nào (train, validation,
+test hay không gán nhãn), bậc của nút và danh sách láng giềng kèm nhãn của chúng. Vì GNN chuyển dẫn tính biểu diễn cho cả
+đồ thị một lượt, mô-đun chạy mô hình trên toàn bộ Cora một lần khi nạp (trên CPU, đồ thị nhỏ) rồi chỉ tra kết quả cho từng
+yêu cầu. Hiển thị láng giềng cùng nhãn giúp người dùng thấy trực tiếp cơ chế ``hỏi ý kiến láng giềng'': khi đa số láng
+giềng cùng chủ đề, GNN đúng ngay cả với nút mà MLP sai.
+
+\maNguon{serve_ch6__SPECS}{Khai báo trải nghiệm \texttt{ch6\_cora} cho Web App}
+\maDai{serve_ch6__predict}{Hàm suy luận: mã nút $\to$ chủ đề, xác suất, láng giềng và nhãn thật}
+
+\anhUI{ch6_cora_web}{Phân loại bài báo trên đồ thị trích dẫn Cora trong Web App (desktop): chủ đề dự đoán, phân bố xác
+suất và láng giềng}{ch6-ui-web}
+\anhMobile{ch6_cora_mobile}{Trải nghiệm phân loại nút Cora trên khung điện thoại 390 px}{ch6-ui-mobile}
+
+% ---------------------------------------------------------------------
+\section{Kết luận chương}
+
+Chương này đi từ lý do dữ liệu quan hệ cần một kiến trúc riêng, qua ba ma trận biểu diễn đồ thị và khung truyền thông
+điệp, tới ba kiến trúc GCN, GraphSAGE, GAT -- tự cài bằng PyTorch thuần và khớp với thư viện chuẩn. Thực nghiệm trên hai
+mạng trích dẫn cho các kết luận có số liệu:
+\begin{itemize}
+  \item \textbf{Cạnh có giá trị lớn}: cùng kiến trúc, dùng đồ thị nâng accuracy thêm \SL{ch6_summary/Cora/gain_gcn_mlpPct}
+        điểm trên Cora và \SL{ch6_summary/CiteSeer/gain_gcn_mlpPct} điểm trên CiteSeer khi chỉ có 20 nhãn mỗi lớp.
+  \item \textbf{Kiến trúc ít quan trọng hơn dữ liệu}: GAT tốt nhất nhưng chỉ hơn GCN trong phạm vi độ lệch chuẩn; attention
+        học được gần như đều.
+  \item \textbf{Sâu hơn không tốt hơn}: hai lớp là tối ưu; tám lớp không nối tắt sụp về \SL{ch6_summary/depth/acc8Pct}\,\%
+        với MAD gần 0, nối tắt cứu lại được phần lớn.
+  \item \textbf{Cạnh sai còn tệ hơn không có cạnh}: nối lại ngẫu nhiên toàn bộ cạnh khiến GCN kém MLP; homophily là điều
+        kiện cần kiểm tra trước khi chọn GNN.
+  \item \textbf{Dự đoán liên kết} không cần nhãn: GAE đạt AUC \SL{ch6_link/test_auc_meanPct}\,\%, nền tảng cho hoàn thiện
+        đồ thị tri thức.
+\end{itemize}
+Các giới hạn: thực nghiệm dùng hai đồ thị nhỏ, đồng tính, chuyển dẫn; trên đồ thị dị tính, đồ thị rất lớn hoặc thay đổi
+theo thời gian, thứ tự các mô hình có thể khác và cần lấy mẫu láng giềng như GraphSAGE.

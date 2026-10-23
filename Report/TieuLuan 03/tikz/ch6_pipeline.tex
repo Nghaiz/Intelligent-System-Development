@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm, node distance=0.6cm]
+  \node[csdl=cTeal] (d) at (0,0) {Planetoid\\Cora\\CiteSeer};
+  \node[khoi, text width=2.8cm, right=0.8cm of d] (pre) {Chuẩn hoá đặc trưng theo hàng; đối xứng hoá cạnh};
+  \node[khoiC, text width=2.8cm, right=0.8cm of pre] (split) {Mặt nạ chuẩn: 20 nút/lớp train, 500 val, 1.000 test};
+  \node[khoiP, text width=3.0cm, right=0.8cm of split] (models) {LogReg, MLP\\GCN, GraphSAGE, GAT\\(PyTorch thuần)};
+  \node[khoiG, text width=2.8cm, below=1.2cm of models] (train) {Adam, lr 0{,}01, wd $5\cdot10^{-4}$; chọn epoch theo val};
+  \node[khoiR, text width=2.8cm, left=0.8cm of train] (eval) {5 seed: trung bình $\pm$ độ lệch; F1, ma trận nhầm lẫn};
+  \node[khoiT, text width=2.8cm, left=0.8cm of eval] (ana) {Độ sâu, MAD, nhiễu cạnh, t-SNE, attention, GAE};
+  \node[khoiX, text width=2.6cm, left=0.8cm of ana] (serve) {serve\_ch6.py\\$\rightarrow$ Web App};
+  \draw[mui] (d) -- (pre); \draw[mui] (pre) -- (split); \draw[mui] (split) -- (models);
+  \draw[mui] (models) -- (train); \draw[mui] (train) -- (eval); \draw[mui] (eval) -- (ana); \draw[mui] (ana) -- (serve);
+  \foreach \n/\k in {d/1, pre/2, split/3, models/4, train/5, eval/6, ana/7, serve/8}
+    \node[buoc] at (\n.north west) {\k};
+\end{tikzpicture}

@@ -1,0 +1,21 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % (a) kết nối đầy đủ
+  \node[tieude, align=center] at (2.2,5.6) {(a) Kết nối đầy đủ\\(MLP)};
+  \foreach \i in {0,...,6}{\node[cau=cBlue, minimum size=6mm] (a\i) at (0,4.6-\i*0.75) {};}
+  \foreach \j in {0,...,4}{\node[cau=cOrange, minimum size=6mm] (b\j) at (4.4,4.0-\j*0.8) {};}
+  \foreach \i in {0,...,6}{\foreach \j in {0,...,4}{\draw[gray!55] (a\i) -- (b\j);}}
+  \node[font=\small, align=center, text width=6.4cm, anchor=north] at (2.2,-0.4) {Mỗi nơ-ron nối \emph{mọi} điểm ảnh.
+    Ảnh $224{\times}224{\times}3$ vào 1.000 nơ-ron: $\approx$150 triệu trọng số.};
+  % (b) cục bộ + chia sẻ
+  \begin{scope}[xshift=8.6cm]
+  \node[tieude, align=center] at (2.2,5.6) {(b) Cục bộ + chia sẻ\\trọng số (CNN)};
+  \foreach \i in {0,...,6}{\node[cau=cBlue, minimum size=6mm] (c\i) at (0,4.6-\i*0.75) {};}
+  \foreach \j in {0,...,4}{\node[cau=cGreen, minimum size=6mm] (d\j) at (4.4,4.0-\j*0.8) {};}
+  \foreach \j in {0,...,4}{
+    \pgfmathtruncatemacro{\pb}{\j+1}\pgfmathtruncatemacro{\pc}{\j+2}
+    \draw[cRed, very thick] (c\j) -- (d\j); \draw[cPurple, very thick] (c\pb) -- (d\j); \draw[cTeal, very thick] (c\pc) -- (d\j);}
+  \node[font=\small, align=left] at (5.6,2.4) {\textcolor{cRed}{$w_1$}\\\textcolor{cPurple}{$w_2$}\\\textcolor{cTeal}{$w_3$}};
+  \node[font=\small, align=center, text width=6.4cm, anchor=north] at (2.2,-0.4) {Mỗi nơ-ron chỉ nhìn một vùng nhỏ; cùng bộ $(w_1,w_2,w_3)$
+    dùng lại ở mọi vị trí. Conv $3{\times}3$, $3\to64$ kênh: 1.792 tham số, bất kể kích thước ảnh.};
+  \end{scope}
+\end{tikzpicture}

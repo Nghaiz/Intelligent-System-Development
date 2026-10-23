@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % chuỗi 16 ô
+  \foreach \k in {1,...,16} {
+    \pgfmathsetmacro{\hh}{0.9+0.55*sin(\k*40)+0.03*\k}
+    \fill[cSky!40, draw=cBlue!60] (\k*0.85,0) rectangle ++(0.7,\hh);
+    \node[font=\scriptsize] at (\k*0.85+0.35,-0.3) {$x_{\k}$};
+  }
+  % ba cửa sổ
+  \foreach \s/\col/\yy/\lab in {1/cGreen/-1.2/1, 2/cOrange/-2.4/2, 3/cPurple/-3.6/3} {
+    \pgfmathsetmacro{\a}{\s*0.85-0.05}
+    \pgfmathsetmacro{\b}{(\s+7)*0.85+0.75}
+    \pgfmathsetmacro{\t}{(\s+8)*0.85}
+    \fill[\col!25, draw=\col!70!black, thick, rounded corners=3pt] (\a,\yy-0.35) rectangle (\b,\yy+0.35);
+    \node[font=\small\bfseries, text=\col!50!black] at ({(\a+\b)/2},\yy) {$X_{\lab} = [x_{\lab},\dots,x_{\the\numexpr\lab+7\relax}]$};
+    \fill[cRed!70, draw=cRed!60!black, rounded corners=3pt] (\t,\yy-0.35) rectangle ++(0.7,0.7);
+    \node[font=\small\bfseries, text=white] at (\t+0.35,\yy) {$y$};
+    \draw[mui, \col!70!black] (\b,\yy) -- (\t,\yy);
+  }
+  \node[nhan, anchor=west] at (13.9,-1.2) {$y_1 = x_9$};
+  \node[nhan, anchor=west] at (13.9,-2.4) {$y_2 = x_{10}$};
+  \node[nhan, anchor=west] at (13.9,-3.6) {$y_3 = x_{11}$};
+  \node[khoiX, align=center] at (7.2,-5.0) {Cửa sổ trượt bước 1: $N$ quan sát $\Rightarrow$ $N - w$ mẫu \;(ở đây $w=8$; trong thực nghiệm $w=30$)};
+\end{tikzpicture}

@@ -1,0 +1,30 @@
+\begin{tikzpicture}[node distance=0.32cm, every node/.style={font=\small}]
+  % Basic
+  \node[tieude, align=center] at (0,1.1) {Basic CNN\\(NumPy = PyTorch = TensorFlow)};
+  \node[khoiX, minimum width=5.2cm] (b0) at (0,0) {Ảnh $H{\times}W{\times}C$, chuẩn hoá $[0,1]$};
+  \node[khoi, below=of b0, minimum width=5.2cm] (b1) {Conv $3{\times}3$, 32, pad 1 + ReLU};
+  \node[khoiP, below=of b1, minimum width=5.2cm] (b2) {MaxPool $2{\times}2$};
+  \node[khoi, below=of b2, minimum width=5.2cm] (b3) {Conv $3{\times}3$, 64, pad 1 + ReLU};
+  \node[khoiP, below=of b3, minimum width=5.2cm] (b4) {MaxPool $2{\times}2$};
+  \node[khoiC, below=of b4, minimum width=5.2cm] (b5) {Flatten $\to$ FC 128 + ReLU};
+  \node[khoiR, below=of b5, minimum width=5.2cm] (b6) {FC $K$ + Softmax};
+  \node[below=0.35cm of b6, align=center, text=cSlate, text width=5.6cm] (bo) {Adam $\eta=10^{-3}$ hằng số, CE thường;
+    không tăng cường, không BatchNorm};
+  \foreach \a/\b in {b0/b1,b1/b2,b2/b3,b3/b4,b4/b5,b5/b6}{\draw[mui] (\a) -- (\b);}
+  % Improved
+  \begin{scope}[xshift=8.9cm]
+  \node[tieude, align=center] at (0,1.1) {Improved CNN\\(PyTorch, TensorFlow)};
+  \node[khoiX, minimum width=6.8cm] (i0) at (0,0) {Ảnh $\to$ \textbf{tăng cường} (lật, xoay, dịch, zoom, sáng)};
+  \node[khoiT, below=of i0, minimum width=6.8cm] (i1) {Chuẩn hoá theo kênh $(x-\mu_c)/\sigma_c$};
+  \node[khoi, below=of i1, minimum width=6.8cm] (i2) {Stem: Conv $3{\times}3$ + \textbf{BatchNorm} + ReLU};
+  \node[khoiG, below=of i2, minimum width=6.8cm, minimum height=13mm] (i3) {\textbf{ResBlock}$(w_\ell)$ $\to$ MaxPool $\to$ \textbf{Dropout} $0{,}1\ell$\\
+     lặp $L$ lần, $w=(32,64,128[,256])$ hoặc $(64,128,256)$};
+  \node[khoiC, below=of i3, minimum width=6.8cm] (i4) {Global Average Pooling $\to$ FC 256 + Dropout 0,4};
+  \node[khoiR, below=of i4, minimum width=6.8cm] (i5) {FC $K$ + Softmax};
+  \node[below=0.35cm of i5, align=center, text=cSlate, text width=7cm] (io) {AdamW + OneCycle/Cosine (đỉnh $3\cdot10^{-3}$),
+    weight decay $5\cdot10^{-4}$, label smoothing 0,1, giữ trọng số có val accuracy tốt nhất};
+  \foreach \a/\b in {i0/i1,i1/i2,i2/i3,i3/i4,i4/i5}{\draw[mui] (\a) -- (\b);}
+  \draw[muiM=cGreen!60!black] (i3.south east) ++(0.1,0.15) arc[start angle=-60, end angle=60, radius=0.5];
+  \node[font=\scriptsize, text=cGreen!50!black] at ([xshift=0.75cm]i3.east) {$\times L$};
+  \end{scope}
+\end{tikzpicture}

@@ -1,0 +1,37 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % trục thời gian
+  \fill[cNavy!8, rounded corners=4pt] (-0.4,-1.55) rectangle (15.9,-0.35);
+  \draw[line width=2.2pt, cNavy, -{Stealth[length=4mm]}] (-0.4,-0.35) -- (16.0,-0.35);
+  \foreach \i/\h/\c/\nam in {
+      0/1.2/cSlate/{trước\\1943},
+      1/2.0/cIndigo/{1943--\\1956},
+      2/3.6/cBlue/{1956--\\1974},
+      3/1.0/cSky/{1974--\\1980},
+      4/3.2/cTeal/{1980--\\1987},
+      5/0.9/cGreen/{1987--\\1993},
+      6/2.4/cLime/{1993--\\2011},
+      7/3.4/cYellow/{2012--\\2017},
+      8/4.2/cOrange/{2017--\\2022},
+      9/5.0/cRed/{2022--\\nay}} {
+    \pgfmathsetmacro{\x}{\i*1.58}
+    \pgfmathtruncatemacro{\so}{\i+1}
+    \khoibaD{\x}{0}{1.15}{\h}{0.9}{\c}
+    \node[font=\small\bfseries, text=\c!50!black, align=center] at (\x+0.58,-0.95) {\nam};
+    \node[buoc=\c!70!black, minimum size=7mm] at (\x+0.8,\h+0.95) {\so};
+  }
+  % chú giải tên giai đoạn
+  \foreach \so/\c/\ten/\cot/\hang in {
+      1/cSlate/{Tiền đề: logic, máy tính}/0/0,
+      2/cIndigo/{Khai sinh, Hội thảo Dartmouth}/0/1,
+      3/cBlue/{Thành công bước đầu}/0/2,
+      4/cSky/{Mùa đông AI thứ nhất}/0/3,
+      5/cTeal/{Hệ chuyên gia}/0/4,
+      6/cGreen/{Mùa đông AI thứ hai}/8/0,
+      7/cLime/{Học máy thống kê}/8/1,
+      8/cYellow/{Bùng nổ học sâu}/8/2,
+      9/cOrange/{Transformer, mô hình nền}/8/3,
+      10/cRed/{AI tạo sinh, LLM, tác tử}/8/4} {
+    \node[buoc=\c!70!black, minimum size=7mm] at (\cot+0.3,-2.3-\hang*0.82) {\so};
+    \node[font=\small, anchor=west, text=\c!45!black] at (\cot+0.8,-2.3-\hang*0.82) {\ten};
+  }
+\end{tikzpicture}

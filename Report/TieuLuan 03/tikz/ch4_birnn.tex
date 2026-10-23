@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \i in {1,...,5} {
+    \pgfmathsetmacro{\xx}{2.6*\i}
+    \node[khoiC, minimum width=10mm] (x\i) at (\xx,0) {$x_{\i}$};
+    \node[cau=cBlue, minimum size=10mm] (f\i) at (\xx,1.8) {$\overrightarrow{h}_{\i}$};
+    \node[cau=cPink, minimum size=10mm] (b\i) at (\xx,3.5) {$\overleftarrow{h}_{\i}$};
+    \node[khoiP, minimum width=14mm] (y\i) at (\xx,5.4) {$[\overrightarrow{h}_{\i};\overleftarrow{h}_{\i}]$};
+    \draw[mui, black!60] (x\i) -- (f\i);
+    \draw[mui, black!60] (x\i.north east) to[bend right=20] (b\i.south east);
+    \draw[mui, cBlue] (f\i) to[bend left=25] (y\i.south west);
+    \draw[mui, cPink] (b\i) -- (y\i);
+  }
+  \foreach \i/\j in {1/2,2/3,3/4,4/5} {
+    \draw[muiM=cBlue] (f\i) -- (f\j);
+    \draw[muiM=cPink] (b\j) -- (b\i);
+  }
+  \node[font=\small\bfseries, text=cBlue, anchor=east] at (1.8,1.8) {chiều xuôi $\rightarrow$};
+  \node[font=\small\bfseries, text=cPink, anchor=east] at (1.8,3.5) {chiều ngược $\leftarrow$};
+  \node[khoiR, align=center, text width=13cm] at (7.8,-1.4)
+    {Phù hợp khi đã có cả chuỗi (gán nhãn, phân loại văn bản). Với dự báo, BiLSTM chỉ đọc hai chiều \textbf{bên trong cửa sổ quá khứ}
+     — không nhìn thấy tương lai thật, nên vẫn hợp lệ.};
+\end{tikzpicture}

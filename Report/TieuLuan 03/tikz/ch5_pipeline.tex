@@ -1,0 +1,25 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % khối 3D cho từng bước
+  \foreach \x/\c/\t/\n in {0/cSlate/{Bảng CSV\\gốc}/1, 3.2/cOrange/{Khảo sát\\làm sạch}/2, 6.4/cRed/{Định danh\\bản ghi}/3}{
+    \khoibaD{\x}{2.2}{2.4}{1.5}{0.9}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\x+1.2,2.95) {\t};
+    \node[buoc] at (\x+0.2,3.85) {\n};
+  }
+  \draw[mui] (2.45,2.95) -- (3.15,2.95); \draw[mui] (5.65,2.95) -- (6.35,2.95);
+  % rẽ nhánh
+  \draw[mui] (8.85,3.3) -- ++(0.9,0.9) node[right] {};
+  \draw[mui] (8.85,2.6) -- ++(0.9,-0.9);
+  % nhánh văn bản
+  \node[hop=cBlue, text width=2.6cm] (doc) at (11.3,4.5) {\textbf{Văn bản hoá}\\ mỗi dòng $\to$ tài liệu};
+  \node[hop=cTeal, text width=2.3cm] (ix) at (14.6,4.5) {\textbf{Chỉ mục}\\ TF-IDF, BM25, vector};
+  \draw[mui] (doc) -- (ix);
+  % nhánh đồ thị
+  \node[hop=cPurple, text width=2.6cm] (tr) at (11.3,1.3) {\textbf{Bộ ba}\\ (s, p, o) + khái niệm};
+  \node[hop=cGreen, text width=2.3cm] (kg) at (14.6,1.3) {\textbf{KG}\\ NetworkX / RDF};
+  \draw[mui] (tr) -- (kg);
+  \node[buoc=cBlue] at (9.45,4.5) {4a}; \node[buoc=cPurple] at (9.45,1.3) {4b};
+  % kiểm tra
+  \node[hop=cYellow, text width=11cm, font=\small] (qc) at (8.0,-0.7)
+     {\textbf{Kiểm tra chất lượng:} thiếu / trùng / ngoại lệ, đơn vị cột, khoá duy nhất, đếm nút -- cạnh, truy vấn mẫu};
+  \draw[muiM=cOrange, dashed] (ix.south) |- (qc.east); \draw[muiM=cOrange, dashed] (kg.south) -- ++(0,-0.95);
+\end{tikzpicture}

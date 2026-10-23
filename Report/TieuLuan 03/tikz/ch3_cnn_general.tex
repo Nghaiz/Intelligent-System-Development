@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \khoibaD{0}{0}{0.35}{3.2}{3.2}{cSlate}
+  \node[font=\small, align=center] at (0.9,-0.55) {Ảnh vào\\$32{\times}32{\times}3$};
+  \foreach \i in {0,...,5}{\pgfmathsetmacro{\xx}{2.3+\i*0.13}\khoibaD{\xx}{0.1}{0.13}{3.0}{3.0}{cBlue}}
+  \node[font=\small, align=center] at (3.5,-0.55) {Conv + ReLU\\$32{\times}32{\times}32$};
+  \foreach \i in {0,...,5}{\pgfmathsetmacro{\xx}{4.9+\i*0.13}\khoibaD{\xx}{0.6}{0.13}{1.9}{1.9}{cSky}}
+  \node[font=\small, align=center] at (5.9,-0.55) {MaxPool\\$16{\times}16{\times}32$};
+  \foreach \i in {0,...,9}{\pgfmathsetmacro{\xx}{7.2+\i*0.12}\khoibaD{\xx}{0.65}{0.12}{1.8}{1.8}{cPurple}}
+  \node[font=\small, align=center] at (8.5,-0.55) {Conv + ReLU\\$16{\times}16{\times}64$};
+  \foreach \i in {0,...,9}{\pgfmathsetmacro{\xx}{9.9+\i*0.1}\khoibaD{\xx}{1.0}{0.1}{1.1}{1.1}{cPink}}
+  \node[font=\small, align=center] at (10.8,-0.55) {MaxPool\\$8{\times}8{\times}64$};
+  \foreach \k in {0,...,13}{\fill[cOrange!70!black] (12.2,0.2+\k*0.22) rectangle ++(0.22,0.18);}
+  \node[font=\small, align=center] at (12.3,-0.55) {Flatten\\4.096};
+  \foreach \k in {0,...,8}{\node[cau=cGreen, minimum size=4mm, inner sep=0pt] (h\k) at (13.6,0.4+\k*0.36) {};}
+  \node[font=\small, align=center] at (13.6,-0.55) {FC\\128};
+  \foreach \k in {0,...,4}{\node[cau=cRed, minimum size=5mm, inner sep=0pt] (o\k) at (15.1,0.9+\k*0.55) {};}
+  \foreach \a in {0,...,8}{\foreach \b in {0,...,4}{\draw[gray!40, thin] (h\a) -- (o\b);}}
+  \node[font=\small, align=center] at (15.1,-0.55) {Softmax\\$K$ lớp};
+  \draw[decorate, decoration={brace, amplitude=6pt}, thick, cNavy] (0,4.6) -- (11.5,4.6)
+     node[midway, above=6pt, font=\normalsize\bfseries, text=cNavy] {Trích chọn đặc trưng (feature extraction)};
+  \draw[decorate, decoration={brace, amplitude=6pt}, thick, cRed!80!black] (12.0,4.6) -- (15.5,4.6)
+     node[midway, above=6pt, font=\normalsize\bfseries, text=cRed!80!black] {Phân loại};
+\end{tikzpicture}

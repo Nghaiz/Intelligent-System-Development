@@ -1,0 +1,29 @@
+\begin{tikzpicture}[x=0.7cm,y=0.7cm]
+  % ảnh 4x4 với nhãn a..p
+  \node[tieude] at (2,5.0) {Ảnh $4{\times}4$};
+  \foreach \r in {0,...,3}{\foreach \c in {0,...,3}{
+    \pgfmathtruncatemacro{\n}{\r*4+\c}
+    \pgfmathsetmacro{\ch}{{"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"}[\n]}
+    \draw[gray!60, fill=white] (\c,3-\r) rectangle ++(1,1); \node at (\c+.5,3.5-\r) {\ch};}}
+  \draw[very thick, cRed] (0,1) rectangle (3,4);
+  \draw[very thick, cBlue, dashed] (1,1) rectangle (4,4);
+  \draw[very thick, cGreen, densely dotted] (0,0) rectangle (3,3);
+  % ma trận cột 4 x 9
+  \node[tieude] at (11.5,5.0) {Ma trận cột $(H_o W_o)\times(k^2 C)$};
+  \foreach \row/\cl/\list [count=\i from 0] in {
+      0/cRed/{a,b,c,e,f,g,i,j,k},
+      1/cBlue/{b,c,d,f,g,h,j,k,l},
+      2/cGreen/{e,f,g,i,j,k,m,n,o},
+      3/cOrange/{f,g,h,j,k,l,n,o,p}}{
+    \foreach \v [count=\j from 0] in \list {
+      \filldraw[fill=\cl!20, draw=\cl!70!black] (7+\j,3-\i) rectangle ++(1,1); \node at (7.5+\j,3.5-\i) {\v};}}
+  \draw[mui] (4.3,2) -- (6.7,2) node[midway, above, font=\small] {duỗi cửa sổ};
+  % nhân với kernel
+  \node[font=\Large] at (16.6,2) {$\times$};
+  \foreach \j in {0,...,8}{\filldraw[fill=cPurple!25, draw=cPurple] (17.2,4.0-\j*0.5) rectangle ++(1,0.5);
+    \pgfmathtruncatemacro{\jj}{\j+1}\node[font=\scriptsize] at (17.7,4.25-\j*0.5) {$w_{\jj}$};}
+  \node[font=\small, align=center] at (17.7,-1.1) {kernel\\$9\times F$};
+  \node[draw=cSlate, fill=softgray, rounded corners=3pt, font=\small, text width=17cm, align=center] at (9.5,-2.6)
+   {Tích chập trở thành \emph{một phép nhân ma trận} lớn (GEMM) mà BLAS/GPU tối ưu rất tốt; đổi lại tốn bộ nhớ vì mỗi điểm ảnh bị
+    chép tới $k^2$ lần. Lan truyền ngược dùng phép ngược \texttt{col2im}: cộng dồn gradient các cửa sổ chồng lấn.};
+\end{tikzpicture}

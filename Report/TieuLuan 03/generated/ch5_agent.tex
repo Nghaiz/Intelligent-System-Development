@@ -1,0 +1,20 @@
+\begin{tabular}{lL{5.4cm}rrrr}
+\toprule
+Miền & Hệ thống & \makecell[r]{Độ chính\\xác (\%)} & \makecell[r]{Nguồn\\đúng (\%)} & \makecell[r]{Trễ TB\\(ms)} & \makecell[r]{Trễ trung\\vị (ms)} \\
+\midrule
+Tiểu đường & LLM thuần (không truy xuất) & 28{,}12 & -- & 17{.}735 & 12{.}236 \\
+ & Naive RAG (dense top-5) & 78{,}12 & 71{,}88 & 15{.}461 & 12{.}551 \\
+ & Advanced RAG (lai + rerank) & 71{,}88 & 100{,}00 & 15{.}550 & 13{.}009 \\
+ & Tác tử chọn công cụ & \textbf{100{,}00} & 100{,}00 & \textbf{171} & 87 \\
+\midrule
+Cổ phiếu Google & LLM thuần (không truy xuất) & 0{,}00 & -- & 35{.}688 & 38{.}122 \\
+ & Naive RAG (dense top-5) & 43{,}75 & 40{,}62 & 16{.}506 & 15{.}599 \\
+ & Advanced RAG (lai + rerank) & 68{,}75 & 75{,}00 & 18{.}198 & 16{.}494 \\
+ & Tác tử chọn công cụ & \textbf{100{,}00} & 100{,}00 & \textbf{2} & 2 \\
+\midrule
+Vàng (FINAL\_USO) & LLM thuần (không truy xuất) & 0{,}00 & -- & 40{.}001 & 41{.}156 \\
+ & Naive RAG (dense top-5) & 66{,}67 & 69{,}23 & 16{.}610 & 15{.}055 \\
+ & Advanced RAG (lai + rerank) & 94{,}87 & 100{,}00 & 18{.}054 & 16{.}124 \\
+ & Tác tử chọn công cụ & \textbf{100{,}00} & 100{,}00 & \textbf{3} & 3 \\
+\bottomrule
+\end{tabular}

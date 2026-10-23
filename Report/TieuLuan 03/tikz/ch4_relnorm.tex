@@ -1,0 +1,30 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ----- trái: MinMax toàn cục -----
+  \begin{scope}
+    \node[tieude, text=cRed] at (3.4,5.0) {MinMax toàn cục (fit trên train)};
+    \fill[cBlue!12] (0,0) rectangle (4.4,3.0);
+    \fill[cGreen!12] (4.4,0) rectangle (6.8,4.4);
+    \draw[thick, cBlue] plot[smooth] coordinates {(0,0.2) (0.8,0.5) (1.6,0.7) (2.4,1.4) (3.2,1.9) (4.0,2.6) (4.4,3.0)};
+    \draw[thick, cGreen!60!black] plot[smooth] coordinates {(4.4,3.0) (5.0,3.5) (5.6,3.9) (6.2,4.3) (6.8,4.6)};
+    \draw[dashed, cRed, very thick] (0,3.0) -- (6.8,3.0) node[right, font=\small, text=cRed] {$x_{\max}^{\text{train}}\mapsto 1$};
+    \draw[thick, cRed, dashed] plot[smooth] coordinates {(4.4,2.9) (5.0,2.95) (5.6,2.98) (6.2,2.99) (6.8,3.0)};
+    \node[font=\small, text=cRed, align=center] at (5.6,1.6) {dự báo bị\\ “kẹt trần”};
+    \draw[->, thick] (0,0) -- (7.2,0);
+    \draw[->, thick] (0,0) -- (0,4.8);
+    \node[font=\small] at (2.2,-0.35) {train};
+    \node[font=\small] at (5.6,-0.35) {test};
+  \end{scope}
+  % ----- phải: chuẩn hoá tương đối -----
+  \begin{scope}[shift={(9.4,0)}]
+    \node[tieude, text=cGreen!50!black] at (3.4,5.0) {Tương đối theo cửa sổ};
+    \foreach \ox/\col/\lev in {0/cBlue/0.4, 2.3/cOrange/1.6, 4.6/cGreen/3.2} {
+      \fill[\col!15, rounded corners=3pt] (\ox,\lev-0.4) rectangle ++(1.9,1.1);
+      \draw[thick, \col!80!black] plot[smooth] coordinates {(\ox+0.1,\lev-0.2) (\ox+0.6,\lev) (\ox+1.1,\lev+0.35) (\ox+1.8,\lev+0.1)};
+      \fill[\col!80!black] (\ox+1.8,\lev+0.1) circle (2.2pt);
+    }
+    \draw[->, thick] (0,0) -- (6.8,0);
+    \draw[->, thick] (0,0) -- (0,4.8);
+    \node[khoiG, align=center, font=\small, anchor=north] at (3.4,-0.45) {$\tilde x_{t-k} = \log\dfrac{x_{t-k}}{x_t}$, \quad mục tiêu $r_{t+1}=\log\dfrac{P_{t+1}}{P_t}$\\
+       mọi cửa sổ cùng thang, kể cả khi giá test cao gấp nhiều lần train};
+  \end{scope}
+\end{tikzpicture}

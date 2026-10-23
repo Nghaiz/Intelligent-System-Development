@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[tieude] at (7.2,5.4) {AlexNet (2012): ReLU, Dropout, tăng cường dữ liệu, huấn luyện trên 2 GPU};
+  \tensorbaD{0}{0}{0.3}{3.4}{3.4}{cSlate}{Vào\\$227^2{\times}3$}
+  \tensorbaD{2.1}{0.5}{0.55}{2.4}{2.4}{cBlue}{Conv1 $11^2$/4\\$55^2{\times}96$}
+  \tensorbaD{4.5}{0.9}{0.75}{1.6}{1.6}{cSky}{Conv2 $5^2$\\$27^2{\times}256$}
+  \tensorbaD{6.8}{1.2}{1.0}{1.0}{1.0}{cPurple}{Conv3 $3^2$\\$13^2{\times}384$}
+  \tensorbaD{8.8}{1.2}{1.0}{1.0}{1.0}{cPurple}{Conv4\\$13^2{\times}384$}
+  \tensorbaD{10.8}{1.2}{0.75}{1.0}{1.0}{cPink}{Conv5\\$13^2{\times}256$}
+  \foreach \x/\c/\h in {12.7/cOrange/3.2,13.5/cOrange/3.2,14.3/cRed/1.6}{\khoibaD{\x}{1.7-\h/2}{0.3}{\h}{0.3}{\c}}
+  \node[font=\small, align=center, anchor=north] at (13.6,0.0) {FC6 · FC7 · FC8\\4.096 · 4.096 · 1.000};
+  \foreach \x/\y in {3.6/1.4,5.9/1.4,8.15/1.4,10.15/1.4,12.05/1.4}{\draw[mui] (\x-0.35,\y) -- ++(0.35,0);}
+  \node[draw=cSlate, fill=softgray, rounded corners=3pt, font=\small, text width=15cm, align=center] at (7.2,-2.3)
+    {Khoảng 60 triệu tham số; sai số top-5 trên ImageNet 15,3\,\% (phương pháp đứng thứ hai năm 2012: 26,2\,\%).};
+\end{tikzpicture}

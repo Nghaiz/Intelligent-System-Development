@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \shade[left color=cSky!40, right color=cPurple!45, rounded corners=4pt] (-0.3,-0.25) rectangle (16.3,0.25);
+  \foreach \x/\y/\yr/\txt/\c [count=\i] in {
+      0.0/1.6/1959/{Hubel \& Wiesel:\\tế bào thị giác\\đơn giản / phức hợp}/cSlate,
+      1.6/-1.7/1980/{Neocognitron\\(Fukushima)}/cBrown,
+      3.2/1.6/1989/{LeCun: CNN\\+ lan truyền ngược\\đọc mã bưu chính}/cBlue,
+      4.8/-1.7/1998/{LeNet-5\\(MNIST)}/cSky,
+      6.4/1.6/2012/{AlexNet\\thắng ImageNet\\(GPU, ReLU)}/cRed,
+      8.0/-1.7/2014/{VGG,\\GoogLeNet}/cOrange,
+      9.6/1.6/2015/{ResNet:\\152 tầng,\\vượt người}/cGreen,
+      11.2/-1.7/2017/{DenseNet,\\MobileNet}/cTeal,
+      12.8/1.6/2019/{EfficientNet\\(compound\\scaling)}/cPurple,
+      14.4/-1.7/2020/{Vision\\Transformer}/cPink,
+      16.0/1.6/2022/{ConvNeXt:\\CNN hiện đại hoá}/cIndigo}{
+    \fill[\c] (\x,0) circle (0.16);
+    \draw[\c, thick] (\x,0) -- (\x,\y*0.55);
+    \node[hop=\c, text width=2.1cm, font=\scriptsize] at (\x,\y) {\textbf{\yr}\\\txt};}
+\end{tikzpicture}

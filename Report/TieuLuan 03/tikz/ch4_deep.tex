@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ba tầng hồi tiếp xếp chồng, mỗi ô là một khối 3D
+  \foreach \l/\col/\lab in {0/cGreen/{tầng 1}, 1/cBlue/{tầng 2}, 2/cPurple/{tầng 3}} {
+    \foreach \t in {0,...,4} {
+      \khoibaD{\t*2.5}{\l*2.1+1.2}{1.2}{1.0}{0.9}{\col}
+    }
+    \foreach \t in {0,...,3} {
+      \draw[muiM=\col!70!black] (\t*2.5+1.25,\l*2.1+1.7) -- (\t*2.5+2.45,\l*2.1+1.7);
+    }
+    \node[font=\small\bfseries, text=\col!70!black, anchor=east] at (-0.3,\l*2.1+1.7) {\lab};
+  }
+  \foreach \t in {0,...,4} {
+    \node[khoiC, minimum width=9mm] (x\t) at (\t*2.5+0.6,0) {$x_{\the\numexpr\t+1\relax}$};
+    \draw[mui] (x\t) -- (\t*2.5+0.6,1.2);
+    \draw[mui] (\t*2.5+0.6,2.2) -- (\t*2.5+0.6,3.3);
+    \draw[mui] (\t*2.5+0.6,4.3) -- (\t*2.5+0.6,5.4);
+  }
+  \node[khoiR, minimum width=12mm] (y) at (10.6,7.6) {$\hat y_{T+1}$};
+  \draw[mui] (10.6,6.4) -- (y);
+  \node[nhan, align=left, anchor=west, text width=5.2cm] at (12.6,3.8)
+    {$h^{(l)}_t = f\big(W^{(l)}h^{(l-1)}_t + U^{(l)}h^{(l)}_{t-1}\big)$\\[4pt]
+     Đầu ra tầng dưới là đầu vào tầng trên; tầng cao học biểu diễn trừu tượng hơn nhưng nhiều tham số và dễ quá khớp.};
+\end{tikzpicture}

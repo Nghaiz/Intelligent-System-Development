@@ -1,0 +1,20 @@
+\begin{tabular}{llrrrl}
+\toprule
+\makecell[l]{Thực\\nghiệm} & Kiến trúc & \makecell[r]{RMSE\\PyTorch} & \makecell[r]{RMSE\\Keras} & \makecell[r]{Keras so với\\PyTorch (\%)} & Tốt hơn \\
+\midrule
+E-commerce & SimpleRNN & 6{.}861 & 7{.}464 & \ensuremath{+}8{,}8 & PyTorch \\
+ & LSTM & 6{.}836 & 7{.}290 & \ensuremath{+}6{,}6 & PyTorch \\
+ & GRU & 7{.}415 & 7{.}013 & \ensuremath{-}5{,}4 & Keras \\
+ & BiLSTM & 6{.}893 & 7{.}133 & \ensuremath{+}3{,}5 & PyTorch \\
+\midrule
+AAPL & SimpleRNN & 2{,}257 & 2{,}262 & \ensuremath{+}0{,}2 & PyTorch \\
+ & LSTM & 2{,}259 & 2{,}277 & \ensuremath{+}0{,}8 & PyTorch \\
+ & GRU & 2{,}257 & 2{,}272 & \ensuremath{+}0{,}7 & PyTorch \\
+ & BiLSTM & 2{,}259 & 2{,}285 & \ensuremath{+}1{,}2 & PyTorch \\
+\midrule
+Vàng GLD & SimpleRNN & 0{,}743 & 0{,}762 & \ensuremath{+}2{,}5 & PyTorch \\
+ & LSTM & 0{,}738 & 0{,}737 & \ensuremath{-}0{,}1 & Keras \\
+ & GRU & 0{,}751 & 0{,}747 & \ensuremath{-}0{,}5 & Keras \\
+ & BiLSTM & 0{,}739 & 0{,}778 & \ensuremath{+}5{,}3 & PyTorch \\
+\bottomrule
+\end{tabular}
