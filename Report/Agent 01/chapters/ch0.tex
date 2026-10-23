@@ -1,0 +1,46 @@
+% =====================================================================
+%  LỜI MỞ ĐẦU VÀ TỔNG QUAN BÀI TẬP
+% =====================================================================
+\chapter*{Lời mở đầu và tổng quan bài tập}
+\addcontentsline{toc}{chapter}{Lời mở đầu và tổng quan bài tập}
+\markboth{Lời mở đầu}{Lời mở đầu}
+
+Các mô hình ngôn ngữ lớn (Large Language Models -- LLM) đã thay đổi cách máy tính xử lý ngôn ngữ tự nhiên: chỉ với một
+câu lệnh, mô hình có thể tóm tắt văn bản, viết mã, trả lời câu hỏi chuyên môn. Nhưng một mô hình nền tảng thuần túy vẫn
+làm việc theo kiểu \emph{hỏi -- đáp} (prompt-and-response). Nó chờ người dùng hỏi rồi mới trả lời, tri thức dừng lại ở
+thời điểm huấn luyện, và nó không tự mở cơ sở dữ liệu, không tự gọi một API hay chạy một đoạn mã để thay đổi trạng thái
+của thế giới số.
+
+Bước chuyển đang diễn ra là đưa mô hình nền tảng vào bên trong một \textbf{hệ tác tử thông minh} (AI Agent, Agentic AI):
+một hệ thống phần mềm tự đặt kế hoạch, tự chọn công cụ, ghi nhớ ngữ cảnh và hành động liên tục để đạt mục tiêu người dùng
+giao. Bài tập Agent 01 yêu cầu tìm hiểu khái niệm này từ ba nguồn tài liệu công nghệ: \textbf{Google Cloud}
+\cite{google_agents}, \textbf{IBM Think} \cite{ibm_agents} và \textbf{McKinsey} \cite{mckinsey_agents}. Đồng thời, bài tập
+yêu cầu thực hành một dạng tác tử cổ điển là \textbf{tác tử học tăng cường} theo tài liệu \textbf{GeeksforGeeks}
+\cite{gfg_rl}: lập trình trên Jupyter Notebook, chụp lại màn hình mã nguồn (copy screen code) và màn hình kết quả
+(copy screen output).
+
+\section*{Mục tiêu}
+\begin{enumerate}
+  \item Trình bày định nghĩa, ba trụ cột kỹ thuật và sự tiến hóa của AI Agent theo Google Cloud và McKinsey.
+  \item Phân tích chu trình nhận thức, các mô hình suy luận (ReAct, ReWOO và các mô hình khác), các loại tác tử, rủi ro và
+        nguyên tắc quản trị theo IBM Think.
+  \item Trình bày nền tảng học tăng cường theo GeeksforGeeks: bài toán thăm dò -- khai thác, chính sách
+        $\varepsilon$-greedy, phương trình Bellman và các trường phái thuật toán.
+  \item Xây dựng tác tử Q-Learning trên Jupyter Notebook giải bài toán robot điều hướng mê cung, chụp màn hình mã và kết quả,
+        rồi phân tích quá trình hội tụ của chính sách.
+  \item Liên hệ học tăng cường với các tác tử LLM hiện đại (RLHF, suy luận dạng cây, hệ đa tác tử).
+\end{enumerate}
+
+\section*{Bố cục báo cáo}
+Chương~1 và Chương~2 trình bày bản chất của AI Agent và lộ trình tiến hóa từ chatbot đến mạng lưới tác tử. Chương~3 đi vào
+kiến trúc kỹ thuật và các cơ chế suy luận theo IBM Think. Chương~4 quy chiếu tác tử hiện đại về năm loại tác tử kinh điển
+của Russell \& Norvig \cite{russell_norvig} và khung Quá trình Quyết định Markov. Chương~5 trình bày lý thuyết học tăng
+cường. Chương~6 tổng hợp các nhóm ứng dụng doanh nghiệp cùng rủi ro và cách quản trị. Chương~7 và Chương~8 là phần thực
+nghiệm: mô tả bài toán, mã nguồn, ảnh chụp màn hình notebook và phân tích kết quả. Chương~9 bàn về sự giao thoa giữa LLM
+Agent và học tăng cường; Chương~10 tổng kết.
+
+\begin{phathien}{Cách tạo số liệu trong báo cáo}
+Notebook \texttt{agent01\_rl\_qlearning.ipynb} được sinh và chạy tự động từ mã nguồn trong gói \texttt{ag1}. Khi chạy xong,
+notebook ghi kết quả ra tệp JSON. Mọi con số thực nghiệm trong văn bản và bảng được đọc từ tệp này khi dựng báo cáo; các
+đoạn mã in trong báo cáo được trích nguyên văn từ chính mã đã chạy. Ảnh chụp màn hình là notebook đó mở trong JupyterLab.
+\end{phathien}

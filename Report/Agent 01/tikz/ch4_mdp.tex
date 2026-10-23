@@ -1,0 +1,26 @@
+\begin{tikzpicture}
+  % tác tử (khối 3D) và môi trường (khối 3D)
+  \khoibaD{5.4}{4.4}{5.0}{1.5}{1.4}{cBlue}
+  \node[text=white, font=\normalsize\bfseries\sffamily, align=center] at (7.9,5.15) {TÁC TỬ\\(Agent)};
+  \khoibaD{5.4}{0}{5.0}{1.5}{1.4}{cGreen}
+  \node[text=white, font=\normalsize\bfseries\sffamily, align=center] at (7.9,0.75) {MÔI TRƯỜNG\\(Environment)};
+  % hành động: phải, đi xuống
+  \draw[muiM=cOrange!80!black, line width=2pt] (11.15,5.15) -- (12.4,5.15) -- node[right, font=\small, text=cOrange!70!black, align=left]
+    {Hành động\\$A_t \sim \pi(\cdot \mid S_t)$} (12.4,0.75) -- (11.2,0.75);
+  % trạng thái (ngoài) và phần thưởng (trong): trái, đi lên
+  \draw[muiM=cPurple!80!black, line width=2pt] (5.4,0.4) -- (2.3,0.4) -- node[left, font=\small, text=cPurple!70!black, align=right, pos=0.5]
+    {Trạng thái\\mới $S_{t+1}$} (2.3,4.85) -- (5.4,4.85);
+  \draw[muiM=cRed!80!black, line width=2pt] (5.4,1.1) -- (4.0,1.1) -- node[left, font=\small, text=cRed!70!black, align=right, pos=0.5]
+    {Thưởng\\$R_{t+1}$} (4.0,5.45) -- (5.4,5.45);
+
+  % hộp mô hình MDP (bên dưới)
+  \node[anchor=north, hop=cIndigo, text width=15.0cm, align=left, font=\small] at (7.9,-0.9)
+    {\centering\textbf{Quá trình Quyết định Markov: \ $\mathcal{M} = \langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle$}\par\medskip
+     \begin{tabular}{@{}p{7.2cm}p{7.4cm}@{}}
+     \textcolor{cBlue!80!black}{$\bm{\mathcal{S}}$}: không gian trạng thái (nhận thức môi trường) &
+     \textcolor{cOrange!80!black}{$\bm{\mathcal{A}}$}: không gian hành động hợp lệ \\[3pt]
+     \textcolor{cPurple!80!black}{$\bm{P(s' \mid s, a)}$}: xác suất chuyển trạng thái &
+     \textcolor{cRed!80!black}{$\bm{R(s, a, s')}$}: phần thưởng tức thời, vô hướng \\[3pt]
+     \multicolumn{2}{@{}l@{}}{\textcolor{cGreen!60!black}{$\bm{\gamma \in [0, 1]}$}: hệ số chiết khấu, cân bằng lợi ích tức thời và mục tiêu dài hạn}
+     \end{tabular}};
+\end{tikzpicture}

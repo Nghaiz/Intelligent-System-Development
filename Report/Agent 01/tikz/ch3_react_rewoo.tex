@@ -1,0 +1,39 @@
+\begin{tikzpicture}
+  % ======================= ReAct (trái)
+  \node[tieude, align=center] at (3.75,10.3) {ReAct\\(Reasoning and Action)};
+  \node[hop=cSlate, minimum width=3.4cm, font=\small] (qa) at (3.75,8.8) {Truy vấn người dùng};
+  \node[hop=cOrange, minimum width=3.0cm, minimum height=1.1cm, font=\small] (th) at (3.75,6.85) {\textbf{Suy nghĩ}\\(Thought)};
+  \node[hop=cBlue, minimum width=3.0cm, minimum height=1.1cm, font=\small] (ac) at (5.85,4.1) {\textbf{Hành động}\\(Action)};
+  \node[hop=cGreen, minimum width=3.0cm, minimum height=1.1cm, font=\small] (ob) at (1.75,4.1) {\textbf{Quan sát}\\(Observation)};
+  \draw[mui] (qa) -- (th);
+  \draw[muiM=cOrange!75!black, line width=1.8pt] (th.east) to[out=0, in=90] (ac.north);
+  \draw[muiM=cBlue!75!black, line width=1.8pt] (ac.south) to[out=-90, in=-90] node[below, font=\small] {gọi công cụ, nhận kết quả} (ob.south);
+  \draw[muiM=cGreen!65!black, line width=1.8pt] (ob.north) to[out=90, in=180] (th.west);
+  \node[cau=cRed, minimum size=1.05cm, font=\small\bfseries] at (3.75,5.25) {LLM};
+  \node[hop=cTeal, minimum width=3.4cm, font=\small] (ra) at (3.75,1.25) {Câu trả lời cuối};
+  \draw[mui, dashed] ([yshift=-2mm]th.north west) -- node[above, font=\small, pos=0.55] {đủ thông tin} (0.0,6.98) |- (ra.west);
+  \node[hop=cRed, text width=7.0cm, font=\small, align=left] at (3.85,-0.55)
+    {\textbf{+} Thích ứng rất linh hoạt\\\textbf{--} Gọi LLM sau mỗi bước quan sát: độ trễ cao, tốn nhiều token};
+
+  % ngăn cách
+  \draw[cSlate!60, very thick, dashed] (8.05,-1.45) -- (8.05,10.9);
+
+  % ======================= ReWOO (phải)
+  \node[tieude, align=center, font=\small\bfseries\sffamily] at (12.1,10.3) {ReWOO\\(Reasoning WithOut Observation)};
+  \node[hop=cSlate, minimum width=3.4cm, font=\small] (qb) at (12.1,8.8) {Truy vấn người dùng};
+  \node[hop=cOrange, text width=6.6cm, font=\small] (pl) at (12.1,7.0)
+    {\textbf{Planner}: lập trước toàn bộ kế hoạch\\\#E1, \#E2, \#E3 = công cụ + đối số};
+  \foreach \i/\x in {1/9.95, 2/12.1, 3/14.25} {
+    \node[hop=cBlue, minimum width=1.9cm, minimum height=1.1cm, font=\small] (w\i) at (\x,4.75) {\textbf{Worker}\\\#E\i};
+    \draw[muiM=cOrange!75!black] (pl.south -| w\i) -- (w\i);
+  }
+  \node[font=\small\itshape, text=cBlue!70!black, fill=white, inner sep=1pt] at (12.1,3.6) {gọi song song các API ngoại vi};
+  \node[hop=cGreen, text width=6.6cm, font=\small] (so) at (12.1,2.45)
+    {\textbf{Solver}: tổng hợp dữ liệu \#E1–\#E3};
+  \foreach \i in {1,2,3} { \draw[muiM=cBlue!75!black] (w\i.south) -- (w\i.south |- so.north); }
+  \node[hop=cTeal, minimum width=3.4cm, font=\small] (rb) at (12.1,1.25) {Câu trả lời cuối};
+  \draw[mui] (qb) -- (pl);
+  \draw[mui] (so) -- (rb);
+  \node[hop=cGreen, text width=7.0cm, font=\small, align=left] at (12.1,-0.55)
+    {\textbf{+} Tiết kiệm tối đa chi phí token\\\textbf{+} Giảm triệt để độ trễ};
+\end{tikzpicture}

@@ -1,0 +1,71 @@
+% =====================================================================
+%  CHƯƠNG 1. BẢN CHẤT VÀ BA TRỤ CỘT NỀN TẢNG CỦA AI AGENT
+% =====================================================================
+\chapter{Bản chất và ba trụ cột nền tảng của AI Agent}
+
+\section{Định nghĩa học thuật theo Google Cloud và McKinsey}
+Google Cloud định nghĩa AI Agent là hệ thống phần mềm dùng trí tuệ nhân tạo để theo đuổi mục tiêu và hoàn thành nhiệm vụ
+thay mặt người dùng; tác tử thể hiện khả năng suy luận, lập kế hoạch và ghi nhớ, đồng thời có một mức độ tự chủ để tự ra
+quyết định, tự học và tự thích nghi \cite{google_agents}. McKinsey nhấn mạnh tác tử là hệ thống dựa trên mô hình nền
+tảng, có thể \emph{thực thi} các quy trình nhiều bước phức tạp trong thế giới số: nhận một yêu cầu bằng ngôn ngữ tự
+nhiên, tự chia nhỏ thành các bước, gọi công cụ và hoàn thành công việc thay vì chỉ trả lời \cite{mckinsey_agents}.
+
+\begin{dinhnghia}{Định nghĩa làm việc dùng trong báo cáo}
+\textbf{AI Agent} là hệ thống phần mềm vận hành bởi mô hình AI tạo sinh, có mức độ tự trị để chủ động theo đuổi một mục
+tiêu: tự lập kế hoạch, tự duy trì ngữ cảnh và tự sử dụng công cụ bên ngoài để hoàn thành chuỗi tác vụ phức hợp thay mặt
+người dùng.
+\end{dinhnghia}
+
+Hai đặc điểm phân biệt tác tử với một mô hình ngôn ngữ đứng riêng:
+\begin{itemize}
+  \item \textbf{Tính chủ động hướng mục tiêu.} Người dùng giao \emph{kết quả cần đạt} chứ không giao từng bước; tác tử tự
+        quyết định trình tự hành động.
+  \item \textbf{Khả năng tác động vào môi trường.} Tác tử không chỉ sinh văn bản mà còn đọc, ghi dữ liệu, gọi API và
+        quan sát kết quả hành động của chính nó để điều chỉnh bước tiếp theo.
+\end{itemize}
+
+\section{Ba trụ cột kỹ thuật của một tác tử thông minh}
+Tổng hợp từ Google Cloud và McKinsey \cite{google_agents,mckinsey_agents}, một tác tử tiêu chuẩn được dựng trên ba trụ
+cột quanh lõi mô hình nền tảng (Hình~\ref{fig:ch1-architecture}).
+
+\subsection{Suy luận và lập kế hoạch (Reasoning \& Planning)}
+Tác tử phân rã mục tiêu lớn thành chuỗi tác vụ con có thứ tự, đánh giá các phương án và chọn trình tự hợp lý nhất. Mô
+hình nền tảng đóng vai bộ não suy luận: hiểu yêu cầu, lập kế hoạch, và khi kết quả trung gian không như mong đợi thì lập
+lại kế hoạch.
+
+\subsection{Bộ nhớ và quản lý ngữ cảnh (Memory Management)}
+\begin{itemize}
+  \item \textbf{Bộ nhớ ngắn hạn} giữ lịch sử hội thoại và trạng thái của phiên làm việc hiện tại, để tác tử hiểu các tham
+        chiếu như ``kết quả vừa rồi''.
+  \item \textbf{Bộ nhớ dài hạn} lưu tri thức và kinh nghiệm qua nhiều phiên, thường đặt trong cơ sở dữ liệu vector
+        (Vector DB) hoặc đồ thị tri thức (Knowledge Graph) và được truy xuất khi cần.
+\end{itemize}
+
+\subsection{Sử dụng công cụ ngoại vi (Tool Use \& Action Engine)}
+Đây là trụ cột biến ``lời nói'' thành ``hành động''. Tác tử kích hoạt Function Calling để gọi API, truy vấn cơ sở dữ liệu
+nội bộ, chạy mã lệnh, tìm kiếm web. Kết quả công cụ trả về trở thành quan sát mới cho vòng suy luận tiếp theo.
+
+\hinhtikz{ch1_architecture}{Sơ đồ kiến trúc nhận thức của một hệ tác tử thông minh (AI Agent Cognitive Architecture):
+lõi mô hình nền tảng, ba trụ cột suy luận -- bộ nhớ -- công cụ, môi trường doanh nghiệp và lớp quản trị.}{ch1-architecture}
+
+\section{Vòng tương tác giữa ba trụ cột}
+Ba trụ cột không hoạt động rời rạc. Khi nhận mục tiêu, tác tử dùng trụ cột suy luận để lập kế hoạch; mỗi bước của kế
+hoạch có thể kích hoạt một công cụ; kết quả công cụ được ghi vào bộ nhớ ngắn hạn và đưa trở lại cho bước suy luận kế
+tiếp; tri thức đáng giữ được chuyển vào bộ nhớ dài hạn. Bảng~\ref{tab:ch1-pillars} tóm tắt vai trò của từng trụ cột.
+
+\begin{table}[!htbp]\centering
+\caption{Ba trụ cột kỹ thuật của AI Agent và vai trò của chúng.}\label{tab:ch1-pillars}
+\small
+\begin{tabularx}{\linewidth}{L{3.6cm}XX}
+\toprule
+\textbf{Trụ cột} & \textbf{Chức năng} & \textbf{Thành phần kỹ thuật điển hình} \\
+\midrule
+Suy luận \& lập kế hoạch & Phân rã mục tiêu, sắp xếp tác vụ con, lập lại kế hoạch khi gặp lỗi & LLM, kỹ thuật
+chuỗi suy nghĩ, mô hình ReAct/ReWOO \\
+Bộ nhớ \& ngữ cảnh & Duy trì hội thoại, tích lũy kinh nghiệm qua nhiều phiên & Cửa sổ ngữ cảnh, Vector DB,
+Knowledge Graph \\
+Công cụ \& hành động & Thu thập dữ liệu thực tế và tác động vào hệ thống & Function Calling, API, truy vấn SQL,
+trình thông dịch mã \\
+\bottomrule
+\end{tabularx}
+\end{table}

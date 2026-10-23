@@ -1,0 +1,22 @@
+\begin{tikzpicture}[
+    the/.style={draw=#1!65!black, thick, fill=#1!85!black, text=white, font=\small\bfseries\sffamily,
+                minimum width=3.45cm, text width=3.2cm, align=center, minimum height=1.25cm, inner sep=3pt},
+    than/.style={draw=#1!65!black, thick, top color=#1!6, bottom color=#1!24, font=\small,
+                 minimum width=3.45cm, text width=3.2cm, align=center, minimum height=4.9cm, inner sep=3pt}]
+  \foreach \i/\x/\c/\t/\y/\v in {
+      1/0/cBlue/{Value-Based\\(dựa trên giá trị)}/{Ước lượng hàm giá trị tối ưu $Q^*(s,a)$, chọn hành động tham lam theo giá trị}/{Q-Learning\\DQN\\SARSA},
+      2/3.95/cOrange/{Policy-Based\\(dựa trên chính sách)}/{Tối ưu trực tiếp $\pi_\theta(a \mid s)$ bằng Gradient Ascent, không cần Q-Table}/{REINFORCE\\Policy Gradients\\TRPO},
+      3/7.9/cGreen/{Actor-Critic\\(diễn viên -- phê bình)}/{Actor sinh hành động, Critic đánh giá giá trị để giảm phương sai}/{A2C\\A3C\\PPO},
+      4/11.85/cPurple/{Model-Based\\(dựa trên mô hình)}/{Tự xây dựng mô hình giả lập môi trường để hoạch định trước khi hành động}/{Dyna-Q\\World Models\\MuZero}} {
+    \node[than=\c, anchor=north] (b\i) at ({\x+1.725},4.9) {\y\par\medskip\rule{2.6cm}{0.6pt}\par\smallskip\textbf{\v}};
+    \node[the=\c, anchor=south] (h\i) at (b\i.north) {\t};
+    % mặt trên và mặt bên tạo khối 3D
+    \begin{scope}[on background layer]
+      \fill[\c!50, draw=\c!65!black] (h\i.north west) -- ++(0.42,0.32) -- ([shift={(0.42,0.32)}]h\i.north east) -- (h\i.north east) -- cycle;
+      \fill[\c!60!black, draw=\c!65!black] (h\i.north east) -- ++(0.42,0.32) -- ([shift={(0.42,0.32)}]b\i.south east) -- (b\i.south east) -- cycle;
+    \end{scope}
+  }
+  % đường phân loại
+  \draw[{Stealth[length=3mm]}-{Stealth[length=3mm]}, line width=1.6pt, cSlate] (0.3,-0.45) -- (15.3,-0.45);
+  \node[fill=white, font=\small\itshape, text=cSlate] at (7.8,-0.45) {Các trường phái chính của Học tăng cường (GeeksforGeeks)};
+\end{tikzpicture}

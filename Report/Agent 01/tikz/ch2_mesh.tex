@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+  % điều phối viên trung tâm
+  \node[circle, minimum size=3.1cm, draw=cNavy, very thick, inner color=cSky!15, outer color=cBlue!45,
+        blur shadow={shadow blur steps=8, shadow opacity=35}, align=center, font=\small\bfseries] (orc) at (0,0)
+        {Điều phối viên\\(Orchestrator)};
+  % sáu tác tử chuyên môn
+  \foreach \ang/\c/\t/\n in {90/cOrange/{Tác tử\\Khách hàng}/a1, 30/cGreen/{Tác tử\\Dữ liệu}/a2,
+      -30/cTeal/{Tác tử\\Mã nguồn}/a3, -90/cRed/{Tác tử\\Bảo mật}/a4, -150/cPurple/{Tác tử\\Nhân sự}/a5,
+      150/cIndigo/{Tác tử\\Tiếp thị}/a6} {
+    \node[hop=\c, minimum width=2.75cm, minimum height=1.3cm, font=\small\bfseries] (\n) at (\ang:4.05cm) {\t};
+    \draw[{Stealth[length=2.4mm]}-{Stealth[length=2.4mm]}, very thick, \c!70!black] (orc) -- (\n);
+  }
+  % liên kết tác tử với tác tử (A2A)
+  \foreach \u/\v in {a1/a2, a2/a3, a3/a4, a4/a5, a5/a6, a6/a1} {
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick, dashed, cSlate] (\u) -- (\v);
+  }
+  \node[font=\small\bfseries, text=cSlate, fill=white, inner sep=1.5pt, rounded corners=2pt] at ($(a1)!0.5!(a2)$) {A2A};
+  % bộ nhớ và công cụ dùng chung
+  \node[csdl=cPurple, minimum width=2.3cm, minimum height=2.0cm, font=\small] (mem) at (-6.35,0)
+    {Bộ nhớ\\dùng chung};
+  \node[csdl=cTeal, minimum width=2.3cm, minimum height=2.0cm, font=\small] (tool) at (6.35,0)
+    {Công cụ\\\& API};
+  \draw[muiM=cPurple!70!black, {Stealth[length=2.4mm]}-{Stealth[length=2.4mm]}] (mem) -- (a5);
+  \draw[muiM=cPurple!70!black, {Stealth[length=2.4mm]}-{Stealth[length=2.4mm]}] (mem) -- (a6);
+  \draw[muiM=cTeal!70!black, {Stealth[length=2.4mm]}-{Stealth[length=2.4mm]}] (tool) -- (a2);
+  \draw[muiM=cTeal!70!black, {Stealth[length=2.4mm]}-{Stealth[length=2.4mm]}] (tool) -- (a3);
+  % lớp kiểm toán
+  \node[hop=cSlate, minimum width=14.2cm, minimum height=1.15cm, font=\small] (audit) at (0,-5.85)
+    {\textbf{LỚP KIỂM TOÁN \& QUẢN TRỊ}\\Agent ID duy nhất \,·\, Audit Trail \,·\, Giao thức tương tác mở};
+  \draw[muiM=cSlate!80!black, {Stealth[length=2.4mm]}-{Stealth[length=2.4mm]}] (a4) -- (audit);
+\end{tikzpicture}

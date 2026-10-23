@@ -141,3 +141,14 @@ Report/TieuLuan 03/main.*
 Report/TieuLuan 03/kiemtra_*
 Report/TieuLuan 03/toanbo.*
 Report/TieuLuan 03/*.auxlock
+# ===== Agent 01 =====
+# Báo cáo: các tệp build.py tự sinh lại (mã trích, macro số liệu, bộ đệm TikZ/minted, lượt dựng thử)
+Report/Agent 01/code/
+Report/Agent 01/_minted*/
+Report/Agent 01/tikzcache/
+Report/Agent 01/generated/so_lieu.tex
+Report/Agent 01/main.*
+!Report/Agent 01/main.tex
+Report/Agent 01/kiemtra_*
+Report/Agent 01/toanbo.*
+Report/Agent 01/*.auxlock

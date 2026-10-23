@@ -1,0 +1,77 @@
+% =====================================================================
+%  CHƯƠNG 3. KIẾN TRÚC KỸ THUẬT VÀ CƠ CHẾ SUY LUẬN THEO IBM THINK
+% =====================================================================
+\chapter{Kiến trúc kỹ thuật và cơ chế suy luận theo IBM Think}
+
+\section{Chu trình nhận thức ba giai đoạn (IBM Cognitive Cycle)}
+IBM Think \cite{ibm_agents} mô tả hoạt động của một AI Agent qua ba giai đoạn khép kín (Hình~\ref{fig:ch3-cycle}).
+\begin{enumerate}
+  \item \textbf{Khởi tạo mục tiêu và lập kế hoạch (Goal Initialization \& Planning).} Con người hoặc hệ thống đặt mục tiêu
+        và các ràng buộc; tác tử phân rã yêu cầu thành những tác vụ con có thể đo lường được. Với tác vụ đơn giản, bước lập
+        kế hoạch có thể lược bỏ.
+  \item \textbf{Suy luận với công cụ sẵn có (Reasoning with Available Tools).} Tác tử không biết hết mọi thứ, nên nó
+        dùng công cụ (tìm kiếm web, API, cơ sở dữ liệu, thậm chí các tác tử khác) để bổ sung thông tin còn thiếu, rồi cập
+        nhật kế hoạch dựa trên dữ liệu mới.
+  \item \textbf{Học hỏi và phản chiếu (Learning \& Reflection).} Tác tử tiếp nhận phản hồi, từ người dùng hoặc từ tác tử
+        khác, lưu những gì đã học vào bộ nhớ và tinh chỉnh kế hoạch theo vòng lặp (iterative refinement) để không lặp lại
+        lỗi cũ.
+\end{enumerate}
+
+\hinhtikz{ch3_ibm_cycle}{Chu trình nhận thức ba giai đoạn của AI Agent theo IBM Think.}{ch3-cycle}
+
+\section{Đối chiếu hai mô hình suy luận: ReAct và ReWOO}
+IBM Think \cite{ibm_agents} chỉ ra hai trường phái suy luận then chốt định hình hiệu năng của tác tử
+(Hình~\ref{fig:ch3-react-rewoo}).
+
+\subsection{ReAct (Reasoning and Action)}
+ReAct \cite{yao_react} yêu cầu mô hình xen kẽ \emph{suy nghĩ} và \emph{hành động}: sau mỗi hành động, tác tử quan sát kết
+quả rồi mới suy nghĩ bước kế tiếp. Vòng lặp có dạng
+\[
+  \text{Thought} \;\rightarrow\; \text{Action} \;\rightarrow\; \text{Observation} \;\rightarrow\; \text{Thought}
+  \;\rightarrow\; \cdots \;\rightarrow\; \text{Final Answer}.
+\]
+Ưu điểm là thích nghi linh hoạt: nếu một công cụ trả về lỗi, bước suy nghĩ tiếp theo sẽ thấy và đổi hướng. Nhược điểm là
+mỗi bước quan sát đòi hỏi một lần gọi LLM với toàn bộ ngữ cảnh tích lũy, nên độ trễ và chi phí token tăng theo số bước.
+
+\subsection{ReWOO (Reasoning Without Observation)}
+ReWOO \cite{xu_rewoo} tách pha lập kế hoạch khỏi pha thực thi và gồm ba mô-đun:
+\begin{itemize}
+  \item \textbf{Planner} lập trước toàn bộ kế hoạch, kể cả các lời gọi công cụ, dùng biến giữ chỗ (\#E1, \#E2,\dots)
+        cho kết quả chưa có.
+  \item \textbf{Worker} thực thi các lời gọi công cụ, có thể song song khi không phụ thuộc nhau.
+  \item \textbf{Solver} tổng hợp kế hoạch và các bằng chứng thu được thành câu trả lời cuối.
+\end{itemize}
+Vì LLM chỉ được gọi ở pha lập kế hoạch và pha tổng hợp, ReWOO tiết kiệm token và giảm độ trễ. Đổi lại, kế hoạch đã lập
+không tự thay đổi khi kết quả trung gian bất ngờ.
+
+\hinhtikz{ch3_react_rewoo}{So sánh cơ chế vận hành: ReAct (vòng lặp suy nghĩ -- hành động -- quan sát liên tục) và ReWOO
+(lập kế hoạch trước, thực thi song song, tổng hợp sau).}{ch3-react-rewoo}
+
+\begin{table}[!htbp]\centering
+\caption{Đối chiếu ReAct và ReWOO.}\label{tab:ch3-react-rewoo}
+\small
+\begin{tabularx}{\linewidth}{L{3.6cm}XX}
+\toprule
+\textbf{Tiêu chí} & \textbf{ReAct} & \textbf{ReWOO} \\
+\midrule
+Thứ tự suy luận -- thực thi & Xen kẽ từng bước & Lập kế hoạch toàn bộ trước khi thực thi \\
+Số lần gọi LLM & Một lần sau mỗi quan sát & Hai lần (Planner và Solver) \\
+Khả năng thích nghi & Cao, đổi hướng ngay khi gặp kết quả bất ngờ & Thấp hơn, kế hoạch cố định \\
+Chi phí token, độ trễ & Cao, tăng theo số bước & Thấp, công cụ có thể chạy song song \\
+Phù hợp & Bài toán khám phá, môi trường biến động & Quy trình có cấu trúc, cần tiết kiệm chi phí \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Các mô hình suy luận nâng cao khác}
+Ngoài ReAct và ReWOO, các tác tử hiện đại còn áp dụng thêm nhiều mẫu suy luận (Hình~\ref{fig:ch3-patterns}):
+\begin{itemize}
+  \item \textbf{Plan-and-Solve:} lập kế hoạch trừu tượng ở mức cao trước, sau đó chi tiết hóa và giải từng bước.
+  \item \textbf{LLM Compiler:} biểu diễn các tác vụ thành đồ thị phụ thuộc và thực thi song song những nhánh độc lập,
+        giống trình biên dịch tối ưu luồng thực thi.
+  \item \textbf{Reflection:} một tác tử (hoặc chính tác tử đó ở vai trò khác) đóng vai phản biện độc lập, rà soát kết
+        quả và yêu cầu sửa trước khi hoàn tất.
+\end{itemize}
+
+\hinhtikz{ch3_patterns}{Ba mẫu suy luận nâng cao: Plan-and-Solve, LLM Compiler (đồ thị tác vụ song song) và Reflection
+(tác tử thực thi -- tác tử phản biện).}{ch3-patterns}

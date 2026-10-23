@@ -1,0 +1,131 @@
+% =====================================================================
+%  CHƯƠNG 7. THỰC NGHIỆM LẬP TRÌNH TÁC TỬ HỌC TĂNG CƯỜNG TRÊN JUPYTER NOTEBOOK
+% =====================================================================
+\chapter{Thực nghiệm lập trình tác tử học tăng cường trên Jupyter Notebook}\label{ch:thucnghiem}
+
+\section{Mô tả bài toán điều hướng mê cung}
+Để hiện thực hóa cơ chế tự học của Learning Agent (Chương~4) bằng thuật toán Q-Learning (Chương~5), bài thực hành xây
+dựng chương trình hoàn chỉnh trên Jupyter Notebook \texttt{agent01\_rl\_qlearning.ipynb} giải bài toán \textbf{robot
+điều hướng mê cung} theo tài liệu GeeksforGeeks \cite{gfg_rl}. Mê cung do sinh viên tự thiết kế, kích thước
+$\SL{ch8_qlearning/params/n_rows} \times \SL{ch8_qlearning/params/n_cols}$ với \SL{ch8_qlearning/params/n_fire} ô tường lửa
+(Fire). Xuất phát từ ô $S\,\SL{ch8_qlearning/params/start}$, robot không biết trước bản đồ; nó phải tự khám phá, học cách
+tránh tường lửa và tìm ra lộ trình ngắn nhất về đích $G\,\SL{ch8_qlearning/params/goal}$ với tổng phần thưởng lớn nhất
+(Hình~\ref{fig:ch7-maze}).
+
+\hinhtikz{ch7_maze}{Mê cung $12 \times 12$ của bài thực hành: ô xuất phát $S$, ô đích $G$, các ô tường lửa, bốn hành
+động và hàm phần thưởng.}{ch7-maze}
+
+\subsection{Bốn thành tố của bài toán học tăng cường}
+Bài toán được mô hình hóa thành một MDP (Bảng~\ref{tab:ch7-mdp}):
+\begin{enumerate}
+  \item \textbf{Trạng thái} $\mathcal{S}$: tọa độ ô $(r, c)$ với $0 \le r, c \le 11$, tổng cộng
+        \SL{ch8_qlearning/params/n_states} trạng thái lưới. Mỗi trạng thái được đánh chỉ số $r \cdot 12 + c$ để làm
+        hàng của Q-Table.
+  \item \textbf{Hành động} $\mathcal{A}$: bốn hướng rời rạc Trái $(0,-1)$, Phải $(0,1)$, Lên $(-1,0)$, Xuống $(1,0)$.
+  \item \textbf{Phần thưởng} $R$: $R_{\text{fire}} = \SL{ch8_qlearning/params/r_fire}$ khi đâm vào tường lửa hoặc ra
+        khỏi mê cung (robot đứng yên tại chỗ), $R_{\text{goal}} = +\SL{ch8_qlearning/params/r_goal}$ khi về đích (kết
+        thúc episode), $R_{\text{step}} = \SL{ch8_qlearning/params/r_step}$ cho mỗi bước đi hợp lệ để thúc tác tử đi
+        đường ngắn.
+  \item \textbf{Quy tắc học}: cập nhật Bellman $Q(s,a) \leftarrow Q(s,a) + \alpha\,[R + \gamma \max_{a'} Q(s',a') -
+        Q(s,a)]$ với $\alpha = \SL{ch8_qlearning/params/alpha}$, $\gamma = \SL{ch8_qlearning/params/gamma}$ và lịch
+        $\varepsilon$-greedy giảm từ \SL{ch8_qlearning/params/eps_start} về \SL{ch8_qlearning/params/eps_min} (nhân
+        \SL{ch8_qlearning/params/eps_decay} sau mỗi episode), huấn luyện \SL{ch8_qlearning/params/episodes} episode,
+        tối đa \SL{ch8_qlearning/params/max_steps} bước mỗi episode.
+\end{enumerate}
+
+\begin{table}[!htbp]\centering
+\caption{Các thành phần MDP của bài toán mê cung.}\label{tab:ch7-mdp}
+\small
+\begin{tabularx}{\linewidth}{L{3.4cm}X}
+\toprule
+\textbf{Thành phần} & \textbf{Giá trị trong bài thực hành} \\
+\midrule
+$\mathcal{S}$ & \SL{ch8_qlearning/params/n_states} ô $(r, c)$; robot chỉ đứng được trên ô trống \\
+$\mathcal{A}$ & \{Trái, Phải, Lên, Xuống\} \\
+$P(s' \mid s, a)$ & Tất định: sang ô kề theo hướng $a$; nếu ô đó là tường lửa hoặc ngoài biên thì $s' = s$ \\
+$R(s, a, s')$ & $+\SL{ch8_qlearning/params/r_goal}$ về đích, $\SL{ch8_qlearning/params/r_fire}$ đâm tường/biên,
+$\SL{ch8_qlearning/params/r_step}$ bước thường \\
+$\gamma$ & \SL{ch8_qlearning/params/gamma} \\
+Trạng thái kết thúc & Ô đích $G\,\SL{ch8_qlearning/params/goal}$, hoặc hết \SL{ch8_qlearning/params/max_steps} bước \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Môi trường lập trình}
+Notebook chạy trên JupyterLab~4 với Python~3.13, dùng NumPy cho Q-Table, pandas để hiển thị bảng và Matplotlib để vẽ.
+Q-Table chỉ có $\SL{ch8_qlearning/params/n_states} \times 4$ ô số thực nên toàn bộ việc huấn luyện chạy trên CPU và mất
+\SL{ch8_qlearning/result/seconds} giây cho \SL{ch8_qlearning/params/episodes} episode; bài toán dạng bảng này không
+cần GPU. Notebook được tổ chức thành tám phần (Hình~\ref{fig:nb-window}):
+\begin{enumerate}
+  \item Thư viện; \quad 2.~Môi trường mê cung; \quad 3.~Q-Learning Agent và vòng huấn luyện; \quad 4.~Huấn luyện;
+  \setcounter{enumi}{4}
+  \item Lộ trình tối ưu theo chính sách tham lam; \quad 6.~Trực quan hóa; \quad 7.~Trích Q-Table;
+        \quad 8.~Lưu số liệu.
+\end{enumerate}
+
+\anhNB{nb_window}{Ảnh chụp màn hình JupyterLab mở notebook Q-Learning của bài tập: phần đầu notebook và ô mã thư
+viện.}{nb-window}
+
+\section{Ảnh chụp màn hình mã nguồn thuật toán (Copy Screen Code)}
+Các hình dưới đây là ảnh chụp màn hình thực tế những khối mã xây dựng môi trường, thiết lập tham số và thuật toán
+Q-Learning Agent trên Jupyter Notebook, đúng yêu cầu của bài tập (copy screen code). Sau mỗi ảnh chụp, báo cáo in lại
+đoạn mã tương ứng ở dạng văn bản (trích nguyên văn từ mã đã chạy) kèm giải thích.
+
+\subsection{Khối thư viện}
+\anhNB[0.55]{code_imports}{Ảnh chụp màn hình ô mã 1: nạp thư viện.}{nb-imports}
+
+\subsection{Khối môi trường mê cung}
+\anhNB{code_maze_1}{Ảnh chụp màn hình ô mã 2 (phần 1/2): bản đồ mê cung, hành động, phần thưởng và đầu lớp
+\texttt{MazeEnv}.}{nb-maze}
+\anhNB{code_maze_2}{Ảnh chụp màn hình ô mã 2 (phần 2/2): phương thức \texttt{step} và BFS kiểm chứng của lớp
+\texttt{MazeEnv}.}{nb-maze-2}
+
+Bản đồ được khai báo bằng các chuỗi ký tự để dễ đọc và dễ sửa: \texttt{S} là xuất phát, \texttt{G} là đích,
+\texttt{\#} là tường lửa.
+
+\maNguon{maze__LAYOUT}{Bản đồ mê cung $12 \times 12$.}
+
+Lớp \texttt{MazeEnv} cài đặt hàm chuyển trạng thái $P$ và hàm phần thưởng $R$ của MDP. Phương thức \texttt{step} nhận
+một hành động, tính ô đích đến; nếu ô đó ra khỏi mê cung hoặc là tường lửa thì robot đứng yên và nhận
+$R_{\text{fire}}$; nếu là ô đích thì episode kết thúc với $R_{\text{goal}}$; còn lại nhận $R_{\text{step}}$. Phương
+thức \texttt{shortest\_path\_length} chạy BFS trên bản đồ. Tác tử \emph{không} dùng hàm này; nó chỉ để kiểm chứng sau
+huấn luyện rằng lộ trình học được có đúng là ngắn nhất.
+
+\maDai{maze__MazeEnv}{Lớp môi trường \texttt{MazeEnv}: trạng thái, bước chuyển, phần thưởng và BFS kiểm chứng.}
+
+\subsection{Khối Q-Learning Agent và vòng huấn luyện}
+\anhNB{code_qlearning_1}{Ảnh chụp màn hình ô mã 3 (phần 1/2): siêu tham số và lớp \texttt{QLearningAgent}.}{nb-qlearning}
+\anhNB{code_qlearning_2}{Ảnh chụp màn hình ô mã 3 (phần 2/2): hàm \texttt{train} và
+\texttt{greedy\_path}.}{nb-qlearning-2}
+
+Lớp \texttt{QLearningAgent} giữ Q-Table dạng mảng NumPy kích thước $\SL{ch8_qlearning/params/n_states} \times 4$,
+khởi tạo bằng 0. Phương thức \texttt{choose\_action} hiện thực chính sách $\varepsilon$-greedy; khi nhiều hành động có
+cùng giá trị lớn nhất (đầu quá trình mọi giá trị đều bằng 0), tác tử chọn ngẫu nhiên giữa chúng để không thiên vị
+hướng nào. Phương thức \texttt{update} là đúng một dòng của phương trình Bellman; ở trạng thái kết thúc, mục tiêu TD chỉ
+là phần thưởng $r$.
+
+\maDai{qlearning__QLearningAgent}{Lớp \texttt{QLearningAgent}: Q-Table, chính sách $\varepsilon$-greedy, cập nhật
+Bellman và giảm $\varepsilon$.}
+
+Hàm \texttt{train} lặp qua các episode. Mỗi episode bắt đầu tại $S$; ở mỗi bước tác tử chọn hành động, môi trường trả
+về trạng thái mới và phần thưởng, tác tử cập nhật Q-Table. Episode dừng khi về đích hoặc khi chạm giới hạn
+\texttt{max\_steps}. Sau mỗi episode, $\varepsilon$ giảm một bậc; cứ 250 episode hàm in một dòng nhật ký gồm
+$\varepsilon$, phần thưởng trung bình, số bước trung bình và tỉ lệ về đích.
+
+\maDai{qlearning__train}{Hàm \texttt{train}: vòng huấn luyện qua các episode và nhật ký tiến trình.}
+
+Sau huấn luyện, \texttt{greedy\_path} chạy chính sách tham lam $\pi^*(s) = \arg\max_a Q(s,a)$ từ $S$, không còn thăm dò,
+để lấy lộ trình tối ưu mà tác tử đã học.
+
+\maNguon{qlearning__greedy_path}{Hàm \texttt{greedy\_path}: lộ trình theo chính sách tham lam.}
+
+\subsection{Khối trực quan hóa và trích Q-Table}
+\anhNB{code_viz}{Ảnh chụp màn hình ô mã 6: các hàm vẽ mê cung, đường cong phần thưởng và trích Q-Table.}{nb-viz}
+
+Hàm \texttt{draw\_maze} tô tường lửa, vẽ lộ trình lên lưới; \texttt{draw\_rewards} vẽ phần thưởng từng episode, đường
+trung bình trượt 100 episode và lịch $\varepsilon$ trên trục phụ. Hàm \texttt{q\_table\_excerpt} tự chọn các ô then
+chốt của lộ trình: ô xuất phát, mọi \emph{điểm rẽ} (nơi hướng đi thay đổi) và ô ngay trước đích.
+
+\maNguon{viz__q_table_excerpt}{Hàm \texttt{q\_table\_excerpt}: trích Q-Table tại các ô then chốt của lộ trình.}
+\maDai{viz__draw_maze}{Hàm \texttt{draw\_maze}: vẽ mê cung và lộ trình tối ưu.}
+\maDai{viz__draw_rewards}{Hàm \texttt{draw\_rewards}: đường cong hội tụ phần thưởng và lịch $\varepsilon$.}

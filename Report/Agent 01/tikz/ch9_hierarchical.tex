@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+  % ---------------- tầng LLM (Neuro)
+  \khoibaD{1.6}{7.0}{11.6}{1.6}{1.4}{cPurple}
+  \node[text=white, font=\small\bfseries, align=center] at (7.4,7.8)
+    {TÁC TỬ LLM CẤP CAO -- META-PLANNER\\phân tích mục tiêu kinh doanh vĩ mô, chia nhiệm vụ con};
+  \node[hop=cPurple, text width=2.1cm, font=\small, anchor=east] at (1.35,7.8) {\textbf{Neuro}\\lập luận nhận thức};
+
+  % ---------------- bus thông điệp chuẩn hóa
+  \node[hop=cSlate, minimum width=11.6cm, minimum height=0.95cm, font=\small] (bus) at (7.4,5.25)
+    {Giao thức thông điệp chuẩn hóa -- minh bạch, kiểm toán được};
+  \draw[muiM=cPurple!75!black, line width=1.8pt] (5.4,7.0) -- node[left, font=\small] {mục tiêu con} (5.4,5.725);
+  \draw[muiM=cTeal!75!black, line width=1.8pt] (9.4,5.725) -- node[right, font=\small] {kết quả, trạng thái} (9.4,7.0);
+
+  % ---------------- tầng RL (Symbolic / Dynamic Programming)
+  \foreach \i/\x/\c/\t in {1/1.6/cBlue/{Tác tử RL\\Robotics}, 2/5.6/cOrange/{Tác tử RL\\giao dịch\\tần suất cao}, 3/9.6/cTeal/{Tác tử RL\\chuyên biệt khác}} {
+    \khoibaD{\x}{2.0}{3.6}{1.75}{1.0}{\c}
+    \node[text=white, font=\small\bfseries, align=center] at ({\x+1.8},2.875) {\t};
+    \draw[{Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, very thick, \c!70!black] ({\x+1.8},4.775) -- ({\x+1.8},4.1);
+  }
+  \node[hop=cBlue, text width=2.1cm, font=\small, anchor=east] at (1.35,2.875) {\textbf{Symbolic}\\tối ưu\\điều khiển\\chính xác};
+
+  % ---------------- thế giới thực
+  \node[hop=cGreen, minimum width=11.6cm, minimum height=0.9cm, font=\small] (w) at (7.4,0.45)
+    {Môi trường thực: thao tác vi mô theo thời gian thực};
+  \foreach \x in {3.4, 7.4, 11.4} {
+    \draw[{Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, very thick, cGreen!65!black] (\x,0.9) -- (\x,2.0);
+  }
+\end{tikzpicture}

@@ -1,0 +1,42 @@
+\begin{tikzpicture}
+  % khung ba ô
+  \foreach \x/\c/\t in {0/cOrange/{Plan-and-Solve}, 5.3/cBlue/{LLM Compiler}, 10.6/cPurple/{Reflection}} {
+    \draw[rounded corners=6pt, draw=\c!60, thick, fill=\c!6] (\x,0) rectangle ++(5.0,8.6);
+    \node[rounded corners=4pt, fill=\c!80!black, text=white, font=\small\bfseries\sffamily, minimum width=4.6cm,
+          minimum height=0.8cm] at ({\x+2.5},8.1) {\t};
+  }
+  % ---------------- Plan-and-Solve
+  \node[hop=cOrange, minimum width=4.2cm, font=\small] (m) at (2.5,6.85) {Mục tiêu tổng};
+  \node[hop=cOrange, minimum width=4.2cm, font=\small] (k) at (2.5,5.4) {Kế hoạch trừu tượng};
+  \foreach \i/\x in {1/1.2, 2/2.5, 3/3.8} {
+    \node[cau=cYellow, minimum size=1.1cm] (b\i) at (\x,3.75) {B\i};
+    \draw[muiM=cOrange!75!black] (k.south -| b\i) -- (b\i);
+  }
+  \draw[muiM=cOrange!75!black] (b1) -- (b2); \draw[muiM=cOrange!75!black] (b2) -- (b3);
+  \node[font=\small\itshape, text=cOrange!70!black, align=center] at (2.5,2.45) {chi tiết hóa\\từng bước};
+  \node[hop=cGreen, minimum width=4.2cm, font=\small] (g) at (2.5,0.75) {Giải và hoàn tất};
+  \draw[mui] (b3.south) to[out=-90, in=0] (g.east);
+  % ---------------- LLM Compiler: DAG song song
+  \node[hop=cBlue, minimum width=4.2cm, font=\small] (pc) at (7.8,6.85) {Planner lập đồ thị tác vụ};
+  \node[cau=cSky, minimum size=1.15cm] (t1) at (6.55,5.0) {T1};
+  \node[cau=cSky, minimum size=1.15cm] (t2) at (7.8,5.0) {T2};
+  \node[cau=cSky, minimum size=1.15cm] (t3) at (9.05,5.0) {T3};
+  \node[cau=cIndigo, minimum size=1.15cm] (t4) at (7.2,3.2) {T4};
+  \node[cau=cIndigo, minimum size=1.15cm] (t5) at (8.6,3.2) {T5};
+  \foreach \t in {t1,t2,t3} { \draw[muiM=cBlue!75!black] (pc.south -| \t) -- (\t); }
+  \draw[muiM=cBlue!75!black] (t1) -- (t4); \draw[muiM=cBlue!75!black] (t2) -- (t4);
+  \draw[muiM=cBlue!75!black] (t3) -- (t5);
+  \node[font=\small\itshape, text=cBlue!70!black, align=center, fill=cBlue!6, inner sep=1pt] at (7.8,2.05) {chạy song song theo\\phụ thuộc};
+  \node[hop=cGreen, minimum width=4.2cm, font=\small] (jn) at (7.8,0.75) {Joiner tổng hợp};
+  \draw[mui] (t4) -- (jn); \draw[mui] (t5) -- (jn);
+  % ---------------- Reflection
+  \node[hop=cPurple, minimum width=3.5cm, font=\small] (act) at (13.55,6.85) {Tác tử thực thi\\(Actor)};
+  \node[hop=cYellow, minimum width=3.0cm, font=\small] (nh) at (13.55,5.15) {Bản nháp};
+  \node[hop=cRed, minimum width=3.5cm, font=\small] (cr) at (13.55,3.45) {Tác tử phản biện\\(Critic)};
+  \node[font=\small\itshape, text=cPurple!70!black, align=left, anchor=west] at (13.3,2.1) {lặp lại\\tới khi đạt};
+  \node[hop=cGreen, minimum width=4.2cm, font=\small] (ok) at (13.1,0.75) {Hoàn tất kết quả};
+  \draw[mui] (act) -- (nh); \draw[mui] (nh) -- (cr);
+  \draw[muiM=cRed!75!black, line width=1.6pt] (cr.west) to[out=180, in=180, looseness=1.15]
+    node[pos=0.5, rotate=90, below, font=\small, text=cRed!70!black] {nhận xét} (act.west);
+  \draw[mui] (cr.south -| ok) -- (ok);
+\end{tikzpicture}

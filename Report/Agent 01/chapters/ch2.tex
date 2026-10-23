@@ -1,0 +1,56 @@
+% =====================================================================
+%  CHƯƠNG 2. SỰ TIẾN HÓA MÔ HÌNH: TỪ CHATBOT ĐẾN AGENTIC MESH
+% =====================================================================
+\chapter{Sự tiến hóa mô hình: từ Chatbot đến Agentic Mesh}
+
+\section{Đối sánh Non-agentic Chatbot, AI Copilot và Autonomous Agent}
+Để làm rõ khác biệt về bản chất kỹ thuật, Bảng~\ref{tab:ch2-compare} đối sánh ba thế hệ công nghệ theo các tiêu chí vận
+hành tổng hợp từ Google Cloud \cite{google_agents} và McKinsey \cite{mckinsey_agents}. Google Cloud phân biệt rõ
+\emph{bot} (làm theo quy tắc định sẵn, ít tự chủ), \emph{trợ lý AI} (hỗ trợ người dùng, người dùng vẫn ra quyết định) và
+\emph{tác tử} (tự chủ cao nhất, tự đưa ra và thực hiện quyết định để đạt mục tiêu).
+
+\begin{table}[!htbp]\centering
+\caption{Đối sánh Chatbot truyền thống, trợ lý AI Copilot và hệ tác tử tự trị.}\label{tab:ch2-compare}
+\small
+\begin{tabularx}{\linewidth}{L{2.9cm}XXX}
+\toprule
+\textbf{Tiêu chí} & \textbf{Non-agentic Chatbot} & \textbf{AI Copilot (trợ lý)} & \textbf{Autonomous AI Agent} \\
+\midrule
+Mức độ tự trị & Thụ động, phụ thuộc hoàn toàn vào câu lệnh & Hỗ trợ từng bước, người dùng quyết định & Tự trị cao,
+tự điều hướng tới mục tiêu \\
+Lập kế hoạch & Không có & Con người tự lập kế hoạch & Tự phân rã nhiệm vụ nhiều bước \\
+Sử dụng công cụ & Không có hoặc rất hạn chế & Gợi ý, con người xác nhận từng lệnh & Tự lựa chọn và thực thi công cụ \\
+Quản lý bộ nhớ & Ngữ cảnh phiên ngắn & Ngữ cảnh theo phiên làm việc & Bộ nhớ dài hạn, lưu vết trạng thái \\
+Cơ chế sửa sai & Không tự sửa lỗi & Dựa vào phản hồi của người dùng & Tự phản chiếu (self-reflection), thử lại \\
+Vai trò con người & Đặt câu hỏi, đọc kết quả & Thao tác chính, AI gợi ý & Giám sát cấp cao (supervisor / HITL) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Lộ trình bốn giai đoạn tiến hóa công nghệ trong tổ chức}
+Hình~\ref{fig:ch2-roadmap} mô tả lộ trình chuyển dịch của AI trong doanh nghiệp. \textbf{Giai đoạn~1} là chatbot thụ
+động trả lời câu hỏi thường gặp. \textbf{Giai đoạn~2} là trợ lý Copilot cài sẵn trong công cụ làm việc, tăng năng suất
+cá nhân. \textbf{Giai đoạn~3} là tác tử đơn lẻ tự trị, đảm nhận trọn một quy trình. \textbf{Giai đoạn~4} là mạng lưới
+nhiều tác tử chuyên biệt phối hợp với nhau trên quy mô toàn doanh nghiệp, McKinsey gọi là \emph{Agentic Mesh}.
+
+\hinhtikz{ch2_roadmap}{Lộ trình tiến hóa công nghệ từ Chatbot thụ động đến mạng lưới tác tử doanh nghiệp (Agentic
+Mesh).}{ch2-roadmap}
+
+Mỗi bước tiến kéo theo hai thay đổi: mức tự trị tăng và vai trò của con người dịch chuyển từ \emph{người thao tác} sang
+\emph{người giám sát}. Vì vậy các yêu cầu về kiểm soát, nhật ký và phân quyền (Chương~\ref{ch:quantri}) cũng tăng
+tương ứng.
+
+\section{Nguyên lý mạng lưới tác tử (Agentic Mesh) theo McKinsey}
+McKinsey \cite{mckinsey_agents} mô tả tương lai của tổ chức là một mạng lưới các tác tử chuyên môn hóa sâu, phối hợp qua
+các giao thức tương tác giữa tác tử với tác tử (Agent-to-Agent communication) để vận hành những quy trình nghiệp vụ phức
+hợp mà không cần con người can thiệp thủ công liên tục. Các đặc điểm chính của mô hình này:
+\begin{itemize}
+  \item \textbf{Chuyên môn hóa.} Mỗi tác tử phụ trách một miền hẹp (tra cứu đơn hàng, phân tích dữ liệu, kiểm tra tuân
+        thủ\dots), dễ kiểm thử và thay thế độc lập.
+  \item \textbf{Điều phối.} Một tác tử điều phối (orchestrator) nhận mục tiêu, phân việc và tổng hợp kết quả.
+  \item \textbf{Hạ tầng dùng chung.} Các tác tử chia sẻ bộ nhớ, kho công cụ và lớp kiểm toán chung để mọi hành động đều
+        truy vết được.
+\end{itemize}
+
+\hinhtikz{ch2_mesh}{Mạng lưới tác tử (Agentic Mesh): tác tử điều phối, các tác tử chuyên biệt liên lạc A2A, bộ nhớ --
+công cụ dùng chung và lớp kiểm toán.}{ch2-mesh}

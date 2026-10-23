@@ -1,0 +1,16 @@
+\begin{tikzpicture}[
+    luc/.style={regular polygon, regular polygon sides=6, minimum size=4.3cm, inner sep=0pt, draw=#1!70!black,
+                very thick, inner color=#1!8, outer color=#1!40, align=center, font=\small,
+                blur shadow={shadow blur steps=6, shadow opacity=30}}]
+  \node[luc=cNavy, minimum size=3.9cm, font=\small\bfseries] (c) at (0,0) {Tác tử AI\\doanh nghiệp};
+  \foreach \ang/\c/\t/\d/\n in {
+      90/cOrange/{Customer Agents}/{CSKH 24/7, đơn hàng, khiếu nại}/k1,
+      30/cBlue/{Employee Agents}/{nhân sự, nghỉ phép, onboarding}/k2,
+      -30/cTeal/{Data Agents}/{câu hỏi sang SQL/ Cypher, báo cáo}/k3,
+      -90/cGreen/{Code Agents}/{sinh mã, rà soát lỗ hổng, CI/CD}/k4,
+      -150/cPink/{Creative Agents}/{tiếp thị đa kênh, cá nhân hóa}/k5,
+      150/cRed/{Security Agents}/{giám sát an ninh, phát hiện tấn công}/k6} {
+    \node[luc=\c] (\n) at (\ang:5.0cm) {\parbox{2.55cm}{\centering\textbf{\t}\\[2pt]\d}};
+    \begin{scope}[on background layer]\draw[\c!70!black, line width=2.2pt] (c.center) -- (\n.center);\end{scope}
+  }
+\end{tikzpicture}

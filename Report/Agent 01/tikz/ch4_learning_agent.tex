@@ -1,0 +1,30 @@
+\begin{tikzpicture}
+  % khung tác tử
+  \draw[rounded corners=8pt, draw=cNavy!60, dashed, very thick, fill=cSky!5] (0,-0.5) rectangle (12.1,7.3);
+  \node[anchor=south, font=\small\bfseries\sffamily, text=cNavy] at (7.6,-0.45) {TÁC TỬ HỌC MÁY (Learning Agent)};
+  % môi trường
+  \node[hop=cGreen, minimum width=2.2cm, minimum height=8.6cm, font=\small\bfseries, align=center] (env) at (14.65,3.4)
+    {MÔI\\TRƯỜNG};
+  % tiêu chuẩn hiệu năng
+  \node[hop=cSlate, minimum width=4.2cm, font=\small] (std) at (4.85,8.45) {Tiêu chuẩn hiệu năng\\(Performance standard)};
+  % các thành phần
+  \node[hop=cRed, minimum width=4.0cm, minimum height=1.25cm, font=\small] (cri) at (4.85,6.0) {\textbf{Critic}\\(Bộ phản biện)};
+  \node[hop=cOrange, minimum width=3.9cm, minimum height=1.25cm, font=\small] (le) at (2.1,3.35) {\textbf{Learning element}\\(Phần tử học)};
+  \node[hop=cBlue, minimum width=3.9cm, minimum height=1.25cm, font=\small] (pe) at (7.6,3.35) {\textbf{Performance element}\\(Phần tử thực thi)};
+  \node[hop=cPurple, minimum width=3.9cm, minimum height=1.25cm, font=\small] (pg) at (2.1,0.85) {\textbf{Problem generator}\\(Bộ sinh vấn đề)};
+  % cảm biến, cơ cấu chấp hành
+  \node[hop=cTeal, minimum width=1.9cm, minimum height=1.1cm, font=\small] (sen) at (10.55,6.0) {Cảm biến\\(Sensors)};
+  \node[hop=cTeal, minimum width=1.9cm, minimum height=1.1cm, font=\small] (act) at (10.55,0.85) {Chấp hành\\(Actuators)};
+  % luồng
+  \draw[mui] (std) -- (cri);
+  \draw[muiM=cGreen!65!black, line width=1.6pt] (env.west |- sen) -- node[above, font=\small] {quan sát} (sen);
+  \draw[mui] (sen) -- (cri);
+  \draw[mui] (sen.south) |- (pe.east);
+  \draw[muiM=cRed!75!black] (cri.south west) -- node[left=2pt, font=\small, text=cRed!70!black] {phản hồi} (le.north);
+  \draw[muiM=cOrange!75!black] ([yshift=2.5mm]le.east) -- node[above, font=\small] {thay đổi} ([yshift=2.5mm]pe.west);
+  \draw[muiM=cBlue!75!black] ([yshift=-2.5mm]pe.west) -- node[below, font=\small] {tri thức} ([yshift=-2.5mm]le.east);
+  \draw[muiM=cOrange!75!black] (le) -- node[right, font=\small] {mục tiêu học} (pg);
+  \draw[muiM=cPurple!75!black] (pg.east) -| node[pos=0.25, above, font=\small] {hành vi thăm dò} (pe.south);
+  \draw[mui] (pe.south east) |- (act.west);
+  \draw[muiM=cGreen!65!black, line width=1.6pt] (act) -- node[below, font=\small, xshift=1mm] {hành động} (env.west |- act);
+\end{tikzpicture}

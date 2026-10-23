@@ -1,0 +1,19 @@
+\begin{tikzpicture}
+  % năm bậc thang 3D theo mức độ thông minh
+  \foreach \i/\x/\h/\c in {1/0/0.9/cSlate, 2/3.05/1.6/cBlue, 3/6.1/2.3/cTeal, 4/9.15/3.0/cOrange, 5/12.2/3.7/cPurple} {
+    \khoibaD{\x}{0}{2.85}{\h}{1.0}{\c}
+    \node[text=white, font=\large\bfseries\sffamily] at ({\x+1.425},{\h/2}) {\i};
+  }
+  \foreach \x/\h/\c/\t/\v/\b in {
+      0/0.9/cSlate/{Simple reflex}/{Phản xạ đơn giản}/{Luật điều kiện -- hành động, không lưu vết},
+      3.05/1.6/cBlue/{Model-based reflex}/{Phản xạ có mô hình}/{Duy trì trạng thái nội tại khi quan sát một phần},
+      6.1/2.3/cTeal/{Goal-based}/{Dựa trên mục tiêu}/{Tìm kiếm đường đi tới mục tiêu định trước},
+      9.15/3.0/cOrange/{Utility-based}/{Dựa trên độ hữu dụng}/{Tối ưu hàm hữu dụng giữa nhiều phương án},
+      12.2/3.7/cPurple/{Learning}/{Tác tử học máy}/{Tự cải thiện qua tương tác, phản hồi môi trường}} {
+    \node[hop=\c, anchor=south, text width=2.62cm, align=center, font=\small] at ({\x+1.425},{\h+0.55})
+      {\textbf{\t}\\\textit{\v}\\[2pt]\b};
+  }
+  \draw[-{Stealth[length=4mm,width=4mm]}, line width=3pt, cRed!80!black, opacity=0.85]
+    (0.2,-0.7) -- (15.5,-0.7) node[pos=0.5, below=2pt, font=\small\bfseries, text=cRed!70!black, opacity=1]
+    {Mức độ thông minh và tự chủ tăng dần (Russell \& Norvig)};
+\end{tikzpicture}

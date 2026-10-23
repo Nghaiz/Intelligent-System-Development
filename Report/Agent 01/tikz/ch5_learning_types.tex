@@ -1,0 +1,30 @@
+\begin{tikzpicture}
+  \foreach \x/\c/\t in {0/cBlue/{Học có giám sát}, 5.3/cTeal/{Học không giám sát}, 10.6/cOrange/{Học tăng cường (RL)}} {
+    \draw[rounded corners=6pt, draw=\c!60, thick, fill=\c!6] (\x,0) rectangle ++(5.0,7.4);
+    \node[rounded corners=4pt, fill=\c!80!black, text=white, font=\small\bfseries\sffamily, minimum width=4.6cm,
+          minimum height=0.8cm] at ({\x+2.5},6.9) {\t};
+  }
+  % ---------------- có giám sát: dữ liệu gán nhãn + đường phân tách
+  \foreach \p in {(0.8,3.4), (1.3,4.4), (1.0,5.2), (1.9,3.9), (2.0,5.4), (1.5,2.9)} {
+    \node[circle, fill=cBlue, draw=cBlue!60!black, minimum size=3.2mm, inner sep=0pt] at \p {};
+  }
+  \foreach \p in {(3.1,2.6), (3.6,3.6), (4.2,2.9), (3.4,4.6), (4.3,4.2), (2.8,3.3)} {
+    \node[regular polygon, regular polygon sides=3, fill=cRed, draw=cRed!60!black, minimum size=4.2mm, inner sep=0pt] at \p {};
+  }
+  \draw[cNavy, very thick, dashed] (1.4,2.2) -- (3.5,5.9);
+  \node[font=\small, align=center, text=black!80] at (2.5,1.15) {Dữ liệu gán nhãn $(x, y)$\\học từ đáp án đúng/sai};
+  % ---------------- không giám sát: cụm
+  \foreach \cx/\cy/\c in {6.6/4.7/cPurple, 8.9/4.9/cGreen, 7.8/2.9/cOrange} {
+    \draw[\c!70!black, thick, dashed, fill=\c!12] (\cx,\cy) ellipse (0.95 and 0.72);
+    \foreach \dx/\dy in {-0.4/0.2, 0.3/0.3, 0/-0.25, -0.2/-0.1, 0.45/-0.2, 0.1/0.1} {
+      \node[circle, fill=\c, minimum size=2.8mm, inner sep=0pt] at ({\cx+\dx},{\cy+\dy}) {};
+    }
+  }
+  \node[font=\small, align=center, text=black!80] at (7.8,1.15) {Không có nhãn\\tìm cấu trúc ẩn trong dữ liệu};
+  % ---------------- tăng cường: tác tử, môi trường, thưởng/phạt
+  \node[cau=cOrange, minimum size=1.5cm, font=\small\bfseries] (ag) at (13.1,5.1) {Tác tử};
+  \node[hop=cGreen, minimum width=3.4cm, minimum height=0.95cm, font=\small\bfseries] (en) at (13.1,2.75) {Môi trường};
+  \draw[muiM=cOrange!80!black, line width=1.6pt] (ag.east) to[out=-20, in=20] node[right, font=\small] {$a$} (en.east);
+  \draw[muiM=cGreen!65!black, line width=1.6pt] (en.west) to[out=160, in=200] node[right, font=\small] {$s'$, $r$} (ag.west);
+  \node[font=\small, align=center, text=black!80] at (13.1,1.15) {Thử và sai (trial \& error)\\cực đại phần thưởng tích lũy};
+\end{tikzpicture}

@@ -1,0 +1,65 @@
+% =====================================================================
+%  CHƯƠNG 6. TAXONOMY ỨNG DỤNG DOANH NGHIỆP, RỦI RO VÀ QUẢN TRỊ AN TOÀN
+% =====================================================================
+\chapter{Taxonomy ứng dụng doanh nghiệp, rủi ro và quản trị an toàn}\label{ch:quantri}
+
+\section{Phân loại tác tử doanh nghiệp theo Google Cloud và McKinsey}
+Google Cloud \cite{google_agents} và McKinsey \cite{mckinsey_agents} nhận diện sáu nhóm tác tử chủ lực trong doanh
+nghiệp (Hình~\ref{fig:ch6-taxonomy}):
+\begin{itemize}
+  \item \textbf{Customer Agents:} chăm sóc khách hàng 24/7, tra cứu đơn hàng, hỗ trợ khiếu nại và đổi trả theo quy chế.
+  \item \textbf{Employee Agents:} hỗ trợ nhân sự nội bộ, giải đáp quy trình, đăng ký nghỉ phép, đón nhân viên mới
+        (onboarding).
+  \item \textbf{Data Agents:} phân tích dữ liệu kinh doanh, chuyển câu hỏi ngôn ngữ tự nhiên thành truy vấn SQL/Cypher và
+        xuất báo cáo tự động.
+  \item \textbf{Code Agents:} sinh mã nguồn, rà soát lỗ hổng bảo mật, viết kiểm thử đơn vị, hỗ trợ CI/CD.
+  \item \textbf{Creative Agents:} thiết kế thông điệp tiếp thị đa kênh, cá nhân hóa nội dung theo hồ sơ khách hàng.
+  \item \textbf{Security Agents:} giám sát nhật ký an ninh mạng, phát hiện tấn công bất thường và kích hoạt quy trình ứng
+        phó.
+\end{itemize}
+
+\hinhtikz{ch6_taxonomy}{Sáu nhóm tác tử doanh nghiệp theo Google Cloud và McKinsey.}{ch6-taxonomy}
+
+\section{Thách thức kỹ thuật và bốn nguyên tắc quản trị theo IBM Think}
+Bên cạnh lợi ích, IBM Think \cite{ibm_agents} cảnh báo ba thách thức lớn:
+\begin{itemize}
+  \item \textbf{Vòng lặp vô hạn (Infinite Loops):} tác tử gọi công cụ lặp đi lặp lại khi không lập được kế hoạch hoàn
+        chỉnh hoặc không đánh giá được kết quả.
+  \item \textbf{Thất bại lan truyền (Cascading Failures):} trong hệ đa tác tử dựng trên cùng một mô hình nền tảng, một
+        điểm yếu chung hoặc dữ liệu sai từ một tác tử có thể kéo theo cả chuỗi.
+  \item \textbf{Rò rỉ đặc quyền (Privilege Escalation):} tác tử được cấp quyền truy cập hệ thống có thể bị lợi dụng, ví dụ
+        bằng tấn công chèn lệnh (prompt injection), để thực hiện thao tác vượt thẩm quyền.
+\end{itemize}
+
+Để bảo đảm an toàn, IBM đề xuất bốn nguyên tắc quản trị:
+\begin{enumerate}
+  \item \textbf{Audit Trail} -- nhật ký hoạt động có dấu thời gian cho mọi lời gọi công cụ và quyết định, để truy vết
+        khi có sự cố.
+  \item \textbf{HITL (Human-in-the-loop)} -- con người có thể can thiệp, phê duyệt hoặc dừng khẩn cấp, đặc biệt với
+        thao tác có hệ quả lớn.
+  \item \textbf{Unique Agent IDs} -- mỗi tác tử có định danh duy nhất để biết hành động nào do tác tử nào thực hiện.
+  \item \textbf{Guardrails} -- ngưỡng giới hạn cứng như số vòng lặp tối đa (\texttt{max\_iterations}), thời gian chờ,
+        cơ chế tự ngắt.
+\end{enumerate}
+
+\hinhtikz{ch6_governance}{Ba nhóm rủi ro vận hành và bốn nguyên tắc quản trị tương ứng.}{ch6-governance}
+
+\begin{table}[!htbp]\centering
+\caption{Ma trận kiểm soát rủi ro vận hành AI Agent theo khuyến nghị của IBM và Google Cloud.}\label{tab:ch6-risk}
+\small
+\begin{tabularx}{\linewidth}{L{3.1cm}XX}
+\toprule
+\textbf{Nhóm rủi ro} & \textbf{Biểu hiện và hậu quả} & \textbf{Cơ chế kiểm soát} \\
+\midrule
+Vòng lặp vô hạn & Tác tử gọi công cụ lặp lại khi gặp lỗi, cạn kiệt tài nguyên máy chủ và chi phí token &
+Ngưỡng cứng \texttt{max\_iterations}, giới hạn thời gian, tự ngắt \\
+Thất bại dây chuyền & Dữ liệu sai từ một tác tử lan sang chuỗi tác tử kế tiếp trong mạng mesh & Định danh tác tử,
+kiểm tra dữ liệu trung gian, cô lập lỗi cục bộ \\
+Rò rỉ quyền hạn & Tác tử bị chèn lệnh, thực hiện thao tác phá hoại dữ liệu hoặc tài khoản thanh toán & HITL cho thao
+tác quan trọng, quyền tối thiểu (least privilege) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Tác tử Q-Learning của bài thực hành cũng có một guardrail theo đúng tinh thần này: hằng số \texttt{MAX\_STEPS} giới hạn
+số bước tối đa của mỗi episode, nên ở giai đoạn đầu, khi tác tử còn đi ngẫu nhiên, nó không thể lặp vô hạn trong mê cung.

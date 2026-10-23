@@ -1,0 +1,41 @@
+\begin{tikzpicture}
+  % ---------------- môi trường doanh nghiệp (trên cùng)
+  \node[hop=cSlate, minimum width=15.4cm, minimum height=1.55cm, font=\small] (env) at (8,12.45)
+    {\textbf{MÔI TRƯỜNG DOANH NGHIỆP (Enterprise Environment)}\\
+     Người dùng \,·\, Hệ thống nội bộ \,·\, Cơ sở dữ liệu \,·\, API bên ngoài};
+
+  % ---------------- vùng lõi tác tử
+  \draw[rounded corners=8pt, draw=cNavy!60, dashed, very thick, fill=cSky!6] (0.1,1.85) rectangle (15.9,9.8);
+  \node[anchor=north, font=\small\bfseries\sffamily, text=cNavy] at (8,9.72)
+    {LÕI SUY LUẬN TỰ TRỊ CỦA TÁC TỬ (Agent Core)};
+
+  % ---------------- ba trụ cột
+  \foreach \x/\c/\n/\t/\b in {
+      2.75/cOrange/p1/{(1) Suy luận \& Lập kế hoạch\\(Reasoning \& Planning)}/{$\bullet$ Phân rã mục tiêu lớn\\$\bullet$ Chuỗi tác vụ con tuần tự, tối ưu\\$\bullet$ Tự phản chiếu, sửa sai},
+      8/cPurple/p2/{(2) Bộ nhớ \& Ngữ cảnh\\(Memory Management)}/{$\bullet$ Ngắn hạn: duy trì hội thoại\\$\bullet$ Dài hạn: Vector DB\\$\bullet$ Knowledge Graph},
+      13.25/cGreen/p3/{(3) Công cụ \& Action Engine\\(Tool Use)}/{$\bullet$ Function Calling\\$\bullet$ Truy vấn CSDL nội bộ\\$\bullet$ Thực thi mã lệnh}} {
+    \node[hop=\c, anchor=south, text width=4.6cm, align=left, font=\small, minimum height=4.05cm] (\n) at (\x,4.75)
+      {{\centering\textbf{\t}\par}\smallskip\raggedright\b};
+  }
+
+  % ---------------- mô hình nền tảng (khối 3D)
+  \khoibaD{0.5}{2.2}{14.15}{1.45}{2}{cBlue}
+  \node[text=white, font=\small\bfseries, align=center] (llm) at (7.575,2.925)
+    {MÔ HÌNH NỀN TẢNG -- LLM (Generative AI Foundation Model)};
+  \foreach \n in {p1,p2,p3} {
+    \draw[{Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, very thick, cNavy] (\n.south) -- ++(0,-0.55);
+  }
+
+  % ---------------- nhận thức / hành động
+  \draw[muiM=cTeal!80!black, line width=1.8pt] (1.3,11.675) -- (1.3,8.8);
+  \node[anchor=west, font=\small\bfseries, text=cTeal!70!black] at (1.45,10.75) {Nhận thức (Perception)};
+  \draw[muiM=cGreen!65!black, line width=1.8pt] (14.7,8.8) -- (14.7,11.675);
+  \node[anchor=east, font=\small\bfseries, text=cGreen!60!black] at (14.55,10.75) {Hành động (Actions)};
+  \draw[cNavy, thick, dashed, -{Stealth[length=2.2mm]}] (p1.east) -- (p2.west);
+  \draw[cNavy, thick, dashed, -{Stealth[length=2.2mm]}] (p2.east) -- (p3.west);
+
+  % ---------------- quản trị an toàn (dưới cùng)
+  \node[hop=cRed, minimum width=15.4cm, minimum height=1.25cm, font=\small] (gov) at (8,0.7)
+    {\textbf{QUẢN TRỊ AN TOÀN (Governance)}\\Guardrails \,·\, Audit Trail \,·\, Human-in-the-loop (HITL) \,·\, Unique Agent ID};
+  \draw[muiM=cRed!70!black] (gov.north) -- (8,2.15);
+\end{tikzpicture}

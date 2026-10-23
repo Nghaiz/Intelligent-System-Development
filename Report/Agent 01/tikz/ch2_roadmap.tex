@@ -1,0 +1,20 @@
+\begin{tikzpicture}
+  % bậc thang 3D: mỗi giai đoạn là một khối, cao dần theo mức độ tự trị
+  \foreach \i/\x/\h/\c in {1/0/1.1/cSlate, 2/3.75/2.0/cBlue, 3/7.5/2.9/cOrange, 4/11.25/3.8/cPurple} {
+    \khoibaD{\x}{0}{3.45}{\h}{1.4}{\c}
+    \node[text=white, font=\small\bfseries\sffamily] at ({\x+1.725},{\h/2}) {GIAI ĐOẠN \i};
+  }
+  % hộp đặc trưng phía trên mỗi bậc
+  \foreach \x/\h/\c/\t/\b in {
+      0/1.1/cSlate/{Chatbot thụ động\\(Non-agentic)}/{$\bullet$ Phản hồi theo prompt\\$\bullet$ Không lập kế hoạch\\$\bullet$ Không dùng công cụ},
+      3.75/2.0/cBlue/{Trợ lý AI Copilot}/{$\bullet$ Hỗ trợ từng bước\\$\bullet$ Con người lập kế hoạch\\$\bullet$ Xác nhận từng lệnh},
+      7.5/2.9/cOrange/{Tác tử đơn lẻ tự trị}/{$\bullet$ Tự phân rã nhiệm vụ\\$\bullet$ Tự chọn, gọi công cụ\\$\bullet$ Tự phản chiếu, thử lại},
+      11.25/3.8/cPurple/{Mạng lưới tác tử\\(Agentic Mesh)}/{$\bullet$ Tác tử chuyên môn sâu\\$\bullet$ Giao tiếp A2A\\$\bullet$ Giám sát cấp cao}} {
+    \node[hop=\c, anchor=south, text width=3.25cm, align=left, font=\small] at ({\x+1.725},{\h+0.75})
+      {{\centering\textbf{\t}\par}\smallskip\raggedright\b};
+  }
+  % mũi tên tăng trưởng
+  \draw[-{Stealth[length=4mm,width=4mm]}, line width=3pt, cRed!80!black, opacity=0.85]
+    (0.3,-0.75) -- (15.6,-0.75) node[pos=0.5, below=2pt, font=\small\bfseries, text=cRed!70!black, opacity=1]
+    {Mức độ tự trị và phạm vi tác động tăng dần};
+\end{tikzpicture}

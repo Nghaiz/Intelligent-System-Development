@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+  % tâm chu trình
+  \node[circle, minimum size=2.7cm, draw=cNavy, very thick, inner color=white, outer color=cSky!45,
+        blur shadow={shadow blur steps=8, shadow opacity=35}, align=center, font=\small\bfseries] (core) at (0,0.55)
+        {Tác tử AI\\(chu trình\\khép kín)};
+  % ba giai đoạn
+  \node[hop=cOrange, text width=4.6cm, minimum height=2.5cm, font=\small] (g1) at (90:3.85cm)
+    {\textbf{(1) Khởi tạo mục tiêu \& Lập kế hoạch}\\(Goal Initialization \& Planning)\\Phân rã yêu cầu thành các hành động đo lường được};
+  \node[hop=cGreen, text width=4.6cm, minimum height=2.5cm, font=\small] (g2) at (-25:4.35cm)
+    {\textbf{(2) Suy luận kết hợp công cụ}\\(Reasoning with Tools)\\Nhận thức môi trường, gọi công cụ bổ sung tri thức};
+  \node[hop=cPurple, text width=4.6cm, minimum height=2.5cm, font=\small] (g3) at (205:4.35cm)
+    {\textbf{(3) Học hỏi \& Tự phản chiếu}\\(Learning \& Reflection)\\Phân tích phản hồi, tinh chỉnh kế hoạch khi gặp lỗi};
+  % vòng lặp
+  \draw[muiM=cOrange!75!black, line width=2pt] (g1.east) to[out=0, in=90] (g2.north);
+  \draw[muiM=cGreen!65!black, line width=2pt] (g2.south) to[out=-110, in=-70] node[below, font=\small\itshape, text=cGreen!50!black] {kết quả, phản hồi} (g3.south);
+  \draw[muiM=cPurple!75!black, line width=2pt] (g3.north) to[out=90, in=180] node[left, font=\small\itshape, text=cPurple!60!black, align=right] {tinh chỉnh\\(iterative\\refinement)} (g1.west);
+  \foreach \n in {g1, g2, g3} { \draw[cSlate, thick, dashed] (core) -- (\n); }
+  % đầu vào và môi trường
+  \node[hop=cSlate, minimum width=3.3cm, font=\small] (user) at (-5.6,4.6) {Yêu cầu\\người dùng};
+  \draw[muiM=cSlate!80!black] (user.east) -- (g1.west |- user.east) ;
+  \node[csdl=cTeal, minimum width=3.4cm, minimum height=1.6cm, font=\small] (tool) at (5.6,4.3)
+    {Công cụ ngoại vi\\API · Web · CSDL};
+  \draw[{Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, very thick, cTeal!70!black] (g2.north east) -- (tool.south);
+\end{tikzpicture}

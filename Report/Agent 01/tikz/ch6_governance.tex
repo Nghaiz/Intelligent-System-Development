@@ -1,0 +1,35 @@
+\begin{tikzpicture}[
+    rr/.style={hop=cRed, text width=4.6cm, align=left, font=\small, minimum height=1.9cm},
+    nt/.style={hop=#1, text width=4.75cm, align=left, font=\small, minimum height=1.45cm}]
+  \node[tieude] at (2.45,9.1) {RỦI RO VẬN HÀNH};
+  \node[tieude, anchor=east] at (15.45,9.1) {NGUYÊN TẮC QUẢN TRỊ (IBM)};
+  % ba rủi ro
+  \node[rr] (r1) at (2.45,7.2) {\textbf{Vòng lặp vô hạn}\\gọi công cụ lặp lại, cạn tài nguyên và chi phí token};
+  \node[rr] (r2) at (2.45,4.55) {\textbf{Thất bại dây chuyền}\\lỗi dữ liệu lan truyền sang chuỗi tác tử kế tiếp};
+  \node[rr] (r3) at (2.45,1.9) {\textbf{Rò rỉ quyền hạn}\\Prompt Injection, lệnh phá hoại CSDL, tài khoản};
+  % biểu tượng cảnh báo
+  \foreach \n in {r1, r2, r3} {
+    \node[regular polygon, regular polygon sides=3, fill=cYellow, draw=cOrange!80!black, thick, minimum size=0.95cm,
+          inner sep=0pt, font=\small\bfseries, yshift=-0.5mm] at ([xshift=-0.3cm, yshift=-0.05cm]\n.north east) {!};
+  }
+  % bốn nguyên tắc, mỗi nguyên tắc có một tấm khiên
+  \foreach \i/\y/\c/\t/\d in {
+      1/7.85/cBlue/{(1) Audit Trail}/{nhật ký kiểm toán có mốc thời gian},
+      2/5.6/cPurple/{(2) Human-in-the-loop}/{con người can thiệp khẩn cấp},
+      3/3.35/cTeal/{(3) Unique Agent ID}/{định danh tác tử duy nhất},
+      4/1.1/cGreen/{(4) Guardrails}/{ngưỡng \texttt{max\_iterations}, timeout}} {
+    \node[nt=\c, anchor=west] (p\i) at (10.25,\y) {\textbf{\t}\\\d};
+    \filldraw[draw=\c!70!black, very thick, top color=\c!25, bottom color=\c!70]
+      (9.55,{\y+0.62}) -- (8.85,{\y+0.42}) -- (8.85,{\y-0.05}) .. controls (8.85,{\y-0.45}) and (9.25,{\y-0.65}) ..
+      (9.55,{\y-0.78}) .. controls (9.85,{\y-0.65}) and (10.25,{\y-0.45}) .. (10.25,{\y-0.05}) -- (10.25,{\y+0.42}) -- cycle;
+    \node[font=\small\bfseries, text=white] at (9.55,{\y-0.05}) {\i};
+  }
+  % ánh xạ rủi ro -> kiểm soát
+  \draw[muiM=cRed!70!black, line width=1.7pt] (r1.east) to[out=0, in=180] ([yshift=-1.2mm]8.85,1.1);
+  \draw[muiM=cRed!70!black, line width=1.7pt] (r2.east) to[out=0, in=180] (8.85,3.35);
+  \draw[muiM=cRed!70!black, line width=1.7pt] (r3.east) to[out=0, in=180] (8.85,5.6);
+  \foreach \n in {r1, r2, r3} {
+    \draw[muiM=cBlue!70!black, thick, dashed] (\n.east) to[out=0, in=180] (8.85,7.85);
+  }
+  \node[font=\small\itshape, text=cBlue!70!black, fill=white, inner sep=1.5pt] at (7.1,8.55) {ghi vết mọi rủi ro};
+\end{tikzpicture}

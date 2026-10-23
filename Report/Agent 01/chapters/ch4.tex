@@ -1,0 +1,79 @@
+% =====================================================================
+%  CHƯƠNG 4. NĂM PHÂN CẤP TÁC TỬ KINH ĐIỂN VÀ MÔ HÌNH HỌC MÁY
+% =====================================================================
+\chapter{Năm phân cấp tác tử kinh điển và mô hình học máy}
+
+\section{Năm loại tác tử theo Russell \& Norvig}
+IBM Think \cite{ibm_agents} quy chiếu các kiến trúc tác tử hiện đại về năm loại tác tử kinh điển của Russell \& Norvig
+\cite{russell_norvig}, xếp theo mức độ phức tạp tăng dần (Hình~\ref{fig:ch4-five}).
+\begin{enumerate}
+  \item \textbf{Simple reflex agent} (tác tử phản xạ đơn giản): hành động theo luật \emph{điều kiện -- hành động} dựa
+        trên tri giác hiện tại, không lưu vết. Ví dụ: bộ điều nhiệt bật máy sưởi khi nhiệt độ dưới ngưỡng.
+  \item \textbf{Model-based reflex agent} (tác tử phản xạ có mô hình): duy trì một mô hình trạng thái nội tại để xử lý
+        môi trường chỉ quan sát được một phần. Ví dụ: robot hút bụi nhớ những vùng đã dọn.
+  \item \textbf{Goal-based agent} (tác tử dựa trên mục tiêu): ra quyết định dựa trên mục tiêu định trước, tìm kiếm và lập
+        kế hoạch chuỗi hành động dẫn tới mục tiêu. Ví dụ: hệ thống chỉ đường tìm lộ trình tới địa điểm.
+  \item \textbf{Utility-based agent} (tác tử dựa trên hữu dụng): khi có nhiều cách đạt mục tiêu, chọn cách tối đa hóa hàm
+        hữu dụng (thời gian, chi phí, an toàn). Ví dụ: chỉ đường cân bằng thời gian và phí cầu đường.
+  \item \textbf{Learning agent} (tác tử học máy): tự cải thiện năng lực qua tương tác và phản hồi của môi trường.
+\end{enumerate}
+
+\hinhtikz{ch4_five_agents}{Năm loại tác tử kinh điển của Russell \& Norvig xếp theo mức tự chủ và năng lực tăng
+dần.}{ch4-five}
+
+\section{Cấu trúc nội tại của tác tử học máy (Learning Agent)}
+Theo Russell \& Norvig \cite{russell_norvig}, một Learning Agent gồm bốn thành phần chức năng
+(Hình~\ref{fig:ch4-learning}):
+\begin{itemize}
+  \item \textbf{Critic} (bộ phê bình): đối chiếu hành vi với \emph{tiêu chuẩn hiệu năng} cố định bên ngoài và sinh tín
+        hiệu phản hồi cho biết tác tử đang làm tốt hay kém.
+  \item \textbf{Learning Element} (phần tử học): nhận phản hồi từ Critic để cập nhật tri thức, tức chính sách của tác tử.
+  \item \textbf{Performance Element} (phần tử thực thi): dựa trên tri thức hiện có, chọn hành động đưa vào môi trường.
+  \item \textbf{Problem Generator} (bộ sinh vấn đề): đề xuất những hành động thăm dò mới để tác tử tích lũy kinh
+        nghiệm, kể cả khi trước mắt chúng chưa phải lựa chọn tốt nhất.
+\end{itemize}
+
+\hinhtikz{ch4_learning_agent}{Kiến trúc tổng quát của tác tử học máy (Learning Agent Architecture) theo Russell \&
+Norvig.}{ch4-learning}
+
+Bốn thành phần này ứng với các phần của tác tử Q-Learning xây dựng ở Chương~\ref{ch:thucnghiem}
+(Bảng~\ref{tab:ch4-map}).
+
+\begin{table}[!htbp]\centering
+\caption{Bốn thành phần của Learning Agent trong tác tử Q-Learning của bài thực hành.}\label{tab:ch4-map}
+\small
+\begin{tabularx}{\linewidth}{L{3.7cm}X}
+\toprule
+\textbf{Thành phần} & \textbf{Hiện thực trong tác tử Q-Learning} \\
+\midrule
+Tiêu chuẩn hiệu năng & Hàm phần thưởng: $-1$ mỗi bước, $-10$ khi đâm tường lửa, $+100$ khi về đích \\
+Critic & Sai số TD $\delta = r + \gamma \max_{a'} Q(s',a') - Q(s,a)$ \\
+Learning Element & Phép cập nhật $Q(s,a) \leftarrow Q(s,a) + \alpha\,\delta$ (phương thức \texttt{update}) \\
+Performance Element & Chọn $\arg\max_a Q(s,a)$ (nhánh khai thác của \texttt{choose\_action}) \\
+Problem Generator & Nhánh thăm dò ngẫu nhiên với xác suất $\varepsilon$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Khung toán học Quá trình Quyết định Markov (MDP)}
+Mọi bài toán tác tử học tương tác với môi trường đều được mô hình hóa bằng \textbf{Quá trình Quyết định Markov} (Markov
+Decision Process) \cite{sutton_barto}, gồm bộ năm thành phần
+\[
+  \mathcal{M} = \langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle,
+\]
+trong đó:
+\begin{itemize}
+  \item $\mathcal{S}$ -- \textbf{không gian trạng thái}, mô tả những gì tác tử nhận thức được về môi trường;
+  \item $\mathcal{A}$ -- \textbf{không gian hành động}, tập các hành vi hợp lệ;
+  \item $P(s' \mid s, a)$ -- \textbf{hàm chuyển trạng thái}, xác suất sang trạng thái $s'$ khi thực hiện $a$ tại $s$;
+  \item $R(s, a, s')$ -- \textbf{hàm phần thưởng}, đại lượng vô hướng tức thời phản hồi chất lượng hành vi;
+  \item $\gamma \in [0,1]$ -- \textbf{hệ số chiết khấu}, cân bằng giữa lợi ích tức thời và mục tiêu dài hạn.
+\end{itemize}
+Tính chất Markov phát biểu rằng tương lai chỉ phụ thuộc trạng thái hiện tại, không phụ thuộc quá khứ:
+$P(S_{t+1} \mid S_t, A_t, S_{t-1}, \dots) = P(S_{t+1} \mid S_t, A_t)$. Mục tiêu của tác tử là tìm chính sách $\pi$ tối
+đa hóa tổng phần thưởng chiết khấu kỳ vọng
+\[
+  G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}.
+\]
+
+\hinhtikz{ch4_mdp}{Vòng tương tác tác tử -- môi trường của một Quá trình Quyết định Markov.}{ch4-mdp}

@@ -1,0 +1,55 @@
+% =====================================================================
+%  CHƯƠNG 9. SỰ GIAO THOA GIỮA LLM AGENT VÀ REINFORCEMENT LEARNING
+% =====================================================================
+\chapter{Sự giao thoa giữa LLM Agent và học tăng cường}\label{ch:giaothoa}
+
+\section{Học tăng cường từ phản hồi con người (RLHF)}
+Các tác tử AI hiện đại dựa trên LLM liên hệ chặt chẽ với học tăng cường qua kỹ thuật \textbf{RLHF} (Reinforcement Learning
+from Human Feedback) \cite{christiano_rlhf}. Quy trình gồm ba bước (Hình~\ref{fig:ch9-rlhf}):
+\begin{enumerate}
+  \item \textbf{Huấn luyện mô hình phần thưởng (Reward Model).} Thu thập đánh giá ưu tiên của con người giữa các câu trả
+        lời của mô hình (câu nào tốt hơn), từ đó huấn luyện một hàm phần thưởng $R_\phi(x, y)$ chấm điểm câu trả lời $y$
+        cho câu hỏi $x$.
+  \item \textbf{Tối ưu chính sách bằng PPO.} Dùng thuật toán Actor-Critic PPO (Proximal Policy Optimization) cập nhật
+        trọng số LLM để tối đa hóa điểm của Reward Model, đồng thời phạt độ lệch KL so với mô hình gốc để mô hình không
+        ``lách luật'' phần thưởng:
+        \[
+          \max_\theta\; \mathbb{E}_{x,\, y \sim \pi_\theta}\!\left[ R_\phi(x,y) \right]
+          - \beta\, \mathrm{KL}\!\left( \pi_\theta(\cdot \mid x) \,\|\, \pi_{\text{ref}}(\cdot \mid x) \right).
+        \]
+  \item \textbf{Định hình hành vi an toàn.} RLHF biến một mô hình dự đoán từ kế tiếp thô thành một tác tử hội thoại biết
+        từ chối yêu cầu độc hại, tuân thủ chỉ dẫn và giải trình mạch lạc.
+\end{enumerate}
+Có thể đặt RLHF vào khung MDP của Chương~4: trạng thái là câu hỏi cùng phần câu trả lời đã sinh, hành động là từ kế tiếp,
+phần thưởng do Reward Model chấm khi câu trả lời hoàn tất. Đây là cùng một vòng lặp tác tử -- môi trường mà tác tử
+Q-Learning của bài thực hành sử dụng, chỉ khác ở quy mô.
+
+\hinhtikz{ch9_rlhf}{Quy trình ba bước của RLHF: dữ liệu ưu tiên của con người, mô hình phần thưởng và tối ưu chính sách
+bằng PPO có ràng buộc KL.}{ch9-rlhf}
+
+\section{Tác tử tự hoàn thiện và suy luận theo cây MCTS}
+Các hệ tác tử tiên tiến đưa thuật toán học tăng cường kinh điển vào chính quá trình suy luận (inference-time compute):
+\begin{itemize}
+  \item \textbf{Monte Carlo Tree Search (MCTS) và Q* Search.} Thay vì sinh một luồng suy luận duy nhất, tác tử khám phá
+        một cây suy luận nhiều nhánh qua bốn bước chọn -- mở rộng -- đánh giá -- lan truyền ngược. Một mô hình đánh giá
+        từng bước (Process Reward Model -- PRM) chấm điểm mỗi bước tư duy, đóng vai hàm giá trị giống như $Q(s,a)$
+        trong Q-Learning (Hình~\ref{fig:ch9-mcts}).
+  \item \textbf{Tự sửa sai (Self-Correction).} Tác tử tự tạo môi trường phản hồi (self-play): viết mã, chạy kiểm thử đơn vị,
+        đọc lỗi và sửa, lặp lại cho tới khi đạt mục tiêu. Kết quả kiểm thử chính là tín hiệu phần thưởng.
+\end{itemize}
+
+\hinhtikz{ch9_mcts}{Suy luận dạng cây MCTS với mô hình đánh giá từng bước (PRM).}{ch9-mcts}
+
+\section{Xu thế hội tụ Neuro-Symbolic trong hệ đa tác tử}
+Kết hợp năng lực lập luận ngôn ngữ của LLM (Neuro) với các giải thuật tối ưu hóa điều khiển chính xác của RL và quy hoạch
+động (Symbolic/Dynamic Programming) mở ra các hệ thống tự hành mới:
+\begin{itemize}
+  \item \textbf{Phân tầng điều khiển (Hierarchical Agent Control).} Tác tử LLM cấp cao làm Meta-Planner: phân tích mục tiêu
+        nghiệp vụ, chia thành mục tiêu con và giao cho các tác tử RL chuyên biệt thực thi thao tác vi mô thời gian thực
+        (robot, giao dịch tần suất cao) (Hình~\ref{fig:ch9-hier}).
+  \item \textbf{Trao đổi thông điệp chuẩn hóa.} Các tác tử trong Agentic Mesh tương tác qua giao thức mở, bảo đảm tính
+        minh bạch và khả năng kiểm toán toàn diện như yêu cầu quản trị ở Chương~\ref{ch:quantri}.
+\end{itemize}
+
+\hinhtikz{ch9_hierarchical}{Phân tầng điều khiển: tác tử LLM Meta-Planner giao mục tiêu con cho các tác tử RL chuyên
+biệt.}{ch9-hier}

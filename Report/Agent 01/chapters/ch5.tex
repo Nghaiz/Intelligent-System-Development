@@ -1,0 +1,89 @@
+% =====================================================================
+%  CHƯƠNG 5. LÝ THUYẾT HỌC TĂNG CƯỜNG THEO GEEKSFORGEEKS
+% =====================================================================
+\chapter[Lý thuyết học tăng cường theo GeeksforGeeks]{Lý thuyết học tăng cường\\theo GeeksforGeeks}
+
+\section{Bản chất của học tăng cường (Reinforcement Learning -- RL)}
+Theo GeeksforGeeks \cite{gfg_rl}, học tăng cường là một nhánh của học máy, trong đó một tác tử tự trị học cách đưa ra
+chuỗi quyết định tối ưu bằng cách tương tác với môi trường để tối đa hóa tổng phần thưởng tích lũy. Tác tử không được chỉ
+dẫn hành động nào là đúng; nó học qua \textbf{thử và sai} (trial and error), nhận phần thưởng khi làm tốt và hình phạt khi
+làm sai. Các thành phần cốt lõi gồm: \textbf{tác tử} (agent), \textbf{môi trường} (environment), \textbf{trạng thái},
+\textbf{hành động}, \textbf{phần thưởng}, \textbf{chính sách} (policy) và \textbf{hàm giá trị} (value function).
+
+Điểm khác biệt với hai mô thức học máy còn lại (Hình~\ref{fig:ch5-types}):
+\begin{itemize}
+  \item \textbf{So với học có giám sát (Supervised):} không có tập dữ liệu gán nhãn đúng/sai từ trước; tác tử phải tự
+        khám phá hành vi tối ưu qua tín hiệu thưởng/phạt, và tín hiệu này có thể đến trễ nhiều bước.
+  \item \textbf{So với học không giám sát (Unsupervised):} không chỉ tìm cấu trúc ẩn trong dữ liệu mà hướng tới cực đại
+        hóa một hàm mục tiêu số học là tổng phần thưởng.
+\end{itemize}
+
+\hinhtikz{ch5_learning_types}{Ba mô thức học máy: học có giám sát, học không giám sát và học tăng cường.}{ch5-types}
+
+\section{Bài toán đánh đổi thăm dò (Exploration) và khai thác (Exploitation)}
+Tác tử luôn đứng trước một thế khó: \emph{khai thác} hành động đã biết để nhận phần thưởng chắc chắn, hay \emph{thăm dò}
+hành động mới để có thể tìm ra phần thưởng lớn hơn. Chỉ khai thác thì dễ mắc kẹt ở lời giải chưa tối ưu; chỉ thăm dò thì
+không bao giờ tận dụng được điều đã học. Chiến lược phổ biến nhất là \textbf{$\varepsilon$-greedy}:
+\[
+  a =
+  \begin{cases}
+    \text{hành động ngẫu nhiên trong } \mathcal{A}, & \text{với xác suất } \varepsilon \quad \text{(thăm dò)},\\[2pt]
+    \arg\max_{a'} Q(s, a'), & \text{với xác suất } 1-\varepsilon \quad \text{(khai thác)}.
+  \end{cases}
+\]
+Trong thực tế $\varepsilon$ được giảm dần theo thời gian: đầu quá trình tác tử chưa biết gì nên cần thăm dò nhiều; khi
+Q-Table đã đáng tin, tác tử chuyển sang khai thác. Bài thực hành dùng lịch giảm theo cấp số nhân
+$\varepsilon_{k+1} = \max(\varepsilon_{\min},\, \varepsilon_k \cdot \lambda)$ với $\varepsilon_0 = 1$,
+$\varepsilon_{\min} = 0{,}01$ và $\lambda = 0{,}998$.
+
+\hinhtikz{ch5_eps_greedy}{Chính sách $\varepsilon$-greedy: phân nhánh thăm dò -- khai thác và lịch giảm dần của
+$\varepsilon$.}{ch5-eps}
+
+\section{Hàm giá trị và phương trình tối ưu Bellman}
+Hàm giá trị hành động $Q^\pi(s, a)$ biểu thị kỳ vọng tổng phần thưởng chiết khấu khi tác tử thực hiện hành động $a$ tại
+trạng thái $s$ rồi sau đó tuân theo chính sách $\pi$:
+\[
+  Q^\pi(s,a) = \mathbb{E}_\pi\!\left[ G_t \mid S_t = s, A_t = a \right].
+\]
+Hàm giá trị tối ưu $Q^*$ thỏa \textbf{phương trình tối ưu Bellman} \cite{sutton_barto}:
+\[
+  Q^*(s,a) = \mathbb{E}\!\left[ R_{t+1} + \gamma \max_{a'} Q^*(S_{t+1}, a') \;\middle|\; S_t = s, A_t = a \right].
+\]
+Thuật toán \textbf{Q-Learning} xấp xỉ $Q^*$ bằng cách lấy mẫu từ kinh nghiệm thực tế và cập nhật dần theo quy tắc
+\[
+  Q(s,a) \;\leftarrow\; Q(s,a) + \alpha \Big[ \underbrace{R + \gamma \max_{a'} Q(s', a')}_{\text{mục tiêu TD}} - Q(s,a)
+  \Big],
+\]
+trong đó $\alpha \in (0,1]$ là tốc độ học và $\gamma \in [0,1]$ là hệ số chiết khấu. Phần trong ngoặc vuông là \emph{sai
+số TD} (temporal difference). Khi tác tử về trạng thái kết thúc, mục tiêu TD chỉ còn là $R$ vì không còn phần thưởng
+tương lai. Q-Learning là thuật toán \emph{off-policy}: nó học chính sách tham lam tối ưu trong khi hành động theo
+$\varepsilon$-greedy.
+
+\hinhtikz{ch5_bellman}{Sơ đồ sao lưu (backup diagram) của phép cập nhật Q-Learning.}{ch5-bellman}
+
+\section{Phân loại các trường phái học tăng cường}
+Bảng~\ref{tab:ch5-families} và Hình~\ref{fig:ch5-families} tóm tắt bốn trường phái chính.
+
+\begin{table}[!htbp]\centering
+\caption{Phân loại các trường phái học tăng cường chính.}\label{tab:ch5-families}
+\small
+\begin{tabularx}{\linewidth}{L{2.8cm}XL{4.4cm}}
+\toprule
+\textbf{Trường phái} & \textbf{Đặc trưng kỹ thuật cốt lõi} & \textbf{Thuật toán tiêu biểu} \\
+\midrule
+Value-Based & Ước lượng hàm giá trị tối ưu $Q^*(s,a)$, chọn hành động tham lam theo giá trị & Q-Learning, SARSA,
+Deep Q-Network (DQN) \\
+Policy-Based & Tối ưu trực tiếp chính sách $\pi_\theta(a \mid s)$ bằng gradient ascent, không cần Q-Table & REINFORCE,
+Policy Gradient, TRPO \\
+Actor-Critic & Kết hợp cả hai: Actor sinh hành động, Critic đánh giá giá trị để giảm phương sai & A2C, A3C, PPO \\
+Model-Based & Tự xây dựng mô hình giả lập môi trường để lập kế hoạch trước khi hành động & Dyna-Q, World Models,
+MuZero \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\hinhtikz{ch5_rl_families}{Bốn trường phái học tăng cường và các thuật toán tiêu biểu.}{ch5-families}
+
+GeeksforGeeks \cite{gfg_rl} cũng nêu các ứng dụng điển hình của học tăng cường: robot và điều khiển tự động, trò chơi
+(cờ vây, game điện tử), xe tự lái, hệ gợi ý, tài chính định lượng, và tinh chỉnh mô hình ngôn ngữ theo phản hồi con
+người (Chương~\ref{ch:giaothoa}).

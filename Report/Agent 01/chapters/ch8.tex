@@ -1,0 +1,86 @@
+% =====================================================================
+%  CHƯƠNG 8. KẾT QUẢ THỰC NGHIỆM VÀ PHÂN TÍCH ĐỘNG HỌC HỌC TẬP
+% =====================================================================
+\chapter{Kết quả thực nghiệm và phân tích động học học tập}
+
+\section{Ảnh chụp màn hình kết quả thực thi (Copy Screen Output)}
+Các hình dưới đây là ảnh chụp màn hình thực tế kết quả chạy chương trình trên Jupyter Notebook, đúng yêu cầu của bài
+tập (copy screen output): nhật ký huấn luyện trên console, lộ trình học được, hai biểu đồ trực quan và Q-Table.
+
+\subsection{Nhật ký huấn luyện}
+\anhNB{out_train}{Ảnh chụp màn hình kết quả ô 4: cấu hình bài toán và nhật ký huấn luyện sau mỗi 250 episode.}{nb-train}
+
+\subsection{Lộ trình tối ưu}
+\anhNB{out_path}{Ảnh chụp màn hình kết quả ô 5: lộ trình học được, đối chiếu với đường ngắn nhất tìm bằng
+BFS.}{nb-path}
+
+Tác tử tìm được lộ trình \SL{ch8_qlearning/result/path_len} bước với tổng phần thưởng
+\SL{ch8_qlearning/result/greedy_reward}, đúng bằng độ dài đường ngắn nhất \SL{ch8_qlearning/result/bfs_len} bước do BFS
+tìm trên bản đồ. Tổng phần thưởng khớp với tính toán: \SL{ch8_qlearning/result/path_len} bước gồm 23 bước thường
+($-1$ mỗi bước) và bước cuối vào đích ($+100$), tức $-23 + 100 = 77$.
+
+\subsection{Biểu đồ trực quan}
+\anhNB{out_plot}{Ảnh chụp màn hình kết quả ô 7: lộ trình tối ưu trong mê cung $12 \times 12$ và đường cong hội tụ phần
+thưởng sau \SL{ch8_qlearning/params/episodes} episode.}{nb-plot}
+
+Để đọc rõ hơn, hai biểu đồ trong Hình~\ref{fig:nb-plot} được vẽ lại dạng vector ở cỡ toàn trang từ chính số liệu notebook
+đã lưu (Hình~\ref{fig:ch8-route} và Hình~\ref{fig:ch8-rewards}).
+
+\hinhpdf{ch8_route}{0.9}{Lộ trình tối ưu \SL{ch8_qlearning/result/path_len} bước của tác tử trong mê cung (vẽ lại
+dạng vector).}{ch8-route}
+
+\hinhpdf{ch8_rewards}{1}{Phần thưởng mỗi episode, trung bình trượt 100 episode và lịch giảm $\varepsilon$ (vẽ lại dạng
+vector).}{ch8-rewards}
+
+\subsection{Q-Table và lưu số liệu}
+\anhNB[0.5]{out_qtable}{Ảnh chụp màn hình kết quả ô 8: trích đoạn Q-Table tại các ô then chốt của lộ trình.}{nb-qtable}
+\anhNB{out_save}{Ảnh chụp màn hình ô 9: lưu số liệu thực nghiệm ra tệp JSON cho báo cáo.}{nb-save}
+
+\section{Phân tích động học học tập và hội tụ chính sách}
+Bảng~\ref{tab:ch8-log} tổng hợp nhật ký huấn luyện theo từng khối 250 episode. Kết hợp với Hình~\ref{fig:ch8-rewards},
+quá trình tự học của tác tử chia thành hai pha rõ rệt.
+
+\bang{ch8_log}{Diễn biến huấn luyện theo từng khối 250 episode.}{ch8-log}
+
+\subsection{Pha thăm dò (khoảng 500 episode đầu)}
+Với $\varepsilon$ gần 1, tác tử gần như đi ngẫu nhiên. Nó liên tục đâm vào tường lửa, mỗi lần mất 10 điểm và đứng yên,
+nên phần thưởng rất thấp: trung bình 100 episode đầu chỉ \SL{ch8_qlearning/result/reward_first100}, episode tệ nhất
+\SL{ch8_qlearning/result/reward_min}. Nhiều episode chạm giới hạn \SL{ch8_qlearning/params/max_steps} bước mà không về
+đích; tỉ lệ về đích của 250 episode đầu là \SL{ch8_qlearning/result/success_first250Pct}\%. Lần đầu tiên tác tử tình cờ về
+được đích là ở episode \SL{ch8_qlearning/result/first_success}. Từ đó phần thưởng $+100$ bắt đầu được lan ngược dần từ ô
+đích về các ô xa hơn qua từng lần cập nhật Bellman. Đây là giai đoạn \emph{Problem Generator} hoạt động mạnh nhất: tác tử
+tích lũy kinh nghiệm chứ chưa khai thác.
+
+\subsection{Pha khai thác và hội tụ}
+Khi giá trị lan đủ xa, các hành động tốt nổi lên trong Q-Table và $\varepsilon$ giảm làm tác tử ngày càng đi theo chúng.
+Đường trung bình trượt 100 episode chuyển sang dương ở khoảng episode \SL{ch8_qlearning/result/ma_first_positive}; từ
+khối 500 trở đi tác tử về đích 100\% số episode. $\varepsilon$ xuống dưới 0,05 ở episode
+\SL{ch8_qlearning/result/eps_below_005}; sau đó phần thưởng ổn định gần trần 77. Trung bình 100 episode cuối đạt
+\SL{ch8_qlearning/result/reward_last100} với \SL{ch8_qlearning/result/steps_last100} bước. Con số này thấp hơn 77 một
+chút vì $\varepsilon$ vẫn giữ ở mức tối thiểu \SL{ch8_qlearning/params/eps_min}, thỉnh thoảng tác tử còn đi một bước
+ngẫu nhiên. Khi tắt thăm dò (chính sách tham lam), tác tử đi đúng lộ trình tối ưu
+\SL{ch8_qlearning/result/path_len} bước.
+
+\section{Phân tích Q-Table và chính sách hành động tối ưu}
+Bảng~\ref{tab:ch8-qtable} trích Q-Table tại ô xuất phát, các điểm rẽ của lộ trình và ô ngay trước đích; giá trị lớn nhất
+mỗi hàng được in đậm và quyết định hành động $\pi^*(s)$.
+
+\bang{ch8_qtable}{Trích đoạn Q-Table và chính sách hành động tối ưu $\pi^*(s)$ tại các ô then chốt.}{ch8-qtable}
+
+Các giá trị trong bảng không phải con số tùy ý. Chúng hội tụ về đúng tổng phần thưởng chiết khấu mà phương trình Bellman
+dự đoán, và có thể kiểm tra bằng tay:
+\begin{itemize}
+  \item \textbf{Ô ngay trước đích $(11, 10)$:} $Q(\text{Phải}) = \SL{ch8_qlearning/qtable/12/Q(Phải)}$, đúng bằng
+        $R_{\text{goal}}$ vì bước này kết thúc episode, không còn phần thưởng tương lai.
+  \item \textbf{Ô $(10, 10)$:} cả Phải và Xuống đều bằng \SL{ch8_qlearning/qtable/11/Q(Phải)} $= -1 + 0{,}95 \times
+        100$. Hai hướng cùng dẫn tới một ô kề đích nên ngang giá trị; cả hai đều tối ưu.
+  \item \textbf{Ô xuất phát $(0, 0)$:} $Q(\text{Phải}) = \SL{ch8_qlearning/qtable/0/Q(Phải)}$ là giá trị của lộ trình
+        \SL{ch8_qlearning/result/path_len} bước:
+        $\displaystyle -\sum_{k=0}^{22} 0{,}95^k + 0{,}95^{23} \times 100 \approx -13{,}85 + 30{,}73 = 16{,}88$.
+  \item \textbf{Hành động đâm tường:} tại $(0,0)$, Trái và Lên đưa robot ra khỏi mê cung nên robot đứng yên:
+        $Q = -10 + 0{,}95 \times 16{,}88 = \SL{ch8_qlearning/qtable/0/Q(Trái)}$. Giá trị này thấp hơn hẳn hướng tốt, nên
+        tác tử đã học được cách tránh tường lửa.
+\end{itemize}
+Giá trị $Q$ dọc lộ trình tăng dần từ \SL{ch8_qlearning/qtable/0/Q(Phải)} ở $S$ lên 100 ở sát đích, mỗi bước nhân
+thêm $\gamma$ và cộng phần thưởng bước. Q-Table vì thế đóng vai một ``bản đồ độ dốc'': từ bất kỳ ô nào trên lộ trình,
+đi theo hướng có $Q$ lớn nhất là đi về đích nhanh nhất.

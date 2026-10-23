@@ -1,0 +1,38 @@
+% =====================================================================
+%  CHƯƠNG 10. TỔNG KẾT VÀ ĐÁNH GIÁ HỌC THUẬT
+% =====================================================================
+\chapter{Tổng kết và đánh giá học thuật}
+
+\section{Đánh giá tổng quan về năng lực và giới hạn hiện tại của AI Agent}
+Tổng hợp từ Google Cloud \cite{google_agents}, IBM Think \cite{ibm_agents}, McKinsey \cite{mckinsey_agents} và
+GeeksforGeeks \cite{gfg_rl}, có thể khẳng định AI Agent là bước chuyển quan trọng của trí tuệ nhân tạo: từ vai trò trợ lý
+thụ động trả lời câu hỏi sang thực thể tự hành giải quyết công việc thực tế. Ba trụ cột suy luận, bộ nhớ và công cụ cho
+phép tác tử lập kế hoạch, ghi nhớ và tác động vào hệ thống; các mô hình suy luận như ReAct, ReWOO, Reflection quyết định
+sự cân bằng giữa độ linh hoạt và chi phí; mạng lưới tác tử (Agentic Mesh) mở rộng mô hình này ra toàn doanh nghiệp.
+
+Tuy vậy, các thách thức về độ tin cậy, chi phí token, an toàn quyền hạn (privilege escalation) và nguy cơ vòng lặp vô
+hạn đòi hỏi các rào chắn nghiêm ngặt: nhật ký kiểm toán, định danh tác tử, ngưỡng giới hạn (guardrails) và cơ chế con
+người can thiệp (human-in-the-loop). Mức tự trị của tác tử càng cao thì các cơ chế này càng cần thiết.
+
+\section{Bài học kinh nghiệm từ bài thực hành lập trình Q-Learning}
+Qua quá trình lập trình và chạy tác tử Q-Learning trong mê cung
+$\SL{ch8_qlearning/params/n_rows} \times \SL{ch8_qlearning/params/n_cols}$:
+\begin{itemize}
+  \item \textbf{Sức mạnh của cập nhật Bellman.} Tác tử không biết bản đồ ban đầu, nhưng sau
+        \SL{ch8_qlearning/params/episodes} episode tương tác (\SL{ch8_qlearning/result/seconds} giây trên CPU) đã tự tìm
+        ra lộ trình \SL{ch8_qlearning/result/path_len} bước, đúng bằng đường ngắn nhất do BFS kiểm chứng. Các giá trị
+        Q-Table hội tụ về đúng tổng phần thưởng chiết khấu mà phương trình Bellman dự đoán.
+  \item \textbf{Tầm quan trọng của cân bằng thăm dò -- khai thác.} Giai đoạn đầu với $\varepsilon$ lớn có phần thưởng
+        rất thấp nhưng cần thiết, vì nhờ đó tác tử tình cờ tìm thấy đích và lan giá trị ngược về. Nếu $\varepsilon$ giảm
+        quá nhanh, tác tử dễ mắc kẹt ở một lộ trình chưa tối ưu; nếu $\varepsilon$ luôn lớn, chính sách không thể ổn
+        định.
+  \item \textbf{Thiết kế phần thưởng định hình hành vi.} Hình phạt $-1$ mỗi bước khiến tác tử ưu tiên đường ngắn; hình
+        phạt $-10$ khi đâm tường dạy nó tránh tường lửa. Đây chính là vai trò của ``tiêu chuẩn hiệu năng'' trong kiến
+        trúc Learning Agent.
+  \item \textbf{Guardrail cũng cần cho tác tử nhỏ.} Giới hạn \SL{ch8_qlearning/params/max_steps} bước mỗi episode ngăn
+        tác tử lặp vô hạn ở giai đoạn đi ngẫu nhiên, đúng như nguyên tắc \texttt{max\_iterations} mà IBM khuyến nghị.
+\end{itemize}
+
+\section{Hướng phát triển trong các bài tập kế tiếp}
+Mở rộng kiến trúc tác tử kết hợp đồ thị tri thức (Knowledge Graph RAG) và tích hợp công cụ Function Calling cho các bài
+toán tài chính và y tế phức hợp trong các bài thực hành tiếp theo của học phần.
