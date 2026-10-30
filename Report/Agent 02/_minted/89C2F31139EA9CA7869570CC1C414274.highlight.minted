@@ -1,0 +1,8 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} ag2/market.py}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{conversion\PYGZus{}probability}\PYG{p}{(}\PYG{n}{cfg}\PYG{p}{,} \PYG{n}{demand}\PYG{p}{,} \PYG{n}{own}\PYG{p}{,} \PYG{n}{rival}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}p\PYGZus{}i(t) = clip(0,30 + 0,25 d + 0,15 a\PYGZus{}i − 0,10 a\PYGZus{}−i, 0,05, 0,95).\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{p} \PYG{o}{=} \PYG{p}{(}\PYG{n}{cfg}\PYG{o}{.}\PYG{n}{base\PYGZus{}conversion} \PYG{o}{+} \PYG{n}{cfg}\PYG{o}{.}\PYG{n}{demand\PYGZus{}effect} \PYG{o}{*} \PYG{n}{demand}
+         \PYG{o}{+} \PYG{n}{cfg}\PYG{o}{.}\PYG{n}{own\PYGZus{}discount\PYGZus{}effect} \PYG{o}{*} \PYG{n}{own} \PYG{o}{\PYGZhy{}} \PYG{n}{cfg}\PYG{o}{.}\PYG{n}{rival\PYGZus{}discount\PYGZus{}effect} \PYG{o}{*} \PYG{n}{rival}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{p}\PYG{p}{,} \PYG{n}{cfg}\PYG{o}{.}\PYG{n}{p\PYGZus{}min}\PYG{p}{),} \PYG{n}{cfg}\PYG{o}{.}\PYG{n}{p\PYGZus{}max}\PYG{p}{)}
+\end{MintedVerbatim}

@@ -1,0 +1,43 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ---------------- Coordinator (khối 3D)
+  \khoibaD{3.7}{5.2}{8.6}{1.45}{1.1}{cNavy}
+  \node[text=white, align=center] at (8.0,5.93)
+    {\textbf{COORDINATOR (điều phối tập trung)}\\hợp đồng · hạn 80 ms · thử lại $\le 2$};
+
+  % ---------------- người dùng và phản hồi
+  \node[hop=cSlate, minimum width=2.7cm, minimum height=1.1cm] (user) at (1.45,5.93) {\textbf{Người dùng}\\câu tự do};
+  \draw[mui] (user.east) -- (3.7,5.93);
+  \node[hop=cYellow, minimum width=6.4cm, minimum height=0.9cm] (ans) at (8.6,7.95)
+    {\textbf{Phản hồi:} status · sản phẩm · tồn kho};
+  \draw[mui] (8.6,7.13) -- (ans.south);
+
+  % ---------------- bốn tác tử chuyên trách, mỗi tác tử ghi cặp thông điệp nó nhận/trả
+  \foreach \x/\c/\n/\t/\m/\s in {
+      1.9/cPurple/ia/{IntentAgent}/{CLASSIFY $\to$ INTENT}/{PyTorch · GPU,\\ngưỡng $\tau$},
+      5.95/cOrange/ca/{CatalogAgent}/{SEARCH $\to$ CANDIDATES}/{loại, hãng,\\ngân sách},
+      10.0/cGreen/ra/{Recommendation}/{RANK $\to$ RANKED}/{lọc giá sau KM,\\top-3},
+      14.05/cTeal/va/{InventoryAgent}/{CHECK\_STOCK $\to$ STOCK}/{tồn kho,\\tuổi dữ liệu}} {
+    \node[hop=\c, minimum width=3.55cm, minimum height=1.7cm, text width=3.3cm] (\n) at (\x,2.55)
+      {\textbf{\t}\\[1pt]{\color{\c!55!black}\footnotesize\m}\\\s};
+  }
+
+  % ---------------- yêu cầu (nét liền) và phản hồi (nét đứt), số thứ tự trên đường đi
+  \foreach \n/\c/\k/\xs in {ia/cPurple/1/4.15, ca/cOrange/2/6.6, ra/cGreen/3/9.4, va/cTeal/4/11.85} {
+    \draw[muiM=\c!80!black] (\xs,5.2) to[out=-90,in=90] node[pos=0.45, buoc=\c!85!black] {\k}
+      ([xshift=-0.5cm]\n.north);
+    \draw[muiM=\c!80!black, dashed] ([xshift=0.5cm]\n.north) to[out=90,in=-90] (\xs+0.45,5.2);
+  }
+
+  % ---------------- thử lại khi kho lỗi
+  \draw[muiM=cRed, dashed, line width=1.4pt] ([xshift=-0.2cm]va.north east) to[out=70,in=-10]
+    node[pos=0.55, right, font=\small\bfseries, text=cRed, align=left] {lỗi\\$\to$ thử lại} (12.85,6.1);
+
+  % ---------------- dữ liệu mỗi tác tử đọc
+  \node[khoiP, minimum width=2.7cm] (ck) at (1.9,0.1) {intent\_net.pt};
+  \node[csdl=cOrange] (db1) at (7.95,0.1) {Catalog\\60 SP};
+  \node[csdl=cTeal] (db2) at (14.05,0.1) {Kho\\+ bản cũ};
+  \draw[muiM=cPurple!80!black] (ck) -- (ia);
+  \draw[muiM=cOrange!80!black] (db1) -- (ca.south);
+  \draw[muiM=cOrange!80!black] (db1) -- (ra.south);
+  \draw[muiM=cTeal!80!black] (db2) -- (va);
+\end{tikzpicture}

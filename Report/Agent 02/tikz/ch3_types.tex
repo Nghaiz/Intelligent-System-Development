@@ -1,0 +1,21 @@
+\begin{tikzpicture}[font=\small]
+  % thanh phổ chuyển màu
+  \shade[left color=cGreen, right color=cYellow, rounded corners=4pt] (0,0) rectangle (7.6,1.0);
+  \shade[left color=cYellow, right color=cRed, rounded corners=4pt] (7.4,0) rectangle (15.4,1.0);
+  \draw[cSlate, thick, rounded corners=4pt] (0,0) rectangle (15.4,1.0);
+  \node[font=\bfseries, text=white] at (2.2,0.5) {Hợp tác};
+  \node[font=\bfseries] at (7.7,0.5) {Cạnh--hợp};
+  \node[font=\bfseries, text=white] at (13.2,0.5) {Cạnh tranh};
+  % ví dụ theo bài khảo sát
+  \node[hop=cGreen, text width=3.8cm] (x1) at (2.2,2.4) {lập kế hoạch -- viết mã -- kiểm thử};
+  \node[hop=cYellow, text width=3.8cm] (x2) at (7.7,2.4) {thương lượng dưới lợi ích khác nhau};
+  \node[hop=cRed, text width=3.8cm] (x3) at (13.2,2.4) {tranh luận đối kháng};
+  \foreach \i/\x in {1/2.2,2/7.7,3/13.2} \draw[cSlate, thick, densely dotted] (x\i) -- (\x,1.0);
+  % hai hệ của báo cáo
+  \node[cau=cBlue, minimum size=11mm] (h1) at (1.6,-1.6) {MAS};
+  \node[hop=cBlue, anchor=west, text width=4.4cm] at (2.4,-1.6) {Hệ mua sắm: cùng hoàn thành yêu cầu};
+  \node[cau=cPink, minimum size=11mm] (h2) at (11.2,-1.6) {\$};
+  \node[hop=cPink, anchor=west, text width=3.2cm] at (12.0,-1.6) {Hai cửa hàng giảm giá};
+  \draw[muiM=cBlue] (h1) -- (1.6,0);
+  \draw[muiM=cPink] (h2) -- (11.2,0);
+\end{tikzpicture}

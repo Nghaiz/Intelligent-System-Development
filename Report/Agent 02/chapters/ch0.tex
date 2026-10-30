@@ -1,0 +1,42 @@
+% =====================================================================
+%  MỞ ĐẦU
+% =====================================================================
+\chapter*{Mở đầu}
+\addcontentsline{toc}{chapter}{Mở đầu}
+\markboth{Mở đầu}{Mở đầu}
+
+Một cửa hàng thương mại điện tử phải quyết định giá mỗi ngày trong khi nhu cầu không chắc chắn và đối thủ cũng đang
+quyết định giá. Có hai cách xây dựng ``bộ não'' cho quyết định đó. Cách thứ nhất là viết luật: người thiết kế đoán trước
+các tình huống và ghi sẵn phản ứng. Cách thứ hai là cho tác tử tự học từ phần thưởng bằng học tăng cường (Reinforcement
+Learning -- RL). Luật dễ hiểu và an toàn nhưng cứng; RL thích nghi được nhưng tốn dữ liệu, phụ thuộc seed và có thể học
+sai nếu phần thưởng hoặc trạng thái thiết kế không khớp mục tiêu.
+
+Bài tập Agent 02 đặt hai cách này cạnh nhau trong một hệ đa tác tử (Multi-Agent System -- MAS) tối giản: hai cửa hàng,
+mỗi bước chọn giảm giá hoặc giữ giá~\cite{lab02}. Phần lý thuyết dựa trên ba tài liệu được giao: tutorial phát triển hệ đa
+tác tử bằng Python và PyTorch~\cite{ch1:tutorial}, bài tổng quan học tăng cường của Naeem và cộng sự~\cite{ch2:naeem}, và
+khảo sát cơ chế cộng tác của hệ đa tác tử dựa trên mô hình ngôn ngữ lớn của Tran và cộng sự~\cite{ch3:tran}.
+
+\section*{Mục tiêu}
+\begin{enumerate}
+  \item Trình bày cơ sở thiết kế hệ đa tác tử, học tăng cường và cơ chế cộng tác đa tác tử theo ba tài liệu.
+  \item Mô hình hóa bài toán theo tác tử, môi trường, trạng thái, hành động, phần thưởng, chính sách; tính sẵn chính sách
+    tối ưu làm mốc.
+  \item Cài đặt môi trường, tác tử Q-learning và tác tử luật bằng Python; tách huấn luyện và đánh giá.
+  \item Thực hiện năm thí nghiệm A--E của đề bài và ba thí nghiệm mở rộng F--H; trả lời mười câu hỏi bằng số liệu đo được,
+    cài đặt một thay đổi môi trường (câu 9) và một tác tử tốt hơn (câu 10).
+  \item Hiện thực hệ đa tác tử hỗ trợ mua sắm theo tutorial, với bộ phân loại ý định PyTorch huấn luyện trên GPU.
+\end{enumerate}
+
+\section*{Cách đọc báo cáo}
+Chương~\ref{chap:1}--\ref{chap:3} là lý thuyết. Chương~\ref{chap:4} hình thức hóa bài toán, Chương~\ref{chap:5} mô tả
+chương trình và giao thức đánh giá, Chương~\ref{chap:6} trình bày kết quả, Chương~\ref{chap:7} trả lời mười câu hỏi,
+Chương~\ref{chap:8} là hệ mua sắm đa tác tử, Chương~\ref{chap:9} thảo luận và kết luận. Mọi con số thực nghiệm trong báo
+cáo được sinh tự động từ tệp JSON do chương trình ghi; mọi đoạn mã được trích nguyên văn từ mã đã chạy.
+
+\begin{phathien}{Kết luận chính}
+Ở cấu hình của đề bài ($\delta=20\%$), chính sách tối ưu khi đối thủ là tác tử luật là \emph{không bao giờ giảm giá}, đạt
+$\SL{ch4_model/d20/optimal}$ mỗi bước, và tác tử luật vốn đã làm đúng như vậy. Q-learning học được chính sách tối ưu ở
+$\SL{ch6_e/agg/n_opt}/10$ seed; chênh lệch so cặp với luật là $\SL{ch6_e/agg/diff_mean}$ với khoảng tin cậy $95\%$
+$[\SL{ch6_e/agg/ci_lo};\,\SL{ch6_e/agg/ci_hi}]$, chứa $0$. Khi giảm giá rẻ hơn ($\delta=5\%$) luật không còn tối ưu và RL
+vượt luật $\SL{ch6_f/005/diff_mean}$ mỗi bước. Tác tử dựa trên mô hình đề xuất ở câu~10 đạt tối ưu ở cả năm kịch bản thử.
+\end{phathien}

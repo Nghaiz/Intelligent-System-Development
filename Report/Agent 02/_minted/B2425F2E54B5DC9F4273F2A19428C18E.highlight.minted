@@ -1,0 +1,18 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} ag2/shop\PYGZus{}mas.py}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{call}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{receiver}\PYG{p}{,} \PYG{n}{kind}\PYG{p}{,} \PYG{n}{payload}\PYG{p}{,} \PYG{n}{expect}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Gửi một yêu cầu, chờ phản hồi đúng hợp đồng; lỗi thì ghi sự kiện và thử lại. Hết lượt \PYGZhy{}\PYGZgt{} None.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{k}{for} \PYG{n}{attempt} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{max\PYGZus{}retries} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{n}{msg} \PYG{o}{=} \PYG{n}{Message}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}coordinator\PYGZdq{}}\PYG{p}{,} \PYG{n}{receiver}\PYG{p}{,} \PYG{n}{kind}\PYG{p}{,} \PYG{n}{payload}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}hop}\PYG{p}{(}\PYG{n}{msg}\PYG{p}{)}
+        \PYG{n}{t0} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{perf\PYGZus{}counter}\PYG{p}{()}
+        \PYG{k}{try}\PYG{p}{:}
+            \PYG{n}{resp} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{agents}\PYG{p}{[}\PYG{n}{receiver}\PYG{p}{]}\PYG{o}{.}\PYG{n}{handle}\PYG{p}{(}\PYG{n}{msg}\PYG{p}{)}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{clock} \PYG{o}{+=} \PYG{l+m+mi}{1000} \PYG{o}{*} \PYG{p}{(}\PYG{n}{time}\PYG{o}{.}\PYG{n}{perf\PYGZus{}counter}\PYG{p}{()} \PYG{o}{\PYGZhy{}} \PYG{n}{t0}\PYG{p}{)}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{check}\PYG{p}{(}\PYG{n}{resp}\PYG{p}{,} \PYG{n}{receiver}\PYG{p}{,} \PYG{n}{expect}\PYG{p}{)}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}hop}\PYG{p}{(}\PYG{n}{resp}\PYG{p}{)}
+            \PYG{k}{return} \PYG{n}{resp}\PYG{o}{.}\PYG{n}{payload}
+        \PYG{k}{except} \PYG{p}{(}\PYG{n+ne}{TimeoutError}\PYG{p}{,} \PYG{n}{ContractError}\PYG{p}{)} \PYG{k}{as} \PYG{n}{e}\PYG{p}{:}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}fault}\PYG{p}{(}\PYG{n}{msg}\PYG{p}{,} \PYG{n}{e}\PYG{p}{,} \PYG{n}{attempt}\PYG{p}{)}
+    \PYG{k}{return} \PYG{k+kc}{None}
+\end{MintedVerbatim}

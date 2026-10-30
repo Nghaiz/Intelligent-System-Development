@@ -1,0 +1,89 @@
+\chapter{Thiết kế hệ đa tác tử}\label{chap:1}
+
+Chương này tóm lược tài liệu hướng dẫn của học phần \emph{Developing Multiagent Systems: A Practical Tutorial
+with Python and PyTorch}~\cite{ch1:tutorial}, bổ sung bằng hai giáo trình kinh điển về tác tử~\cite{ch1:wooldridge,ch1:russell}.
+Mục tiêu là xác lập bộ khái niệm (tác tử, môi trường, PEAS, vai trò, thông điệp, điều phối, kiểm thử) mà
+Chương~\ref{chap:4} dùng để mô hình hóa thị trường hai cửa hàng và Chương~\ref{chap:8} dùng để cài đặt hệ mua sắm.
+
+\section{Tác tử, môi trường và mô tả PEAS}
+
+\begin{dinhnghia}{Định nghĩa 1.1 (Tác tử và hệ đa tác tử)}
+\textbf{Tác tử} (agent) là một thành phần tính toán nhận thông tin từ môi trường qua cảm biến (sensors), chọn
+hành động theo mục tiêu và tác động trở lại môi trường qua cơ cấu chấp hành (actuators). \textbf{Hệ đa tác tử}
+(multi-agent system, MAS) gồm từ hai tác tử trở lên có quyết định ảnh hưởng lẫn nhau, qua thông điệp, qua trạng
+thái dùng chung hoặc qua chính môi trường~\cite{ch1:wooldridge}.
+\end{dinhnghia}
+
+Điểm quan trọng của định nghĩa là các tác tử \emph{không nhất thiết trò chuyện} với nhau. Hai cửa hàng trực tuyến
+không gửi thông điệp nào cho nhau, nhưng quyết định giảm giá của cửa hàng này làm thay đổi xác suất mua hàng ở
+cửa hàng kia; tương tác gián tiếp qua môi trường như vậy vẫn tạo thành một MAS.
+
+Để đặc tả một tác tử trước khi lập trình, tutorial dùng khung \textbf{PEAS}~\cite{ch1:russell}:
+\emph{Performance} (tiêu chí đánh giá), \emph{Environment} (môi trường hoạt động), \emph{Actuators} (cách tác động)
+và \emph{Sensors} (thông tin nhận được). Hình~\ref{fig:ch1-peas} đặt PEAS lên vòng cảm nhận--hành động của tác tử
+bán hàng trong bài thí nghiệm.
+
+\hinhtikz{ch1_peas}{Vòng cảm nhận -- quyết định -- hành động của tác tử bán hàng, đánh dấu bốn thành phần PEAS.}{ch1-peas}
+
+\nhanxet{Cùng một vòng lặp áp dụng cho cả hai tác tử của bài thí nghiệm; chúng chỉ khác ở khối ``chính sách'':
+tác tử học tăng cường cập nhật chính sách từ phần thưởng, tác tử theo luật giữ nguyên một bảng if--else.}
+
+\begin{table}[!htbp]\centering\caption{Đặc tả PEAS của tác tử bán hàng trong bài thí nghiệm giảm giá.}\label{tab:ch1-peas}
+{\small\begin{tabular}{@{}L{3.2cm}L{11.3cm}@{}}\toprule
+Thành phần & Nội dung \\\midrule
+Performance & Lợi nhuận trung bình mỗi bước trong pha đánh giá; phụ: tỷ lệ giảm giá, độ ổn định qua các seed \\
+Environment & Thị trường mô phỏng: nhu cầu ngẫu nhiên hai mức, một đối thủ, số khách và doanh số ngẫu nhiên \\
+Actuators   & Hai hành động: giữ giá hoặc giảm giá trong bước hiện tại \\
+Sensors     & Mức nhu cầu hiện tại và hành động của đối thủ ở bước trước \\\bottomrule
+\end{tabular}}
+\end{table}
+
+Ngoài PEAS, tutorial nêu năm \textbf{thuộc tính} thường gặp của tác tử: tự chủ (autonomy), phản ứng (reactivity),
+chủ động (pro-activeness), giao tiếp (social ability) và học (learning). Các thuộc tính này xuất hiện ở mức độ khác
+nhau: tác tử theo luật vẫn tự chủ và phản ứng với trạng thái mới nhưng không học; tác tử Q-learning học trong pha
+huấn luyện rồi chỉ thực thi chính sách đã học trong pha đánh giá. Sự tách hai pha này là nguyên tắc xuyên suốt của
+Chương~\ref{chap:5}.
+
+\section{Phân chia vai trò và hợp đồng thông điệp}
+
+Một MAS được thiết kế tốt bắt đầu bằng việc chia trách nhiệm thành các \textbf{vai trò} (roles) hẹp, mỗi vai trò
+có đầu vào và đầu ra xác định. Hệ mua sắm của tutorial gồm bốn vai trò~\cite{ch1:tutorial}:
+\textbf{CatalogAgent} tìm sản phẩm ứng viên theo truy vấn; \textbf{RecommendationAgent} lọc theo ngân sách và xếp
+hạng; \textbf{InventoryAgent} xác minh tồn kho; \textbf{Coordinator} nhận yêu cầu, gọi lần lượt các vai trò và
+kiểm tra kết quả trước khi trả lời người dùng (Hình~\ref{fig:ch1-shop}).
+
+\hinhtikz{ch1_shop}{Hệ mua sắm bốn vai trò của tutorial: mọi lời gọi đi qua Coordinator; mỗi mũi tên là một thông điệp có kiểu.}{ch1-shop}
+
+\nhanxet{Coordinator là điểm kiểm soát duy nhất: nó kiểm tra người nhận, kiểu phản hồi, ngân sách và độ mới của
+dữ liệu tồn kho, nên một tác tử trả lời sai bị chặn trước khi lan sang bước sau.}
+
+Các tác tử trao đổi qua \textbf{thông điệp} có cấu trúc cố định. Tutorial dùng bốn trường bắt buộc:
+\texttt{sender}, \texttt{receiver}, \texttt{kind} (loại thông điệp, ví dụ \texttt{search\_request},
+\texttt{rank\_response}) và \texttt{payload} (dữ liệu). Hệ lớn hơn bổ sung mã tác vụ, mã thông điệp, thời điểm gửi
+và hạn chót để truy vết. Cố định hợp đồng thông điệp có hai lợi ích: mỗi tác tử kiểm thử được độc lập bằng thông
+điệp giả, và Coordinator phát hiện được phản hồi sai kiểu thay vì lan truyền lỗi. Chương~\ref{chap:8} viết hợp đồng
+này thành kiểu dữ liệu (\texttt{dataclass}) được kiểm tra khi nhận.
+
+\section{Điều phối tập trung và phân tán}
+
+Cơ chế \textbf{điều phối} (coordination) quyết định ai gọi ai, theo thứ tự nào và ai giải quyết xung đột.
+Điều phối tập trung dễ theo dõi, dễ kiểm thử, nhưng nút điều phối có thể thành điểm nghẽn và điểm lỗi đơn. Điều phối
+phân tán tăng quyền tự chủ và khả năng mở rộng, đổi lại phải xử lý xung đột, tính nhất quán và lỗi giao tiếp
+(Hình~\ref{fig:ch1-coord}). Hai cửa hàng trong bài thí nghiệm thuộc dạng thứ ba: không có điều phối viên, mỗi tác tử
+quyết định độc lập và đồng thời, môi trường áp dụng cả hai hành động rồi trả phần thưởng riêng.
+
+\hinhtikz{ch1_coord}{Ba dạng điều phối: tập trung (hệ mua sắm), phân tán ngang hàng, và tương tác gián tiếp qua môi trường (thị trường hai cửa hàng).}{ch1-coord}
+
+\nhanxet{Dạng điều phối quyết định bài toán học: ở dạng thứ ba, mỗi tác tử thấy đối thủ như một phần của môi
+trường; nếu đối thủ cũng học, môi trường trở nên phi dừng (Chương~\ref{chap:2}, Mục~\ref{sec:ch2-challenge}).}
+
+\section{Tích hợp mô hình học và kiểm thử hệ thống}
+
+Mạng nơ-ron trong MAS chỉ là một thành phần dự đoán nhãn (ví dụ ý định của khách) hoặc điểm xếp hạng; tutorial
+minh họa bằng mạng \texttt{IntentNet} (PyTorch) và yêu cầu đánh giá nó riêng trên tập kiểm tra~\cite{ch1:tutorial}.
+
+Kiểm thử MAS vì vậy có ba tầng: (i) \emph{kiểm thử đơn vị} từng tác tử với thông điệp giả; (ii) \emph{kiểm thử
+tích hợp} luồng qua Coordinator, gồm cả \emph{mô phỏng lỗi} (tác tử im lặng, trả sai kiểu, dữ liệu tồn kho cũ);
+(iii) \emph{đánh giá hệ thống} bằng chỉ số theo mục tiêu: tỷ lệ hoàn thành tác vụ, số lần vi phạm ngân sách, số
+xác nhận tồn kho chưa xác minh, độ trễ và số thông điệp. Với bài thí nghiệm giảm giá, chỉ số hệ thống là lợi nhuận
+đo trên pha đánh giá tách biệt, nhiều seed; Bảng~\ref{tab:ch3-map} ở Chương~\ref{chap:3} so sánh đầy đủ hai hệ.

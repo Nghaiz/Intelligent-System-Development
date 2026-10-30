@@ -1,0 +1,573 @@
+{
+ "data": {
+  "train": 3750,
+  "val": 349,
+  "test": 523,
+  "total": 4622,
+  "n_intents": 6,
+  "n_products": 60,
+  "in_stock": 41
+ },
+ "train": {
+  "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "cuda": true,
+  "torch": "2.13.0+cu126",
+  "epochs": 30,
+  "best_epoch": 24,
+  "train_seconds": 16.202060900000106,
+  "params": 6298054,
+  "tau": 0.9,
+  "best_val_acc": 0.6131805157593123,
+  "history": [
+   {
+    "epoch": 1,
+    "train_loss": 1.6514152193069458,
+    "train_acc": 0.5157333333333334,
+    "val_loss": 1.6343756241238219,
+    "val_acc": 0.32664756446991405
+   },
+   {
+    "epoch": 2,
+    "train_loss": 0.8449644898891449,
+    "train_acc": 0.8317333333333333,
+    "val_loss": 1.4554431923480977,
+    "val_acc": 0.4699140401146132
+   },
+   {
+    "epoch": 3,
+    "train_loss": 0.16362649204333624,
+    "train_acc": 0.9861333333333333,
+    "val_loss": 1.5982756553201758,
+    "val_acc": 0.5444126074498568
+   },
+   {
+    "epoch": 4,
+    "train_loss": 0.0384178759098053,
+    "train_acc": 0.9957333333333334,
+    "val_loss": 1.7003218396686892,
+    "val_acc": 0.5730659025787965
+   },
+   {
+    "epoch": 5,
+    "train_loss": 0.01804076630572478,
+    "train_acc": 0.9994666666666666,
+    "val_loss": 1.7565686788121746,
+    "val_acc": 0.6017191977077364
+   },
+   {
+    "epoch": 6,
+    "train_loss": 0.010451260450979074,
+    "train_acc": 0.9997333333333334,
+    "val_loss": 1.7967620268250604,
+    "val_acc": 0.6103151862464183
+   },
+   {
+    "epoch": 7,
+    "train_loss": 0.00748155417094628,
+    "train_acc": 0.9997333333333334,
+    "val_loss": 1.8474279696756926,
+    "val_acc": 0.6074498567335244
+   },
+   {
+    "epoch": 8,
+    "train_loss": 0.005373424994200468,
+    "train_acc": 0.9997333333333334,
+    "val_loss": 1.9125392471138591,
+    "val_acc": 0.5702005730659025
+   },
+   {
+    "epoch": 9,
+    "train_loss": 0.004299219424898425,
+    "train_acc": 0.9997333333333334,
+    "val_loss": 1.9313173519506155,
+    "val_acc": 0.6017191977077364
+   },
+   {
+    "epoch": 10,
+    "train_loss": 0.0035401037476956846,
+    "train_acc": 1.0,
+    "val_loss": 1.9524945618429976,
+    "val_acc": 0.6045845272206304
+   },
+   {
+    "epoch": 11,
+    "train_loss": 0.002861799744516611,
+    "train_acc": 1.0,
+    "val_loss": 2.0031361333961817,
+    "val_acc": 0.5873925501432665
+   },
+   {
+    "epoch": 12,
+    "train_loss": 0.002324151828760902,
+    "train_acc": 1.0,
+    "val_loss": 2.0395534202499173,
+    "val_acc": 0.5816618911174785
+   },
+   {
+    "epoch": 13,
+    "train_loss": 0.0022104177576489745,
+    "train_acc": 0.9997333333333334,
+    "val_loss": 2.0508246346667707,
+    "val_acc": 0.5845272206303725
+   },
+   {
+    "epoch": 14,
+    "train_loss": 0.0014880310566474993,
+    "train_acc": 1.0,
+    "val_loss": 2.0559974679974227,
+    "val_acc": 0.5931232091690545
+   },
+   {
+    "epoch": 15,
+    "train_loss": 0.001452659842123588,
+    "train_acc": 1.0,
+    "val_loss": 2.098684032871935,
+    "val_acc": 0.5845272206303725
+   },
+   {
+    "epoch": 16,
+    "train_loss": 0.0012608766094471017,
+    "train_acc": 1.0,
+    "val_loss": 2.139028624340593,
+    "val_acc": 0.5787965616045845
+   },
+   {
+    "epoch": 17,
+    "train_loss": 0.0012397601955880721,
+    "train_acc": 0.9997333333333334,
+    "val_loss": 2.1435915194131585,
+    "val_acc": 0.5845272206303725
+   },
+   {
+    "epoch": 18,
+    "train_loss": 0.0009908924928555885,
+    "train_acc": 1.0,
+    "val_loss": 2.150626562386324,
+    "val_acc": 0.5959885386819485
+   },
+   {
+    "epoch": 19,
+    "train_loss": 0.0009723336030729115,
+    "train_acc": 1.0,
+    "val_loss": 2.1654899953771114,
+    "val_acc": 0.5845272206303725
+   },
+   {
+    "epoch": 20,
+    "train_loss": 0.0007286270276332895,
+    "train_acc": 1.0,
+    "val_loss": 2.1952017152890093,
+    "val_acc": 0.5873925501432665
+   },
+   {
+    "epoch": 21,
+    "train_loss": 0.0011413660961513718,
+    "train_acc": 1.0,
+    "val_loss": 2.201893185476177,
+    "val_acc": 0.5988538681948424
+   },
+   {
+    "epoch": 22,
+    "train_loss": 0.0006591546037544807,
+    "train_acc": 1.0,
+    "val_loss": 2.2126272708433747,
+    "val_acc": 0.5931232091690545
+   },
+   {
+    "epoch": 23,
+    "train_loss": 0.0005660325444769114,
+    "train_acc": 1.0,
+    "val_loss": 2.1987929050423696,
+    "val_acc": 0.6103151862464183
+   },
+   {
+    "epoch": 24,
+    "train_loss": 0.0005752679695530484,
+    "train_acc": 1.0,
+    "val_loss": 2.2148358131889627,
+    "val_acc": 0.6131805157593123
+   },
+   {
+    "epoch": 25,
+    "train_loss": 0.0007966615801366667,
+    "train_acc": 1.0,
+    "val_loss": 2.283738610396071,
+    "val_acc": 0.5902578796561605
+   },
+   {
+    "epoch": 26,
+    "train_loss": 0.0004582152955544492,
+    "train_acc": 1.0,
+    "val_loss": 2.282777114720604,
+    "val_acc": 0.5959885386819485
+   },
+   {
+    "epoch": 27,
+    "train_loss": 0.000720884412030379,
+    "train_acc": 0.9997333333333334,
+    "val_loss": 2.286441837819053,
+    "val_acc": 0.5959885386819485
+   },
+   {
+    "epoch": 28,
+    "train_loss": 0.0006620305116598805,
+    "train_acc": 1.0,
+    "val_loss": 2.329924461834752,
+    "val_acc": 0.6131805157593123
+   },
+   {
+    "epoch": 29,
+    "train_loss": 0.0005222563440911472,
+    "train_acc": 1.0,
+    "val_loss": 2.333212779381214,
+    "val_acc": 0.6017191977077364
+   },
+   {
+    "epoch": 30,
+    "train_loss": 0.0003786975163035095,
+    "train_acc": 1.0,
+    "val_loss": 2.343066083667613,
+    "val_acc": 0.5988538681948424
+   }
+  ]
+ },
+ "test": {
+  "accuracy": 0.8317399617590823,
+  "macro_f1": 0.826412475617268,
+  "per_class": {
+   "tim_san_pham": {
+    "precision": 0.7614678899082569,
+    "recall": 0.9222222222222223,
+    "f1": 0.834170854271357,
+    "support": 90
+   },
+   "so_sanh": {
+    "precision": 0.7317073170731707,
+    "recall": 1.0,
+    "f1": 0.8450704225352113,
+    "support": 90
+   },
+   "hoi_ton_kho": {
+    "precision": 0.8194444444444444,
+    "recall": 0.6555555555555556,
+    "f1": 0.728395061728395,
+    "support": 90
+   },
+   "hoi_gia": {
+    "precision": 0.956989247311828,
+    "recall": 0.9888888888888889,
+    "f1": 0.9726775956284154,
+    "support": 90
+   },
+   "chao_hoi": {
+    "precision": 0.8181818181818182,
+    "recall": 0.6835443037974683,
+    "f1": 0.7448275862068965,
+    "support": 79
+   },
+   "khac": {
+    "precision": 1.0,
+    "recall": 0.7142857142857143,
+    "f1": 0.8333333333333333,
+    "support": 84
+   }
+  },
+  "coverage": 0.745697896749522,
+  "accepted_acc": 0.9153846153846154,
+  "conf": {
+   "rows": [
+    [
+     83,
+     4,
+     1,
+     2,
+     0,
+     0
+    ],
+    [
+     0,
+     90,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     29,
+     59,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     89,
+     0,
+     0
+    ],
+    [
+     25,
+     0,
+     0,
+     0,
+     54,
+     0
+    ],
+    [
+     0,
+     0,
+     11,
+     1,
+     12,
+     60
+    ]
+   ]
+  }
+ },
+ "e2e": {
+  "completion": 0.6826003824091779,
+  "unsafe": 0,
+  "unsafe_rate": 0.0,
+  "msgs_mean": 4.611854684512428,
+  "lat_mean": 11.062542267018665,
+  "lat_p95": 19.456053795580917,
+  "status": {
+   "ok": 259,
+   "can_lam_ro": 160,
+   "chao": 52,
+   "khong_co": 20,
+   "chuyen_nhan_vien": 32
+  },
+  "unverified": 0,
+  "errors": 0
+ },
+ "demo": {
+  "rows": [
+   {
+    "query": "Tìm giúp mình laptop dưới 20 triệu",
+    "status": "ok",
+    "items": [
+     "p04",
+     "p07",
+     "p05"
+    ],
+    "messages": 9,
+    "latency_ms": 106.94425722201706,
+    "log": [
+     "[   2.5 ms] coordinator -> intent      CLASSIFY     {'query': 'Tìm giúp mình laptop dưới 20 triệu'}",
+     "[  11.1 ms]      intent -> coordinator INTENT       {'intent': 'tim_san_pham', 'conf': 0.9999183416366577, 'co",
+     "[  14.2 ms] coordinator -> catalog     SEARCH       {'query': 'Tìm giúp mình laptop dưới 20 triệu'}",
+     "[  17.1 ms]     catalog -> coordinator CANDIDATES   {'category': 'laptop', 'brands': [], 'budget': 20.0, 'ids'",
+     "[  18.9 ms] coordinator -> recommend   RANK         {'ids': ['p01', 'p02', 'p03', 'p04', 'p05', 'p06', 'p07', ",
+     "[  22.0 ms]   recommend -> coordinator RANKED       {'ids': ['p04', 'p07', 'p05']}",
+     "[  23.5 ms] coordinator -> inventory   CHECK_STOCK  {'ids': ['p04', 'p07', 'p05']}",
+     "[ 103.5 ms]  !! inventory: inventory không trả lời trước hạn chót (lần 1)",
+     "[ 105.3 ms] coordinator -> inventory   CHECK_STOCK  {'ids': ['p04', 'p07', 'p05']}",
+     "[ 106.9 ms]   inventory -> coordinator STOCK        {'stock': {'p04': 8, 'p07': 1, 'p05': 12}, 'age_s': 0}"
+    ]
+   },
+   {
+    "query": "so sanh tai nghe Sony voi JBL",
+    "status": "ok",
+    "items": [
+     "p21",
+     "p22"
+    ],
+    "messages": 6,
+    "latency_ms": 15.273292691790042,
+    "log": [
+     "[   1.5 ms] coordinator -> intent      CLASSIFY     {'query': 'so sanh tai nghe Sony voi JBL'}",
+     "[   5.2 ms]      intent -> coordinator INTENT       {'intent': 'so_sanh', 'conf': 0.9999911785125732, 'confide",
+     "[   7.4 ms] coordinator -> catalog     SEARCH       {'query': 'so sanh tai nghe Sony voi JBL'}",
+     "[   8.9 ms]     catalog -> coordinator CANDIDATES   {'category': 'tai_nghe', 'brands': ['Sony', 'JBL'], 'budge",
+     "[  12.1 ms] coordinator -> recommend   RANK         {'ids': ['p21', 'p22', 'p26', 'p27'], 'budget': None, 'bra",
+     "[  15.3 ms]   recommend -> coordinator RANKED       {'ids': ['p21', 'p22']}"
+    ]
+   },
+   {
+    "query": "giày Adidas còn hàng không ạ",
+    "status": "ok",
+    "items": [
+     "p42",
+     "p47"
+    ],
+    "messages": 8,
+    "latency_ms": 18.972761075475805,
+    "log": [
+     "[   3.6 ms] coordinator -> intent      CLASSIFY     {'query': 'giày Adidas còn hàng không ạ'}",
+     "[   6.8 ms]      intent -> coordinator INTENT       {'intent': 'hoi_ton_kho', 'conf': 0.9999972581863403, 'con",
+     "[   8.8 ms] coordinator -> catalog     SEARCH       {'query': 'giày Adidas còn hàng không ạ'}",
+     "[  10.3 ms]     catalog -> coordinator CANDIDATES   {'category': 'giay', 'brands': ['Adidas'], 'budget': None,",
+     "[  13.0 ms] coordinator -> recommend   RANK         {'ids': ['p42', 'p47'], 'budget': None, 'brands': ['Adidas",
+     "[  14.3 ms]   recommend -> coordinator RANKED       {'ids': ['p42', 'p47']}",
+     "[  17.2 ms] coordinator -> inventory   CHECK_STOCK  {'ids': ['p42', 'p47']}",
+     "[  19.0 ms]   inventory -> coordinator STOCK        {'stock': {'p42': 3, 'p47': 3}, 'age_s': 0}"
+    ]
+   },
+   {
+    "query": "Xin chào shop",
+    "status": "chao",
+    "items": [],
+    "messages": 2,
+    "latency_ms": 5.244071777276102,
+    "log": [
+     "[   2.0 ms] coordinator -> intent      CLASSIFY     {'query': 'Xin chào shop'}",
+     "[   5.2 ms]      intent -> coordinator INTENT       {'intent': 'chao_hoi', 'conf': 0.9999998807907104, 'confid"
+    ]
+   }
+  ]
+ },
+ "faults": {
+  "r0": {
+   "rate": 0.0,
+   "mas": {
+    "completion": 1.0,
+    "unsafe": 0,
+    "unsafe_rate": 0.0,
+    "msgs_mean": 3.3346080305927344,
+    "lat_mean": 7.0505716122861015,
+    "lat_p95": 14.517749397427863,
+    "status": {
+     "ok": 335,
+     "chao": 79,
+     "chuyen_nhan_vien": 84,
+     "khong_co": 21,
+     "can_lam_ro": 4
+    },
+    "unverified": 0,
+    "errors": 0,
+    "faults": {
+     "timeout": 0,
+     "malformed": 0,
+     "stale": 0
+    }
+   },
+   "pipe": {
+    "completion": 1.0,
+    "unsafe": 0,
+    "unsafe_rate": 0.0,
+    "msgs_mean": 0.5965583173996176,
+    "lat_mean": 1.3115018686997826,
+    "lat_p95": 5.183115789558068,
+    "status": {
+     "ok": 335,
+     "chao": 79,
+     "chuyen_nhan_vien": 84,
+     "khong_co": 21,
+     "can_lam_ro": 4
+    },
+    "unverified": 0,
+    "errors": 0,
+    "faults": {
+     "timeout": 0,
+     "malformed": 0,
+     "stale": 0
+    }
+   }
+  },
+  "r10": {
+   "rate": 0.1,
+   "mas": {
+    "completion": 1.0,
+    "unsafe": 0,
+    "unsafe_rate": 0.0,
+    "msgs_mean": 3.378585086042065,
+    "lat_mean": 8.370384980561962,
+    "lat_p95": 15.144040904294622,
+    "status": {
+     "ok": 335,
+     "chao": 79,
+     "chuyen_nhan_vien": 84,
+     "khong_co": 21,
+     "can_lam_ro": 4
+    },
+    "unverified": 0,
+    "errors": 0,
+    "faults": {
+     "timeout": 8,
+     "malformed": 10,
+     "stale": 5
+    }
+   },
+   "pipe": {
+    "completion": 0.9655831739961759,
+    "unsafe": 3,
+    "unsafe_rate": 0.0057361376673040155,
+    "msgs_mean": 0.5965583173996176,
+    "lat_mean": 3.9129580828677746,
+    "lat_p95": 5.8609106390096075,
+    "status": {
+     "ok": 318,
+     "chao": 79,
+     "chuyen_nhan_vien": 84,
+     "khong_co": 21,
+     "loi": 17,
+     "can_lam_ro": 4
+    },
+    "unverified": 0,
+    "errors": 17,
+    "faults": {
+     "timeout": 8,
+     "malformed": 9,
+     "stale": 4
+    }
+   }
+  },
+  "r30": {
+   "rate": 0.3,
+   "mas": {
+    "completion": 0.9847036328871893,
+    "unsafe": 0,
+    "unsafe_rate": 0.0,
+    "msgs_mean": 3.453154875717017,
+    "lat_mean": 11.128148766828518,
+    "lat_p95": 17.295548505660893,
+    "status": {
+     "ok": 327,
+     "chao": 79,
+     "chuyen_nhan_vien": 84,
+     "khong_co": 21,
+     "chua_xac_minh": 8,
+     "can_lam_ro": 4
+    },
+    "unverified": 8,
+    "errors": 0,
+    "faults": {
+     "timeout": 25,
+     "malformed": 23,
+     "stale": 30
+    }
+   },
+   "pipe": {
+    "completion": 0.9369024856596558,
+    "unsafe": 9,
+    "unsafe_rate": 0.017208413001912046,
+    "msgs_mean": 0.5965583173996176,
+    "lat_mean": 5.7472487138726525,
+    "lat_p95": 83.28106823207486,
+    "status": {
+     "ok": 306,
+     "chao": 79,
+     "chuyen_nhan_vien": 84,
+     "khong_co": 21,
+     "loi": 29,
+     "can_lam_ro": 4
+    },
+    "unverified": 0,
+    "errors": 29,
+    "faults": {
+     "timeout": 15,
+     "malformed": 14,
+     "stale": 22
+    }
+   }
+  }
+ },
+ "tests": {
+  "run": 8,
+  "failed": 0
+ }
+}

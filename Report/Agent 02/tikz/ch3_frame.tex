@@ -1,0 +1,14 @@
+\begin{tikzpicture}[font=\small]
+  % lõi: khối 3D ở giữa
+  \khoibaD{5.4}{1.9}{4.0}{1.5}{1.4}{cNavy}
+  \node[text=white, font=\normalsize\bfseries, align=center] at (7.4,2.65) {Cộng tác\\đa tác tử};
+  % năm chiều
+  \node[hop=cBlue, text width=3.6cm] (a) at (2.0,4.6) {\textbf{1. Tác nhân}\\ai tham gia, năng lực};
+  \node[hop=cGreen, text width=3.6cm] (b) at (12.8,4.6) {\textbf{2. Kiểu quan hệ}\\hợp tác / cạnh tranh / cạnh--hợp};
+  \node[hop=cPurple, text width=3.6cm] (c) at (13.0,1.0) {\textbf{3. Chiến lược}\\luật / vai trò / mô hình};
+  \node[hop=cOrange, text width=3.6cm] (d) at (7.4,-0.7) {\textbf{4. Cấu trúc}\\tập trung / phi tập trung / phân cấp};
+  \node[hop=cTeal, text width=3.6cm] (e) at (1.8,1.0) {\textbf{5. Điều phối}\\tĩnh / động};
+  \foreach \n/\c/\p in {a/cBlue/{(5.6,3.4)}, b/cGreen/{(9.9,3.6)}, c/cPurple/{(10.0,2.4)}, d/cOrange/{(7.4,1.9)}, e/cTeal/{(5.4,2.4)}}
+    \draw[muiM=\c, <->, line width=1.4pt] (\n) -- \p;
+  \node[nhan, align=center] at (7.4,-2.0) {mỗi chiều: lợi ích $\leftrightarrow$ chi phí (lời gọi, độ trễ)};
+\end{tikzpicture}

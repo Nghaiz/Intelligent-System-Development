@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[cau=cTeal, minimum size=16mm, font=\normalsize\bfseries] (s) at (0,0) {$s$};
+  \node[khoi, minimum width=3.6cm, minimum height=11mm] (q1) at (4,0) {Nhu cầu $d_t=1$?};
+  \node[khoiR, minimum width=3.4cm, minimum height=11mm] (q2) at (9.6,0) {Đối thủ vừa giảm\\ $c=a_{-i}(t{-}1)=1$?};
+  \node[khoiG, minimum width=2.9cm, minimum height=11mm] (k1) at (4,-2.6) {Giữ giá\\$a=0$};
+  \node[khoiC, minimum width=2.9cm, minimum height=11mm] (dd) at (9.6,-2.6) {Giảm giá\\$a=1$};
+  \node[khoiG, minimum width=2.9cm, minimum height=11mm] (k2) at (13.2,-1.3) {Giữ giá\\$a=0$};
+  \draw[mui] (s) -- (q1);
+  \draw[mui] (q1) -- node[above, nhan] {có} (q2);
+  \draw[mui] (q1) -- node[left, nhan] {không} (k1);
+  \draw[mui] (q2) -- node[left, nhan] {có} (dd);
+  \draw[mui] (q2.east) -| node[above right, nhan, pos=0.25] {không} (k2.north);
+  \begin{scope}[on background layer]
+    \node[vung=cSlate, fit=(s)(q1)(q2)(k1)(dd)(k2), inner sep=10pt] {};
+  \end{scope}
+  \node[nhan, anchor=north] at (6.6,-3.6) {Chuỗi chính sách theo thứ tự (0,0), (0,1), (1,0), (1,1): \texttt{0001}};
+\end{tikzpicture}

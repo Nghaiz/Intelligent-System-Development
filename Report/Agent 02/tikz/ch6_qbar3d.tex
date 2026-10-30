@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % trục và lưới giá trị Q (chiều cao = Q / 40 cm)
+  \foreach \v in {0,50,100,150,200,250}{
+    \pgfmathsetmacro{\yy}{\v/55}
+    \draw[gray!30] (-0.3,\yy) -- (13.2,\yy);
+    \node[nhan, anchor=east] at (-0.35,\yy) {\v};
+  }
+  \draw[-{Stealth[length=2.6mm]}, thick, cSlate] (-0.3,0) -- (-0.3,5.3) node[above, font=\small\bfseries] {$Q(s,a)$};
+  \draw[thick, cSlate] (-0.3,0) -- (13.2,0);
+  \foreach \k/\s/\lab in {0/00/{(0, 0)},1/01/{(0, 1)},2/10/{(1, 0)},3/11/{(1, 1)}}{
+    \pgfmathsetmacro{\xa}{0.4+3.25*\k}
+    \pgfmathsetmacro{\xb}{\xa+1.2}
+    \pgfmathsetmacro{\ha}{\SL{ch6_a/q/\s/0Raw}/55}
+    \pgfmathsetmacro{\hb}{\SL{ch6_a/q/\s/1Raw}/55}
+    \khoibaD{\xa}{0}{1.05}{\ha}{1.0}{cBlue}
+    \khoibaD{\xb}{0}{1.05}{\hb}{1.0}{cRed}
+    \node[font=\small\bfseries, text=cBlue!70!black, above] at (\xa+0.78,\ha+0.3) {\SL{ch6_a/q/\s/0}};
+    \node[font=\small\bfseries, text=cRed!70!black, above] at (\xb+0.78,\hb+0.3) {\SL{ch6_a/q/\s/1}};
+    \node[font=\small\sffamily\bfseries, text=cNavy, below] at (\xa+1.15,-0.12) {$s=\lab$};
+  }
+  \node[hop=cBlue, anchor=west] at (1.0,5.9) {giữ giá ($a=0$)};
+  \node[hop=cRed, anchor=west] at (4.6,5.9) {giảm giá ($a=1$)};
+  \node[hop=cGreen, anchor=west] at (8.2,5.9) {chính sách tham lam: \texttt{\SL{ch6_a/policy}}};
+\end{tikzpicture}

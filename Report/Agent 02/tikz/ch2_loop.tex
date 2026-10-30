@@ -1,0 +1,25 @@
+\begin{tikzpicture}[font=\small]
+  % tác tử (trên) và môi trường (dưới) dạng khối 3D
+  \khoibaD{4.4}{3.3}{5.4}{1.5}{1.2}{cBlue}
+  \node[text=white, font=\normalsize\bfseries] at (7.1,4.35) {Tác tử};
+  \node[text=white] at (7.1,3.75) {chính sách $\pi(a\mid s)$, bảng $Q(s,a)$};
+  \khoibaD{4.4}{0}{5.4}{1.5}{1.2}{cOrange}
+  \node[text=white, font=\normalsize\bfseries] at (7.1,1.05) {Môi trường};
+  \node[text=white] at (7.1,0.45) {$P(s'\mid s,a)$, $R(s,a)$};
+  % ba đường vòng
+  \draw[muiM=cGreen, line width=1.6pt] (10.45,4.0) -- (12.0,4.0) -- (12.0,0.75) node[pos=0.5, right, nhan, align=left] {hành động\\$a_t$} -- (10.45,0.75);
+  \draw[muiM=cTeal, line width=1.6pt] (4.4,0.55) -- (2.0,0.55) -- (2.0,3.65) node[pos=0.5, left, nhan, align=right] {trạng thái\\$s_{t+1}$} -- (4.4,3.65);
+  \draw[muiM=cRed, line width=1.6pt] (4.4,1.0) -- (2.8,1.0) -- (2.8,4.25) node[pos=0.55, right, nhan] {$r_t$} -- (4.4,4.25);
+  % quỹ đạo theo thời gian
+  \begin{scope}[yshift=-2.1cm]
+    \draw[cSlate, thick, -{Stealth}] (0.2,0) -- (15.6,0) node[below left, nhan] {thời gian};
+    \foreach \i/\x in {0/0.6,1/4.4,2/8.2,3/12.0}{
+      \node[cau=cTeal, minimum size=9mm] (s\i) at (\x,0) {$s_{\i}$};
+    }
+    \foreach \i/\x in {0/1.9,1/5.7,2/9.5}{
+      \node[hop=cGreen, minimum size=7mm] (a\i) at (\x,0) {$a_{\i}$};
+      \node[hop=cRed, minimum size=7mm] (r\i) at (\x+1.25,0) {$r_{\i}$};
+    }
+    \node[nhan] at (14.2,0.45) {$G_0=\sum_k\gamma^k r_k$};
+  \end{scope}
+\end{tikzpicture}

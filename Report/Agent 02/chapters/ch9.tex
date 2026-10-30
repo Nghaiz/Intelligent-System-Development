@@ -1,0 +1,38 @@
+\chapter{Thảo luận, hạn chế và kết luận}\label{chap:9}
+
+\section{Những quan sát chính}
+
+\begin{enumerate}
+  \item \textbf{Mốc chính xác thay đổi cách đọc kết quả.} Thưởng đánh giá lấy mẫu dao động theo chuỗi nhu cầu; giá trị
+    chính xác của chính sách thì không. Ở baseline, RL đạt $\SL{ch6_a/eval_mean}$ trên $10.000$ bước, đúng bằng tác tử luật
+    trên cùng chuỗi nhu cầu, và giá trị chính xác của cả hai là $\SL{ch6_a/exact}$: hai con số khác $35$ chỉ do may rủi
+    của mẫu.
+  \item \textbf{``RL tốt hơn luật'' không phải là một mệnh đề chung.} Ở $\delta=20\%$ luật đã tối ưu, nên RL tốt nhất cũng
+    chỉ hòa; RL trung bình còn thua nhẹ vì có seed học sai (chỉ $\SL{ch6_e/agg/n_opt}/10$ seed đạt tối ưu). Ở $\delta=5\%$, RL thắng.
+    Ở $\delta=10\%$, RL lại thua rõ (KTC $[\SL{ch6_f/010/ci_lo};\,\SL{ch6_f/010/ci_hi}]$) vì nó giảm giá ở nhu cầu thấp,
+    tham lợi trước mắt, mà không thấy rằng chính hành động đó kích hoạt sự trả đũa của đối thủ khi nhu cầu cao.
+  \item \textbf{Trạng thái quan trọng hơn thuật toán.} Thêm $a_i(t-1)$ vào trạng thái giảm regret ở ba trên năm
+    kịch bản của câu~10; học mô hình đối thủ rồi lập kế hoạch thì xử lý trọn lỗi trên: tác tử dựa trên mô hình có regret
+    bằng $0$ ở cả năm kịch bản.
+  \item \textbf{Siêu tham số quyết định độ ổn định.} $\alpha=0{,}50$ làm chính sách tham lam đổi trung bình
+    $\SL{ch6_c/0.50/switches}$ lần trong huấn luyện; không khám phá ($\varepsilon=0$) chỉ đạt tối ưu ở
+    $\SL{ch6_d/khong/n_opt}/10$ seed.
+  \item \textbf{Phần thưởng phải khớp mục tiêu kinh doanh.} Huấn luyện theo doanh thu làm lợi nhuận thật tụt còn
+    $\SL{ch6_g/doanh_thu/exact_mean}$ mỗi bước.
+\end{enumerate}
+
+\section{Hạn chế}
+
+Mô hình cố ý đơn giản: hai mức nhu cầu, hai hành động, không tồn kho, không mùa vụ, khách hàng không nhớ giá. Kết quả chỉ
+có giá trị trong phạm vi mô hình và không nên suy rộng thành kết luận kinh tế. Mười seed là đủ để thấy độ phân tán nhưng
+khoảng tin cậy vẫn rộng. Đề gốc và mã tham chiếu không có sẵn trên máy làm bài, nên mô hình được dựng lại từ công thức
+thống nhất của đề; mọi thay đổi về cách đo được ghi ở Chương~\ref{chap:5}. Hệ mua sắm ở Chương~\ref{chap:8} dùng dữ liệu truy vấn
+tổng hợp và lời gọi đồng bộ trong một tiến trình.
+
+\section{Kết luận}
+
+Báo cáo đã mô hình hóa, cài đặt và đánh giá hai cách ra quyết định trong một hệ đa tác tử thương mại điện tử. Ba điểm rút
+ra: đánh giá phải tách khỏi huấn luyện và nên có mốc tối ưu chính xác; ưu thế của học hay của luật phụ thuộc vào thiết kế
+phần thưởng và vào việc trạng thái có đủ thông tin Markov hay không; và một tác tử dựa trên mô hình nhỏ, biết đối thủ
+phản ứng ra sao, vượt cả Q-learning lẫn luật cố định. Hướng tiếp theo là thêm tồn kho và nhiều mức giá, đối thủ có trí nhớ
+dài hơn, và đánh giá các thuật toán đa tác tử như học đồng thời có mô hình đối thủ.

@@ -1,0 +1,34 @@
+\begin{tikzpicture}[font=\small,
+    st/.style={cau=cTeal, minimum size=9mm},
+    ac/.style={circle, fill=#1, draw=#1!60!black, minimum size=4.5mm, inner sep=0pt,
+               blur shadow={shadow blur steps=4, shadow opacity=30}}]
+  % Q-learning
+  \node[vung=cBlue, minimum width=7.2cm, minimum height=6.6cm] at (3.4,0.9) {};
+  \node[tieude] at (3.4,3.85) {Q-learning (off-policy)};
+  \node[st] (s) at (3.4,2.8) {$s_t$};
+  \node[ac=cBlue] (a) at (3.4,1.6) {};
+  \node[nhan, right=2pt of a] {$a_t$};
+  \draw[mui] (s) -- (a);
+  \node[st] (s2) at (3.4,0.2) {$s_{t+1}$};
+  \draw[mui] (a) -- node[right, nhan] {$r_t$} (s2);
+  \node[ac=cSlate] (bL) at (1.9,-1.2) {}; \draw[mui] (s2) -- (bL);
+  \node[ac=cRed] (bR) at (4.9,-1.2) {}; \draw[mui] (s2) -- (bR);
+  \node[nhan] at (1.3,-0.8) {$a'_1$}; \node[nhan] at (5.5,-0.8) {$a'_2$};
+  \draw[cRed, very thick] (1.9,-1.75) arc[start angle=200, end angle=340, radius=1.6cm];
+  \node[nhan, text=cRed] at (3.4,-2.25) {$\max_{a'}Q(s_{t+1},a')$};
+  % SARSA
+  \begin{scope}[xshift=8.4cm]
+  \node[vung=cGreen, minimum width=7.2cm, minimum height=6.6cm] at (3.4,0.9) {};
+  \node[tieude] at (3.4,3.85) {SARSA (on-policy)};
+  \node[st] (t) at (3.4,2.8) {$s_t$};
+  \node[ac=cBlue] (u) at (3.4,1.6) {};
+  \node[nhan, right=2pt of u] {$a_t$};
+  \draw[mui] (t) -- (u);
+  \node[st] (t2) at (3.4,0.2) {$s_{t+1}$};
+  \draw[mui] (u) -- node[right, nhan] {$r_t$} (t2);
+  \node[ac=cGreen] (v) at (3.4,-1.2) {};
+  \draw[mui] (t2) -- (v);
+  \node[nhan, right=2pt of v] {$a_{t+1}\sim\pi_\varepsilon$};
+  \node[nhan, text=cGreen!60!black] at (3.4,-2.25) {$Q(s_{t+1},a_{t+1})$};
+  \end{scope}
+\end{tikzpicture}

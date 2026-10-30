@@ -1,0 +1,97 @@
+\chapter{Cài đặt và thiết kế thí nghiệm}\label{chap:5}
+
+Chương này mô tả chương trình Python hiện thực mô hình của Chương~\ref{chap:4}, các thay đổi so với mã tham
+chiếu~\cite{lab02code}, giao thức đánh giá và danh mục thí nghiệm. Mọi đoạn mã dưới đây được \texttt{build.py} trích
+nguyên văn từ tệp nguồn đã chạy ra số liệu, nên mã trong báo cáo và mã thực thi luôn trùng nhau.
+
+\section{Kiến trúc chương trình}
+
+Chương trình tách thành thư viện \texttt{ag2} (mô hình, tác tử, vòng lặp, đánh giá chính xác) và các kịch bản
+\texttt{scripts/} (chạy thí nghiệm, tổng hợp, vẽ hình, sinh bảng). Hình~\ref{fig:ch5-arch} cho thấy luồng phụ thuộc:
+kịch bản chỉ gọi thư viện, kết quả đi qua JSON rồi mới vào báo cáo.
+
+\hinhtikz{ch5_arch}{Kiến trúc chương trình: tầng thư viện \texttt{ag2} và tầng kịch bản; mũi tên là quan hệ sử dụng.}{ch5-arch}
+
+\section{Các thay đổi so với mã tham chiếu}
+
+Đề bài cho phép sửa mã nếu ghi lại thay đổi và giữ so sánh hợp lệ, tái lập được~\cite{lab02}. Mô hình thị trường và
+mọi tham số giữ nguyên; các thay đổi chỉ nằm ở cách tổ chức và đo:
+\begin{enumerate}
+  \item[\textbf{M1.}] \textbf{Số ngẫu nhiên chung.} Nhu cầu và doanh số của từng cửa hàng có bộ sinh riêng, tách từ một seed
+    bằng \texttt{SeedSequence.spawn(3)}. Hai lượt đánh giá cùng seed thấy đúng một chuỗi nhu cầu; nếu hai chính sách chọn
+    cùng hành động thì doanh số cũng giống hệt. Phép so sánh RL--luật vì vậy là so cặp (paired).
+  \item[\textbf{M2.}] \textbf{Giao diện tác tử thống nhất} \texttt{observe / act / learn}: một vòng lặp dùng chung cho
+    RL--luật, RL--RL, các đối thủ cố định và tác tử mới ở câu~10.
+  \item[\textbf{M3.}] \textbf{Đánh giá chính xác và tối ưu} (\texttt{exact.py}, Mục~\ref{sec:best}): đo giá trị thật của
+    chính sách tham lam, tách khỏi nhiễu Binomial.
+  \item[\textbf{M4.}] \textbf{Chạy song song} $\SL{ch5_run/runs}$ lượt huấn luyện trên $\SL{ch5_run/workers}$ tiến trình CPU.
+  \item[\textbf{M5.}] \textbf{Mở rộng} phục vụ câu 8--10: tham số \texttt{demand\_persist}, \texttt{reward\_kind},
+    Q-learning có trạng thái mở rộng, tác tử dựa trên mô hình, bốn đối thủ cố định.
+\end{enumerate}
+
+\section{Tham số tham chiếu}
+
+\bang{ch5_params}{Tham số mô phỏng và huấn luyện (đọc trực tiếp từ \texttt{MarketConfig}, \texttt{QLearningAgent} và \texttt{run\_all.py}).}{ch5-params}
+
+Seed của tác tử RL bằng seed môi trường cộng $10.000$; seed đánh giá bằng seed huấn luyện cộng $500.000$, nên
+không episode đánh giá nào trùng episode huấn luyện. Mười seed $7, 17, \dots, 97$ là của riêng báo cáo này (nhóm 07).
+
+\section{Giao thức đánh giá}\label{sec:eval}
+
+Phần thưởng đo trong lúc huấn luyện trộn hai thứ: chất lượng chính sách và cái giá của khám phá. Báo cáo vì vậy đánh
+giá tách biệt (Hình~\ref{fig:ch5-eval}): sau huấn luyện, bảng $Q$ đóng băng, $\varepsilon=0$, không gọi
+\texttt{learn()}, chạy $500$ episode trên môi trường mới với seed riêng. Tác tử luật được đặt vào đúng ghế của RL và
+chạy lại trên cùng seed để có phép so cặp.
+
+\hinhtikz{ch5_eval}{Giao thức huấn luyện -- đánh giá tách biệt và ba bộ sinh số ngẫu nhiên chung.}{ch5-eval}
+
+\maDai{training__run_episode}{Một episode dùng chung cho huấn luyện và đánh giá.}
+
+\section{Danh mục thí nghiệm và chỉ số đo}
+
+\begin{table}[!htbp]\centering\caption{Tám thí nghiệm; A--E theo đề bài, F--H và câu 10 là phần mở rộng.}\label{tab:ch5-exp}
+{\small\begin{tabular}{clL{5.2cm}L{4.4cm}}
+\toprule
+Mã & Nội dung & Cấu hình & Mục đích \\
+\midrule
+A & Baseline & $\alpha=0{,}10$, seed 2026 & Hiệu năng cơ sở, bảng $Q$ \\
+B & Quá trình học & lịch sử của A, $Q$ từng episode & Học có cải thiện không \\
+C & Tốc độ học & $\alpha\in\{0{,}01;\,0{,}10;\,0{,}50\}$, 10 seed & Độ ổn định, độ nhạy \\
+D & Khám phá & 4 lịch (Bảng~\ref{tab:ch5-schedules}), 10 seed & Khám phá -- khai thác \\
+E & So sánh công bằng & 10 seed, so cặp, KTC 95\% & Độ tin cậy của kết luận \\
+F & Mức giảm giá & $\delta\in\{5,10,\dots,30\}\%$, 10 seed & Thiết kế thưởng (câu 5, 9) \\
+G & Môi trường khác & nhu cầu bền $0{,}8$; thưởng = doanh thu & Độ bền (câu 5, 9) \\
+H & Hai tác tử cùng học & Q-learning đối Q-learning & Phi dừng (câu 8) \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\bang{ch5_schedules}{Bốn lịch khám phá của Thí nghiệm D, $\varepsilon_e=\max(\varepsilon_{\min},\varepsilon_0\rho^e)$.}{ch5-schedules}
+
+Các chỉ số dùng nhất quán: tổng thưởng và thưởng trung bình mỗi bước
+$\bar R_i = \frac1T\sum_{t=1}^{T} r_i(t)$ với $T=10.000$ bước đánh giá; tỉ lệ giảm giá
+$\rho_i = \#\{a_i=1\}/T$ (chỉ mô tả hành vi, không đồng nghĩa lợi nhuận); giá trị chính xác $V^{\pi}$ của chính sách
+tham lam và số seed đạt tối ưu; chênh lệch so cặp RL $-$ luật với khoảng tin cậy $95\%$ theo phân phối $t$ ($9$ bậc
+tự do); số lần chính sách tham lam đổi trong huấn luyện (``đổi CS'').
+
+\section{Trích đoạn mã nguồn chính}
+
+\maNguon{agents__QLearningAgent.act}{Chọn hành động $\varepsilon$-greedy.}
+\maNguon{agents__QLearningAgent.learn}{Cập nhật Q-learning theo \eqref{eq:qupdate}.}
+
+\section{Môi trường chạy và phân chia CPU/GPU}
+
+Máy chạy có $\SL{ch5_run/cpus}$ luồng CPU và một GPU NVIDIA RTX 4060 Laptop (8 GB); phần mềm Python
+$\SL{ch5_run/python}$, NumPy $\SL{ch5_run/numpy}$, Matplotlib $\SL{ch5_run/matplotlib}$. Một lượt Q-learning
+($100.000$ bước) mất trung bình $\SL{ch5_run/train_s_q}$~s, một lượt tác tử dựa trên mô hình (quy hoạch lại mỗi
+episode) mất $\SL{ch5_run/train_s_model}$~s. Nếu chạy tuần tự, toàn bộ cần $\SL{ch5_run/serial_s}$~s; chạy song song
+trên $\SL{ch5_run/workers}$ tiến trình hết $\SL{ch5_run/wall_s}$~s.
+
+\begin{luuy}{Vì sao Q-learning không chạy trên GPU}
+Bảng $Q$ chỉ có $8$ ô và mỗi bước phụ thuộc bước trước, nên không có phép tính lớn nào để song song hóa trong một lượt;
+đưa lên GPU chỉ thêm chi phí chép dữ liệu. Song song có lợi ở mức \emph{lượt} (seed $\times$ cấu hình), là việc của CPU
+nhiều nhân. GPU được dùng ở Chương~\ref{chap:8} cho bộ phân loại ý định PyTorch, chạy cùng lúc với các lượt CPU.
+\end{luuy}
+
+Tái lập toàn bộ: \texttt{python scripts/run\_all.py}, rồi \texttt{summarize.py}, \texttt{figures.py},
+\texttt{tables.py}, \texttt{ch8\_run.py}, và \texttt{python build.py} trong thư mục báo cáo. Hai lượt chạy liên tiếp cho cùng số liệu đánh giá (thời gian chạy thì khác).

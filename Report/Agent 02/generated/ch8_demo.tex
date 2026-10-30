@@ -1,0 +1,12 @@
+\textbf{>>> Tìm giúp mình laptop dưới 20 triệu}\par
+[~~~2.5~ms]~coordinator~->~intent~~~~~~CLASSIFY~~~~~\{'query':~'Tìm~giúp~mình~laptop~dư\par
+[~~11.1~ms]~~~~~~intent~->~coordinator~INTENT~~~~~~~\{'intent':~'tim\_san\_pham',~'conf':\par
+[~~14.2~ms]~coordinator~->~catalog~~~~~SEARCH~~~~~~~\{'query':~'Tìm~giúp~mình~laptop~dư\par
+[~~17.1~ms]~~~~~catalog~->~coordinator~CANDIDATES~~~\{'category':~'laptop',~'brands':~[\par
+[~~18.9~ms]~coordinator~->~recommend~~~RANK~~~~~~~~~\{'ids':~['p01',~'p02',~'p03',~'p04\par
+[~~22.0~ms]~~~recommend~->~coordinator~RANKED~~~~~~~\{'ids':~['p04',~'p07',~'p05']\}\par
+[~~23.5~ms]~coordinator~->~inventory~~~CHECK\_STOCK~~\{'ids':~['p04',~'p07',~'p05']\}\par
+[~103.5~ms]~~!!~inventory:~inventory~không~trả~lời~trước~hạn~chót~(lần~1)\par
+[~105.3~ms]~coordinator~->~inventory~~~CHECK\_STOCK~~\{'ids':~['p04',~'p07',~'p05']\}\par
+[~106.9~ms]~~~inventory~->~coordinator~STOCK~~~~~~~~\{'stock':~\{'p04':~8,~'p07':~1,~'p0\par
+\textit{=> ok p04, p07, p05 (9 thông điệp, 106{,}9 ms)}

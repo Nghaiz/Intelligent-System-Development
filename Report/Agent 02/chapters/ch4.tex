@@ -1,0 +1,122 @@
+\chapter{Mô hình thị trường và hai tác tử}\label{chap:4}
+
+Chương này hình thức hóa bài toán của Laboratory 02~\cite{lab02}: môi trường, trạng thái, hành động, phần
+thưởng và hai chính sách. Trước khi chạy bất kỳ thí nghiệm nào, chương tính sẵn lợi nhuận kỳ vọng của mọi tổ hợp
+và chính sách tối ưu, để các kết quả học được ở Chương~\ref{chap:6} có một mốc đối chiếu chính xác.
+
+\section{Mô tả bài toán}
+
+Hai cửa hàng thương mại điện tử cùng bán một loại sản phẩm. Ở mỗi bước thời gian $t$, mỗi cửa hàng $i\in\{1,2\}$
+chọn đồng thời một hành động $a_i(t)\in\{0,1\}$: $0$ là giữ giá gốc, $1$ là giảm giá. Giảm giá kéo thêm khách
+nhưng làm mỏng biên lợi nhuận của từng đơn, và nó còn lấy bớt khách của đối thủ. Cửa hàng~1 dùng tác tử học tăng
+cường (Q-learning), cửa hàng~2 dùng tác tử theo luật cố định. Hình~\ref{fig:ch4-loop} tóm tắt một bước tương tác.
+
+\hinhtikz{ch4_loop}{Vòng tương tác của hai tác tử trong một bước: (1) quan sát và chọn hành động đồng thời,
+(2) thị trường tính xác suất chuyển đổi, (3) lấy mẫu doanh số và trả thưởng.}{ch4-loop}
+
+\nhanxet{hai tác tử không trao đổi thông điệp; chúng ảnh hưởng nhau qua thị trường chung, đúng định nghĩa hệ đa tác
+tử ở Chương~\ref{chap:1}. Tác tử luật cũng nhận phần thưởng nhưng không dùng nó để đổi hành vi.}
+
+\section{Trạng thái và hành động}
+
+Trạng thái cục bộ mà tác tử $i$ quan sát trước khi hành động là
+\begin{equation}\label{eq:state}
+  s_i(t) = \bigl(d_t,\; c_i(t)\bigr),\qquad d_t\in\{0,1\},\quad c_i(t) = a_{-i}(t-1)\in\{0,1\},
+\end{equation}
+trong đó $d_t$ là mức nhu cầu (0: thấp, 1: cao) và $c_i(t)$ là hành động của đối thủ ở bước trước. Mỗi tác tử có
+$|\mathcal S| = 4$ trạng thái và $|\mathcal A|=2$ hành động, nên bảng $Q$ chỉ có $8$ ô. Trạng thái chung của cả
+hệ là bộ ba $(d_t, a_1(t-1), a_2(t-1))$ với $8$ giá trị; tác tử chỉ thấy một phần của nó, cụ thể là không thấy
+hành động trước của chính mình. Điểm này quan trọng ở Mục~\ref{sec:best}.
+
+\section{Chuyển đổi khách hàng, doanh số và lợi nhuận}
+
+Xác suất một khách tiềm năng mua hàng của cửa hàng $i$ là
+\begin{equation}\label{eq:conv}
+  p_i(t) = \operatorname{clip}\bigl(0{,}30 + 0{,}25\,d_t + 0{,}15\,a_i(t) - 0{,}10\,a_{-i}(t);\; 0{,}05;\; 0{,}95\bigr).
+\end{equation}
+Số khách tiềm năng là $N_t = 10$ khi $d_t = 0$ và $N_t = 20$ khi $d_t=1$; số đơn bán được
+$S_i(t)\sim\mathrm{Binomial}(N_t, p_i(t))$. Với giá gốc $P=10$, giá vốn $C=5$ và mức giảm $\delta=0{,}20$, phần thưởng là
+lợi nhuận
+\begin{equation}\label{eq:reward}
+  r_i(t) = S_i(t)\,\bigl[P\,(1-\delta\,a_i(t)) - C\bigr],
+  \qquad \mathbb E[r_i\mid d,a_i,a_{-i}] = N_d\; p_i\; \bigl[P(1-\delta a_i)-C\bigr].
+\end{equation}
+Biên lợi nhuận mỗi đơn là $10-5=\SL{ch4_model/d20/margin_keep}$ khi giữ giá và $8-5=\SL{ch4_model/d20/margin_disc}$
+khi giảm giá: giảm giá cắt $40\%$ biên lợi nhuận để đổi lấy $15$ điểm phần trăm xác suất chuyển đổi.
+
+\maNguon{market__conversion_probability}{Xác suất chuyển đổi theo \eqref{eq:conv}.}
+
+\section{Động lực môi trường}
+
+Sau khi trả thưởng, môi trường sinh nhu cầu kế tiếp $d_{t+1}$ độc lập với hành động, đều trên $\{0,1\}$; hành động
+hiện tại trở thành ``hành động trước'' của bước sau. Mỗi episode có $T=20$ bước; đầu episode nhu cầu được rút
+ngẫu nhiên và hành động trước của cả hai đặt bằng $0$. Lớp \texttt{MarketConfig} còn có tham số
+\texttt{demand\_persist} $=P(d_{t+1}=d_t)$: giá trị $0{,}5$ cho đúng mô hình đề bài, giá trị $0{,}8$ cho biến thể
+``nhu cầu bền'' dùng ở câu~9. Mã của lớp môi trường được trình bày ở Chương~\ref{chap:5}.
+
+\section{Tác tử Q-learning}
+
+Tác tử RL giữ bảng $Q:\mathcal S\times\mathcal A\to\mathbb R$. Sau mỗi bước nó cập nhật cặp vừa dùng~\cite{ch2:watkins}:
+\begin{equation}\label{eq:qupdate}
+  Q(s_t,a_t) \leftarrow Q(s_t,a_t) + \alpha\Bigl[\underbrace{r_t + \gamma\max_{a'}Q(s_{t+1},a')}_{\text{mục tiêu TD}} - Q(s_t,a_t)\Bigr],
+\end{equation}
+với $\alpha = 0{,}10$, $\gamma=0{,}90$; ở bước cuối episode mục tiêu chỉ còn $r_t$. Hành động được chọn theo
+$\varepsilon$-greedy: ngẫu nhiên với xác suất $\varepsilon$, ngược lại chọn $\arg\max_a Q(s,a)$ (hòa thì chọn ngẫu
+nhiên), với lịch giảm dần
+\begin{equation}\label{eq:eps}
+  \varepsilon_e = \max\bigl(\varepsilon_{\min},\; \varepsilon_0\,\rho^{\,e}\bigr) = \max\bigl(0{,}02;\; 0{,}20\cdot 0{,}995^{\,e}\bigr)
+\end{equation}
+ở episode $e$. Sau khoảng $460$ episode $\varepsilon$ chạm sàn $0{,}02$ và giữ nguyên tới cuối.
+
+\section{Tác tử theo luật}
+
+Tác tử luật dùng chính sách if--else viết sẵn (Hình~\ref{fig:ch4-rule}):
+\begin{equation}\label{eq:rule}
+  \pi_{\text{luật}}(d,c) = \begin{cases} 0, & d=0,\\ 1, & d=1 \text{ và } c=1,\\ 0, & d=1 \text{ và } c=0.\end{cases}
+\end{equation}
+Nhu cầu thấp thì giữ giá; nhu cầu cao thì chỉ giảm giá để ``trả đũa'' khi đối thủ vừa giảm.
+
+\hinhtikz{ch4_rule}{Cây quyết định của tác tử theo luật.}{ch4-rule}
+
+\section{Phân tích lợi nhuận kỳ vọng một bước}\label{sec:payoff}
+
+Vì mô hình nhỏ, có thể tính chính xác \eqref{eq:reward} cho mọi tổ hợp nhu cầu $d$, hành động của mình và hành động
+\emph{hiện tại} $b$ của đối thủ (Bảng~\ref{tab:ch4-reward}).
+
+\bang{ch4_reward}{Lợi nhuận kỳ vọng một bước của cửa hàng $i$ theo $(d,b)$, với $\delta=20\%$ và $\delta=5\%$.}{ch4-reward}
+
+\nhanxet{với $\delta=20\%$, giữ giá tốt hơn ở ba trên bốn ô. Chỉ ở ô $(0,1)$, khi nhu cầu thấp và đối thủ đang giảm
+giá, giảm giá nhỉnh hơn ($10{,}5$ so với $10$). Với $\delta=5\%$ biên lợi nhuận khi giảm còn $4{,}5$, và giảm giá thắng
+ở mọi ô có nhu cầu thấp.}
+
+Hình~\ref{fig:ch4-delta} quét $\delta$ từ $0$ đến $40\%$: đường liền (giảm giá) cắt đường đứt (giữ giá) tại các ngưỡng
+khác nhau theo từng trạng thái. Đây là lý do Thí nghiệm F (Chương~\ref{chap:6}) đổi $\delta$ để xem kết luận ``RL hay luật
+tốt hơn'' có đổi chiều hay không.
+
+\hinhpdf{ch4_reward_delta}{1}{Lợi nhuận kỳ vọng một bước theo mức giảm giá $\delta$; đường chấm đứng là $\delta=20\%$.}{ch4-delta}
+
+\section{Chính sách tối ưu khi đối thủ là tác tử luật}\label{sec:best}
+
+Bảng một bước chưa đủ, vì hành động hôm nay đổi trạng thái của đối thủ ngày mai. Nếu RL giảm giá ở bước $t$ và
+nhu cầu ở $t+1$ cao, tác tử luật sẽ giảm giá ở $t+1$ và lợi nhuận của RL tụt từ $55$ xuống $45$. Để có mốc chính xác,
+hàm \texttt{exact\_value} lan truyền phân phối của trạng thái chung qua $20$ bước và cộng phần thưởng kỳ vọng, không
+lấy mẫu; \texttt{best\_stationary} liệt kê toàn bộ $2^4=16$ chính sách tất định trên $(d,c)$; \texttt{optimal\_value}
+giải quy hoạch động ngược trên trạng thái chung và bước $t$ (cận trên thật).
+
+\begin{phathien}{Kết quả phân tích (output của \texttt{scripts/summarize.py})}
+\begin{itemize}
+  \item Hai tác tử luật đối đầu: không ai giảm giá (hành động trước ban đầu bằng $0$), mỗi bên đạt
+    $\SL{ch4_model/d20/rule_rule}$ mỗi bước.
+  \item Tối ưu trên 16 chính sách dừng: \texttt{\SL{ch4_model/d20/best_policy}} (không bao giờ giảm giá), giá trị
+    $\SL{ch4_model/d20/best_value}$; tối ưu quy hoạch động: $\SL{ch4_model/d20/optimal}$. Tác tử luật vì vậy đã tối
+    ưu ở cấu hình tham chiếu; RL giỏi nhất cũng chỉ hòa.
+  \item Với $\delta=5\%$: tối ưu là \texttt{\SL{ch4_model/d05/best_policy}} (luôn giảm giá), giá trị
+    $\SL{ch4_model/d05/optimal}$, cao hơn luật ($\SL{ch4_model/d05/rule_rule}$). Ở đây RL có dư địa để thắng.
+\end{itemize}
+\end{phathien}
+
+\begin{luuy}{Vì sao đây là bài toán đa tác tử khó}
+Hành động của đối thủ có mặt trong xác suất chuyển đổi, trong trạng thái và gián tiếp trong phần thưởng. Trạng thái
+$(d,c)$ thiếu $a_i(t-1)$, thứ quyết định hành động \emph{hiện tại} của tác tử luật, nên quá trình RL thấy không còn
+Markov hoàn toàn; khi đối thủ cũng học, môi trường còn trở thành phi dừng~\cite{busoniu2008}.
+\end{luuy}

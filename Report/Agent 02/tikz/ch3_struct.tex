@@ -1,0 +1,32 @@
+\begin{tikzpicture}[font=\small, nd/.style={cau=#1, minimum size=8mm}]
+  % (a) tập trung
+  \node[vung=cBlue, minimum width=4.8cm, minimum height=4.6cm] at (2.3,1.4) {};
+  \node[tieude] at (2.3,3.4) {(a) Tập trung};
+  \khoibaD{1.65}{0.9}{1.3}{0.9}{0.7}{cNavy}
+  \coordinate (hub) at (2.3,1.35);
+  \foreach \p/\c in {{(0.5,2.6)}/cBlue,{(4.1,2.6)}/cPurple,{(0.5,-0.2)}/cTeal,{(4.1,-0.2)}/cOrange}{
+    \node[nd=\c] (q) at \p {};
+    \draw[muiM=\c, <->] (q) -- (hub);
+  }
+  % (b) phi tập trung
+  \begin{scope}[xshift=5.3cm]
+  \node[vung=cGreen, minimum width=4.8cm, minimum height=4.6cm] at (2.3,1.4) {};
+  \node[tieude] at (2.3,3.4) {(b) Phi tập trung};
+  \node[nd=cBlue] (p1) at (0.8,2.4) {}; \node[nd=cPurple] (p2) at (3.8,2.4) {};
+  \node[nd=cTeal] (p3) at (0.8,0.2) {}; \node[nd=cOrange] (p4) at (3.8,0.2) {};
+  \node[nd=cPink] (p5) at (2.3,1.3) {};
+  \foreach \i/\j in {1/2,1/3,2/4,3/4,1/5,2/5,3/5,4/5}
+    \draw[cGreen!60!black, thick, {Stealth}-{Stealth}] (p\i) -- (p\j);
+  \end{scope}
+  % (c) phân cấp
+  \begin{scope}[xshift=10.6cm]
+  \node[vung=cOrange, minimum width=4.8cm, minimum height=4.6cm] at (2.3,1.4) {};
+  \node[tieude] at (2.3,3.4) {(c) Phân cấp};
+  \node[nd=cNavy] (r) at (2.3,2.6) {};
+  \node[nd=cPurple] (m1) at (1.1,1.4) {}; \node[nd=cPurple] (m2) at (3.5,1.4) {};
+  \foreach \x/\m/\c in {0.4/m1/cBlue,1.6/m1/cTeal,3.0/m2/cOrange,4.2/m2/cPink}{
+    \node[nd=\c] (w) at (\x,0.1) {}; \draw[muiM=\c] (\m) -- (w);
+  }
+  \draw[mui] (r) -- (m1); \draw[mui] (r) -- (m2);
+  \end{scope}
+\end{tikzpicture}

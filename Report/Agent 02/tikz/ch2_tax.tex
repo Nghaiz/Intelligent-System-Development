@@ -1,0 +1,29 @@
+\begin{tikzpicture}[font=\small,
+    lv1/.style={hop=#1, minimum width=3.4cm, minimum height=9mm, font=\small\bfseries},
+    lv2/.style={hop=#1, minimum width=2.7cm, minimum height=8mm}]
+  \node[hop=cNavy, minimum width=4.4cm, minimum height=10mm, font=\normalsize\bfseries, text=white,
+        top color=cNavy!80, bottom color=cNavy] (root) at (7.6,4.6) {Thuật toán RL};
+  \node[lv1=cOrange] (mb) at (3.0,3.0) {Dựa trên mô hình};
+  \node[lv1=cBlue]   (mf) at (11.0,3.0) {Không mô hình};
+  \draw[mui] (root) -- (mb); \draw[mui] (root) -- (mf);
+  \node[lv2=cYellow] (dp) at (1.4,1.4) {Quy hoạch động};
+  \node[lv2=cYellow] (pl) at (4.6,1.4) {Lập kế hoạch\\ học mô hình};
+  \draw[muiM=cOrange] (mb) -- (dp); \draw[muiM=cOrange] (mb) -- (pl);
+  \node[lv1=cTeal]   (vb) at (8.4,1.4) {Dựa trên giá trị};
+  \node[lv1=cPurple] (pb) at (13.4,1.4) {Dựa trên chính sách};
+  \draw[muiM=cBlue] (mf) -- (vb); \draw[muiM=cBlue] (mf) -- (pb);
+  \node[lv2=cTeal] (mc) at (6.0,-0.3) {Monte Carlo};
+  \node[lv2=cTeal] (td) at (9.0,-0.3) {TD(0)};
+  \node[lv2=cRed, line width=1.6pt, draw=cRed] (ql) at (7.3,-1.9) {\textbf{Q-learning}};
+  \node[lv2=cTeal] (sa) at (10.4,-1.9) {SARSA};
+  \node[lv2=cSky]  (dqn) at (7.3,-3.4) {DQN (mạng nơ-ron)};
+  \draw[muiM=cTeal] (vb) -- (mc); \draw[muiM=cTeal] (vb) -- (td);
+  \draw[muiM=cTeal] (td) -- (ql); \draw[muiM=cTeal] (td) -- (sa);
+  \draw[muiM=cSky] (ql) -- (dqn);
+  \node[lv2=cPurple] (pg) at (13.4,-0.3) {Gradient chính sách};
+  \node[lv2=cPink]   (ac) at (13.4,-1.9) {Actor--Critic};
+  \draw[muiM=cPurple] (pb) -- (pg); \draw[muiM=cPurple] (pg) -- (ac);
+  \draw[muiM=cPink, dashed] (sa) -- (ac);
+  \node[hop=cRed, font=\small, text width=3.6cm] (rule) at (2.4,-1.9) {Đối chứng: tác tử theo luật (không học)};
+  \draw[muiM=cRed, dashed] (dp) -- node[left, nhan, align=right] {giá trị\\tối ưu} (rule);
+\end{tikzpicture}

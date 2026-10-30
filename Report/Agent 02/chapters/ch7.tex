@@ -1,0 +1,105 @@
+\chapter{Trả lời mười câu hỏi của bài thí nghiệm}\label{chap:7}
+
+Mỗi câu trả lời dựa trên số liệu đo ở Chương~\ref{chap:6} hoặc trên phép tính trực tiếp từ mô hình ở Chương~\ref{chap:4}; phần suy luận không có số đo đi kèm được nói rõ là giải thích.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 1: Mô hình hóa tác tử và môi trường}
+
+\begin{table}[!htbp]\centering\caption{Các thành phần của hệ theo khung tác tử--môi trường.}\label{tab:ch7-q1}
+{\small\begin{tabular}{L{3.2cm}L{11cm}}
+\toprule
+Thành phần & Trong mô phỏng \\
+\midrule
+Tác tử & Hai cửa hàng: tác tử Q-learning (ghế 1) và tác tử luật (ghế 2) \\
+Môi trường & Thị trường: nhu cầu $d_t\in\{0,1\}$, số khách $N_d$, xác suất chuyển đổi \eqref{eq:conv}, doanh số Binomial \\
+Trạng thái & $s_i(t)=(d_t,\ a_{-i}(t-1))$ -- 4 trạng thái mỗi tác tử \\
+Hành động & $a_i(t)\in\{0:\text{giữ giá},\ 1:\text{giảm giá}\}$, chọn đồng thời \\
+Phần thưởng & Lợi nhuận $r_i=S_i\,[P(1-\delta a_i)-C]$ \eqref{eq:reward} \\
+Chính sách & RL: tham lam theo bảng Q (8 giá trị); luật: \eqref{eq:rule} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Đây là hệ đa tác tử vì phần thưởng của mỗi cửa hàng phụ thuộc hành động của cửa hàng kia ở ba chỗ: số hạng $-0{,}10\,a_{-i}$ trong xác suất chuyển đổi, thành phần $a_{-i}(t-1)$ trong trạng thái, và phản ứng của đối thủ ở bước sau đối với hành động hôm nay. Hai tác tử không trao đổi thông điệp; chúng tương tác gián tiếp qua môi trường chung.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 2: Quyết định dựa trên học và dựa trên luật}
+
+\begin{table}[!htbp]\centering\caption{So sánh hai cách ra quyết định.}\label{tab:ch7-q2}
+{\small\begin{tabular}{L{3.0cm}L{5.7cm}L{5.7cm}}
+\toprule
+Khía cạnh & Tác tử Q-learning & Tác tử luật \\
+\midrule
+Nguồn tri thức & Kinh nghiệm: 100.000 bước tương tác & Người thiết kế viết sẵn \\
+Thích nghi & Có: đổi chính sách khi $\delta$ đổi (5\% $\to$ giảm giá) & Không: cùng hành vi ở mọi $\delta$ \\
+Chi phí học & Khám phá làm mất lợi nhuận khi huấn luyện & Không có \\
+Ổn định & Phụ thuộc seed, $\alpha$, $\varepsilon$ (Mục~\ref{sec:ch6-e}) & Tất định \\
+Giải thích được & Phải đọc bảng Q & Đọc trực tiếp ba nhánh if--else \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Ở cấu hình tham chiếu, luật đã trùng với chính sách tối ưu nên RL chỉ có thể hòa (\SL{ch6_e/agg/eval_mean} so với \SL{ch6_e/agg/rule_mean}, KTC chênh lệch chứa 0). Ưu thế của học chỉ lộ ra khi giả định ẩn trong luật sai: với $\delta=5\%$, RL đạt \SL{ch6_f/005/eval_mean} còn luật \SL{ch6_f/005/exact_rule}.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 3: Tính một bước cập nhật Q-learning}
+
+Bước dưới đây lấy nguyên từ nhật ký huấn luyện của lượt tham chiếu (\texttt{first\_updates} trong \texttt{outputs/raw/baseline.json}): tác tử ở $s=(\SL{ch7_q3/s})$ chọn $a=\SL{ch7_q3/a}$ (giữ giá), nhận $r=\SL{ch7_q3/r}$ và chuyển sang $s'=(\SL{ch7_q3/s2})$. Trước cập nhật $Q(s,a)=\SL{ch7_q3/q_old}$ và $\max_{a'}Q(s',a')=\SL{ch7_q3/max_next}$. Theo \eqref{eq:qupdate} với $\alpha=\SL{ch7_q3/alpha}$, $\gamma=\SL{ch7_q3/gamma}$:
+\begin{align*}
+\text{mục tiêu} &= r+\gamma\max_{a'}Q(s',a') = \SL{ch7_q3/r} + \SL{ch7_q3/gamma}\times\SL{ch7_q3/max_next} = \SL{ch7_q3/target},\\
+\text{sai số TD} &= \SL{ch7_q3/target} - \SL{ch7_q3/q_old} = \SL{ch7_q3/td},\\
+Q_{\text{mới}}(s,a) &= \SL{ch7_q3/q_old} + \SL{ch7_q3/alpha}\times\SL{ch7_q3/td} = \SL{ch7_q3/check}.
+\end{align*}
+Giá trị chương trình thực sự ghi vào bảng là \SL{ch7_q3/q_new}, khớp phép tính tay. Với $\alpha=0{,}1$, mỗi quan sát chỉ dịch Q đi 10\% khoảng cách tới mục tiêu, nên một mẫu doanh số may mắn không làm đảo chính sách ngay.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 4: Khám phá và khai thác}
+
+Thí nghiệm D (Bảng~\ref{tab:ch6-d}) cho câu trả lời định lượng. Không khám phá ($\varepsilon=0$): chỉ \SL{ch6_d/khong/n_opt}/10 seed tối ưu, thưởng đánh giá \SL{ch6_d/khong/eval_mean}, vì hành động thử đầu tiên có thưởng dương sẽ được khai thác mãi. Lịch thấp đạt \SL{ch6_d/thap/eval_mean} với \SL{ch6_d/thap/n_opt}/10 tối ưu; lịch cao còn \SL{ch6_d/cao/n_opt}/10 và giữ tỉ lệ giảm giá \SL{ch6_d/cao/eval_discPct}\% khi đánh giá. Với 8 ô Q và 100.000 bước, cần rất ít khám phá; khám phá thêm là chi phí trả bằng lợi nhuận huấn luyện (\SL{ch6_d/cao/train_mean} so với \SL{ch6_d/thap/train_mean}). Trong môi trường lớn hơn hoặc thưởng thưa, cân bằng này dịch về phía khám phá nhiều hơn -- đây là giải thích, chưa được đo trong bài.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 5: Phần thưởng và mục tiêu kinh doanh}
+
+Với $P=10$, $C=5$, $\delta=0{,}2$: giữ giá lãi 5 mỗi đơn, giảm giá còn $8-5=3$, tức mất 40\% biên lợi nhuận để đổi lấy 15 điểm phần trăm xác suất chuyển đổi. Giảm giá tăng doanh số nhưng chỉ tăng lợi nhuận khi $N\,p_1\cdot 3 > N\,p_0\cdot 5$, điều chỉ xảy ra ở trạng thái $(0,1)$ (Bảng~\ref{tab:ch4-reward}). Thí nghiệm G kiểm chứng tầm quan trọng của việc chọn thưởng: huấn luyện với thưởng là doanh thu cho thưởng huấn luyện \SL{ch6_g/doanh_thu/train_mean} nhưng lợi nhuận đánh giá chỉ \SL{ch6_g/doanh_thu/eval_mean} (regret \SL{ch6_g/doanh_thu/regret}), vì tác tử giảm giá \SL{ch6_g/doanh_thu/eval_discPct}\% số bước. Phần thưởng phải đo đúng mục tiêu kinh doanh; nếu muốn cân nhắc thêm thị phần hay giữ chân khách, phải đưa chúng vào thưởng một cách tường minh.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 6: Đánh giá hiệu năng từ dữ liệu thực nghiệm}
+
+Lượt tham chiếu: $\bar R_{RL}=\SL{ch6_a/eval_total}/\SL{ch6_a/steps}=\SL{ch6_a/eval_mean}$, tỉ lệ giảm giá \SL{ch6_a/eval_discPct}\%; tác tử luật trên cùng luồng ngẫu nhiên cũng đạt \SL{ch6_a/rule_mean}. Một lượt không đủ để kết luận, nên Thí nghiệm E lặp 10 seed: RL \SL{ch6_e/agg/eval_mean} $\pm$ \SL{ch6_e/agg/eval_sd}, chênh lệch cặp \SL{ch6_e/agg/diff_mean}, KTC 95\% $[\SL{ch6_e/agg/ci_lo};\ \SL{ch6_e/agg/ci_hi}]$. Ba nguyên tắc rút ra: (i) đánh giá đóng băng với $\varepsilon=0$, không dùng thưởng huấn luyện; (ii) so cặp trên cùng chuỗi nhu cầu để loại phương sai do mẫu; (iii) báo cáo phân bố qua seed và giá trị chính xác, vì độ lệch chuẩn \SL{ch6_e/agg/eval_sd} chủ yếu đến từ một seed học hỏng chứ không phải từ nhiễu đánh giá.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 7: Tốc độ học và tính ổn định}
+
+Bảng~\ref{tab:ch6-c}: $\alpha=0{,}50$ cho thưởng đánh giá \SL{ch6_c/0.50/eval_mean} và \SL{ch6_c/0.50/switches} lần đổi chính sách; $\alpha=0{,}10$ cho \SL{ch6_c/0.10/eval_mean} và \SL{ch6_c/0.10/switches} lần; $\alpha=0{,}01$ cho \SL{ch6_c/0.01/eval_mean} và chỉ \SL{ch6_c/0.01/switches} lần. $\alpha$ lớn làm Q bám theo mẫu doanh số gần nhất -- với $\alpha=0{,}5$, mẫu mới chiếm một nửa giá trị -- nên ở trạng thái gần hòa như $(0,1)$ thứ tự hai hành động liên tục đảo. $\alpha$ nhỏ làm trung bình mượt nhưng học chậm (thưởng huấn luyện \SL{ch6_c/0.01/train_mean}). Lựa chọn hợp lý là $\alpha$ vừa phải hoặc giảm dần theo số lần thăm $\alpha_n(s,a)=1/n(s,a)$, đúng điều kiện hội tụ của Q-learning~\cite{ch2:watkins}.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 8: Tương tác đa tác tử và tính phi dừng}
+
+Khi đối thủ là luật, phản ứng của nó là một hàm cố định nên với tác tử RL môi trường là dừng (dù không Markov đầy đủ theo quan sát $(d,c)$). Khi đối thủ cũng học (Thí nghiệm H), chính sách của nó đổi trong suốt quá trình học, nên cùng một cặp $(s,a)$ cho phân phối thưởng khác nhau theo thời gian. Số đo: tỉ lệ giảm giá huấn luyện \SL{ch6_h/agg/train_discPct}\% (so với \SL{ch6_e/agg/train_discPct}\% khi đối thủ là luật), thưởng đánh giá \SL{ch6_h/agg/eval_mean} và \SL{ch6_h/opp_eval}, và không seed nào cả hai hội tụ về \texttt{0000}. Kết quả phụ thuộc lẫn nhau giữa hai quá trình học là đặc trưng của học tăng cường đa tác tử~\cite{busoniu2008}; cách xử lý thường gặp là đưa hành động của đối thủ vào mô hình (như tác tử ở Câu 10) hoặc học tập trung, thực thi phân tán.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 9: Giới hạn và thay đổi môi trường đã thực hiện}
+
+Giới hạn chính: (i) không gian rất nhỏ -- 4 trạng thái, 2 hành động, không tồn kho, không nhiều mức giá; (ii) quan sát $(d,c)$ thiếu hành động trước của chính tác tử, nên hậu quả ``giảm giá hôm nay $\to$ đối thủ giảm giá ngày mai'' bị ẩn; (iii) nhu cầu độc lập với lịch sử; (iv) thưởng đo bằng lợi nhuận mô phỏng, không có dữ liệu thật.
+
+Hai thay đổi đã cài và đo. \textbf{Mức giảm giá} (Thí nghiệm F): ở $\delta=10\%$ RL thua luật (KTC $[\SL{ch6_f/010/ci_lo};\ \SL{ch6_f/010/ci_hi}]$) chính vì giới hạn (ii): giảm giá khi nhu cầu thấp có lợi tức thời nhưng kích phản ứng của đối thủ. \textbf{Nhu cầu bền} $P(d_{t+1}=d_t)=0{,}8$ (Thí nghiệm G): tối ưu vẫn là giữ giá (\SL{ch6_g/ben_vung/optimal}); RL đạt \SL{ch6_g/ben_vung/eval_mean} với \SL{ch6_g/ben_vung/n_opt}/10 seed tối ưu, kém hơn môi trường gốc vì trạng thái nhu cầu cao kéo dài làm mẫu kém đa dạng. Kết luận ``RL hòa luật'' vì vậy chỉ đúng trong phạm vi mô hình tham chiếu.
+
+% ---------------------------------------------------------------------------------------------
+\section{Câu 10: Đề xuất và kiểm chứng tác tử tốt hơn}
+
+Hai tác tử được đề xuất và cài đặt, nhằm thẳng vào giới hạn (ii) ở Câu 9:
+\begin{itemize}
+  \item \textbf{Q-learning mở rộng}: quan sát $(d,\ a_{-i}(t-1),\ a_i(t-1))$ -- 8 trạng thái, 16 giá trị Q.
+  \item \textbf{Tác tử dựa trên mô hình}: học từ kinh nghiệm phản ứng của đối thủ, bảng thưởng trung bình và quá trình nhu cầu, rồi lập kế hoạch bằng quy hoạch động ngược trên đúng 20 bước còn lại (Hình~\ref{fig:ch7-mb}). Nó tối ưu trực tiếp thước đo đánh giá (lợi nhuận không chiết khấu mỗi episode) thay vì mục tiêu chiết khấu $\gamma=0{,}9$.
+\end{itemize}
+
+\hinhtikz{ch7_mb}{Kiến trúc tác tử dựa trên mô hình: (1) thu kinh nghiệm, (2) cập nhật ba mô hình đếm tần suất, (3) quy hoạch động ngược đầu mỗi episode, (4) chọn hành động tham lam theo $Q_t$.}{ch7-mb}
+
+\maNguon{model_agent__ModelBasedAgent.backward_induction}{Quy hoạch động ngược của tác tử dựa trên mô hình.}
+
+Ba tác tử được huấn luyện 10 seed trên năm kịch bản: tham chiếu, $\delta=5\%$, đối thủ ăn miếng trả miếng, đối thủ luôn giảm giá, nhu cầu bền. Bảng~\ref{tab:ch7-q10} báo giá trị chính xác trung bình; Hình~\ref{fig:ch7-q10} báo regret = tối ưu $-$ giá trị chính xác.
+
+\bang{ch7_q10}{Giá trị chính xác mỗi bước (TB 10 seed) và số seed đạt tối ưu theo kịch bản.}{ch7-q10}
+\hinhpdf{ch7_q10_regret}{1}{Regret của ba tác tử trong năm kịch bản (TB 10 seed; thấp hơn là tốt hơn).}{ch7-q10}
+
+\nhanxet{Tác tử dựa trên mô hình đạt tối ưu ở cả năm kịch bản (\SL{ch7_q10/tham_chieu/model/n_opt}/10 seed ở tham chiếu, \SL{ch7_q10/giam_5/model/n_opt}/10 ở $\delta=5\%$ với giá trị \SL{ch7_q10/giam_5/model/exact_mean} bằng tối ưu \SL{ch7_q10/giam_5/q/optimal}), trong khi Q-learning gốc chỉ đạt \SL{ch7_q10/giam_5/q/n_opt}/10 seed ở $\delta=5\%$. Q-learning mở rộng giảm regret khi phản ứng của đối thủ phụ thuộc hành động trước của mình (ăn miếng trả miếng: \SL{ch7_q10/an_mieng/q_ext/regret} so với \SL{ch7_q10/an_mieng/q/regret}; nhu cầu bền: \SL{ch7_q10/ben_vung/q_ext/regret} so với \SL{ch7_q10/ben_vung/q/regret}), nhưng kém hơn khi đối thủ luôn giảm giá (\SL{ch7_q10/luon_giam/q_ext/regret} so với \SL{ch7_q10/luon_giam/q/regret}) vì gấp đôi số ô phải học với cùng lượng dữ liệu. Ưu điểm của tác tử dựa trên mô hình đến từ hai nguồn: dùng dữ liệu hiệu quả hơn (mỗi bước cập nhật mô hình dùng chung cho mọi kế hoạch) và lập kế hoạch đúng chân trời 20 bước. Đổi lại, nó cần biết cấu trúc trạng thái chung và giả định đối thủ dừng; trước một đối thủ cũng đang học, mô hình đếm tần suất sẽ cũ dần và phải thêm cơ chế quên.}

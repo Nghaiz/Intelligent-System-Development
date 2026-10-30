@@ -1,0 +1,29 @@
+\begin{tikzpicture}[node distance=7mm and 10mm]
+  % môi trường (khối 3D)
+  \khoibaD{0}{0}{3.2}{2.6}{1.4}{cTeal}
+  \node[font=\small\bfseries, text=white, align=center] at (1.6,1.3) {Thị trường\\hai cửa hàng};
+  % kinh nghiệm
+  \node[csdl=cSlate, minimum width=24mm] (exp) at (6.3,1.3) {Kinh nghiệm\\$(s, a, r, s')$};
+  \draw[muiM=cTeal] (3.95,1.3) -- node[nhan, above, yshift=2pt] {$r_t, s_{t+1}$} (exp.west);
+  % ba mô hình
+  \node[khoiP, text width=56mm, align=center] (pi) at (11.9,3.0) {$\hat\pi(a_{-i}\mid s)$: phản ứng của đối thủ};
+  \node[khoiC, text width=56mm, align=center] (rh) at (11.9,1.3) {$\hat R(d, a_i, a_{-i})$: thưởng trung bình};
+  \node[khoiG, text width=56mm, align=center] (pd) at (11.9,-0.4) {$\hat P(d'\mid d)$: quá trình nhu cầu};
+  \foreach \m in {pi,rh,pd}{\draw[mui] (exp.east) -- (\m.west);}
+  \begin{scope}[on background layer]
+    \node[vung=cPurple, fit=(pi)(rh)(pd), label={[tieude]above:mô hình đếm tần suất}] (models) {};
+  \end{scope}
+  % lập kế hoạch
+  \node[khoiR, text width=80mm, align=center] (plan) at (9.4,-3.4)
+       {\textbf{Quy hoạch động ngược} trên 20 bước còn lại, đầu mỗi episode\\[2pt]
+        $Q_t(s,a)=\mathbb{E}_{a'\sim\hat\pi,\ d'\sim\hat P}\big[\hat R(d,a,a')+V_{t+1}(s')\big]$};
+  \draw[mui] (models.south) -- (models.south |- plan.north);
+  % hành động
+  \node[khoi, align=center] (act) at (1.6,-3.4) {$a_t=\arg\max_a Q_t(s_t,a)$\\($\varepsilon$-greedy khi huấn luyện)};
+  \draw[mui] (plan.west) -- (act.east);
+  \draw[mui] (act.north) -- node[nhan, right] {$a_t$} (act.north |- 0,0);
+  \node[buoc=cRed] at (4.7,0.7) {1};
+  \node[buoc=cRed] at (8.4,2.9) {2};
+  \node[buoc=cRed] at (12.6,-2.1) {3};
+  \node[buoc=cRed] at (4.3,-2.85) {4};
+\end{tikzpicture}

@@ -1,0 +1,130 @@
+\chapter{Học tăng cường theo Naeem và cộng sự (2020)}\label{chap:2}
+
+Bài tổng quan \emph{A Gentle Introduction to Reinforcement Learning and its Application in Different Fields} của
+Naeem, Rizvi và Coronato (IEEE Access, tập 8, tr.~209320--209344)~\cite{ch2:naeem} hệ thống hóa học tăng cường
+(reinforcement learning, RL) theo ba lớp: khung toán học MDP (phần II--III), các họ thuật toán (phần IV) và ứng
+dụng cùng thách thức (phần V). Chương này đi theo đúng trình tự đó, đối chiếu với giáo trình của Sutton và
+Barto~\cite{ch2:sutton}, và chỉ ra phần nào được dùng trực tiếp trong thí nghiệm ở Chương~\ref{chap:4}--\ref{chap:7}.
+
+\section{Quá trình quyết định Markov}
+
+\begin{dinhnghia}{Định nghĩa 2.1 (MDP)}
+Một quá trình quyết định Markov (Markov decision process) là bộ $\mathcal M=(\mathcal S,\mathcal A,P,R,\gamma)$
+gồm tập trạng thái $\mathcal S$, tập hành động $\mathcal A$, xác suất chuyển $P(s'\mid s,a)$, hàm phần thưởng
+$R(s,a)$ và hệ số chiết khấu $\gamma\in[0,1)$. Tính Markov yêu cầu
+$\Pr(s_{t+1},r_t\mid s_t,a_t,s_{t-1},\dots)=\Pr(s_{t+1},r_t\mid s_t,a_t)$.
+\end{dinhnghia}
+
+Tác tử và môi trường tương tác theo các bước rời rạc (Hình~\ref{fig:ch2-loop}): ở bước $t$ tác tử thấy $s_t$, chọn
+$a_t\sim\pi(\cdot\mid s_t)$, nhận phần thưởng $r_t$ và trạng thái mới $s_{t+1}$. Mục tiêu không phải phần thưởng
+tức thời mà là \textbf{lợi tức} (return) chiết khấu, và chất lượng của chính sách được đo bằng hàm giá trị:
+\begin{gather}
+G_t=\sum_{k=0}^{T-t-1}\gamma^{k}r_{t+k},\label{eq:ch2-return}\\
+V^{\pi}(s)=\mathbb E_{\pi}\!\left[G_t\mid s_t=s\right],\qquad
+Q^{\pi}(s,a)=\mathbb E_{\pi}\!\left[G_t\mid s_t=s,a_t=a\right].\notag
+\end{gather}
+
+\hinhtikz{ch2_loop}{Vòng tương tác tác tử -- môi trường của MDP và quỹ đạo $(s_0,a_0,r_0,s_1,\dots)$ sinh ra theo thời gian.}{ch2-loop}
+
+\nhanxet{Phần thưởng $r_t$ là phản hồi một bước, còn $G_t$ cộng dồn có chiết khấu. Trong bài thí nghiệm, báo cáo
+lợi nhuận \emph{trung bình không chiết khấu} mỗi bước, trong khi bảng Q ước lượng lợi tức với $\gamma=0{,}9$; hai đại
+lượng vì vậy khác thang đo dù cùng đơn vị tiền.}
+
+\section{Phương trình Bellman}
+
+Tách số hạng đầu khỏi tổng~\eqref{eq:ch2-return} cho quan hệ đệ quy giữa giá trị hiện tại và giá trị ở bước sau.
+Với một chính sách cố định $\pi$ ta có \textbf{phương trình Bellman kỳ vọng}, còn với chính sách tối ưu ta có
+\textbf{phương trình Bellman tối ưu}~\cite{ch2:naeem,ch2:sutton}:
+\begin{align}
+V^{\pi}(s)&=\sum_{a}\pi(a\mid s)\sum_{s'}P(s'\mid s,a)\big[R(s,a)+\gamma V^{\pi}(s')\big],\label{eq:ch2-bell-v}\\
+Q^{*}(s,a)&=\sum_{s'}P(s'\mid s,a)\Big[R(s,a)+\gamma\max_{a'}Q^{*}(s',a')\Big],\label{eq:ch2-bell-q}\\
+\pi^{*}(s)&=\arg\max_{a}Q^{*}(s,a).\notag
+\end{align}
+Khi biết $P$ và $R$, \eqref{eq:ch2-bell-q} giải được bằng lặp giá trị; khi không biết, các thuật toán RL thay kỳ vọng
+bằng mẫu trải nghiệm. Bài thí nghiệm nhỏ đến mức mô hình $P,R$ tính được chính xác, nên Chương~\ref{chap:4} dùng
+\eqref{eq:ch2-bell-q} làm giá trị đối chiếu cho những gì Q-learning học được.
+
+\section{Các họ thuật toán}
+
+Naeem và cộng sự chia thuật toán theo hai trục: có dùng mô hình môi trường hay không (model-based /
+model-free), và học giá trị hay học trực tiếp chính sách (Hình~\ref{fig:ch2-tax}).
+
+\hinhtikz{ch2_tax}{Phân loại các thuật toán RL theo bài tổng quan; ô viền đỏ là thuật toán được dùng trong thí nghiệm.}{ch2-tax}
+
+\begin{itemize}
+\item \textbf{Quy hoạch động} (dynamic programming, DP): lặp chính sách / lặp giá trị trên mô hình đã biết; chính xác
+nhưng cần $P$ và tốn kém khi $|\mathcal S|$ lớn.
+\item \textbf{Monte Carlo} (MC): ước lượng $V^\pi$ bằng trung bình lợi tức của các episode hoàn chỉnh; không
+\emph{bootstrap}, không thiên lệch nhưng phương sai lớn và phải chờ hết episode.
+\item \textbf{Sai phân thời gian} (temporal difference, TD): cập nhật sau từng bước bằng ước lượng của chính nó,
+$V(s_t)\leftarrow V(s_t)+\alpha\,[r_t+\gamma V(s_{t+1})-V(s_t)]$; kết hợp lấy mẫu của MC với bootstrap của DP.
+\item \textbf{Actor--Critic}, phương pháp Bayes và \textbf{DQN}: tách chính sách (actor) khỏi giá trị (critic), mô hình
+hóa bất định, hoặc xấp xỉ $Q$ bằng mạng nơ-ron cho không gian lớn.
+\end{itemize}
+
+\subsection{Q-learning và SARSA}
+
+Hai đại diện quan trọng nhất của TD điều khiển chỉ khác nhau ở \emph{mục tiêu} (target) của phép cập nhật
+(Hình~\ref{fig:ch2-backup}). Q-learning~\cite{ch2:watkins} là \textbf{off-policy}: mục tiêu lấy hành động tốt nhất
+ở trạng thái sau, bất kể hành động thực sự được chọn; SARSA là \textbf{on-policy}: mục tiêu dùng chính hành động
+$a_{t+1}$ mà chính sách đang khám phá chọn:
+\begin{align}
+\text{Q-learning:}&\quad Q(s_t,a_t)\leftarrow Q(s_t,a_t)+\alpha\Big[\underbrace{r_t+\gamma\max_{a'}Q(s_{t+1},a')}_{y_t}-Q(s_t,a_t)\Big],\label{eq:ch2-q}\\
+\text{SARSA:}&\quad Q(s_t,a_t)\leftarrow Q(s_t,a_t)+\alpha\big[r_t+\gamma\,Q(s_{t+1},a_{t+1})-Q(s_t,a_t)\big].\label{eq:ch2-sarsa}
+\end{align}
+Ở bước cuối episode, mục tiêu chỉ còn $y_t=r_t$. Đại lượng $\delta_t=y_t-Q(s_t,a_t)$ là \textbf{sai số TD}.
+
+\hinhtikz{ch2_backup}{Sơ đồ sao lưu (backup diagram) của Q-learning (lấy max) và SARSA (lấy hành động thực).}{ch2-backup}
+
+\nhanxet{Vì Q-learning học giá trị của chính sách tham lam trong khi vẫn khám phá, nó cho phép tách gọn pha huấn
+luyện ($\varepsilon>0$) khỏi pha đánh giá ($\varepsilon=0$) --- đúng cách đánh giá được dùng ở Chương~\ref{chap:5}.}
+
+\subsection{Khám phá, tốc độ học và điều kiện hội tụ}
+
+Chiến lược \textbf{$\varepsilon$-greedy} chọn ngẫu nhiên với xác suất $\varepsilon$, ngược lại chọn
+$\arg\max_a Q(s,a)$; với hai hành động, hành động ``không tốt nhất'' được chọn với xác suất $\varepsilon/2$.
+Thường $\varepsilon$ giảm dần, ví dụ $\varepsilon_e=\max(\varepsilon_{\min},\varepsilon_0\rho^{e})$ theo episode $e$.
+Tốc độ học $\alpha$ quyết định mỗi mẫu thay đổi $Q$ bao nhiêu: $\alpha$ nhỏ cho đường học mượt nhưng chậm, $\alpha$
+lớn phản ứng nhanh nhưng khuếch đại nhiễu. Q-learning hội tụ về $Q^{*}$ với xác suất 1 nếu MDP dừng, mọi cặp
+$(s,a)$ được thăm vô hạn lần và $\sum_t\alpha_t=\infty$, $\sum_t\alpha_t^2<\infty$~\cite{ch2:watkins}.
+
+\begin{luuy}{Khoảng cách giữa lý thuyết và thí nghiệm}
+Thí nghiệm dùng $\alpha$ hằng, số bước hữu hạn và một trạng thái rút gọn không chứa hành động trước của chính tác tử;
+đối thủ cũng có thể học. Cả ba điều kiện trên vì vậy không được bảo đảm hoàn toàn, nên độ ổn định phải được đo bằng
+nhiều seed thay vì suy ra từ định lý.
+\end{luuy}
+
+\subsection{Từ bảng Q tới DQN}
+
+Khi $|\mathcal S|$ lớn, bảng Q được thay bằng mạng $Q(s,a;\theta)$. DQN~\cite{ch2:mnih} ổn định quá trình học bằng
+hai cơ chế: \emph{bộ nhớ phát lại} (experience replay) phá tương quan giữa các mẫu liên tiếp, và \emph{mạng mục tiêu}
+$\theta^{-}$ cập nhật chậm; hàm mất mát là
+$\mathcal L(\theta)=\mathbb E\big[(r+\gamma\max_{a'}Q(s',a';\theta^{-})-Q(s,a;\theta))^2\big]$. Bài thí nghiệm chỉ có
+$4\times2=8$ giá trị Q nên bảng là lựa chọn đúng; DQN được nêu để chỉ hướng mở rộng khi trạng thái giàu hơn.
+
+\section{Ứng dụng và thách thức}\label{sec:ch2-challenge}
+
+Phần V của bài tổng quan khảo sát RL trong nhiều lĩnh vực; điểm chung là chuỗi quyết định nối tiếp, trong đó
+hành động hôm nay thay đổi tình huống ngày mai (Bảng~\ref{tab:ch2-app}).
+
+\begin{table}[!htbp]\centering\caption{Một số lĩnh vực ứng dụng RL được Naeem và cộng sự khảo sát.}\label{tab:ch2-app}
+{\small\begin{tabular}{@{}L{3.6cm}L{5.4cm}L{5.5cm}@{}}\toprule
+Lĩnh vực & Trạng thái / hành động & Phần thưởng điển hình \\\midrule
+Robot, điều khiển & Cảm biến khớp / mô-men xoắn & Bám quỹ đạo, tiết kiệm năng lượng \\
+Mạng, viễn thông & Tải kênh / cấp phát tài nguyên & Thông lượng, độ trễ \\
+IoT tự chủ & Trạng thái thiết bị / lịch hoạt động & Tuổi thọ pin, chất lượng dịch vụ \\
+Ngôn ngữ, thị giác & Ngữ cảnh / từ hoặc vùng chọn & Điểm chất lượng đầu ra \\
+Trò chơi & Bàn cờ, khung hình / nước đi & Thắng / thua, điểm \\
+Lập lịch, tài nguyên & Hàng đợi / phân công & Thời gian hoàn thành \\
+Y tế & Tình trạng bệnh nhân / phác đồ & Kết cục điều trị \\\bottomrule
+\end{tabular}}
+\end{table}
+
+Các thách thức được nêu gồm: \textbf{hiệu quả mẫu} (cần rất nhiều tương tác), \textbf{không gian lớn},
+\textbf{an toàn} khi khám phá trên hệ thật, \textbf{quan sát một phần}, \textbf{môi trường phi dừng} và đánh đổi
+\textbf{thiên lệch--phương sai}. Cả sáu đều xuất hiện ở quy mô nhỏ trong bài thí nghiệm: doanh số nhị thức tạo phương
+sai; bootstrap tạo thiên lệch; trạng thái thiếu hành động trước của chính mình làm quan sát không đầy đủ; nếu đối thủ
+cũng học, phân phối phản hồi thay đổi theo thời gian; và mỗi lần ``khám phá'' bằng giảm giá là một khoản lợi nhuận
+thật bị mất. Vì vậy thí nghiệm lấy từ bài tổng quan bốn thành phần: MDP (mô hình hóa), Q-learning off-policy với
+$\varepsilon$-greedy giảm dần (tác tử A), Bellman tối ưu trên mô hình đã biết (giá trị đối chiếu), và thiết kế
+đánh giá nhiều seed cùng thí nghiệm hai tác tử cùng học (đối phó phương sai và tính phi dừng).

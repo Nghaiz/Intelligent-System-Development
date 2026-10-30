@@ -1,0 +1,13 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} ag2/shop\PYGZus{}intent.py}
+\PYG{k}{class}\PYG{+w}{ }\PYG{n+nc}{IntentNet}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Module}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}EmbeddingBag(trung bình) \PYGZhy{}\PYGZgt{} Dropout \PYGZhy{}\PYGZgt{} Linear \PYGZhy{}\PYGZgt{} ReLU \PYGZhy{}\PYGZgt{} Linear(6 ý định).\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{dim}\PYG{o}{=}\PYG{l+m+mi}{96}\PYG{p}{,} \PYG{n}{hidden}\PYG{o}{=}\PYG{l+m+mi}{64}\PYG{p}{,} \PYG{n}{n\PYGZus{}classes}\PYG{o}{=}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{INTENTS}\PYG{p}{),} \PYG{n}{dropout}\PYG{o}{=}\PYG{l+m+mf}{0.3}\PYG{p}{):}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{emb} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{EmbeddingBag}\PYG{p}{(}\PYG{n}{N\PYGZus{}BUCKETS}\PYG{p}{,} \PYG{n}{dim}\PYG{p}{,} \PYG{n}{mode}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}mean\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{head} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}\PYG{n}{nn}\PYG{o}{.}\PYG{n}{Dropout}\PYG{p}{(}\PYG{n}{dropout}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{n}{dim}\PYG{p}{,} \PYG{n}{hidden}\PYG{p}{),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{ReLU}\PYG{p}{(),} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{n}{hidden}\PYG{p}{,} \PYG{n}{n\PYGZus{}classes}\PYG{p}{))}
+
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{forward}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{ids}\PYG{p}{,} \PYG{n}{offsets}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{head}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{emb}\PYG{p}{(}\PYG{n}{ids}\PYG{p}{,} \PYG{n}{offsets}\PYG{p}{))}
+\end{MintedVerbatim}

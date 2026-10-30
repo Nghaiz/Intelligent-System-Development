@@ -1,0 +1,26 @@
+\begin{tikzpicture}[font=\small]
+  % người dùng
+  \node[cau=cPink, minimum size=14mm] (u) at (-0.6,4.2) {Khách};
+  % Coordinator: khối 3D
+  \khoibaD{4.2}{3.4}{5.6}{1.6}{1.4}{cNavy}
+  \node[text=white, font=\normalsize\bfseries] at (7.0,4.5) {Coordinator};
+  \node[text=white] at (7.0,3.85) {kiểm tra kiểu, ngân sách, độ mới};
+  \coordinate (co) at (7.0,3.4);
+  \draw[muiM=cPink] (u.20) -- node[above, nhan, pos=0.45] {query, budget} (4.2,4.5);
+  \draw[muiM=cGreen] (4.2,3.8) -- node[below, nhan, pos=0.55] {kết quả} (u.-20);
+  % ba tác tử
+  \foreach \x/\c/\n/\t in {1.0/cBlue/CatalogAgent/tìm ứng viên, 5.6/cPurple/Recommendation/lọc \& xếp hạng, 10.2/cTeal/InventoryAgent/kiểm tra tồn kho}{
+    \khoibaD{\x}{0}{3.6}{1.4}{1.0}{\c}
+    \node[text=white, font=\bfseries] at (\x+1.8,0.95) {\n};
+    \node[text=white] at (\x+1.8,0.4) {\t};
+  }
+  % thông điệp
+  \draw[muiM=cBlue] (6.0,3.4) to[out=-120,in=60] node[pos=0.45, left, nhan] {\texttt{search\_request}} (3.4,1.4);
+  \draw[muiM=cPurple] (7.2,3.4) -- node[right, nhan, pos=0.55] {\texttt{rank\_request}} (7.2,1.4);
+  \draw[muiM=cTeal] (8.4,3.4) to[out=-60,in=120] node[pos=0.22, right, nhan] {\texttt{stock\_request}} (11.0,1.4);
+  % kho dữ liệu
+  \node[csdl=cBlue] at (2.8,-1.7) {Danh mục\\sản phẩm};
+  \node[csdl=cPurple] at (7.4,-1.7) {Mô hình\\ý định};
+  \node[csdl=cTeal] at (12.0,-1.7) {Dữ liệu\\tồn kho};
+  \foreach \x in {2.8,7.4,12.0} \draw[muiM=cSlate, densely dashed] (\x,0) -- (\x,-1.0);
+\end{tikzpicture}

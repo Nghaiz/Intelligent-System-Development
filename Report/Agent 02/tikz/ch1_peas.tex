@@ -1,0 +1,25 @@
+\begin{tikzpicture}[font=\small]
+  % môi trường: khối 3D lớn bên trái
+  \khoibaD{0}{0}{4.2}{4.6}{1.6}{cOrange}
+  \node[text=white, font=\normalsize\bfseries, align=center] at (2.1,3.95) {E -- Environment};
+  \node[hop=cYellow, text width=3.4cm] (dem) at (2.1,2.85) {Nhu cầu $d_t$: thấp / cao};
+  \node[hop=cRed, text width=3.4cm] (opp) at (2.1,1.65) {Đối thủ: hành động $a_{-i}$};
+  \node[text=white, align=center] at (2.1,0.55) {doanh số ngẫu nhiên};
+  % tác tử bên phải
+  \node[vung=cBlue, minimum width=7.6cm, minimum height=4.6cm] (ag) at (11.3,2.1) {};
+  \node[tieude, anchor=north] at ([yshift=-3pt]ag.north) {Tác tử bán hàng $i$};
+  \node[hop=cTeal, minimum width=2.1cm, minimum height=1.2cm] (sen) at (8.7,2.3) {S -- Sensors\\[-1pt]$(d_t, c_t)$};
+  \node[hop=cPurple, minimum width=2.1cm, minimum height=1.2cm] (pol) at (11.3,2.3) {Chính sách\\[-1pt]$\pi(s)$};
+  \node[hop=cGreen, minimum width=2.1cm, minimum height=1.2cm] (act) at (13.9,2.3) {A -- Actuators\\[-1pt]giữ / giảm};
+  \node[csdl=cIndigo, minimum width=13mm, minimum height=10mm] (mem) at (11.3,0.6) {Bảng Q\\ / luật};
+  \draw[mui] (sen) -- (pol);
+  \draw[mui] (pol) -- (act);
+  \draw[muiM=cIndigo, <->] (pol) -- (mem);
+  % P ở trên
+  \node[hop=cPink, text width=7.0cm] (perf) at (11.3,6.1) {P -- Performance: lợi nhuận trung bình mỗi bước $\bar R_i$};
+  % mũi tên vòng
+  \draw[muiM=cTeal] (4.95,3.0) -- node[above, nhan] {quan sát} (7.3,3.0) |- (sen.west);
+  \draw[muiM=cGreen] (act.south) |- node[pos=0.75, below, nhan] {hành động $a_i(t)$} (3.0,-0.6) -- (3.0,0);
+  \draw[muiM=cPink, dashed] (1.6,5.4) |- node[pos=0.75, above, nhan] {phần thưởng $r_i(t)$} (perf.west);
+  \draw[muiM=cPink, dashed] (perf.south) -- (ag.north);
+\end{tikzpicture}

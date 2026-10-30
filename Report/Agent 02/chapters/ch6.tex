@@ -1,0 +1,94 @@
+\chapter{Kết quả thực nghiệm}\label{chap:6}
+
+Chương này trình bày kết quả của năm thí nghiệm A--E theo đề bài~\cite{lab02} và ba thí nghiệm mở rộng F--H phục vụ câu 8 và câu 9. Mọi con số được đọc từ \texttt{outputs/metrics/*.json} do \texttt{scripts/summarize.py} ghi. Với mỗi chính sách, báo cáo nêu hai đại lượng: \emph{thưởng đánh giá} (lấy mẫu, 500 episode $\times$ 20 bước, $\varepsilon=0$, bảng Q đóng băng, seed riêng) và \emph{giá trị chính xác} (lan truyền phân phối trạng thái, không có nhiễu Binomial). Giá trị tối ưu khi đối thủ là tác tử luật ở cấu hình tham chiếu là \SL{ch6_e/agg/optimal} mỗi bước (Chương~\ref{chap:4}).
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm A: cấu hình tham chiếu}\label{sec:ch6-a}
+
+Lượt tham chiếu dùng seed tham chiếu của Bảng~\ref{tab:ch5-params} cho huấn luyện; đánh giá chạy \SL{ch6_a/steps} bước trên môi trường mới. Tác tử Q-learning đạt tổng thưởng \SL{ch6_a/eval_total}, tức \SL{ch6_a/eval_mean} mỗi bước, tỉ lệ giảm giá \SL{ch6_a/eval_discPct}\%. Đặt tác tử luật vào cùng ghế, trên cùng chuỗi nhu cầu và cùng luồng doanh số, cho tổng \SL{ch6_a/rule_total}: chênh lệch đúng bằng \SL{ch6_a/diff}. Kết quả trùng khít này là do số ngẫu nhiên chung: hai chính sách cùng chọn ``giữ giá'' ở mọi trạng thái gặp phải nên nhận đúng cùng doanh số.
+
+\bang{ch6_a_q}{Bảng Q sau 5.000 episode của lượt tham chiếu và số lần cập nhật từng cặp trạng thái--hành động.}{ch6-a-q}
+
+\hinhtikz{ch6_qbar3d}{Bảng Q tham chiếu dưới dạng cột 3D: ở cả bốn trạng thái, cột ``giữ giá'' cao hơn cột ``giảm giá''.}{ch6-qbar}
+
+\nhanxet{Chính sách tham lam là \texttt{\SL{ch6_a/policy}} (không bao giờ giảm giá), có giá trị chính xác \SL{ch6_a/exact} -- đúng bằng mức tối ưu. Giá trị Q nhỏ hơn $\bar r/(1-\gamma)=350$ vì episode kết thúc sau 20 bước mà quan sát không chứa bước $t$: mỗi ô Q là trung bình của lợi nhuận chiết khấu còn lại trên mọi vị trí trong episode. Số lượt cập nhật lệch mạnh: trạng thái $(1,1)$ chỉ có \SL{ch6_a/visits/11/1} lần thử giảm giá vì tác tử luật chỉ giảm giá khi tác tử RL vừa giảm giá; ước lượng ở các ô hiếm vì vậy nhiễu hơn hẳn.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm B: quá trình học}\label{sec:ch6-b}
+
+\hinhpdf{ch6_b_curve}{1}{Thưởng mỗi bước theo episode khi huấn luyện (đường mờ: từng episode; đường đậm: trung bình trượt 100 episode) và lịch $\varepsilon$.}{ch6-b-curve}
+
+\nhanxet{Thưởng huấn luyện trung bình tăng từ \SL{ch6_b/first500} (500 episode đầu) lên \SL{ch6_b/last500} (500 episode cuối), còn tỉ lệ giảm giá giảm từ \SL{ch6_b/disc_first500Pct}\% xuống \SL{ch6_b/disc_last500Pct}\%. Đường cong rất nhiễu vì nhiễu Binomial lớn hơn nhiều so với mức cải thiện do học.}
+
+\hinhpdf{ch6_b_exact}{1}{Trái: giá trị chính xác của chính sách tham lam, tính lại sau mỗi 25 episode. Phải: tỉ lệ giảm giá của hai tác tử khi huấn luyện.}{ch6-b-exact}
+
+\hinhpdf{ch6_b_qtraj}{1}{Quỹ đạo tám giá trị Q theo episode (lượt tham chiếu).}{ch6-b-qtraj}
+
+\nhanxet{Giá trị chính xác đạt mức tối ưu sớm nhưng thỉnh thoảng rơi xuống: chính sách tham lam đổi qua \SL{ch6_b/n_policies} dạng khác nhau và chỉ ổn định từ episode \SL{ch6_b/stable_ep}. Nguyên nhân thấy rõ ở Hình~\ref{fig:ch6-b-qtraj}: ở trạng thái $(0,1)$, hai đường Q sát nhau (giảm giá chỉ kém một chút, Bảng~\ref{tab:ch4-reward}) và trạng thái này hiếm, nên vài mẫu Binomial may mắn đủ đảo thứ tự. Phần lớn các lần đảo nằm ở trạng thái không bao giờ xuất hiện khi đánh giá với đối thủ luật, nên giá trị chính xác hầu như không đổi.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm C: tốc độ học}\label{sec:ch6-c}
+
+Ba giá trị $\alpha\in\{0{,}01;\ 0{,}10;\ 0{,}50\}$ được chạy với 10 seed; các tham số khác giữ nguyên. Cột ``Tối ưu'' là số seed có chính sách cuối đạt giá trị chính xác tối ưu; ``Đổi CS'' là số lần chính sách tham lam thay đổi giữa hai episode liên tiếp.
+
+\hinhpdf{ch6_c_alpha}{1}{Thí nghiệm C: đường học (TB $\pm$ SD trên 10 seed, cửa sổ 100 episode) và thưởng đánh giá theo $\alpha$ (chấm đen: từng seed; nét đỏ: tối ưu).}{ch6-c}
+\bang{ch6_c}{Ảnh hưởng của tốc độ học (10 seed, đánh giá tham lam 10.000 bước mỗi seed).}{ch6-c}
+
+\nhanxet{$\alpha=0{,}50$ cho thưởng đánh giá thấp nhất (\SL{ch6_c/0.50/eval_mean}) và chính sách đổi \SL{ch6_c/0.50/switches} lần, gấp nhiều lần $\alpha=0{,}10$ (\SL{ch6_c/0.10/switches}): mỗi cập nhật thay một nửa giá trị cũ bằng một mẫu nhiễu nên Q không bao giờ lắng. $\alpha=0{,}01$ ổn định nhất (\SL{ch6_c/0.01/switches} lần đổi) nhưng học chậm, thưởng huấn luyện chỉ \SL{ch6_c/0.01/train_mean}. Cả ba cấu hình đều có khoảng tin cậy chênh lệch với luật chứa 0.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm D: mức khám phá}\label{sec:ch6-d}
+
+Bốn lịch khám phá (Bảng~\ref{tab:ch5-schedules}) được so sánh; lịch ``Không khám phá'' ($\varepsilon=0$) được thêm làm đối chứng cực đoan.
+
+\hinhpdf{ch6_d_explore}{1}{Thí nghiệm D: đường học theo lịch khám phá và thưởng đánh giá ($\varepsilon=0$ khi đánh giá).}{ch6-d}
+\bang{ch6_d}{Ảnh hưởng của khám phá (10 seed).}{ch6-d}
+
+\nhanxet{Không khám phá là cấu hình tệ nhất: chỉ \SL{ch6_d/khong/n_opt}/10 seed tối ưu, thưởng đánh giá \SL{ch6_d/khong/eval_mean}. Với $Q$ khởi tạo bằng 0, hành động đầu tiên nhận thưởng dương sẽ được giữ mãi vì hành động còn lại không bao giờ được thử. Lịch thấp đạt tốt nhất (\SL{ch6_d/thap/eval_mean}, \SL{ch6_d/thap/n_opt}/10 tối ưu) vì bài toán chỉ có 8 ô Q; lịch cao giữ $\varepsilon$ lớn lâu nên còn nhiều hành động giảm giá (\SL{ch6_d/cao/eval_discPct}\% khi đánh giá) và \SL{ch6_d/cao/n_opt}/10 tối ưu. Khám phá vừa đủ là cần, khám phá nhiều chỉ tốn lợi nhuận trong huấn luyện.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm E: so sánh công bằng trên nhiều seed}\label{sec:ch6-e}
+
+Mỗi seed huấn luyện một tác tử mới; đánh giá dùng seed huấn luyện $+500.000$. Tác tử luật được đánh giá trên đúng chuỗi nhu cầu đó (so cặp, mục~\ref{sec:eval}).
+
+\hinhpdf{ch6_e_seeds}{1}{Thí nghiệm E: thưởng đánh giá theo seed và chênh lệch cặp RL $-$ luật với khoảng tin cậy 95\% trong từng seed.}{ch6-e}
+\bang{ch6_e}{So sánh RL và luật trên 10 seed (``Chính xác'': giá trị chính xác của chính sách RL; tối ưu = \SL{ch6_e/agg/optimal}).}{ch6-e}
+
+\nhanxet{RL đạt \SL{ch6_e/agg/eval_mean} $\pm$ \SL{ch6_e/agg/eval_sd}, luật đạt \SL{ch6_e/agg/rule_mean}. Chênh lệch cặp trung bình \SL{ch6_e/agg/diff_mean}, KTC 95\% qua 10 seed $[\SL{ch6_e/agg/ci_lo};\ \SL{ch6_e/agg/ci_hi}]$ chứa 0: không đủ bằng chứng để nói một bên tốt hơn. \SL{ch6_e/agg/n_opt}/\SL{ch6_e/agg/n} seed đạt tối ưu; các seed có chính sách \texttt{0100} vẫn tối ưu vì trạng thái $(0,1)$ không xuất hiện khi đối thủ là luật. Một seed rơi vào chính sách giảm giá ở nhiều trạng thái và kéo trung bình xuống: độ lệch chuẩn qua seed lớn chủ yếu do một lượt học hỏng, không do nhiễu đánh giá.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm F (mở rộng): mức giảm giá}\label{sec:ch6-f}
+
+Mức giảm $\delta$ đổi từ 5\% đến 30\%; luật giữ nguyên. Tối ưu được tính bằng quy hoạch động trên trạng thái chung.
+
+\hinhpdf{ch6_f_delta}{1}{Thí nghiệm F: thưởng của RL, của luật và mức tối ưu theo $\delta$; phải: tỉ lệ giảm giá của RL khi đánh giá.}{ch6-f}
+\bang{ch6_f}{Ảnh hưởng của mức giảm giá (10 seed mỗi mức).}{ch6-f}
+
+\nhanxet{Khi $\delta=5\%$, giảm giá có lợi ở mọi trạng thái; luật cứng nhắc chỉ đạt \SL{ch6_f/005/exact_rule} còn RL học giảm giá (\SL{ch6_f/005/eval_discPct}\%) và đạt \SL{ch6_f/005/eval_mean}, vượt luật với KTC $[\SL{ch6_f/005/ci_lo};\ \SL{ch6_f/005/ci_hi}]$. Ngược lại ở $\delta=10\%$, RL thua luật rõ rệt (KTC $[\SL{ch6_f/010/ci_lo};\ \SL{ch6_f/010/ci_hi}]$): giảm giá khi nhu cầu thấp có lợi tức thời, nhưng hành động đó khiến tác tử luật giảm giá ở bước sau, đúng lúc nhu cầu có thể cao. Quan sát $(d,c)$ không chứa hành động trước của chính tác tử nên hậu quả này ``ẩn'' với Q-learning; môi trường không còn Markov theo quan sát. Từ $\delta\ge 20\%$, giữ giá chiếm ưu thế và RL quay về gần tối ưu.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm G (mở rộng): nhu cầu bền và thưởng theo doanh thu}\label{sec:ch6-g}
+
+Hai thay đổi môi trường cho câu 5 và câu 9: (i) nhu cầu bền, $P(d_{t+1}=d_t)=0{,}8$ thay vì độc lập; (ii) huấn luyện với thưởng là doanh thu $S\,P(1-\delta a)$ nhưng vẫn đánh giá bằng lợi nhuận.
+
+\bang{ch6_g}{Hai biến thể môi trường (10 seed; đánh giá luôn theo lợi nhuận).}{ch6-g}
+
+\nhanxet{Nhu cầu bền không đổi kết luận: tối ưu vẫn là giữ giá (\SL{ch6_g/ben_vung/optimal}), RL đạt \SL{ch6_g/ben_vung/eval_mean}. Thưởng theo doanh thu thì làm hỏng hẳn mục tiêu: thưởng huấn luyện cao (\SL{ch6_g/doanh_thu/train_mean}, tính bằng doanh thu) nhưng lợi nhuận khi đánh giá chỉ \SL{ch6_g/doanh_thu/eval_mean}, regret \SL{ch6_g/doanh_thu/regret}, vì tác tử giảm giá \SL{ch6_g/doanh_thu/eval_discPct}\% số bước để tăng số đơn. Tác tử tối ưu đúng cái được thưởng, không phải cái người thiết kế muốn.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Thí nghiệm H (mở rộng): hai tác tử Q-learning cùng học}\label{sec:ch6-h}
+
+Thay tác tử luật bằng một tác tử Q-learning thứ hai; cả hai cùng học từ đầu, đánh giá với cả hai đóng băng.
+
+\hinhpdf{ch6_h_two}{1}{Thí nghiệm H: tỉ lệ giảm giá và thưởng khi huấn luyện của hai Q-learning cùng học (TB $\pm$ SD 10 seed); đường xám: Q-learning học với đối thủ luật.}{ch6-h}
+\nhanxet{Với đối thủ học, tỉ lệ giảm giá huấn luyện cao hơn (\SL{ch6_h/agg/train_discPct}\% so với \SL{ch6_e/agg/train_discPct}\% khi đối thủ là luật) và thưởng đánh giá thấp hơn (\SL{ch6_h/agg/eval_mean} và \SL{ch6_h/opp_eval}). Không seed nào cả hai cùng hội tụ về \texttt{0000} (\SL{ch6_h/both_0000}/10): chính sách cuối khác nhau theo seed, ví dụ seed 7 cho cặp \texttt{\SL{ch6_h/policies/0}}--\texttt{\SL{ch6_h/opp_policies/0}}, seed 17 cho \texttt{\SL{ch6_h/policies/1}}--\texttt{\SL{ch6_h/opp_policies/1}}; nhiều cặp chọn giảm giá khi nhu cầu thấp. Mỗi tác tử là một phần của môi trường đối với tác tử kia, nên phân phối phản hồi thay đổi trong suốt quá trình học -- môi trường phi dừng, điều kiện hội tụ của Q-learning một tác tử không còn đúng.}
+
+% ---------------------------------------------------------------------------------------------
+\section{Tổng hợp}\label{sec:ch6-sum}
+
+\begin{phathien}{Những điều kết quả cho thấy}
+\begin{itemize}
+  \item Ở cấu hình tham chiếu, luật đã tối ưu; RL chỉ hòa (tối ưu ở \SL{ch6_e/agg/n_opt}/10 seed, chênh lệch không có ý nghĩa thống kê).
+  \item RL thắng khi giả định ẩn trong luật sai ($\delta=5\%$), thua khi quan sát thiếu thông tin ($\delta=10\%$) hoặc thưởng lệch mục tiêu; $\alpha$ lớn, khám phá dài hay hai tác tử cùng học đều làm chính sách dao động.
+\end{itemize}
+\end{phathien}

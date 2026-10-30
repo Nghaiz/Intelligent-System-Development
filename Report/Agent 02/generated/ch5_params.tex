@@ -1,0 +1,23 @@
+\begin{tabular}{llL{4.2cm}}
+\toprule
+Tham số & Giá trị & Trong mã \\
+\midrule
+Giá gốc P & 10 & \texttt{base\_price} \\
+Giá vốn C & 5 & \texttt{unit\_cost} \\
+Mức giảm δ & 0{,}2 & \texttt{discount\_rate} \\
+Khách khi d = 0 & 10 & \texttt{customers\_low} \\
+Khách khi d = 1 & 20 & \texttt{customers\_high} \\
+Chuyển đổi nền & 0{,}3 & \texttt{base\_conversion} \\
+Hiệu ứng nhu cầu & 0{,}25 & \texttt{demand\_effect} \\
+Hiệu ứng tự giảm giá & 0{,}15 & \texttt{own\_discount\_effect} \\
+Hiệu ứng đối thủ giảm giá & 0{,}1 & \texttt{rival\_discount\_effect} \\
+Số bước mỗi episode & 20 & \texttt{steps} \\
+P(d giữ nguyên) & 0{,}5 & \texttt{demand\_persist} \\
+Tốc độ học α & 0{,}1 & \texttt{alpha} \\
+Hệ số chiết khấu γ & 0{,}9 & \texttt{gamma} \\
+$\varepsilon_0$ / $\varepsilon_{\min}$ / $\rho$ & 0{,}2 / 0{,}02 / 0{,}995 & \texttt{eps\_*} \\
+Episode huấn luyện / đánh giá & 5{.}000 / 500 & \texttt{run\_all} \\
+Seed tham chiếu / đánh giá & 2026 / 502026 & \texttt{BASE\_SEED} \\
+Mười seed (C–H, câu 10) & 7, 17, 27, 37, 47, 57, 67, 77, 87, 97 & \texttt{SEEDS} \\
+\bottomrule
+\end{tabular}

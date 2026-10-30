@@ -1,0 +1,21 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} ag2/exact.py}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{exact\PYGZus{}value}\PYG{p}{(}\PYG{n}{cfg}\PYG{p}{,} \PYG{n}{pol1}\PYG{p}{,} \PYG{n}{pol2}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Thưởng kỳ vọng mỗi bước (ghế 0, ghế 1) của cặp chính sách trên một episode.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{dist} \PYG{o}{=} \PYG{p}{\PYGZob{}(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{):} \PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{):} \PYG{l+m+mf}{0.5}\PYG{p}{\PYGZcb{}}
+    \PYG{n}{total} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{t} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{cfg}\PYG{o}{.}\PYG{n}{steps}\PYG{p}{):}
+        \PYG{n}{nxt} \PYG{o}{=} \PYG{p}{\PYGZob{}\PYGZcb{}}
+        \PYG{k}{for} \PYG{n}{joint}\PYG{p}{,} \PYG{n}{w} \PYG{o+ow}{in} \PYG{n}{dist}\PYG{o}{.}\PYG{n}{items}\PYG{p}{():}
+            \PYG{n}{d} \PYG{o}{=} \PYG{n}{joint}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+            \PYG{n}{p1}\PYG{p}{,} \PYG{n}{p2} \PYG{o}{=} \PYG{n}{pol1}\PYG{p}{(}\PYG{n}{joint}\PYG{p}{,} \PYG{n}{t}\PYG{p}{),} \PYG{n}{pol2}\PYG{p}{(}\PYG{n}{joint}\PYG{p}{,} \PYG{n}{t}\PYG{p}{)}
+            \PYG{k}{for} \PYG{n}{a1}\PYG{p}{,} \PYG{n}{a2} \PYG{o+ow}{in} \PYG{n}{itertools}\PYG{o}{.}\PYG{n}{product}\PYG{p}{((}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{),} \PYG{n}{repeat}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{):}
+                \PYG{n}{pr} \PYG{o}{=} \PYG{n}{w} \PYG{o}{*} \PYG{p}{(}\PYG{n}{p1} \PYG{k}{if} \PYG{n}{a1} \PYG{k}{else} \PYG{l+m+mi}{1} \PYG{o}{\PYGZhy{}} \PYG{n}{p1}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{n}{p2} \PYG{k}{if} \PYG{n}{a2} \PYG{k}{else} \PYG{l+m+mi}{1} \PYG{o}{\PYGZhy{}} \PYG{n}{p2}\PYG{p}{)}
+                \PYG{k}{if} \PYG{n}{pr} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+                    \PYG{k}{continue}
+                \PYG{n}{total} \PYG{o}{+=} \PYG{n}{pr} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{expected\PYGZus{}reward}\PYG{p}{(}\PYG{n}{cfg}\PYG{p}{,} \PYG{n}{d}\PYG{p}{,} \PYG{n}{a1}\PYG{p}{,} \PYG{n}{a2}\PYG{p}{),} \PYG{n}{expected\PYGZus{}reward}\PYG{p}{(}\PYG{n}{cfg}\PYG{p}{,} \PYG{n}{d}\PYG{p}{,} \PYG{n}{a2}\PYG{p}{,} \PYG{n}{a1}\PYG{p}{)])}
+                \PYG{k}{for} \PYG{n}{s2}\PYG{p}{,} \PYG{n}{q} \PYG{o+ow}{in} \PYG{n}{\PYGZus{}next\PYGZus{}states}\PYG{p}{(}\PYG{n}{cfg}\PYG{p}{,} \PYG{n}{d}\PYG{p}{,} \PYG{n}{a1}\PYG{p}{,} \PYG{n}{a2}\PYG{p}{):}
+                    \PYG{n}{nxt}\PYG{p}{[}\PYG{n}{s2}\PYG{p}{]} \PYG{o}{=} \PYG{n}{nxt}\PYG{o}{.}\PYG{n}{get}\PYG{p}{(}\PYG{n}{s2}\PYG{p}{,} \PYG{l+m+mf}{0.0}\PYG{p}{)} \PYG{o}{+} \PYG{n}{pr} \PYG{o}{*} \PYG{n}{q}
+        \PYG{n}{dist} \PYG{o}{=} \PYG{n}{nxt}
+    \PYG{k}{return} \PYG{p}{(}\PYG{n}{total} \PYG{o}{/} \PYG{n}{cfg}\PYG{o}{.}\PYG{n}{steps}\PYG{p}{)}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()}
+\end{MintedVerbatim}

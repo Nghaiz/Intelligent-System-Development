@@ -1,0 +1,77 @@
+\chapter{Cơ chế cộng tác của hệ đa tác tử LLM (Tran và cộng sự, 2025)}\label{chap:3}
+
+Bài khảo sát \emph{Multi-Agent Collaboration Mechanisms: A Survey of LLMs} của Tran, Dao, Nguyen, Pham,
+O'Sullivan và Nguyen (arXiv:2501.06322, 2025)~\cite{ch3:tran} chuyển trọng tâm từ năng lực của một mô hình ngôn
+ngữ lớn (LLM) sang câu hỏi: \emph{nhiều tác tử phối hợp với nhau như thế nào}. Dù bài thí nghiệm không dùng LLM,
+khung phân tích của bài khảo sát đủ tổng quát để mô tả cả thị trường hai cửa hàng lẫn hệ mua sắm của Chương~\ref{chap:8}.
+
+\section{Khung phân tích năm chiều}
+
+Bài khảo sát mô tả một hệ cộng tác bằng năm chiều (Hình~\ref{fig:ch3-frame}): \textbf{tác nhân} (actors) --- ai
+tham gia; \textbf{kiểu quan hệ} (types) --- hợp tác, cạnh tranh hay vừa hợp tác vừa cạnh tranh;
+\textbf{chiến lược} (strategies) --- dựa trên luật, vai trò hay mô hình; \textbf{cấu trúc truyền thông}
+(structures) --- tập trung, phi tập trung hay phân cấp; và \textbf{điều phối} (coordination/orchestration) --- tĩnh
+hay động. Mỗi chiều vừa là nguồn lợi ích vừa là nguồn chi phí: thêm một tác tử kiểm chứng giảm sai sót nhưng làm
+tăng số lời gọi và độ trễ.
+
+\hinhtikz{ch3_frame}{Khung năm chiều mô tả cơ chế cộng tác đa tác tử theo Tran và cộng sự.}{ch3-frame}
+
+\nhanxet{Năm chiều độc lập với nhau: cùng một tập tác tử có thể ghép với nhiều cấu trúc và cách điều phối khác
+nhau, nên thiết kế MAS là chọn một điểm trong không gian năm chiều này chứ không chọn một ``kiến trúc mẫu''.}
+
+\section{Kiểu quan hệ: hợp tác, cạnh tranh và cạnh--hợp}
+
+\textbf{Hợp tác} (cooperation) là cùng đóng góp vào một mục tiêu chung, ví dụ nhóm tác tử lập kế hoạch, viết mã và
+kiểm thử. \textbf{Cạnh tranh} (competition) là ưu tiên mục tiêu riêng có thể xung đột, ví dụ tranh luận đối kháng để
+lộ điểm yếu của lập luận. \textbf{Cạnh--hợp} (coopetition) kết hợp hai dạng trên, như thương lượng tìm thỏa thuận
+dưới lợi ích khác nhau~\cite{ch3:tran}. Hình~\ref{fig:ch3-types} đặt hai hệ của báo cáo lên trục này.
+
+\hinhtikz{ch3_types}{Phổ kiểu quan hệ giữa các tác tử và vị trí của hai hệ trong báo cáo.}{ch3-types}
+
+\nhanxet{Thị trường hai cửa hàng là cạnh tranh nhưng \emph{không} tổng bằng không: tổng lợi nhuận thay đổi theo số
+đơn và biên lãi, nên cả hai cùng giữ giá có thể tốt hơn cho cả hai so với cùng giảm giá --- đúng dạng thế lưỡng nan
+mà Chương~\ref{chap:4} sẽ tính bằng số.}
+
+\section{Chiến lược và cấu trúc truyền thông}
+
+Ở chiều chiến lược, bài khảo sát phân biệt ba loại giao thức. \textbf{Dựa trên luật} (rule-based): hành vi định
+sẵn bằng quy tắc, dễ dự đoán và kiểm tra nhưng kém thích nghi. \textbf{Dựa trên vai trò} (role-based): mỗi tác tử
+giữ một vai chuyên biệt, hỗ trợ chuyên môn hóa và phân công. \textbf{Dựa trên mô hình} (model-based): tác tử suy luận
+xác suất về môi trường và ý định của tác tử khác, xử lý được bất định nhưng đắt và khó triển khai.
+
+\begin{luuy}{Hai nghĩa của ``model-based''}
+``Model-based'' trong phân loại cộng tác chỉ việc suy luận về tác tử khác; nó không đồng nghĩa với model-based RL
+(học mô hình chuyển trạng thái). Q-learning của bài thí nghiệm là model-free, còn tác tử theo luật là rule-based.
+\end{luuy}
+
+Ở chiều cấu trúc, các tác tử có thể giao tiếp qua một nút trung tâm (\textbf{tập trung}), trực tiếp với nhau
+(\textbf{phi tập trung}, ngang hàng) hoặc theo nhiều tầng quản lý (\textbf{phân cấp}) (Hình~\ref{fig:ch3-struct}).
+Cấu trúc tập trung dễ kiểm soát nhưng có điểm nghẽn; phi tập trung bền với lỗi một nút nhưng tốn thông điệp và khó
+đạt đồng thuận; phân cấp cân bằng hai bên cho bài toán lớn. Về điều phối, luồng \textbf{tĩnh} định trước thứ tự các
+bước, còn luồng \textbf{động} chọn tác tử và phụ thuộc khi đã biết yêu cầu cụ thể.
+
+\hinhtikz{ch3_struct}{Ba cấu trúc truyền thông: tập trung, phi tập trung và phân cấp.}{ch3-struct}
+
+\section{Ứng dụng, thách thức và ánh xạ vào hai hệ của báo cáo}
+
+Bài khảo sát tổng hợp ứng dụng trong mạng 5G/6G và Công nghiệp 5.0, hỏi đáp và sinh ngôn ngữ, cùng các mô phỏng
+xã hội và văn hóa. Kết luận chung là hiệu quả phụ thuộc vào kênh phối hợp, tri thức miền và chi phí mở rộng; trong
+một số thiết lập, một tác tử đơn còn tốt hơn nhiều tác tử phối hợp kém. Các vấn đề mở gồm quản trị thống nhất,
+ra quyết định tập thể, \textbf{lỗi lan truyền} giữa các tác tử, chi phí tài nguyên và thiếu benchmark chung.
+Bảng~\ref{tab:ch3-map} dùng năm chiều để mô tả hai hệ được thực hiện.
+
+\begin{table}[!htbp]\centering\caption{Ánh xạ khung năm chiều vào hai hệ đa tác tử của báo cáo.}\label{tab:ch3-map}
+{\small\begin{tabular}{@{}L{2.6cm}L{5.9cm}L{6.0cm}@{}}\toprule
+Chiều & Thị trường hai cửa hàng (Ch.~4--7) & Hệ mua sắm (Ch.~8) \\\midrule
+Tác nhân & Một tác tử Q-learning, một tác tử theo luật & Catalog, Recommendation, Inventory, Coordinator \\
+Kiểu quan hệ & Cạnh tranh lợi nhuận, không tổng bằng không & Hợp tác hoàn thành một yêu cầu mua \\
+Chiến lược & Học từ phần thưởng (RL) đối đầu luật cố định & Phân vai; luật xác minh ngân sách, tồn kho \\
+Cấu trúc & Không giao tiếp; tương tác qua môi trường & Tập trung qua Coordinator \\
+Điều phối & Đồng thời: cả hai chọn rồi môi trường áp dụng & Tĩnh: tìm $\to$ lọc, xếp hạng $\to$ kiểm kho \\
+Lỗi lan truyền & Phản ứng giảm giá dây chuyền của đối thủ & Tồn kho cũ dẫn tới xác nhận sai \\\bottomrule
+\end{tabular}}
+\end{table}
+
+\nhanxet{Hai hệ nằm ở hai đầu của khung: hệ thứ nhất cạnh tranh, không có thông điệp, mọi tương tác ẩn trong động
+lực thị trường; hệ thứ hai hợp tác, mọi tương tác là thông điệp tường minh. Vì vậy chỉ số đánh giá cũng khác hẳn:
+lợi nhuận cho hệ thứ nhất, độ đúng và chi phí phối hợp cho hệ thứ hai.}

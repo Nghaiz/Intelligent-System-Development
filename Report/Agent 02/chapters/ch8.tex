@@ -1,0 +1,107 @@
+% =====================================================================
+%  CHƯƠNG 8. HỆ ĐA TÁC TỬ HỖ TRỢ MUA SẮM (Tutorial MAS, PyTorch trên GPU)
+% =====================================================================
+\chapter{Hệ đa tác tử hỗ trợ mua sắm}\label{chap:8}
+
+Chương này hiện thực hệ mua sắm của Tutorial MAS \cite{ch8:tutorial} (tác tử ý định là mạng PyTorch trên GPU) để đo
+luận điểm của Chương~1: phân vai giúp xử lý lỗi, nhưng mỗi chặng thông điệp đều có giá về độ trễ.
+
+\section{Đặc tả PEAS và luồng thông điệp}
+Catalog tổng hợp có \SL{ch8_shop/data/n_products} mặt hàng sáu loại; kho có \SL{ch8_shop/data/in_stock} mặt hàng còn
+hàng. Môi trường (E) là phiên mua sắm; mọi tác tử chỉ \emph{đọc} dữ liệu của mình (Bảng~\ref{tab:ch8-peas}).
+
+\begin{table}[!htbp]\centering
+\caption{Đặc tả PEAS của năm thành phần trong hệ mua sắm.}\label{tab:ch8-peas}
+\small
+\begin{tabularx}{\linewidth}{L{2.9cm}XL{3.6cm}}
+\toprule
+\textbf{Tác tử} & \textbf{Cảm biến (S) $\to$ Hành động (A), thông điệp} & \textbf{Hiệu năng (P)} \\
+\midrule
+IntentAgent & câu người dùng $\to$ CLASSIFY/INTENT \{ý định, độ tin cậy\}; dưới ngưỡng $\tau$ thì hỏi lại
+  & accuracy, macro-F1 \\
+CatalogAgent & câu, catalog $\to$ SEARCH/CANDIDATES \{loại, hãng, ngân sách, id\}; không nhận ra loại thì trả rỗng
+  & đúng tập ứng viên \\
+Recommendation & ứng viên $\to$ RANK/RANKED: lọc giá sau khuyến mãi, xếp theo đánh giá, top-3 & không vượt ngân sách \\
+InventoryAgent & id, kho $\to$ CHECK\_STOCK/STOCK \{số lượng, tuổi dữ liệu\} & dữ liệu mới ($\le 60$ s) \\
+Coordinator & mọi phản hồi $\to$ gọi theo thứ tự, kiểm hợp đồng, thử lại & đúng, không khẳng định sai, trễ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\hinhtikz{ch8_flow}{Luồng thông điệp của hệ mua sắm: Coordinator gửi bốn yêu cầu (nét liền) và nhận bốn phản hồi
+(nét đứt) theo thứ tự 1--4; lời gọi kho lỗi được thử lại tối đa hai lần.}{ch8-flow}
+
+Mọi lời gọi đi qua \texttt{Coordinator.call} (Đoạn mã~\ref{code:shop_mas__Coordinator.call}). Phản hồi chỉ được nhận
+khi đúng lớp \texttt{Message}, đúng người gửi/nhận, đúng loại, đủ trường; riêng STOCK còn phải có tuổi dữ liệu
+$\le 60$~s. Lỗi được ghi rồi thử lại; hết lượt thì trả \texttt{chua\_xac\_minh}, \emph{không} khẳng định còn hàng.
+Độ trễ theo đồng hồ ảo: mỗi chặng trễ lognormal trung vị 2~ms cộng thời gian tính thật, quá hạn tốn trọn 80~ms.
+
+\noindent\begin{minipage}{\linewidth}
+\maDai{shop_mas__Coordinator.call}{Coordinator gửi yêu cầu, kiểm hợp đồng phản hồi và thử lại khi lỗi.}
+\end{minipage}
+
+\section{Bộ phân loại ý định bằng PyTorch trên GPU}
+Câu truy vấn được sinh tất định từ 14 khuôn câu Việt--Anh mỗi ý định, thêm biến thể như người dùng thật (hậu tố hội
+thoại, bỏ dấu 30\,\%, hoán đổi ký tự). Mấu chốt là \textbf{chia khuôn câu trước khi sinh câu} (9 train, 2 val, 3
+test), nên test gồm những \emph{cách nói chưa từng gặp}: \SL{ch8_shop/data/train} câu train,
+\SL{ch8_shop/data/val} val, \SL{ch8_shop/data/test} test, \SL{ch8_shop/data/n_intents} ý định.
+
+Mỗi câu là một túi đặc trưng (từ, cặp từ, 3-gram ký tự, ở cả dạng có dấu và không dấu) băm CRC32 vào $2^{16}$ ô theo
+tinh thần fastText \cite{ch8:fasttext}; \texttt{IntentNet} (Đoạn mã~\ref{code:shop_intent__IntentNet}) lấy trung bình
+embedding rồi qua hai lớp tuyến tính, tổng \SL{ch8_shop/train/params} tham số. Huấn luyện AdamW \cite{ch8:pytorch} trên
+\textbf{\SL{ch8_shop/train/device}}, \SL{ch8_shop/train/epochs} epoch trong \SL{ch8_shop/train/train_seconds}~s,
+giữ trọng số epoch \SL{ch8_shop/train/best_epoch} có val accuracy cao nhất.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{ch8_learning.pdf}
+\caption{Đường học của IntentNet: train gần 100\,\% sau vài epoch, val dừng thấp hơn rõ rệt -- khoảng cách đo đúng
+độ khó của khuôn câu mới.}\label{fig:ch8-learning}
+\end{figure}
+
+\maDai{shop_intent__IntentNet}{Mạng phân loại ý định: EmbeddingBag trên đặc trưng băm và đầu phân loại hai lớp.}
+
+
+
+\begin{figure}[H]\centering
+\begin{minipage}[c]{0.50\linewidth}\centering
+  {\small\setlength{\tabcolsep}{5pt}\begin{adjustbox}{max width=\linewidth}\input{generated/ch8_report}\end{adjustbox}}\par\smallskip
+  {\small (a) Precision (P), recall (R), F1}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.48\linewidth}\centering
+  \includegraphics[width=\linewidth]{ch8_confusion.pdf}\par
+  {\small (b) Ma trận nhầm lẫn}
+\end{minipage}
+\caption{Bộ phân loại ý định trên tập test gồm các khuôn câu chưa gặp khi huấn luyện.}\label{fig:ch8-report}
+\end{figure}
+
+\nhanxet{Accuracy test \SL{ch8_shop/test/accuracyPct}\,\% (macro-F1 \SL{ch8_shop/test/macro_f1}), thấp hơn hẳn train vì
+test đổi cách nói. Yếu nhất là \emph{hỏi tồn kho} (recall \SL{ch8_shop/test/per_class/hoi_ton_kho/recallPct}\,\%, hay
+nhầm sang \emph{so sánh}) và \emph{chào hỏi} (recall \SL{ch8_shop/test/per_class/chao_hoi/recallPct}\,\%),
+Hình~\ref{fig:ch8-report}b. Vì vậy cần ngưỡng tin cậy, chọn trên val: $\tau = \SL{ch8_shop/train/tau}$. Hệ nhận
+\SL{ch8_shop/test/coveragePct}\,\% câu test, đúng \SL{ch8_shop/test/accepted_accPct}\,\% trong số đó; còn lại được hỏi
+lại thay vì đoán sai.}
+
+\section{Demo, kiểm thử và mô phỏng lỗi}
+Hộp dưới là nhật ký thông điệp thật của một yêu cầu demo; lần gọi kho đầu được cài sẵn lỗi quá hạn nên Coordinator
+chờ hết 80~ms, ghi sự kiện, gửi lại và nhận tồn kho hợp lệ. \SL{ch8_shop/tests/run} kiểm thử đơn vị (phân tích ngân
+sách, câu lạ, ngân sách, hàng hết, ba kiểu lỗi kho, sai người gửi, pipeline tin dữ liệu cũ) đều đạt.
+
+\begin{ketqua}{Nhật ký thông điệp của Coordinator (\texttt{scripts/ch8\_run.py})}
+{\footnotesize\input{generated/ch8_demo}}
+\end{ketqua}
+
+Để cô lập phần điều phối, cả hai hệ nhận \emph{ý định đúng} của \SL{ch8_shop/data/test} câu test và phản hồi được so
+với đáp án chuẩn. Với xác suất 0, 10 hoặc 30\,\%, kho gặp một trong ba lỗi đều nhau: quá hạn, thiếu trường
+\texttt{stock}, hoặc bản chụp cũ 3.600~s lệch kho thật ở khoảng một phần ba mặt hàng. Pipeline đơn khối cùng logic
+nhưng gọi hàm trực tiếp, không kiểm hợp đồng, không thử lại.
+
+\hinhpdf{ch8_faults}{1}{Mô phỏng lỗi kho trên \SL{ch8_shop/data/test} yêu cầu: MAS có Coordinator so với pipeline đơn
+khối; nhãn trắng là số lần khẳng định sai tồn kho, trục trễ theo thang log.}{ch8-faults}
+
+\nhanxet{Khi kho không lỗi hai hệ cùng đúng \SL{ch8_shop/faults/r0/mas/completionPct}\,\%, nhưng MAS tốn
+\SL{ch8_shop/faults/r0/mas/msgs_mean} thông điệp, \SL{ch8_shop/faults/r0/mas/lat_mean}~ms mỗi yêu cầu so với
+\SL{ch8_shop/faults/r0/pipe/lat_mean}~ms: giá của phân vai. Ở mức lỗi 30\,\%, pipeline còn
+\SL{ch8_shop/faults/r30/pipe/completionPct}\,\%, \textbf{\SL{ch8_shop/faults/r30/pipe/unsafe} lần khẳng định sai} tồn
+kho và \SL{ch8_shop/faults/r30/pipe/errors} yêu cầu hỏng; MAS giữ \SL{ch8_shop/faults/r30/mas/completionPct}\,\%,
+không khẳng định sai lần nào, \SL{ch8_shop/faults/r30/mas/unverified} yêu cầu báo ``chưa xác minh''. Có bộ phân
+loại ở đầu chuỗi, tỉ lệ đúng toàn trình là \SL{ch8_shop/e2e/completionPct}\,\%: nút thắt là hiểu câu.}
