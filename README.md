@@ -18,7 +18,8 @@ Coursework for **Intelligent System Development** at the Posts and Telecommunica
 | **04** | Convolutional Neural Networks | 1D and 2D convolution implemented three times (pure NumPy, PyTorch, TensorFlow) across five data domains (text, tabular, grayscale and color images), plus an MLP-vs-CNN comparison and PCA analysis of the latent space | [`src/Assignment 04`](src/Assignment%2004) | [PDF](Report/Assignment%2004/A04_CT_nghiand.600.pdf) |
 | **05** | CNNs as Compositions of Functions | CNN concepts written as NumPy functions, nine architectures from LeNet to ViT, a baseline CNN and three improved models (VGG, ResNet, SE-ResNet) trained on CIFAR-10, CIFAR-100 and Diabetes; LaTeX report with every figure drawn in TikZ | [`src/Assignment 05`](src/Assignment%2005) | [PDF](Report/Assignment%2005/A05_CT_nghiand.600.pdf) |
 | **06** | Recurrent Neural Networks on Sequence Data | Simple RNN, LSTM, GRU and BiLSTM in PyTorch and Keras (16 models) on AMZN stock prices 1997–2024 and listening logs of 100,000 KKBox users; theory implemented in NumPy, cross-framework benchmarking, Flask web app | [`src/Assignment 06`](src/Assignment%2006) | [PDF](Report/Assignment%2006/A06_CT_nghiand.600.pdf) |
-| **Agent 01** | Discovering AI Agents + Q-Learning | A 12×12 maze environment formulated as an MDP, a tabular Q-Learning agent (epsilon-greedy, Bellman updates) verified against BFS, reward curves and Q-table visualization in a generated Jupyter notebook | [`src/Agent 01`](src/Agent%2001) | [PDF](Report/Agent%2001/agent01_CT_07_nghiand.pdf) |
+| **Agent 01** | Discovering AI Agents + Q-Learning | A 12×12 maze environment formulated as an MDP, a tabular Q-Learning agent (epsilon-greedy, Bellman updates) verified against BFS, reward curves and Q-table visualization in a generated Jupyter notebook; Streamlit web demo | [`src/Agent 01`](src/Agent%2001) | [PDF](Report/Agent%2001/agent01_CT_07_nghiand.pdf) |
+| **Agent 02** | RL and Rule-Based Agents in Multi-Agent Systems | Q-Learning and rule-based agents competing in a market environment, checked against exact solutions; experiments A–H; a multi-agent shopping system with a PyTorch intent model; Streamlit web demo | [`src/Agent 02`](src/Agent%2002) | [PDF](Report/Agent%2002/agent02_CT_07_nghiand.pdf) |
 
 ## Essays
 
@@ -27,6 +28,13 @@ Coursework for **Intelligent System Development** at the Posts and Telecommunica
 | **TL01** | Classical ML, CNNs and RNNs in Intelligent Systems | History of AI; Linear/Logistic Regression, SVM, Random Forest and MLP (NumPy, Keras, PyTorch) on diabetes, Vietnamese house prices and customer reviews; Custom CNN, VGG-11, MobileNetV2 and ResNet-18 on SVHN and EuroSAT; RNN/LSTM/GRU/BiLSTM on VN30 stocks and KKBox; six-module Flask web app | [`src/TieuLuan 01`](src/TieuLuan%2001) | [PDF](Report/TieuLuan%2001/tieuluan01_CT_07_nghiand.600.pdf) |
 | **TL02** | Knowledge Graphs, RAG and AI Agents | Ontologies, RDFS inference, RDF export and SPARQL; 5 chunking strategies × 5 retrievers, HyDE, Multi-Query, reranking and GraphRAG; a type 2 diabetes KG with an MLP risk model (100,000 records); a signed causal finance KG with BiLSTM forecasting of VN30 and SJC gold; a ReAct agent with 7 tools, citation and number checking, and a Flask web app, all on a local Qwen2.5-1.5B | [`src/TieuLuan 02`](src/TieuLuan%2002) | [PDF](Report/TieuLuan%2002/tieuluan02_CT_07_nghiand.pdf) |
 | **TL03** | Analysis of Intelligent Systems | History of AI; ML from scratch in NumPy plus K-means and PCA; CNNs on MNIST, Fashion-MNIST, Rock/Paper/Scissors and CIFAR-10; RNNs on e-commerce revenue, AAPL and GLD; KG and RAG across three domains with six retrievers and a routing agent; GCN, GraphSAGE and GAT on Cora/CiteSeer; Direct, CoT, PAL and multi-agent reasoning on GSM8K | [`src/TieuLuan 03`](src/TieuLuan%2003) | [PDF](Report/TieuLuan%2003/tieuluan03_CT_07_nghiand.pdf) |
+| **Final** | Developing Intelligent Systems | The full chain from classical ML, CNNs and RNNs to knowledge graphs, RAG, multi-agent systems and graph neural networks, on real datasets with shared metrics; everything runs locally and is served from one FastAPI web app, Dong Tam AI Lab | [`src/TieuLuan Final`](src/TieuLuan%20Final) | [PDF](Report/TieuLuan%20Final/tieuluan_final_CT_07_nghiand.pdf) |
+
+## Project
+
+| # | Topic | Highlights | Source | Report |
+|---|---|---|---|---|
+| **Project 01** | DiaNexus: multi-agent diabetes screening and advice | Classical and deep models for diagnosis, lab-free screening and readmission; diabetic retinopathy grading with Grad-CAM; a Neo4j knowledge graph with hybrid retrieval; a Double DQN policy that picks screening questions; a state-graph multi-agent system with a Critic; FastAPI website. For reference only, not a medical diagnosis | [`src/Project 01`](src/Project%2001) | [PDF](Report/Project%2001/project01_CT_07_nghiand.pdf) |
 
 Each project has its own README in its source folder with instructions for rebuilding it from scratch.
 
@@ -45,17 +53,21 @@ Intelligent-System-Development/
 │   │                             mnist/ cifar10/ mlp_vs_cnn/ analysis/
 │   ├── Assignment 05/            a05/ (shared package) notebooks/ models/ outputs/
 │   ├── Assignment 06/            a06/ (shared package) app/ (web app) notebooks/ models/ outputs/
-│   ├── Agent 01/                 ag1/ (shared package) notebooks/ scripts/ outputs/
+│   ├── Agent 01/                 ag1/ (shared package) notebooks/ scripts/ web/ outputs/
+│   ├── Agent 02/                 ag2/ (shared package) scripts/ web/ models/ outputs/
+│   ├── Project 01/               dnx/ (shared package) scripts/ web/ neo4j/ tests/ outputs/
 │   ├── TieuLuan 01/              tl/ (shared package) scripts/ app/ data/ models/ outputs/
 │   ├── TieuLuan 02/              tl2/ (shared package) scripts/ app/ data/ models/ outputs/
-│   └── TieuLuan 03/              tl3/ (shared package) scripts/ app/ data/ models/ outputs/
+│   ├── TieuLuan 03/              tl3/ (shared package) scripts/ app/ data/ models/ outputs/
+│   └── TieuLuan Final/           tlf/ (shared package) scripts/ web/ outputs/
 │
 ├── Report/                     Reports (PDF + the sources that build them)
 │   ├── Assignment 01/            LaTeX: main.tex, chapters/, refs.bib, figures/
 │   ├── Assignment 02–04/         Python: build_report.py, chapters_*.py, figures/
 │   ├── Assignment 05–06/         LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
-│   ├── Agent 01/                 LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
-│   └── TieuLuan 01–03/           LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
+│   ├── Agent 01–02/              LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
+│   ├── Project 01/               LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
+│   └── TieuLuan 01–03, Final/    LaTeX + TikZ: build.py, main.tex, chapters/, tikz/
 │
 └── TAILIEU/                    Course materials
     ├── 1. BASIC MACHINE LEARNING ... .pdf
@@ -90,7 +102,7 @@ TAILIEU/slide-assign_07/      slides and assignment brief
 | `api/` | REST services |
 | `web/`, `mobile/` | User interfaces |
 
-**Report file names:** `A<number>_CT_nghiand.600.pdf` for assignments, `tieuluan<number>_CT_07_nghiand*.pdf` for essays.
+**Report file names:** `A<number>_CT_nghiand.600.pdf` for assignments, `tieuluan<number>_CT_07_nghiand*.pdf` for essays, `tieuluan_final_CT_07_nghiand.pdf` for the final essay, `project<number>_CT_07_nghiand.pdf` for projects.
 
 **Environment:** each project has its own `requirements.txt`. Create a virtual environment inside that project's folder:
 
@@ -103,7 +115,9 @@ pip install -r requirements.txt
 
 **Environment variables:** projects that use Neo4j read their connection settings from `.env`. Copy `.env.example` to `.env` and fill in your own values. `.env` is listed in `.gitignore` and is never committed.
 
-**Large files:** some datasets and the HuggingFace models used by TL02 and TL03 (about 8 GB) are not in git. Each project's README lists the download scripts that fetch them.
+**Large files:** some datasets and the HuggingFace models used by TL02 and TL03 (about 8 GB) are not in git. Each project's README lists the download scripts that fetch them. The same applies to `data/` and `models/` in TieuLuan Final and Project 01.
+
+**Git LFS:** `src/Project 01/neo4j/full_graph.cypher` (124 MB) is stored with Git LFS, so install [Git LFS](https://git-lfs.com) before cloning. Without it you get a small pointer file instead of the graph dump.
 
 ---
 
