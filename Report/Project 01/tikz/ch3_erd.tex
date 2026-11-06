@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \fill[cBlue!6, rounded corners=8pt] (-0.3,3.45) rectangle (15.9,7.0);
+  \fill[cOrange!7, rounded corners=8pt] (-0.3,-0.8) rectangle (15.9,3.15);
+  \node[font=\small\bfseries\sffamily, text=cBlue!70!black, anchor=north west] at (-0.2,6.95) {Bảng dữ liệu phục vụ học máy};
+  \node[font=\small\bfseries\sffamily, text=cOrange!70!black, anchor=north west] at (-0.2,3.1) {Bảng vận hành của hệ đa tác tử};
+  \foreach \x/\n/\c/\t in {1.5/patients\_lab/cBlue/{tuổi, BMI,\\HbA1c, đường huyết},4.75/brfss/cTeal/{21 chỉ báo\\tự khai},8.0/hospital/cIndigo/{lần nhập viện,\\thuốc, tái nhập},11.25/pima/cPurple/{phụ nữ\\Pima},14.2/frankfurt/cPink/{tập ngoài\\cùng lược đồ}}{
+    \node[csdl=\c, minimum width=26mm, minimum height=15mm, inner sep=1pt] at (\x,5.4) {\footnotesize\texttt{\n}};
+    \node[font=\small, align=center, text=black!75] at (\x,3.98) {\t};
+  }
+  \foreach \x/\i/\n/\c in {1.3/a/sessions/cOrange,3.95/b/messages/cGreen,6.75/c/predictions/cRed,9.75/d/agent\_events/cYellow,12.45/e/screenings/cLime,14.75/f/feedback/cSky}{
+    \node[hop=\c, minimum height=9mm, font=\small\ttfamily, inner sep=3pt] (o\i) at (\x,1.75) {\n};
+  }
+  \draw[mui] (oa) -- (ob);
+  \foreach \i/\b in {c/12,d/16,e/20,f/24}{\draw[muiM=cSlate] (oa.south) to[bend right=\b] (o\i.south);}
+  \node[nhan, fill=white, inner sep=2pt, rounded corners=2pt] at (7.8,-0.45) {mọi bảng liên kết với \texttt{sessions} qua khóa \texttt{session\_id}};
+\end{tikzpicture}

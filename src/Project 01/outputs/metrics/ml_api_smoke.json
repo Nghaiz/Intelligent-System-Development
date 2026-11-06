@@ -1,0 +1,176 @@
+{
+ "load_and_first_predict_s": 1.4279053000000204,
+ "predict_full": {
+  "mode": "full",
+  "prob": 0.995,
+  "label": 1,
+  "threshold": 0.36,
+  "model": "xgboost",
+  "calibrated": true,
+  "raw_prob": 0.9962784647941589,
+  "base_value": -2.3858306407928467,
+  "imputed": [],
+  "top3": [
+   {
+    "feature": "hba1c",
+    "label_vi": "HbA1c",
+    "value": 6.9,
+    "contribution": 6.811931133270264
+   },
+   {
+    "feature": "hypertension",
+    "label_vi": "Tăng huyết áp",
+    "value": 1,
+    "contribution": 0.4640727639198303
+   },
+   {
+    "feature": "glucose",
+    "label_vi": "Đường huyết",
+    "value": 170,
+    "contribution": 0.28326794505119324
+   }
+  ]
+ },
+ "predict_ms": 47.54940000020724,
+ "predict_full_low": {
+  "prob": 0.005,
+  "label": 0
+ },
+ "predict_screening": {
+  "mode": "screening",
+  "prob": 0.45454543828964233,
+  "label": 1,
+  "threshold": 0.23,
+  "model": "xgboost",
+  "calibrated": true,
+  "raw_prob": 0.49127575755119324,
+  "base_value": -1.7263625860214233,
+  "imputed": [
+   "chol_check",
+   "stroke",
+   "heart_disease_or_attack",
+   "fruits",
+   "veggies",
+   "hvy_alcohol_consump",
+   "any_healthcare",
+   "no_docbc_cost",
+   "ment_hlth",
+   "phys_hlth",
+   "diff_walk",
+   "education",
+   "income"
+  ],
+  "top3": [
+   {
+    "feature": "gen_hlth",
+    "label_vi": "Sức khỏe tự đánh giá",
+    "value": 4,
+    "contribution": 0.6304883360862732
+   },
+   {
+    "feature": "high_bp",
+    "label_vi": "Huyết áp cao",
+    "value": 1,
+    "contribution": 0.41048815846443176
+   },
+   {
+    "feature": "bmi",
+    "label_vi": "Chỉ số khối cơ thể (BMI)",
+    "value": 33.0,
+    "contribution": 0.3190619647502899
+   }
+  ]
+ },
+ "what_if_hba1c": {
+  "before": 0.995,
+  "after": 0.005,
+  "delta": -0.99
+ },
+ "what_if_bmi_screening": {
+  "before": 0.45454543828964233,
+  "after": 0.33984607458114624,
+  "delta": -0.1146993637084961
+ },
+ "readmission_high": {
+  "prob": 0.2083333283662796,
+  "label": 1,
+  "threshold": 0.14
+ },
+ "readmission_low": {
+  "prob": 0.020270269364118576,
+  "label": 0,
+  "threshold": 0.14
+ },
+ "errors": {
+  "sex": "sex không hợp lệ: 'x'; cho phép ['female', 'male']",
+  "full_missing": "Chế độ full cần cả hba1c và glucose"
+ },
+ "model_card_tasks": [
+  "full",
+  "screening",
+  "readmission"
+ ],
+ "retina": {
+  "grade0_1.jpg": {
+   "grade": 0,
+   "label_vi": "Không có dấu hiệu bệnh võng mạc",
+   "p": 0.73,
+   "ms": 15942
+  },
+  "grade0_2.jpg": {
+   "grade": 0,
+   "label_vi": "Không có dấu hiệu bệnh võng mạc",
+   "p": 0.96,
+   "ms": 496
+  },
+  "grade1_1.jpg": {
+   "grade": 2,
+   "label_vi": "Bệnh võng mạc không tăng sinh mức trung bình",
+   "p": 0.478,
+   "ms": 573
+  },
+  "grade1_2.jpg": {
+   "grade": 0,
+   "label_vi": "Không có dấu hiệu bệnh võng mạc",
+   "p": 0.78,
+   "ms": 496
+  },
+  "grade2_1.jpg": {
+   "grade": 0,
+   "label_vi": "Không có dấu hiệu bệnh võng mạc",
+   "p": 0.617,
+   "ms": 505
+  },
+  "grade2_2.jpg": {
+   "grade": 2,
+   "label_vi": "Bệnh võng mạc không tăng sinh mức trung bình",
+   "p": 0.601,
+   "ms": 583
+  },
+  "grade3_1.jpg": {
+   "grade": 4,
+   "label_vi": "Bệnh võng mạc tăng sinh",
+   "p": 0.522,
+   "ms": 572
+  },
+  "grade3_2.jpg": {
+   "grade": 3,
+   "label_vi": "Bệnh võng mạc không tăng sinh mức nặng",
+   "p": 0.826,
+   "ms": 550
+  },
+  "grade4_1.jpg": {
+   "grade": 4,
+   "label_vi": "Bệnh võng mạc tăng sinh",
+   "p": 0.98,
+   "ms": 580
+  },
+  "grade4_2.jpg": {
+   "grade": 4,
+   "label_vi": "Bệnh võng mạc tăng sinh",
+   "p": 0.977,
+   "ms": 540
+  }
+ },
+ "retina_bad_input": "Tệp không phải ảnh hợp lệ: cannot identify image file <_io.BytesIO object at 0x0000028C49971EE0>"
+}

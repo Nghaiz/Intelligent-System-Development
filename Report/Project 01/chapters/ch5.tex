@@ -1,0 +1,91 @@
+\chapter{Cơ sở tri thức, Neo4j và RAG}\label{chap:tritthuc}
+
+\section{Thu thập và tiền xử lý}
+
+Cơ sở tri thức của DiaNexus đến từ bốn loại nguồn: bài phổ biến kiến thức (Wikipedia tiếng Việt, MedlinePlus, NIDDK, WHO, CDC), tài liệu PDF hướng dẫn chuyên môn (trong đó có hướng dẫn của Bộ Y tế), tóm tắt bài báo khoa học kèm từ khóa MeSH qua Europe PMC, và đồ thị y sinh Hetionet~\cite{hetionet}. Hình~\ref{fig:ingest} là toàn bộ đường đi của dữ liệu.
+
+\hinhtikz{ch5_ingest}{Đường ống từ tài liệu thô đến chỉ mục và đồ thị}{ingest}
+
+Mọi nguồn được ghi lại URL và ngày lấy. Văn bản được chia theo câu thành đoạn tối đa 180 từ, chồng lấn tối đa 30 từ, tổng cộng \SL{kb_chunks/chunks} đoạn từ \SL{kb_chunks/docs} tài liệu (Bảng~\ref{tab:kbsrc}). Kho rất lệch: tóm tắt bài báo chiếm phần lớn, tiếng Việt chỉ có \SL{kb_chunks/by_lang/vi} đoạn, nên việc truy xuất chéo ngôn ngữ là yêu cầu bắt buộc.
+
+\begin{table}[!htbp]\centering\caption{Nguồn của cơ sở tri thức}\label{tab:kbsrc}
+\small\begin{tabular}{@{}lrrl@{}}\toprule
+\textbf{Nguồn} & \textbf{Tài liệu} & \textbf{Đoạn} & \textbf{Ngôn ngữ}\\\midrule
+Europe PMC & \SL{kb_sources/sources/europepmc/docs} & \SL{kb_chunks/by_source/europepmc} & Anh\\
+Wikipedia & \SL{kb_sources/sources/wikipedia_vi/docs} & \SL{kb_chunks/by_source/wikipedia_vi} & Việt\\
+MedlinePlus & \SL{kb_sources/sources/medlineplus/docs} & \SL{kb_chunks/by_source/medlineplus} & Anh\\
+NIDDK & \SL{kb_sources/sources/niddk/docs} & \SL{kb_chunks/by_source/niddk} & Anh\\
+CDC & \SL{kb_sources/sources/cdc/docs} & \SL{kb_chunks/by_source/cdc} & Anh\\
+WHO & \SL{kb_sources/sources/who/docs} & \SL{kb_chunks/by_source/who} & Anh\\
+Tờ thông tin dịch & \SL{kb_sources/sources/medlineplus_vi/docs} & \SL{kb_chunks/by_source/medlineplus_vi} & Việt\\
+Bộ Y tế & \SL{kb_sources/sources/bo_y_te/docs} & \SL{kb_chunks/by_source/bo_y_te} & Việt\\\bottomrule
+\end{tabular}\end{table}
+
+Ngưỡng chẩn đoán được trích riêng thành dữ liệu có cấu trúc: \SL{kb_thresholds/count} ngưỡng, mỗi ngưỡng gắn với đoạn văn làm bằng chứng. Hệ luật ở Chương~\ref{chap:tactu} đọc đúng các ngưỡng này.
+
+\section{Ontology và đồ thị trên Neo4j}
+
+Ontology được khai báo đóng trong mã nguồn. Đồ thị dùng \SL{kg_stats/n_labels} nhãn nút và \SL{kg_stats/n_rel_types} loại quan hệ. Mỗi quan hệ do LLM trích có ràng buộc miền và trị, nên cạnh sai loại bị loại ngay bằng mã thay vì nhờ LLM tự kiểm.
+
+\maNguon{ontology__LLM_RELATIONS}{Ontology đóng: mỗi quan hệ quy định loại chủ thể và đối tượng hợp lệ}
+
+Đồ thị đang chạy trên Neo4j có \SL{kg_stats/nodes} nút và \SL{kg_stats/relationships} cạnh, ghép từ bốn lớp:
+
+\begin{itemize}
+  \item \textbf{Hetionet:} từ 11 bệnh gốc, giữ \SL{kg_hetionet/kept_nodes} nút và \SL{kg_hetionet/kept_edges} cạnh trong tổng số \SL{kg_hetionet/edges_full} cạnh của bản đầy đủ, vì máy chỉ cấp 1 GB heap cho Neo4j.
+  \item \textbf{MeSH:} từ khóa của bài báo tạo nút chủ đề và quan hệ đồng xuất hiện.
+  \item \textbf{Văn bản:} tài liệu, đoạn văn và quan hệ \texttt{MENTIONS} nối đoạn văn với thực thể.
+  \item \textbf{Trích bằng LLM:} Qwen đọc \SL{kg_llm_extract/chunks_processed} đoạn, sinh \SL{kg_llm_extract/funnel/raw_edges} cạnh thô. Bộ lọc mã nguồn loại \SL{kg_llm_extract/funnel/rej_evidence_not_in_text} cạnh có câu bằng chứng không nằm trong đoạn văn và \SL{kg_llm_extract/funnel/rej_domain_range} cạnh sai miền, trị, còn lại \SL{kg_llm_extract/funnel/accepted} cạnh.
+\end{itemize}
+
+Đồ thị không chỉ để trình diễn mà trả lời được câu hỏi nhiều bước. Truy vấn dưới đây đi từ đặc trưng của mô hình học máy tới ngưỡng rồi tới đoạn văn làm bằng chứng, tức là nối hai nhánh của sơ đồ đề bài:
+
+\begin{minted}[fontsize=\small,breaklines]{cypher}
+MATCH (f:Feature {name:'hba1c'})-[:MAPS_TO]->(t:Test)
+      -[:HAS_THRESHOLD]->(h)-[:EVIDENCED_BY]->(c:Chunk)
+RETURN f.name_vi, h.op, h.value, h.unit, h.meaning, c.source
+\end{minted}
+
+Bộ lọc chỉ kiểm được hình thức, chưa kiểm được ý nghĩa. Lấy mẫu ngẫu nhiên \SL{kg_llm_audit/n} cạnh để chấm chặt, chỉ \SL{kg_llm_audit/correct} cạnh đúng, tức precision \SL{kg_llm_audit/precision}, khoảng Wilson 95\% từ \SL{kg_llm_audit/wilson95/0} đến \SL{kg_llm_audit/wilson95/1}. Người chấm là một tác tử AI, không phải bác sĩ. Vì vậy cạnh có \texttt{origin='llm'} chỉ dùng để gợi ý, không làm bằng chứng y khoa, và hệ thống không dùng chúng cho ngưỡng hay luật.
+
+\hinhpdf{kg_relations}{0.9}{Số cạnh theo từng loại quan hệ trong đồ thị (thang log)}{kgrel}
+
+\hinhpdf{kg_subgraph}{0.92}{Một phần đồ thị thật quanh đái tháo đường type 2}{kgsub}
+
+\section{Truy xuất lai}
+
+Hàm \texttt{search} kết hợp ba bộ truy xuất. BM25 bắt tên thuốc và mã xét nghiệm chính xác. Vector e5 đa ngôn ngữ~\cite{e5} nối câu hỏi tiếng Việt với tóm tắt tiếng Anh. Bộ truy xuất đồ thị nhận diện thực thể trong câu hỏi, đi tới lân cận trên Neo4j rồi lấy các đoạn văn nhắc tới chúng, xếp bằng trọng số hiếm kết hợp độ tương tự cosin. Ba danh sách được hợp bằng RRF; đoạn nào có nhiều bộ cùng tìm thấy sẽ được đẩy lên.
+
+\maNguon{search___graph}{Bộ truy xuất đồ thị: từ thực thể tới lân cận tới đoạn văn}
+
+\maNguon{search___rrf}{Hợp các danh sách bằng Reciprocal Rank Fusion}
+
+Nếu Neo4j không chạy, chế độ lai ghi cảnh báo rồi tiếp tục với hai bộ còn lại, và kết quả không có nhãn \texttt{graph}, nên người đọc biết nguồn nào đã tham gia.
+
+\section{Đánh giá truy xuất}
+
+Bộ đánh giá gồm \SL{rag_eval/n_questions} câu hỏi: \SL{rag_eval/by_kind/hand} câu tự viết và \SL{rag_eval/funnel/ok} câu do LLM sinh từ chính đoạn văn, trong đó \SL{rag_eval/by_kind/cross_vi_on_en} câu hỏi tiếng Việt trên nguồn tiếng Anh. Câu tự viết không gán nhãn tay từng đoạn: đoạn đúng là mọi đoạn khớp bộ biểu thức chính quy của câu đó, nên có câu có hàng nghìn đoạn đúng. Hit@$k$ và MRR vì vậy có ý nghĩa hơn Recall@$k$.
+
+\begin{table}[!htbp]\centering\caption{Năm chế độ truy xuất và thí nghiệm cắt bỏ từng bộ khỏi RRF}\label{tab:rag}
+\small\setlength{\tabcolsep}{4pt}\input{generated/ch5_rag}\end{table}
+
+\hinhpdf{rag_by_group}{0.9}{MRR theo nhóm câu hỏi: khó nhất là câu tiếng Việt trên nguồn tiếng Anh}{raggroup}
+
+Bảng~\ref{tab:rag} và Hình~\ref{fig:raggroup} cho bốn nhận xét:
+
+\begin{itemize}
+  \item Rerank mới là bước tạo khác biệt: MRR tăng từ \SL{rag_eval/modes/hybrid/all/mrr} lên \SL{rag_eval/modes/hybrid_rerank/all/mrr}, đổi lại trung vị độ trễ từ \SL{rag_eval/modes/hybrid/latency_ms/p50} lên \SL{rag_eval/modes/hybrid_rerank/latency_ms/p50} ms.
+  \item Riêng RRF không tốt hơn vector đơn. Bỏ từng bộ khỏi RRF chỉ làm MRR giảm khoảng 0,01 đến 0,02, nên đồ thị đóng góp nhỏ vào xếp hạng đoạn văn. Giá trị của nó nằm ở truy vấn nhiều bước và ở đường dẫn giải thích cho tác tử.
+  \item Câu tiếng Việt trên nguồn tiếng Anh rất yếu: MRR chỉ \SL{rag_eval/modes/hybrid/kind=cross_vi_on_en/mrr} với lai và \SL{rag_eval/modes/hybrid_rerank/kind=cross_vi_on_en/mrr} với rerank. Đây là điểm yếu lớn nhất của kho hiện tại.
+  \item Số của nhóm tự viết lạc quan vì công thức điểm đồ thị được chỉnh trên chính nhóm này; câu sinh tự động thì có từ vựng gần đoạn gốc.
+\end{itemize}
+
+Ở khâu sinh câu trả lời, đồ án so sánh trên \SL{rag_eval/generation/n} câu cùng Qwen có và không có ngữ cảnh (Bảng~\ref{tab:gen}). RAG cải thiện rõ, nhưng tỉ lệ chứa đúng đáp án vẫn dưới một nửa, và khi chỉ hỏi trực tiếp, mô hình hiếm khi tự trích dẫn. Vì thế tác tử Advisor có khuôn viết riêng và Critic kiểm trích dẫn ở Chương~\ref{chap:tactu}.
+
+\begin{table}[!htbp]\centering\caption{Sinh câu trả lời có và không có RAG}\label{tab:gen}
+\small\begin{tabular}{@{}lcc@{}}\toprule
+\textbf{Chỉ số} & \textbf{Có RAG} & \textbf{Không RAG}\\\midrule
+F1 theo token & \SL{rag_eval/generation/rag_f1/mean} & \SL{rag_eval/generation/norag_f1/mean}\\
+Chứa đáp án vàng & \SL{rag_eval/generation/rag_contains/mean} & \SL{rag_eval/generation/norag_contains/mean}\\
+Con số có trong ngữ cảnh & \SL{rag_eval/generation/rag_faith/mean} & \SL{rag_eval/generation/norag_faith/mean}\\\bottomrule
+\end{tabular}\end{table}

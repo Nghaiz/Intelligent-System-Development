@@ -1,0 +1,405 @@
+{
+ "traces": [
+  {
+   "qid": "het0000",
+   "dataset": "hetionet",
+   "question": "Trong các thuốc điều trị type 2 diabetes mellitus, thuốc nào gây tác dụng phụ Pathological gambling?",
+   "gold": "Bromocriptine",
+   "answer": "Bromocriptine",
+   "em": 1.0,
+   "trace": [
+    {
+     "kind": "thought",
+     "text": "Cần tìm thuốc (c:Compound) điều trị bệnh type 2 diabetes mellitus và gây tác dụng phụ Pathological gambling. Sử dụng lược đồ để tìm kết quả."
+    },
+    {
+     "kind": "action",
+     "text": "cypher(MATCH (c:Compound)-[:TREATS|PALLIATES]->(:Disease {name:'type 2 diabetes mellitus'})-[:PRESENTS]->(s:Symptom), (c)-[:CAUSES]->(:SideEffect {name:'Pathological gambling'}) RETURN c.name)"
+    },
+    {
+     "kind": "observation",
+     "text": "[{\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}, {\"c.name\": \"Bromocriptine\"}]"
+    },
+    {
+     "kind": "thought",
+     "text": "Kết quả trả về nhiều lần tên \"Bromocriptine\", có nghĩa là đây là thuốc đáp ứng yêu cầu."
+    },
+    {
+     "kind": "final",
+     "text": "Bromocriptine",
+     "sources": [
+      "cypher: MATCH (c:Compound)-[:TREATS|PALLIATES]->(:Disease {name:'type 2 diabetes mellitus'})-[:PRESENTS]->(s:Symptom), (c)-[:CAUSES]->(:SideEffect {name:'Pathological gambling'}) RETURN c.name"
+     ],
+     "blocked": false,
+     "steps": 2,
+     "forced": false
+    }
+   ],
+   "sources": [
+    "cypher: MATCH (c:Compound)-[:TREATS|PALLIATES]->(:Disease {name:'type 2 diabetes mellitus'})-[:PRESENTS]->(s:Symptom), (c)-[:CAUSES]->(:SideEffect {name:'Pathological gambling'}) RETURN c.name"
+   ],
+   "seconds": 4.215624000000389
+  },
+  {
+   "qid": "het0001",
+   "dataset": "hetionet",
+   "question": "Trong các thuốc điều trị type 2 diabetes mellitus, thuốc nào gây tác dụng phụ Fibrosis?",
+   "gold": "Bromocriptine",
+   "answer": "No",
+   "em": 0.0,
+   "trace": [
+    {
+     "kind": "thought",
+     "text": "Cần tìm thuốc (compound) điều trị type 2 diabetes mellitus và gây tác dụng phụ Fibrosis."
+    },
+    {
+     "kind": "action",
+     "text": "cypher(MATCH (c:Compound)-[:TREATS|PALLIATES]->(:Disease {name:'type 2 diabetes mellitus'})-[:CAUSES]->(se:SideEffect {name:'Fibrosis'}) RETURN c.name LIMIT 1)"
+    },
+    {
+     "kind": "observation",
+     "text": "Không có dòng nào."
+    },
+    {
+     "kind": "thought",
+     "text": "Không có kết quả trả về, có thể không có thuốc nào gây cả hai tác dụng."
+    },
+    {
+     "kind": "final",
+     "text": "No",
+     "sources": [
+      "cypher: MATCH (c:Compound)-[:TREATS|PALLIATES]->(:Disease {name:'type 2 diabetes mellitus'})-[:CAUSES]->(se:SideEffect {name:'Fibrosis'}) RETURN c.name LIMIT 1"
+     ],
+     "blocked": false,
+     "steps": 2,
+     "forced": false
+    }
+   ],
+   "sources": [
+    "cypher: MATCH (c:Compound)-[:TREATS|PALLIATES]->(:Disease {name:'type 2 diabetes mellitus'})-[:CAUSES]->(se:SideEffect {name:'Fibrosis'}) RETURN c.name LIMIT 1"
+   ],
+   "seconds": 2.4701149999991685
+  },
+  {
+   "qid": "vn30002",
+   "dataset": "vn30",
+   "question": "Tháng 8 năm 2019, lợi suất của cổ phiếu HPG là bao nhiêu phần trăm?",
+   "gold": "-1,77",
+   "answer": "-1.77",
+   "em": 1.0,
+   "trace": [
+    {
+     "kind": "thought",
+     "text": "Cần tìm cổ phiếu HPG có liên kết HAS_MONTH với tháng 8/2019 và lấy giá trị ret_pct."
+    },
+    {
+     "kind": "action",
+     "text": "cypher(MATCH (c:Company {ticker:'HPG'})-[:HAS_MONTH]->(m:MonthStat {month:'2019-08'}) RETURN m.ret_pct)"
+    },
+    {
+     "kind": "observation",
+     "text": "[{\"m.ret_pct\": -1.77}]"
+    },
+    {
+     "kind": "thought",
+     "text": "Đã tìm được lợi suất của cổ phiếu HPG vào tháng 8/2019."
+    },
+    {
+     "kind": "final",
+     "text": "-1.77",
+     "sources": [
+      "cypher: MATCH (c:Company {ticker:'HPG'})-[:HAS_MONTH]->(m:MonthStat {month:'2019-08'}) RETURN m.ret_pct"
+     ],
+     "blocked": false,
+     "steps": 2,
+     "forced": false
+    }
+   ],
+   "sources": [
+    "cypher: MATCH (c:Company {ticker:'HPG'})-[:HAS_MONTH]->(m:MonthStat {month:'2019-08'}) RETURN m.ret_pct"
+   ],
+   "seconds": 3.2899508000000424
+  },
+  {
+   "qid": "vn30000",
+   "dataset": "vn30",
+   "question": "Mã nào có tương quan lợi suất ngày cao nhất với PLX?",
+   "gold": "GAS",
+   "answer": "Không đủ dữ liệu.",
+   "em": 0.0,
+   "trace": [
+    {
+     "kind": "thought",
+     "text": "Cần tìm mã có tương quan (rho) cao nhất với mã PLX."
+    },
+    {
+     "kind": "action",
+     "text": "cypher(MATCH (c1:Company {ticker:'PLX'})-[:CORRELATED {rho: r}]->(c2:Company {ticker:ticker}) RETURN c2.ticker, r ORDER BY r DESC LIMIT 1)"
+    },
+    {
+     "kind": "observation",
+     "text": "Lỗi: CypherSyntaxError: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `r` not defined (line 1, column 54 (offset: 53))\n\"MATCH (c1:Company {ticker:'PLX'})-[:COR"
+    },
+    {
+     "kind": "thought",
+     "text": "Cần sửa lỗi cú pháp Cypher."
+    },
+    {
+     "kind": "action",
+     "text": "cypher(MATCH (c1:Company {ticker:'PLX'})-[:CORRELATED {rho: r}]->(c2:Company) RETURN c2.ticker, r ORDER BY r DESC LIMIT 1)"
+    },
+    {
+     "kind": "observation",
+     "text": "Lỗi: CypherSyntaxError: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Variable `r` not defined (line 1, column 54 (offset: 53))\n\"MATCH (c1:Company {ticker:'PLX'})-[:COR"
+    },
+    {
+     "kind": "thought",
+     "text": "Cần sửa lỗi cú pháp Cypher."
+    },
+    {
+     "kind": "final",
+     "text": "Không đủ dữ liệu.",
+     "sources": [],
+     "blocked": false,
+     "steps": 4,
+     "forced": true
+    }
+   ],
+   "sources": [],
+   "seconds": 7.92251479999959
+  },
+  {
+   "qid": "hot0000",
+   "dataset": "hotpot",
+   "question": "Were Scott Derrickson and Ed Wood of the same nationality?",
+   "gold": "yes",
+   "answer": "yes",
+   "em": 1.0,
+   "trace": [
+    {
+     "kind": "thought",
+     "text": "我需要查找Scott Derrickson和Ed Wood的国籍信息，然后比较他们是否相同。我将分别查询这两位人物的国籍。"
+    },
+    {
+     "kind": "action",
+     "text": "vector_search(Scott Derrickson nationality)"
+    },
+    {
+     "kind": "observation",
+     "text": "[1] Scott Derrickson. Scott Derrickson (born July 16, 1966) is an American director, screenwriter and producer. He lives in Los Angeles, California. He is best known for directing horror films such as \"Sinister\", \"The Exorcism of Emily Rose\", and \"Deliver Us From Evil\", as well as the 2016 Marvel Cinematic Universe installment, \"Doctor Strange.\"\n[2] Deliver Us from Evil (2014 film). Deliver Us from Evil is a 2014 American supernatural horror film directed by Scott Derrickson and produced by Jerry Bruckheimer. The film is officially based on a 2001 non-fiction book entitled \"Beware the Night\" by Ralph Sarchie and Lisa Collier Cool, and its marketing campaign highlighted that it was \"inspired "
+    },
+    {
+     "kind": "thought",
+     "text": "从观察结果中，我们可以得知Scott Derrickson是美国国籍。"
+    },
+    {
+     "kind": "action",
+     "text": "vector_search(Ed Wood nationality)"
+    },
+    {
+     "kind": "observation",
+     "text": "[1] Ed Wood. Edward Davis Wood Jr. (October 10, 1924 – December 10, 1978) was an American filmmaker, actor, writer, producer, and director.\n[2] Ed Wood (film). Ed Wood is a 1994 American biographical period comedy-drama film directed and produced by Tim Burton, and starring Johnny Depp as cult filmmaker Ed Wood. The film concerns the period in Wood's life when he made his best-known films as well as his relationship with actor Bela Lugosi, played by Martin Landau. Sarah Jessica Parker, Patricia Arquette, Jeffrey Jones, Lisa Marie, and Bill Murray are among the supporting cast.\n[3] Ade Edmondson. Adrian Charles \"Ade\" Edmondson (born 24 January 1957) is an English comedian, actor, writer, musi"
+    },
+    {
+     "kind": "thought",
+     "text": "从观察结果中，我们可以得知Ed Wood是美国国籍。"
+    },
+    {
+     "kind": "final",
+     "text": "yes",
+     "sources": [
+      "hot:Scott Derrickson",
+      "hot:Deliver Us from Evil (2014 film)",
+      "hot:Scott Parkin",
+      "hot:Ed Wood",
+      "hot:Ed Wood (film)",
+      "hot:Ade Edmondson"
+     ],
+     "blocked": false,
+     "steps": 3,
+     "forced": false
+    }
+   ],
+   "sources": [
+    "hot:Scott Derrickson",
+    "hot:Deliver Us from Evil (2014 film)",
+    "hot:Scott Parkin",
+    "hot:Ed Wood",
+    "hot:Ed Wood (film)",
+    "hot:Ade Edmondson"
+   ],
+   "seconds": 44.18746360000023
+  },
+  {
+   "qid": "hot0001",
+   "dataset": "hotpot",
+   "question": "What government position was held by the woman who portrayed Corliss Archer in the film Kiss and Tell?",
+   "gold": "Chief of Protocol",
+   "answer": "ambassador",
+   "em": 0.0,
+   "trace": [
+    {
+     "kind": "thought",
+     "text": "需要找到扮演Corliss Archer的女性角色所持有的政府职位，需要先找到与Corliss Archer相关的实体，再找到该实体所关联的政府职位。"
+    },
+    {
+     "kind": "action",
+     "text": "vector_search(Corliss Archer)"
+    },
+    {
+     "kind": "observation",
+     "text": "[1] Meet Corliss Archer (TV series). Meet Corliss Archer is an American television sitcom that aired on CBS (July 13, 1951 - August 10, 1951) and in syndication via the Ziv Company from April to December 1954. The program was an adaptation of the radio series of the same name, which was based on a series of short stories by F. Hugh Herbert.\n[2] Meet Corliss Archer. Meet Corliss Archer, a program from radio's Golden Age, ran from January 7, 1943 to September 30, 1956. Although it was CBS's answer to NBC's popular \"A Date with Judy\", it was also broadcast by NBC in 1948 as a summer replacement for \"The Bob Hope Show\". From October 3, 1952 to June 26, 1953, it aired on ABC, finally returning to"
+    },
+    {
+     "kind": "thought",
+     "text": "从搜索结果中没有直接找到扮演Corliss Archer的女性角色所持有的政府职位信息，需要进一步细化搜索范围。"
+    },
+    {
+     "kind": "action",
+     "text": "vector_search(Kiss and Tell)"
+    },
+    {
+     "kind": "observation",
+     "text": "[1] Kiss and Tell (1945 film). Kiss and Tell is a 1945 American comedy film starring then 17-year-old Shirley Temple as Corliss Archer. In the film, two teenage girls cause their respective parents much concern when they start to become interested in boys. The parents' bickering about which girl is the worse influence causes more problems than it solves.\n[2] Shut Up, Make Love. \"Shut Up, Make Love\" is a song by American rock band Poison; released in 2000, it was the first single presented to radio stations from their 2000 \"Crack a Smile...and More! \" album. The song also appears on the second promo single \"Be the One\" as a B-side. \"Crack a Smile\" is Poison's fifth studio album, released on M"
+    },
+    {
+     "kind": "thought",
+     "text": "从搜索结果中找到了扮演Corliss Archer的演员Shirley Temple，但没有直接提到她所持有的政府职位。需要进一步查找Shirley Temple的相关信息。"
+    },
+    {
+     "kind": "action",
+     "text": "vector_search(Shirley Temple)"
+    },
+    {
+     "kind": "observation",
+     "text": "[1] Shirley Temple. Shirley Temple Black (April 23, 1928 – February 10, 2014) was an American actress, singer, dancer, businesswoman, and diplomat who was Hollywood's number one box-office draw as a child actress from 1935 to 1938. As an adult, she was named United States ambassador to Ghana and to Czechoslovakia and also served as Chief of Protocol of the United States.\n[2] Kiss and Tell (1945 film). Kiss and Tell is a 1945 American comedy film starring then 17-year-old Shirley Temple as Corliss Archer. In the film, two teenage girls cause their respective parents much concern when they start to become interested in boys. The parents' bickering about which girl is the worse influence causes"
+    },
+    {
+     "kind": "thought",
+     "text": "从搜索结果中找到了Shirley Temple担任的政府职位信息。"
+    },
+    {
+     "kind": "final",
+     "text": "ambassador",
+     "sources": [
+      "hot:Meet Corliss Archer (TV series)",
+      "hot:Meet Corliss Archer",
+      "hot:Kiss and Tell (1945 film)",
+      "hot:Kiss and Tell (1945 film)",
+      "hot:Shut Up, Make Love",
+      "hot:A Kiss for Corliss",
+      "hot:Shirley Temple",
+      "hot:Kiss and Tell (1945 film)",
+      "hot:A Kiss for Corliss"
+     ],
+     "blocked": false,
+     "steps": 4,
+     "forced": false
+    }
+   ],
+   "sources": [
+    "hot:Meet Corliss Archer (TV series)",
+    "hot:Meet Corliss Archer",
+    "hot:Kiss and Tell (1945 film)",
+    "hot:Kiss and Tell (1945 film)",
+    "hot:Shut Up, Make Love",
+    "hot:A Kiss for Corliss",
+    "hot:Shirley Temple",
+    "hot:Kiss and Tell (1945 film)",
+    "hot:A Kiss for Corliss"
+   ],
+   "seconds": 7.628190899999936
+  }
+ ],
+ "tools": {
+  "cypher": 70,
+  "vector_search": 46,
+  "calculator": 1
+ },
+ "calls": {
+  "hetionet": {
+   "cypher": {
+    "ok": 10,
+    "empty": 16,
+    "err": 6
+   }
+  },
+  "vn30": {
+   "cypher": {
+    "ok": 20,
+    "empty": 0,
+    "err": 18
+   }
+  },
+  "hotpot": {
+   "vector_search": {
+    "ok": 46,
+    "empty": 0,
+    "err": 0
+   },
+   "calculator": {
+    "ok": 1,
+    "empty": 0,
+    "err": 0
+   }
+  }
+ },
+ "em": {
+  "hetionet": {
+   "filter_2hop": {
+    "GraphRAG": 0.0,
+    "Agent": 0.2857142857142857,
+    "n": 7
+   },
+   "count_1hop": {
+    "GraphRAG": 0.875,
+    "Agent": 1.0,
+    "n": 8
+   },
+   "lookup_1hop": {
+    "GraphRAG": 1.0,
+    "Agent": 0.0,
+    "n": 5
+   },
+   "intersect_2hop": {
+    "GraphRAG": 0.6,
+    "Agent": 0.0,
+    "n": 10
+   }
+  },
+  "vn30": {
+   "lookup_1hop": {
+    "GraphRAG": 1.0,
+    "Agent": 0.5,
+    "n": 14
+   },
+   "stat_1hop": {
+    "GraphRAG": 0.8333333333333334,
+    "Agent": 0.8333333333333334,
+    "n": 6
+   },
+   "aggregate_2hop": {
+    "GraphRAG": 0.3333333333333333,
+    "Agent": 1.0,
+    "n": 6
+   },
+   "compare_2hop": {
+    "GraphRAG": 0.5,
+    "Agent": 0.25,
+    "n": 4
+   }
+  },
+  "hotpot": {
+   "comparison": {
+    "GraphRAG": 0.5,
+    "Agent": 0.75,
+    "n": 8
+   },
+   "bridge": {
+    "GraphRAG": 0.09090909090909091,
+    "Agent": 0.36363636363636365,
+    "n": 22
+   }
+  }
+ }
+}

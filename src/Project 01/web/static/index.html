@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DiaNexus</title>
+<meta name="description" content="Hệ đa tác tử hỗ trợ hội chẩn đái tháo đường, chạy cục bộ.">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/shell.css">
+<link rel="stylesheet" href="/static/css/parts.css">
+<link rel="stylesheet" href="/static/css/pages.css">
+<script src="/static/js/theme-boot.js"></script>
+<script src="/static/vendor/echarts.min.js" defer></script>
+<script src="/static/vendor/3d-force-graph.min.js" defer></script>
+<script type="module" src="/static/js/app.js"></script>
+</head>
+<body>
+<aside class="rail">
+  <a class="brand" href="/" data-nav aria-label="DiaNexus, về Tổng quan">
+    <svg viewBox="0 0 40 48" width="30" height="36" aria-hidden="true">
+      <path class="drop" d="M20 2 C20 2 3 21 3 31 a17 15 0 0 0 34 0 C37 21 20 2 20 2 Z"/>
+      <path class="blip" d="M3 31 h9 l3 -5 l4 13 l4 -20 l4 12 h10"/>
+    </svg>
+    <span><b>DiaNexus</b><small>Hội chẩn đa tác tử</small></span>
+  </a>
+  <nav id="nav" aria-label="Trang chính"></nav>
+</aside>
+<header class="vitals" aria-label="Sinh hiệu hệ thống">
+  <div id="vitals-cells" class="cells"></div>
+  <div class="tools">
+    <button id="palette-open" class="btn-ghost" title="Bảng lệnh">Tìm <kbd>Ctrl K</kbd></button>
+    <button id="theme" class="btn-ghost" title="Đổi nền sáng hoặc tối" aria-label="Đổi nền sáng hoặc tối">Nền</button>
+  </div>
+  <canvas id="trace" aria-hidden="true"></canvas>
+</header>
+<main id="view" tabindex="-1"></main>
+<footer class="foot"><span>Kết quả chỉ mang tính tham khảo, không thay thế chẩn đoán của bác sĩ.</span><span>Chạy cục bộ ở 127.0.0.1</span></footer>
+<dialog id="palette" aria-label="Bảng lệnh"><input id="palette-q" placeholder="Gõ tên trang hoặc câu hỏi hội chẩn" autocomplete="off"><ul id="palette-list"></ul></dialog>
+</body>
+</html>

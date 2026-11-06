@@ -1,0 +1,163 @@
+{
+ "rows": [
+  {
+   "accuracy": 0.5022109917877448,
+   "f1_macro": 0.22287636669470143,
+   "ci_lo": 0.218111166863053,
+   "ci_hi": 0.22808885369050766,
+   "dataset": "UIT-VSFC",
+   "model": "Dummy",
+   "family": "dummy",
+   "framework": "scikit-learn",
+   "seconds": 0.0024040000000695727,
+   "val_score": 0.2247347850362926,
+   "params": {},
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 0.0024040000000695727
+  },
+  {
+   "accuracy": 0.86481364497789,
+   "f1_macro": 0.7151208786910352,
+   "ci_lo": 0.6949799918189057,
+   "ci_hi": 0.737365956542002,
+   "dataset": "UIT-VSFC",
+   "model": "LogReg/Ridge",
+   "family": "linear",
+   "framework": "scikit-learn",
+   "seconds": 1.1548981999999341,
+   "val_score": 0.7499136435861727,
+   "params": {
+    "C": 1
+   },
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 1.1548981999999341
+  },
+  {
+   "accuracy": 0.8834491471888819,
+   "f1_macro": 0.6654030030147521,
+   "ci_lo": 0.6407220754634473,
+   "ci_hi": 0.6906962113242042,
+   "dataset": "UIT-VSFC",
+   "model": "Linear SVM",
+   "family": "svm",
+   "framework": "scikit-learn",
+   "seconds": 0.33407740000006925,
+   "val_score": 0.7161920629300177,
+   "params": {
+    "C": 0.1
+   },
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 0.33407740000006925
+  },
+  {
+   "accuracy": 0.7113076437144662,
+   "f1_macro": 0.6177765504374663,
+   "ci_lo": 0.6029924464714591,
+   "ci_hi": 0.6335112990864036,
+   "dataset": "UIT-VSFC",
+   "model": "Cây quyết định",
+   "family": "tree",
+   "framework": "scikit-learn",
+   "seconds": 16.415492500000028,
+   "val_score": 0.6158573718548844,
+   "params": {
+    "max_depth": 14,
+    "min_samples_leaf": 5
+   },
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 16.415492500000028
+  },
+  {
+   "accuracy": 0.8417561591914087,
+   "f1_macro": 0.7172767908839344,
+   "ci_lo": 0.6945489427003333,
+   "ci_hi": 0.7411549113214113,
+   "dataset": "UIT-VSFC",
+   "model": "Random Forest",
+   "family": "rf",
+   "framework": "scikit-learn",
+   "seconds": 29.54497309999988,
+   "val_score": 0.7267223517223518,
+   "params": {
+    "max_depth": null,
+    "min_samples_leaf": 2
+   },
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 29.54497309999988
+  },
+  {
+   "accuracy": 0.8730259001895135,
+   "f1_macro": 0.7494434145286908,
+   "ci_lo": 0.7268690933991052,
+   "ci_hi": 0.7715976456840202,
+   "dataset": "UIT-VSFC",
+   "model": "XGBoost",
+   "family": "xgb",
+   "framework": "xgboost",
+   "seconds": 214.5028052,
+   "val_score": 0.7776313122090331,
+   "params": {
+    "max_depth": 5,
+    "reg_lambda": 1
+   },
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 214.5028052,
+   "n_trees": 500
+  }
+ ],
+ "best": {
+  "family": "xgb",
+  "name": "XGBoost",
+  "threshold": null
+ },
+ "terms": {
+  "0": {
+   "rows": [
+    "nên",
+    "cần",
+    "chưa",
+    "khó",
+    "hơn",
+    "quá",
+    "ít",
+    "hơi",
+    "không",
+    "nghỉ"
+   ]
+  },
+  "1": {
+   "rows": [
+    "không",
+    "dung ôn",
+    "ơn",
+    "không có",
+    "giống",
+    "tra thường",
+    "chưa có",
+    "rất hiền",
+    "đủ số",
+    "có tương"
+   ]
+  },
+  "2": {
+   "rows": [
+    "tốt",
+    "rất",
+    "hay",
+    "dễ hiểu",
+    "tình",
+    "vui",
+    "nhiệt",
+    "nhiệt tình",
+    "tận",
+    "hiểu"
+   ]
+  }
+ }
+}

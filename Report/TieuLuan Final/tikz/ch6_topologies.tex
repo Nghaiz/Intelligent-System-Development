@@ -1,0 +1,43 @@
+\begin{tikzpicture}[x=1cm,y=1cm, tt/.style={font=\small\bfseries\sffamily, text=cNavy, align=center},
+  n/.style={cau=#1, minimum size=9mm, font=\footnotesize\bfseries, align=center},
+  nn/.style={cau=#1, minimum size=7mm, font=\scriptsize, align=center}]
+  % (a) đơn tác tử
+  \node[vung=cBlue, minimum width=7.6cm, minimum height=4.3cm] at (3.9,2.0) {};
+  \node[tt] at (3.9,3.8) {(a) Single ReAct};
+  \node[n=cBlue, minimum size=12mm] (a) at (3.9,1.8) {Tác tử};
+  \node[csdl=cTeal, minimum width=11mm, minimum height=9mm] (t) at (6.5,1.8) {Công cụ};
+  \node[hop=cSlate] (u) at (1.2,1.8) {Câu hỏi};
+  \draw[mui] (u) -- (a);
+  \draw[mui, bend left=25] (a) to node[above, font=\scriptsize] {Action} (t);
+  \draw[mui, bend left=25] (t) to node[below, font=\scriptsize] {Observation} (a);
+  % (b) điều phối
+  \node[vung=cOrange, minimum width=7.6cm, minimum height=4.3cm] at (12.0,2.0) {};
+  \node[tt] at (12.0,3.8) {(b) Supervisor};
+  \node[n=cOrange, minimum size=12mm, font=\scriptsize\bfseries] (s) at (12.0,2.75) {Điều\\[-2pt]phối};
+  \foreach \x/\c/\t/\m in {9.7/cTeal/CG1/e1, 12.0/cTeal/CG2/e2, 14.3/cRed/Kiểm/e3} {
+    \node[nn=\c, minimum size=10mm] (\m) at (\x,0.75) {\t};
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, very thick, cNavy] (s) -- (\m);
+  }
+  % (c) phân cấp
+  \node[vung=cPurple, minimum width=7.6cm, minimum height=4.7cm] at (3.9,-3.0) {};
+  \node[tt] at (3.9,-1.0) {(c) Hierarchical};
+  \node[n=cPurple] (c) at (3.9,-1.85) {Gốc};
+  \foreach \x/\m in {2.0/l, 5.8/r} {
+    \node[nn=cIndigo, minimum size=9mm] (t\m) at (\x,-3.1) {Tổ};
+    \draw[mui] (c) -- (t\m);
+    \foreach \d/\k in {-1.0/1, 0/2, 1.0/3} {
+      \node[nn=cSky] (w\m\k) at (\x+\d,-4.55) {};
+      \draw[mui] (t\m) -- (w\m\k);
+    }
+  }
+  % (d) tranh luận
+  \node[vung=cGreen, minimum width=7.6cm, minimum height=4.7cm] at (12.0,-3.0) {};
+  \node[tt] at (12.0,-1.0) {(d) Debate};
+  \node[n=cBlue, minimum size=11mm] (da) at (9.9,-2.5) {A};
+  \node[n=cRed, minimum size=11mm] (db) at (14.1,-2.5) {B};
+  \node[n=cGreen, minimum size=12mm, font=\scriptsize\bfseries] (dj) at (12.0,-4.4) {Trọng\\[-2pt]tài};
+  \draw[muiM=cRed, bend left=16] (da) to node[above, font=\scriptsize] {phản biện} (db);
+  \draw[muiM=cBlue, bend left=16] (db) to node[below, font=\scriptsize] {phản biện} (da);
+  \draw[mui] (da) -- (dj);
+  \draw[mui] (db) -- (dj);
+\end{tikzpicture}

@@ -152,3 +152,35 @@ Report/Agent 01/main.*
 Report/Agent 01/kiemtra_*
 Report/Agent 01/toanbo.*
 Report/Agent 01/*.auxlock
+
+# ===== Tiểu luận Final =====
+# Dữ liệu và mô hình lớn tải lại bằng scripts/ (xem src/TieuLuan Final/README.md)
+src/TieuLuan Final/data/
+src/TieuLuan Final/models/
+src/TieuLuan Final/outputs/logs/
+src/TieuLuan Final/outputs/mem_slots/
+src/TieuLuan Final/outputs/*.lock
+src/TieuLuan Final/web/node_modules/
+Report/TieuLuan Final/code/
+Report/TieuLuan Final/generated/
+Report/TieuLuan Final/tikzcache/
+Report/TieuLuan Final/_minted*/
+Report/TieuLuan Final/main.*
+!Report/TieuLuan Final/main.tex
+Report/TieuLuan Final/kiemtra_ch*
+Report/TieuLuan Final/toanbo.*
+
+# ===== Project 01 (DiaNexus) =====
+src/Project 01/data/
+src/Project 01/models/
+src/Project 01/outputs/logs/
+src/Project 01/outputs/mem_slots/
+src/Project 01/outputs/*.lock
+src/Project 01/web/node_modules/
+Report/Project 01/code/
+Report/Project 01/generated/
+Report/Project 01/tikzcache/
+Report/Project 01/_minted*/
+Report/Project 01/main.*
+!Report/Project 01/main.tex
+Report/Project 01/kiemtra_*

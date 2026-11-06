@@ -1,0 +1,1126 @@
+{
+ "version": 1,
+ "rules": [
+  {
+   "id": "URG-01",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 100,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 600
+     }
+    ]
+   },
+   "message": "Đường huyết từ 600 mg/dL có thể là tăng áp lực thẩm thấu do tăng đường huyết: cần tới cấp cứu ngay.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 16; đồng thuận ADA/EASD 2024 về cấp cứu tăng đường huyết",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-02",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 99,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 250
+     },
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "nôn",
+       "đau bụng",
+       "thở nhanh",
+       "thở sâu",
+       "hơi thở mùi trái cây",
+       "ketone",
+       "ceton"
+      ]
+     }
+    ]
+   },
+   "message": "Đường huyết rất cao kèm triệu chứng gợi ý nhiễm toan ceton: cần tới cấp cứu ngay.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 16; đồng thuận ADA/EASD 2024 về cấp cứu tăng đường huyết",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-03",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 98,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 300
+     }
+    ]
+   },
+   "message": "Đường huyết từ 300 mg/dL là mức rất cao: cần liên hệ cơ sở y tế trong ngày, tới cấp cứu nếu có triệu chứng.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 16; đồng thuận ADA/EASD 2024 về cấp cứu tăng đường huyết",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-04",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 97,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose",
+      "op": "<",
+      "value": 54
+     }
+    ]
+   },
+   "message": "Đường huyết dưới 54 mg/dL là hạ đường huyết mức 2: cần xử trí ngay và gọi hỗ trợ y tế.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 6 (Glycemic Goals and Hypoglycemia)",
+   "then": {
+    "urgent": true,
+    "hypoglycemia": true
+   }
+  },
+  {
+   "id": "URG-05",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 96,
+   "when": {
+    "all": [
+     {
+      "fact": "hypoglycemia",
+      "op": "is",
+      "value": true
+     },
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "lơ mơ",
+       "lú lẫn",
+       "hôn mê",
+       "bất tỉnh",
+       "ngất",
+       "co giật",
+       "không tỉnh",
+       "không đánh thức"
+      ]
+     }
+    ]
+   },
+   "message": "Hạ đường huyết kèm rối loạn ý thức là mức 3: gọi cấp cứu 115, không cho người bệnh ăn uống khi không tỉnh.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 6 (Glycemic Goals and Hypoglycemia)"
+  },
+  {
+   "id": "URG-06",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 95,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "lơ mơ",
+       "lú lẫn",
+       "hôn mê",
+       "bất tỉnh",
+       "ngất",
+       "co giật",
+       "không tỉnh",
+       "không đánh thức"
+      ]
+     }
+    ]
+   },
+   "message": "Rối loạn ý thức ở người nghi đái tháo đường là tình huống cấp cứu: gọi 115 ngay.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 16; đồng thuận ADA/EASD 2024 về cấp cứu tăng đường huyết",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-07",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 94,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "đau ngực",
+       "tức ngực",
+       "khó thở",
+       "đau thắt ngực",
+       "nhồi máu"
+      ]
+     }
+    ]
+   },
+   "message": "Đau ngực hoặc khó thở có thể là biến cố tim mạch: gọi cấp cứu 115.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 10 (Cardiovascular Disease and Risk Management)",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-08",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 93,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "méo miệng",
+       "yếu nửa người",
+       "liệt nửa người",
+       "nói ngọng đột ngột",
+       "không nói được",
+       "tê nửa người"
+      ]
+     }
+    ]
+   },
+   "message": "Dấu hiệu gợi ý đột quỵ: gọi cấp cứu 115 và ghi lại thời điểm khởi phát.",
+   "source": "AHA/ASA: nhận biết đột quỵ theo BE FAST",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-09",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 92,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "mất thị lực",
+       "mù đột ngột",
+       "đột ngột không nhìn thấy",
+       "mờ mắt đột ngột",
+       "đột ngột mờ",
+       "màn đen che mắt"
+      ]
+     }
+    ]
+   },
+   "message": "Giảm thị lực đột ngột cần được bác sĩ mắt khám cấp cứu trong ngày.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 12 (Retinopathy, Neuropathy, and Foot Care)",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-10",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 91,
+   "when": {
+    "any": [
+     {
+      "fact": "sbp",
+      "op": ">=",
+      "value": 180
+     },
+     {
+      "fact": "dbp",
+      "op": ">=",
+      "value": 120
+     }
+    ]
+   },
+   "message": "Huyết áp từ 180/120 mmHg là cơn tăng huyết áp: đo lại và liên hệ cơ sở y tế ngay.",
+   "source": "AHA/ACC 2017 Hypertension Guideline: cơn tăng huyết áp",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-11",
+   "group": "urgent",
+   "severity": "urgent",
+   "priority": 90,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "loét chân",
+       "vết loét",
+       "hoại tử",
+       "chân đen",
+       "vết thương ở bàn chân",
+       "sưng đỏ bàn chân",
+       "chảy mủ"
+      ]
+     }
+    ]
+   },
+   "message": "Loét hoặc nhiễm trùng bàn chân ở người đái tháo đường cần được khám trong 24 giờ.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 12 (Retinopathy, Neuropathy, and Foot Care)",
+   "then": {
+    "urgent": true
+   }
+  },
+  {
+   "id": "URG-12",
+   "group": "urgent",
+   "severity": "warn",
+   "priority": 80,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose",
+      "op": "<",
+      "value": 70
+     },
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 54
+     }
+    ]
+   },
+   "message": "Đường huyết dưới 70 mg/dL là hạ đường huyết mức 1: cần xử trí và đo lại theo hướng dẫn của nhân viên y tế.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 6 (Glycemic Goals and Hypoglycemia)",
+   "then": {
+    "hypoglycemia": true
+   }
+  },
+  {
+   "id": "DX-01",
+   "group": "diagnostic",
+   "severity": "warn",
+   "priority": 70,
+   "when": {
+    "all": [
+     {
+      "fact": "hba1c",
+      "op": ">=",
+      "value": 6.5,
+      "threshold": {
+       "test": "hba1c",
+       "unit": "%",
+       "kind": "diabetes"
+      }
+     }
+    ]
+   },
+   "message": "HbA1c ở mức của ngưỡng chẩn đoán đái tháo đường: cần xét nghiệm lặp lại để bác sĩ xác nhận.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "dx_range": "diabetes"
+   }
+  },
+  {
+   "id": "DX-02",
+   "group": "diagnostic",
+   "severity": "info",
+   "priority": 60,
+   "when": {
+    "all": [
+     {
+      "fact": "hba1c",
+      "op": ">=",
+      "value": 5.7,
+      "threshold": {
+       "test": "hba1c",
+       "unit": "%",
+       "kind": "prediabetes"
+      }
+     },
+     {
+      "fact": "hba1c",
+      "op": "<",
+      "value": 6.5,
+      "threshold": {
+       "test": "hba1c",
+       "unit": "%",
+       "kind": "diabetes"
+      }
+     }
+    ]
+   },
+   "message": "HbA1c nằm trong khoảng tiền đái tháo đường theo tiêu chuẩn tham chiếu.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "dx_range": "prediabetes"
+   }
+  },
+  {
+   "id": "DX-03",
+   "group": "diagnostic",
+   "severity": "warn",
+   "priority": 70,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose_kind",
+      "op": "is",
+      "value": "fasting"
+     },
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 126,
+      "threshold": {
+       "test": "fpg",
+       "unit": "mg/dL",
+       "kind": "diabetes"
+      }
+     }
+    ]
+   },
+   "message": "Đường huyết lúc đói ở mức của ngưỡng chẩn đoán: cần xét nghiệm lặp lại để bác sĩ xác nhận.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "dx_range": "diabetes"
+   }
+  },
+  {
+   "id": "DX-04",
+   "group": "diagnostic",
+   "severity": "info",
+   "priority": 60,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose_kind",
+      "op": "is",
+      "value": "fasting"
+     },
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 100,
+      "threshold": {
+       "test": "fpg",
+       "unit": "mg/dL",
+       "kind": "prediabetes"
+      }
+     },
+     {
+      "fact": "glucose",
+      "op": "<",
+      "value": 126,
+      "threshold": {
+       "test": "fpg",
+       "unit": "mg/dL",
+       "kind": "diabetes"
+      }
+     }
+    ]
+   },
+   "message": "Đường huyết lúc đói nằm trong khoảng rối loạn đường huyết đói.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "dx_range": "prediabetes"
+   }
+  },
+  {
+   "id": "DX-05",
+   "group": "diagnostic",
+   "severity": "warn",
+   "priority": 70,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose_kind",
+      "op": "is",
+      "value": "ogtt"
+     },
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 200,
+      "threshold": {
+       "test": "ogtt",
+       "unit": "mg/dL",
+       "kind": "diabetes"
+      }
+     }
+    ]
+   },
+   "message": "Đường huyết 2 giờ sau nghiệm pháp ở mức của ngưỡng chẩn đoán: cần bác sĩ xác nhận.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "dx_range": "diabetes"
+   }
+  },
+  {
+   "id": "DX-06",
+   "group": "diagnostic",
+   "severity": "info",
+   "priority": 60,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose_kind",
+      "op": "is",
+      "value": "ogtt"
+     },
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 140,
+      "threshold": {
+       "test": "ogtt",
+       "unit": "mg/dL",
+       "kind": "prediabetes"
+      }
+     },
+     {
+      "fact": "glucose",
+      "op": "<",
+      "value": 200,
+      "threshold": {
+       "test": "ogtt",
+       "unit": "mg/dL",
+       "kind": "diabetes"
+      }
+     }
+    ]
+   },
+   "message": "Đường huyết 2 giờ sau nghiệm pháp nằm trong khoảng rối loạn dung nạp glucose.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "dx_range": "prediabetes"
+   }
+  },
+  {
+   "id": "DX-07",
+   "group": "diagnostic",
+   "severity": "warn",
+   "priority": 70,
+   "when": {
+    "all": [
+     {
+      "fact": "glucose_kind",
+      "op": "is",
+      "value": "random"
+     },
+     {
+      "fact": "glucose",
+      "op": ">=",
+      "value": 200,
+      "threshold": {
+       "test": "rpg",
+       "unit": "mg/dL",
+       "kind": "diabetes"
+      }
+     },
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "khát nhiều",
+       "tiểu nhiều",
+       "sụt cân",
+       "uống nhiều",
+       "ăn nhiều",
+       "mờ mắt"
+      ]
+     }
+    ]
+   },
+   "message": "Đường huyết bất kỳ cao kèm triệu chứng kinh điển: cần gặp bác sĩ sớm để xác nhận.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "dx_range": "diabetes"
+   }
+  },
+  {
+   "id": "DX-08",
+   "group": "diagnostic",
+   "severity": "info",
+   "priority": 40,
+   "when": {
+    "all": [
+     {
+      "fact": "bmi",
+      "op": ">=",
+      "value": 23
+     }
+    ]
+   },
+   "message": "BMI từ 23 ở người châu Á là một yếu tố nên cân nhắc sàng lọc đái tháo đường.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)"
+  },
+  {
+   "id": "DX-09",
+   "group": "diagnostic",
+   "severity": "info",
+   "priority": 40,
+   "when": {
+    "all": [
+     {
+      "fact": "age",
+      "op": ">=",
+      "value": 35
+     }
+    ]
+   },
+   "message": "Từ 35 tuổi nên sàng lọc đái tháo đường định kỳ.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)"
+  },
+  {
+   "id": "MED-01",
+   "group": "medication",
+   "severity": "urgent",
+   "priority": 85,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "metformin"
+     },
+     {
+      "fact": "egfr",
+      "op": "<",
+      "value": 30
+     }
+    ]
+   },
+   "message": "Metformin chống chỉ định khi eGFR dưới 30: cần liên hệ bác sĩ điều trị để xem lại thuốc, không tự ý đổi.",
+   "source": "FDA Drug Safety Communication 2016: metformin và chức năng thận"
+  },
+  {
+   "id": "MED-02",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 75,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "metformin"
+     },
+     {
+      "fact": "egfr",
+      "op": ">=",
+      "value": 30
+     },
+     {
+      "fact": "egfr",
+      "op": "<",
+      "value": 45
+     }
+    ]
+   },
+   "message": "Metformin khi eGFR từ 30 đến dưới 45 cần bác sĩ đánh giá lại lợi ích và nguy cơ.",
+   "source": "FDA Drug Safety Communication 2016: metformin và chức năng thận"
+  },
+  {
+   "id": "MED-03",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 74,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "metformin"
+     },
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "uống rượu nhiều",
+       "nhậu nhiều",
+       "nghiện rượu"
+      ]
+     }
+    ]
+   },
+   "message": "Uống nhiều rượu khi dùng metformin làm tăng nguy cơ nhiễm toan lactic.",
+   "source": "FDA Drug Safety Communication 2016: metformin và chức năng thận"
+  },
+  {
+   "id": "MED-04",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 74,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "metformin"
+     },
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "chụp cản quang",
+       "thuốc cản quang"
+      ]
+     }
+    ]
+   },
+   "message": "Trước khi chụp có thuốc cản quang cần báo bác sĩ đang dùng metformin.",
+   "source": "FDA Drug Safety Communication 2016: metformin và chức năng thận"
+  },
+  {
+   "id": "MED-05",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 74,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "sglt2"
+     },
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "nôn",
+       "đau bụng",
+       "thở nhanh",
+       "thở sâu",
+       "hơi thở mùi trái cây",
+       "ketone",
+       "ceton"
+      ]
+     }
+    ]
+   },
+   "message": "Đang dùng thuốc ức chế SGLT2 mà có nôn, đau bụng, thở nhanh cần được kiểm tra ceton dù đường huyết không cao.",
+   "source": "FDA Drug Safety Communication 2015: chất ức chế SGLT2 và nhiễm toan ceton"
+  },
+  {
+   "id": "MED-06",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 73,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "sulfonylurea"
+     },
+     {
+      "fact": "age",
+      "op": ">=",
+      "value": 65
+     }
+    ]
+   },
+   "message": "Người cao tuổi dùng sulfonylurea có nguy cơ hạ đường huyết cao hơn, cần trao đổi với bác sĩ.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 6 (Glycemic Goals and Hypoglycemia)"
+  },
+  {
+   "id": "MED-07",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 76,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "insulin"
+     },
+     {
+      "fact": "hypoglycemia",
+      "op": "is",
+      "value": true
+     }
+    ]
+   },
+   "message": "Đang dùng insulin mà hạ đường huyết: cần báo bác sĩ để xem lại phác đồ, không tự chỉnh.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 6 (Glycemic Goals and Hypoglycemia)"
+  },
+  {
+   "id": "MED-08",
+   "group": "medication",
+   "severity": "urgent",
+   "priority": 86,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "acei_arb"
+     },
+     {
+      "fact": "pregnant",
+      "op": "is",
+      "value": true
+     }
+    ]
+   },
+   "message": "Thuốc ức chế men chuyển hoặc chẹn thụ thể không dùng khi mang thai: cần liên hệ bác sĩ ngay.",
+   "source": "Tờ hướng dẫn thuốc ức chế men chuyển (FDA boxed warning: độc tính thai nhi)"
+  },
+  {
+   "id": "MED-09",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 75,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "acei_arb"
+     },
+     {
+      "fact": "potassium",
+      "op": ">=",
+      "value": 5.5
+     }
+    ]
+   },
+   "message": "Kali máu từ 5,5 mmol/L khi dùng ức chế men chuyển cần bác sĩ xem lại.",
+   "source": "Tờ hướng dẫn thuốc ức chế men chuyển (FDA boxed warning: độc tính thai nhi)"
+  },
+  {
+   "id": "MED-10",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 75,
+   "when": {
+    "all": [
+     {
+      "fact": "meds",
+      "op": "has",
+      "value": "nsaid"
+     },
+     {
+      "fact": "egfr",
+      "op": "<",
+      "value": 30
+     }
+    ]
+   },
+   "message": "Thuốc kháng viêm không steroid cần tránh khi eGFR dưới 30.",
+   "source": "KDIGO 2022 Clinical Practice Guideline for Diabetes Management in CKD"
+  },
+  {
+   "id": "MED-11",
+   "group": "medication",
+   "severity": "warn",
+   "priority": 65,
+   "when": {
+    "all": [
+     {
+      "fact": "egfr",
+      "op": "<",
+      "value": 60
+     }
+    ]
+   },
+   "message": "eGFR dưới 60 gợi ý giảm chức năng thận: cần theo dõi và bác sĩ xem lại các thuốc đang dùng.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 11 (Chronic Kidney Disease)"
+  },
+  {
+   "id": "POL-01",
+   "group": "policy",
+   "severity": "warn",
+   "priority": 88,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "kê đơn",
+       "kê thuốc",
+       "liều",
+       "bao nhiêu mg",
+       "mấy viên",
+       "uống mấy",
+       "tiêm bao nhiêu",
+       "đơn thuốc",
+       "bao nhiêu đơn vị",
+       "tăng thuốc",
+       "giảm thuốc"
+      ]
+     }
+    ]
+   },
+   "message": "Yêu cầu về kê đơn hoặc liều thuốc: hệ thống không nêu liều cụ thể, chỉ bác sĩ điều trị mới được quyết định.",
+   "source": "Chính sách an toàn DiaNexus",
+   "then": {
+    "no_dose": true
+   }
+  },
+  {
+   "id": "POL-02",
+   "group": "policy",
+   "severity": "warn",
+   "priority": 87,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "ngừng thuốc",
+       "bỏ thuốc",
+       "dừng thuốc",
+       "ngưng thuốc",
+       "ngừng insulin",
+       "bỏ insulin",
+       "thay thuốc bằng"
+      ]
+     }
+    ]
+   },
+   "message": "Không tự ý ngừng hoặc thay thuốc đang dùng: cần trao đổi với bác sĩ điều trị.",
+   "source": "Chính sách an toàn DiaNexus",
+   "then": {
+    "no_dose": true
+   }
+  },
+  {
+   "id": "POL-03",
+   "group": "policy",
+   "severity": "info",
+   "priority": 50,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "tôi có bị",
+       "tôi bị tiểu đường không",
+       "tôi bị đái tháo đường không",
+       "có phải tôi",
+       "chẩn đoán giúp"
+      ]
+     }
+    ]
+   },
+   "message": "Hệ thống chỉ ước lượng nguy cơ, không khẳng định người dùng đã mắc bệnh.",
+   "source": "Chính sách an toàn DiaNexus",
+   "then": {
+    "no_diagnosis": true
+   }
+  },
+  {
+   "id": "POL-04",
+   "group": "policy",
+   "severity": "info",
+   "priority": 45,
+   "when": {
+    "all": [
+     {
+      "fact": "text",
+      "op": "contains_any",
+      "value": [
+       "thời tiết",
+       "giá vàng",
+       "chứng khoán",
+       "bóng đá",
+       "viết thơ",
+       "viết code",
+       "lập trình",
+       "nấu ăn",
+       "du lịch",
+       "xổ số",
+       "tỉ giá",
+       "bộ phim"
+      ]
+     }
+    ]
+   },
+   "message": "Nội dung nằm ngoài phạm vi đái tháo đường của hệ thống.",
+   "source": "Chính sách an toàn DiaNexus",
+   "then": {
+    "out_of_scope": true
+   }
+  },
+  {
+   "id": "POL-05",
+   "group": "policy",
+   "severity": "warn",
+   "priority": 84,
+   "when": {
+    "all": [
+     {
+      "fact": "pregnant",
+      "op": "is",
+      "value": true
+     }
+    ]
+   },
+   "message": "Đang mang thai cần bác sĩ sản khoa theo dõi đường huyết, ngưỡng và thuốc khác với người thường.",
+   "source": "Chính sách an toàn DiaNexus"
+  },
+  {
+   "id": "RSK-01",
+   "group": "risk",
+   "severity": "info",
+   "priority": 35,
+   "when": {
+    "all": [
+     {
+      "fact": "smoking",
+      "op": "is",
+      "value": "current"
+     }
+    ]
+   },
+   "message": "Hút thuốc làm tăng nguy cơ biến chứng tim mạch: nên trao đổi về hỗ trợ cai thuốc.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 5 (Lifestyle Behavior Change)"
+  },
+  {
+   "id": "RSK-02",
+   "group": "risk",
+   "severity": "info",
+   "priority": 35,
+   "when": {
+    "all": [
+     {
+      "fact": "bmi",
+      "op": ">=",
+      "value": 30
+     }
+    ]
+   },
+   "message": "BMI từ 30 thuộc nhóm béo phì: giảm cân có giám sát giúp cải thiện chuyển hóa.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 5 (Lifestyle Behavior Change)"
+  },
+  {
+   "id": "RSK-03",
+   "group": "risk",
+   "severity": "info",
+   "priority": 36,
+   "when": {
+    "any": [
+     {
+      "fact": "hypertension",
+      "op": "is",
+      "value": 1
+     },
+     {
+      "fact": "high_bp",
+      "op": "is",
+      "value": 1
+     }
+    ]
+   },
+   "message": "Có tăng huyết áp: cần theo dõi huyết áp vì đây là yếu tố nguy cơ tim mạch quan trọng.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 10 (Cardiovascular Disease and Risk Management)",
+   "then": {
+    "has_hypertension": true
+   }
+  },
+  {
+   "id": "RSK-04",
+   "group": "risk",
+   "severity": "warn",
+   "priority": 55,
+   "when": {
+    "all": [
+     {
+      "fact": "risk_prob",
+      "op": ">=",
+      "value": 0.5
+     }
+    ]
+   },
+   "message": "Mô hình ước lượng nguy cơ ở mức cao: nên đi xét nghiệm HbA1c hoặc đường huyết lúc đói.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 2 (Diagnosis and Classification)",
+   "then": {
+    "high_risk": true
+   }
+  },
+  {
+   "id": "RSK-05",
+   "group": "risk",
+   "severity": "warn",
+   "priority": 56,
+   "when": {
+    "all": [
+     {
+      "fact": "high_risk",
+      "op": "is",
+      "value": true
+     },
+     {
+      "fact": "has_hypertension",
+      "op": "is",
+      "value": true
+     }
+    ]
+   },
+   "message": "Nguy cơ cao kèm tăng huyết áp: nên khám sớm thay vì chỉ sàng lọc định kỳ.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 10 (Cardiovascular Disease and Risk Management)"
+  },
+  {
+   "id": "RSK-06",
+   "group": "risk",
+   "severity": "warn",
+   "priority": 57,
+   "when": {
+    "all": [
+     {
+      "fact": "dx_range",
+      "op": "is",
+      "value": "diabetes"
+     },
+     {
+      "fact": "retina_grade",
+      "op": ">=",
+      "value": 2
+     }
+    ]
+   },
+   "message": "Chỉ số đường huyết cao kèm ảnh võng mạc gợi ý tổn thương mức trung bình trở lên: nên khám mắt sớm.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 12 (Retinopathy, Neuropathy, and Foot Care)"
+  },
+  {
+   "id": "RSK-07",
+   "group": "risk",
+   "severity": "info",
+   "priority": 37,
+   "when": {
+    "all": [
+     {
+      "fact": "retina_grade",
+      "op": ">=",
+      "value": 1
+     }
+    ]
+   },
+   "message": "Ảnh võng mạc gợi ý có thay đổi: nên khám mắt theo chỉ định.",
+   "source": "ADA Standards of Care in Diabetes 2025, Section 12 (Retinopathy, Neuropathy, and Foot Care)"
+  }
+ ]
+}

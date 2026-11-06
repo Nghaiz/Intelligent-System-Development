@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % các tầng xếp chồng như bản mỏng 3D, tầng dưới vẽ trước
+  \foreach \y/\c/\t/\s in {
+     0.0/cSlate/{Tầng LLM: Qwen2.5-7B qua Ollama trên GPU 8 GB}/{gpu\_session, complete(): gọi LLM, đếm token},
+     1.75/cIndigo/{Tầng điều phối: Run, run\_to\_end, stream}/{sổ token, vết thông điệp, giờ từng lượt},
+     3.5/cTeal/{Tầng kiến trúc: generator yield Call / Note}/{direct, single, supervisor, debate},
+     5.25/cOrange/{Tầng miền: GSM8K, PubMedQA, ca lâm sàng}/{công cụ calc, find, guideline; đọc đáp án}} {
+    \khoibaD{0.3}{\y}{10.6}{1.05}{1.2}{\c}
+    \node[font=\small\bfseries, text=white] at (5.6,\y+0.72) {\t};
+    \node[font=\footnotesize, text=white] at (5.6,\y+0.30) {\s};
+  }
+  \foreach \y in {1.05,2.8,4.55} \draw[{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, very thick, cNavy] (5.6,\y+0.05) -- (5.6,\y+0.68);
+  \node[hop=cRed, minimum width=3.3cm, minimum height=12mm] (w) at (13.9,6.2) {Web App\\luồng SSE};
+  \node[hop=cGreen, minimum width=3.3cm, minimum height=12mm] (m) at (13.9,3.6) {Đánh giá\\JSONL theo câu};
+  \node[hop=cPurple, minimum width=3.3cm, minimum height=12mm] (s) at (13.9,1.0) {Thống kê\\McNemar, Wilson};
+  \draw[mui] (w) -- (12.0,4.1);
+  \draw[mui] (m) -- (12.0,3.1);
+  \draw[mui] (m) -- (s);
+\end{tikzpicture}

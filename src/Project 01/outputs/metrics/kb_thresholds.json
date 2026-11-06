@@ -1,0 +1,436 @@
+{
+ "count": 22,
+ "missing": [],
+ "rows": [
+  {
+   "id": "TH:00",
+   "test": "HbA1c",
+   "test_id": "T:hba1c",
+   "aliases": [
+    "hba1c",
+    "a1c",
+    "hemoglobin a1c",
+    "glycated hemoglobin"
+   ],
+   "op": ">=",
+   "value": 6.5,
+   "unit": "%",
+   "meaning": "đái tháo đường",
+   "evidence": "| Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:01",
+   "test": "HbA1c",
+   "test_id": "T:hba1c",
+   "aliases": [
+    "hba1c",
+    "a1c",
+    "hemoglobin a1c",
+    "glycated hemoglobin"
+   ],
+   "op": "between",
+   "value": [
+    5.7,
+    6.4
+   ],
+   "unit": "%",
+   "meaning": "tiền đái tháo đường",
+   "evidence": "Diagnosis | A1C | Fasting Plasma Glucose | Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:02",
+   "test": "HbA1c",
+   "test_id": "T:hba1c",
+   "aliases": [
+    "hba1c",
+    "a1c",
+    "hemoglobin a1c",
+    "glycated hemoglobin"
+   ],
+   "op": "<",
+   "value": 5.7,
+   "unit": "%",
+   "meaning": "bình thường",
+   "evidence": "Diagnosis | A1C | Fasting Plasma Glucose | Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:03",
+   "test": "HbA1c",
+   "test_id": "T:hba1c",
+   "aliases": [
+    "hba1c",
+    "a1c",
+    "hemoglobin a1c",
+    "glycated hemoglobin"
+   ],
+   "op": ">=",
+   "value": 48,
+   "unit": "mmol/mol",
+   "meaning": "đái tháo đường",
+   "evidence": "People with fasting plasma glucose values of ≥ 7.0 mmol/L (126 mg/dl), 2-h post-load plasma glucose ≥ 11.1 mmol/L (200 mg/dl) (5), HbA1c ≥ 6.5% (48 mmol/mol); or a random blood glucose ≥ 11.1 mmol/L (200 mg/ dl) in the presence of signs and symptoms are considered to have diabetes (6).",
+   "url": "https://iris.who.int/server/api/core/bitstreams/2cb3ab68-a52a-402e-ad47-8bc5a4edc834/content",
+   "source": "who",
+   "chunk_id": "who:pdf_classification-of-diabetes-mellitus#14"
+  },
+  {
+   "id": "TH:04",
+   "test": "Fasting plasma glucose",
+   "test_id": "T:fpg",
+   "aliases": [
+    "fpg",
+    "fasting glucose",
+    "fasting plasma glucose",
+    "glucose lúc đói",
+    "đường huyết lúc đói",
+    "glucose"
+   ],
+   "op": ">=",
+   "value": 126,
+   "unit": "mg/dL",
+   "meaning": "đái tháo đường",
+   "evidence": "| Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:05",
+   "test": "Fasting plasma glucose",
+   "test_id": "T:fpg",
+   "aliases": [
+    "fpg",
+    "fasting glucose",
+    "fasting plasma glucose",
+    "glucose lúc đói",
+    "đường huyết lúc đói",
+    "glucose"
+   ],
+   "op": "between",
+   "value": [
+    100,
+    125
+   ],
+   "unit": "mg/dL",
+   "meaning": "tiền đái tháo đường",
+   "evidence": "Diagnosis | A1C | Fasting Plasma Glucose | Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:06",
+   "test": "Fasting plasma glucose",
+   "test_id": "T:fpg",
+   "aliases": [
+    "fpg",
+    "fasting glucose",
+    "fasting plasma glucose",
+    "glucose lúc đói",
+    "đường huyết lúc đói",
+    "glucose"
+   ],
+   "op": "<=",
+   "value": 99,
+   "unit": "mg/dL",
+   "meaning": "bình thường",
+   "evidence": "Diagnosis | A1C | Fasting Plasma Glucose | Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:07",
+   "test": "Fasting plasma glucose",
+   "test_id": "T:fpg",
+   "aliases": [
+    "fpg",
+    "fasting glucose",
+    "fasting plasma glucose",
+    "glucose lúc đói",
+    "đường huyết lúc đói",
+    "glucose"
+   ],
+   "op": ">=",
+   "value": 7.0,
+   "unit": "mmol/L",
+   "meaning": "đái tháo đường",
+   "evidence": "sed during pregnancy No change Gestational diabetes mellitus Hyperglycaemia below diagnostic thresholds for diabetes in pregnancy Defined by 2013 diagnostic criteria Diagnostic criteria for diabetes: fasting plasma glucose ≥ 7.0 mmol/L or 2-hour post-load plasma glucose ≥ 11.1 mmol/L or Hba1c ≥ 48 mmol/mol Diagnostic criteria for gestational diabetes: fasting plasma glucose 5.1–6.9 mmol/L or",
+   "url": "https://iris.who.int/server/api/core/bitstreams/2cb3ab68-a52a-402e-ad47-8bc5a4edc834/content",
+   "source": "who",
+   "chunk_id": "who:pdf_classification-of-diabetes-mellitus#10"
+  },
+  {
+   "id": "TH:08",
+   "test": "Fasting plasma glucose",
+   "test_id": "T:fpg",
+   "aliases": [
+    "fpg",
+    "fasting glucose",
+    "fasting plasma glucose",
+    "glucose lúc đói",
+    "đường huyết lúc đói",
+    "glucose"
+   ],
+   "op": ">=",
+   "value": 7.0,
+   "unit": "mmol/L",
+   "meaning": "đái tháo đường",
+   "evidence": "c) Chẩn đoán xác định đái tháo đường: Tiêu chuẩn chẩn đoán bệnh đái tháo đường (WHO- 1999), dựa vào một trong 3 tiêu chí: - Mức glucose huyết tương lúc đói ≥ 7,0 mmol/l (≥ 126 mg/dl).",
+   "url": "https://kcb.vn/upload/2005611/20210723/8e4a6b72bc14089e7c9028042a34193f3280_Q-BYT.pdf",
+   "source": "bo_y_te",
+   "chunk_id": "bo_y_te:Hướng_dẫn_chẩn_đoán_và_điều_trị_đái_tháo#6"
+  },
+  {
+   "id": "TH:09",
+   "test": "OGTT 2 giờ",
+   "test_id": "T:ogtt",
+   "aliases": [
+    "ogtt",
+    "oral glucose tolerance test",
+    "nghiệm pháp dung nạp glucose",
+    "2h glucose"
+   ],
+   "op": ">=",
+   "value": 200,
+   "unit": "mg/dL",
+   "meaning": "đái tháo đường",
+   "evidence": "| Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:10",
+   "test": "OGTT 2 giờ",
+   "test_id": "T:ogtt",
+   "aliases": [
+    "ogtt",
+    "oral glucose tolerance test",
+    "nghiệm pháp dung nạp glucose",
+    "2h glucose"
+   ],
+   "op": "between",
+   "value": [
+    140,
+    199
+   ],
+   "unit": "mg/dL",
+   "meaning": "tiền đái tháo đường",
+   "evidence": "Diagnosis | A1C | Fasting Plasma Glucose | Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:11",
+   "test": "OGTT 2 giờ",
+   "test_id": "T:ogtt",
+   "aliases": [
+    "ogtt",
+    "oral glucose tolerance test",
+    "nghiệm pháp dung nạp glucose",
+    "2h glucose"
+   ],
+   "op": "<=",
+   "value": 139,
+   "unit": "mg/dL",
+   "meaning": "bình thường",
+   "evidence": "Diagnosis | A1C | Fasting Plasma Glucose | Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:12",
+   "test": "OGTT 2 giờ",
+   "test_id": "T:ogtt",
+   "aliases": [
+    "ogtt",
+    "oral glucose tolerance test",
+    "nghiệm pháp dung nạp glucose",
+    "2h glucose"
+   ],
+   "op": ">=",
+   "value": 11.1,
+   "unit": "mmol/L",
+   "meaning": "đái tháo đường",
+   "evidence": "nal diabetes mellitus Hyperglycaemia below diagnostic thresholds for diabetes in pregnancy Defined by 2013 diagnostic criteria Diagnostic criteria for diabetes: fasting plasma glucose ≥ 7.0 mmol/L or 2-hour post-load plasma glucose ≥ 11.1 mmol/L or Hba1c ≥ 48 mmol/mol Diagnostic criteria for gestational diabetes: fasting plasma glucose 5.1–6.9 mmol/L or 1-hour post-load plasma glucose ≥ 10.0 mmol/L or",
+   "url": "https://iris.who.int/server/api/core/bitstreams/2cb3ab68-a52a-402e-ad47-8bc5a4edc834/content",
+   "source": "who",
+   "chunk_id": "who:pdf_classification-of-diabetes-mellitus#10"
+  },
+  {
+   "id": "TH:13",
+   "test": "Random plasma glucose",
+   "test_id": "T:rpg",
+   "aliases": [
+    "rpg",
+    "random glucose",
+    "random plasma glucose",
+    "glucose bất kỳ"
+   ],
+   "op": ">=",
+   "value": 200,
+   "unit": "mg/dL",
+   "meaning": "đái tháo đường khi có triệu chứng tăng đường huyết",
+   "evidence": "| Oral Glucose Tolerance Test* | Random Plasma Glucose Test‡ Normal | below 5.7% | 99 mg/dL or below | 139 mg/dL or below | N/A Prediabetes | 5.7% to 6.4% | 100 to 125 mg/dL | 140 to 199 mg/dL | N/A Diabetes | 6.5% or above | 126 mg/dL or above | 200 mg/dL or above | 200 mg/dL or above",
+   "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+   "source": "niddk",
+   "chunk_id": "niddk:health-information_diabetes_overview_tests-diagnosis#15"
+  },
+  {
+   "id": "TH:14",
+   "test": "Random plasma glucose",
+   "test_id": "T:rpg",
+   "aliases": [
+    "rpg",
+    "random glucose",
+    "random plasma glucose",
+    "glucose bất kỳ"
+   ],
+   "op": ">=",
+   "value": 11.1,
+   "unit": "mmol/L",
+   "meaning": "đái tháo đường khi có triệu chứng tăng đường huyết",
+   "evidence": "People with fasting plasma glucose values of ≥ 7.0 mmol/L (126 mg/dl), 2-h post-load plasma glucose ≥ 11.1 mmol/L (200 mg/dl) (5), HbA1c ≥ 6.5% (48 mmol/mol); or a random blood glucose ≥ 11.1 mmol/L (200 mg/ dl) in the presence of signs and symptoms are considered to have diabetes (6).",
+   "url": "https://iris.who.int/server/api/core/bitstreams/2cb3ab68-a52a-402e-ad47-8bc5a4edc834/content",
+   "source": "who",
+   "chunk_id": "who:pdf_classification-of-diabetes-mellitus#14"
+  },
+  {
+   "id": "TH:15",
+   "test": "Blood pressure",
+   "test_id": "T:bp",
+   "aliases": [
+    "bp",
+    "blood pressure",
+    "huyết áp",
+    "high_bp",
+    "hypertension"
+   ],
+   "op": ">=",
+   "value": "140/90",
+   "unit": "mmHg",
+   "meaning": "tăng huyết áp",
+   "evidence": "Hypertension (high blood pressure) is when the pressure in your blood vessels is too high (140/90 mmHg or higher).",
+   "url": "https://www.who.int/news-room/fact-sheets/detail/hypertension",
+   "source": "who",
+   "chunk_id": "who:hypertension#1"
+  },
+  {
+   "id": "TH:16",
+   "test": "BMI",
+   "test_id": "T:bmi",
+   "aliases": [
+    "bmi",
+    "body mass index",
+    "chỉ số khối cơ thể"
+   ],
+   "op": ">=",
+   "value": 25,
+   "unit": "kg/m2",
+   "meaning": "thừa cân",
+   "evidence": "overweight is a BMI greater than or equal to 25; and obesity is a BMI greater than or equal to 30.",
+   "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+   "source": "who",
+   "chunk_id": "who:obesity-and-overweight#2"
+  },
+  {
+   "id": "TH:17",
+   "test": "BMI",
+   "test_id": "T:bmi",
+   "aliases": [
+    "bmi",
+    "body mass index",
+    "chỉ số khối cơ thể"
+   ],
+   "op": ">=",
+   "value": 30,
+   "unit": "kg/m2",
+   "meaning": "béo phì",
+   "evidence": "overweight is a BMI greater than or equal to 25; and obesity is a BMI greater than or equal to 30.",
+   "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+   "source": "who",
+   "chunk_id": "who:obesity-and-overweight#2"
+  },
+  {
+   "id": "TH:18",
+   "test": "BMI",
+   "test_id": "T:bmi",
+   "aliases": [
+    "bmi",
+    "body mass index",
+    "chỉ số khối cơ thể"
+   ],
+   "op": ">=",
+   "value": 23,
+   "unit": "kg/m2",
+   "meaning": "ngưỡng BMI người châu Á dùng để sàng lọc, theo quy trình lâm sàng tại Việt Nam",
+   "evidence": "Đánh giá toàn diện tình trạng bệnh Phát hiện sớm và chẩn đoán Đái tháo đường (ĐTĐ) típ 2 Tuổi ≥ 45 Có triệu chứng ĐTĐ BMI ≥ 23 kg/m2 hoặc cân nặng >120% cân nặng l{ tưởng và có thêm ≥ 1 yếu tốnguy cơ (YTNC) của ĐTĐ típ 2 (Phụlục 1) Xét nghiệm chẩn đoán ĐTĐ: Glucose huyết tương: lúc đói (FPG)",
+   "url": "https://files01.duytan.edu.vn/svruploads/kdieuduong-duytan/upload/2024/3/31/Quy trình lâm sàng chẩn đoán và điều trị Đái tháo đường típ 2.pdf",
+   "source": "bo_y_te",
+   "chunk_id": "bo_y_te:Quy_trình_lâm_sàng_chẩn_đoán_và_điều_trị#0"
+  },
+  {
+   "id": "TH:19",
+   "test": "Total cholesterol",
+   "test_id": "T:lipid",
+   "aliases": [
+    "total cholesterol",
+    "cholesterol",
+    "high_chol"
+   ],
+   "op": "<",
+   "value": 200,
+   "unit": "mg/dL",
+   "meaning": "mức mong muốn ở người lớn",
+   "evidence": "one age 19 or younger: Type of Cholesterol | Healthy Level Total Cholesterol | Less than 170 mg/dL Non-HDL | Less than 120 mg/dL LDL | Less than 110 mg/dL HDL | More than 45mg/dL Men age 20 or older: Total Cholesterol | Less than 200 mg/dL Non-HDL | Less than 130 mg/dL LDL | Less than 100 mg/dL HDL | Greater than or equal to 60 mg/dL is best.",
+   "url": "https://medlineplus.gov/cholesterollevelswhatyouneedtoknow.html",
+   "source": "medlineplus",
+   "chunk_id": "medlineplus:cholesterollevelswhatyouneedtoknow.html#3"
+  },
+  {
+   "id": "TH:20",
+   "test": "LDL cholesterol",
+   "test_id": "T:lipid",
+   "aliases": [
+    "ldl",
+    "ldl cholesterol"
+   ],
+   "op": "<",
+   "value": 100,
+   "unit": "mg/dL",
+   "meaning": "mức mong muốn",
+   "evidence": "The general ranges for healthy adults are: LDL (Bad) Cholesterol Level | LDL Cholesterol Category Less than 100 mg/dL | Optimal 100-129 mg/dL | Near optimal/above optimal 130-159 mg/dL | Borderline high 160-189 mg/dL | High 190 mg/dL and above | Very High If you have coronary artery dis",
+   "url": "https://medlineplus.gov/ldlthebadcholesterol.html",
+   "source": "medlineplus",
+   "chunk_id": "medlineplus:ldlthebadcholesterol.html#6"
+  },
+  {
+   "id": "TH:21",
+   "test": "Triglyceride",
+   "test_id": "T:lipid",
+   "aliases": [
+    "triglyceride",
+    "triglycerides"
+   ],
+   "op": ">=",
+   "value": 150,
+   "unit": "mg/dL",
+   "meaning": "tăng, có thể cần điều trị",
+   "evidence": "You might need treatment if you have triglyceride levels that are borderline high (150-199 mg/dL) or high (200 mg/dL or more).",
+   "url": "https://medlineplus.gov/cholesterollevelswhatyouneedtoknow.html",
+   "source": "medlineplus",
+   "chunk_id": "medlineplus:cholesterollevelswhatyouneedtoknow.html#4"
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[tieude] at (2.5,4.9) {Độ dày cạnh là $\alpha_{vu}$ (minh họa)};
+  \node[cau=cRed, minimum size=10mm] (v) at (2.5,2.3) {$h_v$};
+  \foreach \a/\w/\c [count=\k] in {90/4.5/cBlue, 160/2.4/cOrange, 220/1.2/cGreen, 300/0.8/cPurple, 20/2.0/cTeal}{
+    \node[cau=\c] (u\k) at ($(v)+(\a:2.0)$) {$h_{\k}$};
+    \draw[line width=\w pt, \c!80!black, -{Stealth[length=3mm]}] (u\k) -- (v);}
+  \node[khoi] (wv) at (6.7,4.4) {$W h_v$};
+  \node[khoi] (wu) at (8.7,4.4) {$W h_u$};
+  \node[khoiC, minimum width=3.8cm] (cat) at (7.7,3.1) {ghép $[\,Wh_v \,\|\, Wh_u\,]$};
+  \node[khoiP] (a) at (7.7,1.9) {$e_{vu}=\mathrm{LeakyReLU}\big(\mathbf a^{\top}[\cdot]\big)$};
+  \node[khoiR, text width=3.8cm] (sm) at (7.7,0.4) {$\alpha_{vu}=\dfrac{\exp e_{vu}}{\sum_{k\in\mathcal N(v)}\exp e_{vk}}$};
+  \draw[mui] (wv) -- (cat); \draw[mui] (wu) -- (cat); \draw[mui] (cat) -- (a); \draw[mui] (a) -- (sm);
+  \foreach \k/\c in {0/cBlue, 1/cOrange, 2/cGreen}
+    \node[hop=\c, minimum width=1.3cm, minimum height=0.65cm] (hd\k) at (11.0,3.0-\k*1.05) {đầu \the\numexpr\k+1\relax};
+  \foreach \k/\c in {0/cBlue, 1/cOrange, 2/cGreen} \draw[muiM=\c!80!black] (sm.east) -- (hd\k.west);
+  \node[khoiT, text width=2.7cm, anchor=west] (cc) at (12.5,1.95) {$\big\Vert_{k=1}^{K}\sigma\big(\sum_u \alpha^{k}_{vu}W^{k}h_u\big)$\\[2pt]{\footnotesize lớp ẩn ghép $K=8$ đầu}};
+  \foreach \k in {0,1,2} \draw[mui] (hd\k.east) -- (cc.west);
+\end{tikzpicture}

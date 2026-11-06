@@ -1,0 +1,135 @@
+{
+ "datasets": [
+  {
+   "id": "hetionet",
+   "name": "Hetionet v1.0, tiểu đồ thị đái tháo đường",
+   "source": "https://github.com/hetio/hetionet",
+   "url": "https://github.com/hetio/hetionet",
+   "task": "Đồ thị y sinh",
+   "n_samples": 6727,
+   "n_features": 10976,
+   "size_mb": 14.2,
+   "license": "CC0 1.0",
+   "note": "10976 nút, 38659 cạnh, 6727 chunk, 153 câu hỏi đánh giá.",
+   "sample_rows": [
+    {
+     "id": "het:Gene::801:GiG:0:3",
+     "title": "CALM1 (GiG)",
+     "text": "Gen CALM1 tương tác với gen: RIPK3, RIT2, RPL13A, RPL22, RPS14, RPS15A, RPS4Y1, RPS8, RPSA, RRAD, RYR1, RYR2, S100B, SCHIP1, SCLT1, SCN4A, S"
+    },
+    {
+     "id": "het:Gene::801:GiG:0:4",
+     "title": "CALM1 (GiG)",
+     "text": "Gen CALM1 tương tác với gen: UCHL5, USP6, VHL, VIPR1, XRCC4, YBX1, YWHAE, YWHAZ, ZBTB24."
+    },
+    {
+     "id": "het:Gene::356:GiG:0:0",
+     "title": "FASLG (GiG)",
+     "text": "Gen FASLG tương tác với gen: ARHGAP4, ARHGAP9, ARHGDIA, BAIAP2L1, BID, BTK, CACNB3, CACNB4, CASP10, CASP8, CRK, DAXX, DLG2, DMD, DNMBP, DOCK"
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "PARTICIPATES",
+     "INTERACTS",
+     "ASSOCIATES",
+     "CAUSES",
+     "EXPRESSES",
+     "BINDS",
+     "UPREGULATES",
+     "DOWNREGULATES"
+    ],
+    "values": [
+     12525,
+     11019,
+     3945,
+     3096,
+     2096,
+     2065,
+     913,
+     811
+    ]
+   }
+  },
+  {
+   "id": "vn30",
+   "name": "VN30: giá phiên, ngành, Wikipedia tiếng Việt",
+   "source": "https://finance.yahoo.com",
+   "url": "https://finance.yahoo.com, https://vi.wikipedia.org",
+   "task": "Đồ thị tài chính và kho văn bản",
+   "n_samples": 722,
+   "n_features": 157,
+   "size_mb": 5.6,
+   "license": "Yahoo: chỉ học thuật; Wikipedia: CC BY-SA 4.0",
+   "note": "157 nút, 398 cạnh, 722 chunk, 208 câu hỏi đánh giá.",
+   "sample_rows": [
+    {
+     "id": "profile:BVH",
+     "title": "Hồ sơ BVH",
+     "text": "BVH là mã của Tập đoàn Bảo Việt, thuộc rổ VN30, ngành Bảo hiểm. Cùng ngành: không có mã nào khác."
+    },
+    {
+     "id": "profile:CTG",
+     "title": "Hồ sơ CTG",
+     "text": "CTG là mã của VietinBank, thuộc rổ VN30, ngành Ngân hàng. Cùng ngành: ACB, BID, HDB, LPB, MBB, SHB, SSB, STB, TCB, TPB, VCB, VIB, VPB."
+    },
+    {
+     "id": "profile:FPT",
+     "title": "Hồ sơ FPT",
+     "text": "FPT là mã của Tập đoàn FPT, thuộc rổ VN30, ngành Công nghệ. Cùng ngành: không có mã nào khác."
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "CORRELATED",
+     "IN_YEAR",
+     "MEMBER_OF",
+     "IN_SECTOR"
+    ],
+    "values": [
+     232,
+     106,
+     30,
+     30
+    ]
+   }
+  },
+  {
+   "id": "hotpot",
+   "name": "HotpotQA, tập validation, 1.000 câu đầu",
+   "source": "https://huggingface.co/datasets/hotpotqa/hotpot_qa",
+   "url": "https://huggingface.co/datasets/hotpotqa/hotpot_qa",
+   "task": "Hỏi đáp đa bước trên văn bản",
+   "n_samples": 9769,
+   "n_features": 18672,
+   "size_mb": 18.0,
+   "license": "CC BY-SA 4.0",
+   "note": "18672 nút, 55817 cạnh, 9769 chunk, 1000 câu hỏi đánh giá.",
+   "sample_rows": [
+    {
+     "id": "hot:Tyler Bates",
+     "title": "Tyler Bates",
+     "text": "Tyler Bates. Tyler Bates (born June 5, 1965) is an American musician, music producer, and composer for films, television, and video games.  "
+    },
+    {
+     "id": "hot:Ed Wood",
+     "title": "Ed Wood",
+     "text": "Ed Wood. Edward Davis Wood Jr. (October 10, 1924 – December 10, 1978) was an American filmmaker, actor, writer, producer, and director."
+    },
+    {
+     "id": "hot:Deliver Us from Evil (2014 film)",
+     "title": "Deliver Us from Evil (2014 film)",
+     "text": "Deliver Us from Evil (2014 film). Deliver Us from Evil is a 2014 American supernatural horror film directed by Scott Derrickson and produced"
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "LINKS_TO"
+    ],
+    "values": [
+     55817
+    ]
+   }
+  }
+ ]
+}

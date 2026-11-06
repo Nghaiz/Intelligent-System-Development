@@ -1,0 +1,102 @@
+\chapter{Luật, học tăng cường và hệ đa tác tử}\label{chap:tactu}
+
+\section{Hệ luật an toàn}
+
+Hệ luật giữ các quyết định không được phép phụ thuộc vào xác suất. Luật nằm trong tệp dữ liệu \texttt{rules.json}, mỗi luật có mã, nhóm, mức độ, ưu tiên, điều kiện và nguồn trích. Bộ máy suy diễn tiến chạy theo ưu tiên giảm dần; luật cháy có thể thêm dữ kiện để luật khác cháy ở vòng sau. Ngưỡng chẩn đoán được đọc từ cơ sở tri thức, nên một con số có nguồn chỉ tồn tại ở một nơi.
+
+\input{generated/ch6_rules}
+
+Ví dụ luật \texttt{MED-01}: người dùng đang dùng metformin và eGFR dưới 30 thì phát cảnh báo khẩn cấp. Khi chỉ có creatinin, tuổi, giới, hệ thống tự tính eGFR theo CKD-EPI 2021 rồi mới so khớp.
+
+\maNguon{rules__evaluate}{Vòng suy diễn tiến của hệ luật}
+
+\section{Học tăng cường: sàng lọc thích ứng}
+
+\subsection{Mô hình hóa}
+
+Một bảng câu hỏi cố định hỏi mọi người cùng 21 câu, dù nhiều câu không giúp gì cho người đó. Đồ án coi đây là MDP trên chính dữ liệu thật \texttt{brfss}: mỗi tập là một hồ sơ thật, đáp án bị che và chỉ lộ ra khi tác tử hỏi.
+
+\begin{itemize}
+  \item \textbf{Trạng thái:} đáp án đã có, mặt nạ các câu đã hỏi, logit xác suất hiện tại.
+  \item \textbf{Hành động:} hỏi một đặc trưng chưa hỏi, hoặc dừng. Hành động không hợp lệ bị che.
+  \item \textbf{Thưởng:} $r_t=\Delta\,\text{log-score}-\lambda c_k$. Chi phí $c_k$ phản ánh công sức của người trả lời: câu biết ngay rẻ, câu phải nhớ kết quả khám đắt. Phần log-score được chia theo từng bước bằng biến đổi thế năng nên không làm đổi chính sách tối ưu. Đây là giả định thiết kế, đổi bảng chi phí thì phải huấn luyện lại.
+\end{itemize}
+
+Xác suất do một MLP chịu được thiếu đặc trưng cung cấp: mạng nhận giá trị nhân mặt nạ nối với chính mặt nạ, huấn luyện với mặt nạ ngẫu nhiên, nên dự đoán được từ bất kỳ tập câu trả lời nào.
+
+\maNguon{predictor__MaskedMLP}{Mô hình dự đoán chịu thiếu đặc trưng}
+
+\subsection{Huấn luyện Double DQN}
+
+Môi trường chạy song song hàng trăm hồ sơ trên GPU. Bộ nhớ phát lại nằm luôn trên GPU, mạng đích cập nhật mềm. Bước tính mục tiêu dưới đây là phần cốt lõi của Double DQN: mạng trực tuyến chọn hành động, mạng đích đánh giá.
+
+\maDai{dqn__train}{Huấn luyện Double DQN song song trên GPU}
+
+\subsection{Kết quả}
+
+Đồ án chấm trên \SL{rl_compare/n_test} hồ sơ test bằng nhãn thật, so với hỏi đủ 21 câu, thứ tự cố định theo độ quan trọng, ngẫu nhiên, tham lam theo thông tin và Q-learning bảng. Mỗi mức phạt $\lambda$ cho một điểm trên đường đánh đổi. Do giới hạn thời gian, $\lambda=0{,}002$ chạy 5 seed, các mức còn lại chạy 2 seed; Q-learning bảng chỉ chạy ba mức $\lambda$, thua DQN ở cả ba.
+
+\begin{table}[!htbp]\centering\caption{DQN dừng thích ứng theo $\lambda$ trên test, so với AUC của hai đối chứng tại cùng chi phí}\label{tab:rl}
+\small\setlength{\tabcolsep}{3.5pt}\input{generated/ch6_rl}\end{table}
+
+\hinhpdf{rl_cost_tradeoff}{0.86}{Đánh đổi giữa chi phí hỏi và AUC của các chính sách}{rltrade}
+
+Bảng~\ref{tab:rl} và Hình~\ref{fig:rltrade} cho ba kết luận. Thứ nhất, sàng lọc thích ứng tiết kiệm thật: với $\lambda=0{,}002$, tác tử chỉ hỏi trung bình khoảng 11 câu thay vì 21, AUC giảm chưa tới 0,004. Thứ hai, DQN \textbf{không} vượt được thứ tự cố định theo độ quan trọng: tại cùng chi phí, hai bên chênh nhau không quá 0,001 ở mọi mức $\lambda$. Lý do hợp lý nhất là 21 câu của BRFSS tương quan với nhau và thứ tự cố định đã tính từ chính dữ liệu, nên dư địa cá nhân hóa nhỏ. Thứ ba, DQN cao hơn tham lam thông tin trên chi phí ở mọi mức $\lambda$, khoảng cách rõ nhất ở ngân sách thấp: 0,8078 so với 0,7955 với khoảng 4,5 câu.
+
+Đóng góp thực tế của DQN vì vậy không phải là vượt thứ tự cố định, mà là tự quyết định khi nào dừng cho từng người: thứ tự cố định chỉ cho biết nên hỏi gì tiếp, không cho biết nên hỏi bao nhiêu câu. Mỗi bước cũng chỉ cần một lần suy luận, thay vì đánh giá lại mọi câu hỏi như chiến lược tham lam.
+
+Hình~\ref{fig:rlfreq} cho thấy chính sách thực sự thích ứng: sức khỏe chung, tuổi, BMI, huyết áp gần như luôn được hỏi, còn các câu khác chỉ hỏi với một phần người dùng.
+
+\hinhpdf{rl_question_frequency}{0.78}{Tỉ lệ người được hỏi từng câu dưới chính sách DQN}{rlfreq}
+
+\section{Hệ đa tác tử}
+
+\subsection{Vai trò và đồ thị trạng thái}
+
+DiaNexus có tám vai trò chia sẻ một bảng đen \texttt{Board}. Mỗi tác tử chỉ giữ vài công cụ, nên mô hình ngôn ngữ nhỏ không phải chọn giữa quá nhiều lựa chọn (Bảng~\ref{tab:vaitro}). Việc nào kiểm được bằng mã thì kiểm bằng mã, LLM Qwen2.5-7B~\cite{qwen} chỉ dùng cho phần cần sinh ngôn ngữ.
+
+\begin{table}[!htbp]\centering\caption{Tám vai trò của hệ đa tác tử}\label{tab:vaitro}
+\small\setlength{\tabcolsep}{4pt}\begin{tabular}{@{}lp{6.3cm}l@{}}\toprule
+\textbf{Tác tử} & \textbf{Nhiệm vụ} & \textbf{Công cụ}\\\midrule
+Supervisor & Xác định ý định, định tuyến & Luật, LLM\\
+Intake & Trích hồ sơ từ tiếng Việt, hỏi lại & RL \texttt{next\_question}\\
+Risk & Ước lượng nguy cơ, SHAP & \texttt{predict}\\
+Retina & Phân cấp ảnh đáy mắt & \texttt{grade}\\
+Knowledge & Truy xuất lai, tự mở rộng truy vấn & \texttt{search}, \texttt{subgraph}\\
+RuleGuard & Khẩn cấp, ngưỡng, an toàn thuốc & \texttt{evaluate}\\
+Advisor & Viết câu trả lời có trích dẫn & LLM\\
+Critic & Kiểm số, trích dẫn, liều thuốc & \texttt{check}\\\bottomrule
+\end{tabular}\end{table}
+
+Luồng điều khiển là dữ liệu: mỗi nút có danh sách cạnh điều kiện, cạnh đầu tiên thỏa mãn được chọn (Hình~\ref{fig:agraph}). Các cạnh đỏ quay lui là điểm phân biệt hệ này với một đường ống: Risk trả về Intake khi thiếu dữ liệu, Knowledge tự mở rộng truy vấn khi bằng chứng yếu, Critic trả bản nháp về Advisor hoặc đòi thêm bằng chứng. Mỗi nút có giới hạn số lượt nên vòng lặp luôn dừng.
+
+\hinhtikz{ch6_graph}{Đồ thị trạng thái của hệ đa tác tử, nét đỏ là cạnh quay lui}{agraph}
+
+\maNguon{graph__GRAPH}{Đồ thị điều phối khai báo dưới dạng dữ liệu}
+
+\subsection{Critic kiểm bằng mã}
+
+Critic không nhờ LLM tự chấm. Nó kiểm năm loại lỗi: nêu liều thuốc, khẳng định người dùng đã mắc bệnh, con số không có trong dữ liệu đầu vào, trích dẫn không tồn tại, câu thiếu trích dẫn. Câu trả lời trượt được trả về Advisor kèm danh sách lỗi cụ thể.
+
+\maNguon{textcheck__check}{Critic kiểm câu trả lời bằng mã}
+
+\subsection{Đánh giá bằng thí nghiệm cắt bỏ}
+
+Đồ án chạy \SL{agent_ablation/n_scenarios_complete} kịch bản thuộc tám nhóm qua năm cấu hình, tổng cộng 240 lượt có LLM thật (Bảng~\ref{tab:abl}, Hình~\ref{fig:abl}). Mỗi lượt được chấm bằng mã: định tuyến đúng, số có trong dữ liệu, trích dẫn hợp lệ và an toàn, tức không nêu liều, không bỏ sót ca khẩn cấp, không trả lời ngoài phạm vi.
+
+\begin{table}[!htbp]\centering\caption{Thí nghiệm cắt bỏ trên 48 kịch bản, mỗi cấu hình một hàng}\label{tab:abl}
+\small\input{generated/ch6_ablation}\end{table}
+
+\hinhpdf{agent_ablation}{0.92}{Tỉ lệ đạt theo từng tiêu chí của năm cấu hình}{abl}
+
+Kết quả rõ nhất nằm ở an toàn. Bỏ hệ luật làm hai ca khẩn cấp bị bỏ sót: trên \SL{agent_ablation/configs/full/by_group/khan_cap/n} kịch bản khẩn cấp, tỉ lệ an toàn giảm từ \SL{agent_ablation/configs/full/by_group/khan_cap/safe} xuống \SL{agent_ablation/configs/no_rules/by_group/khan_cap/safe}. Cũng ở cấu hình này, hai câu trả lời xếp sai nhóm xét nghiệm. Bỏ Critic làm hai câu trả lời nêu liều thuốc lọt ra ngoài, dù tiết kiệm được gần hai phần ba thời gian. Cấu hình một tác tử kém nhất, tỉ lệ trích dẫn hợp lệ chỉ \SL{agent_ablation/configs/single_agent/citations_ok}, cho thấy một lời gọi LLM với đủ công cụ không thay được việc chia vai trò.
+
+Bảng này cần đọc thận trọng ở ba điểm:
+
+\begin{itemize}
+  \item Điểm tuyệt đối của cấu hình đầy đủ phần lớn đến từ cách đo: Critic và bộ chấm dùng chung một bộ kiểm, và \SL{agent_ablation/configs/full/sanitized} trên 48 lượt phải cắt câu sau hai vòng viết lại.
+  \item Cấu hình chỉ vector gần như bằng cấu hình đầy đủ, chỉ kém nhẹ ở cột số đúng. Thước đo không đủ nhạy với chất lượng truy xuất, nên không thể kết luận đồ thị vô ích từ bảng này.
+  \item Bộ chấm chưa kiểm được đúng sai y khoa nói chung, chỉ kiểm được những gì có luật đối chiếu. Đây là khoảng trống lớn nhất của hệ thống.
+\end{itemize}
+
+Quá trình đánh giá phát hiện bốn lỗi thật. Câu “đột ngột méo miệng, yếu nửa người” từng bị coi là ngoài phạm vi, nên Supervisor được sửa để chạy luật khẩn cấp trước khi từ chối. Chỉ số bỏ sót khẩn cấp ban đầu không bao giờ báo đỏ, vì từ “bác sĩ” luôn có trong câu miễn trừ; câu miễn trừ nay được bỏ khi chấm. Nghiêm trọng nhất, LLM từng xếp HbA1c 6,6\% vào tiền đái tháo đường dù luật đã báo ở ngưỡng chẩn đoán, và Critic lẫn bộ chấm đều không thấy. Đồ án thêm phép kiểm \texttt{wrong\_range} đối chiếu câu trả lời với luật đã cháy, rồi chạy lại mọi kịch bản liên quan ở cả năm cấu hình. Khi thử trực tiếp còn lộ ra lỗi định tuyến: câu nêu số xét nghiệm nhưng không có từ xưng hô bị coi là hỏi kiến thức chung, nên luật không có dữ liệu để chạy; “đường huyết đói” thiếu chữ “lúc” cũng không được nhận là lúc đói. Cả hai đã được sửa, kèm kiểm thử. Bảng~\ref{tab:abl} là số sau tất cả các lần sửa. Bài học là điểm 1,000 trước đó đã không chứng minh được câu trả lời đúng, chỉ chứng minh nó qua được các phép kiểm lúc đó.

@@ -1,0 +1,111 @@
+{
+ "n": 4000,
+ "scale": "log-odds",
+ "mean_abs": [
+  {
+   "feature": "gen_hlth",
+   "label_vi": "Sức khỏe tự đánh giá",
+   "mean_abs_shap": 0.551916241645813
+  },
+  {
+   "feature": "high_bp",
+   "label_vi": "Huyết áp cao",
+   "mean_abs_shap": 0.45541107654571533
+  },
+  {
+   "feature": "bmi",
+   "label_vi": "Chỉ số khối cơ thể (BMI)",
+   "mean_abs_shap": 0.39332735538482666
+  },
+  {
+   "feature": "age",
+   "label_vi": "Tuổi",
+   "mean_abs_shap": 0.3863736093044281
+  },
+  {
+   "feature": "high_chol",
+   "label_vi": "Cholesterol cao",
+   "mean_abs_shap": 0.27137595415115356
+  },
+  {
+   "feature": "sex",
+   "label_vi": "Giới tính",
+   "mean_abs_shap": 0.12105067074298859
+  },
+  {
+   "feature": "income",
+   "label_vi": "Mức thu nhập",
+   "mean_abs_shap": 0.10347209125757217
+  },
+  {
+   "feature": "ment_hlth",
+   "label_vi": "Số ngày tinh thần kém",
+   "mean_abs_shap": 0.08614099025726318
+  },
+  {
+   "feature": "chol_check",
+   "label_vi": "Đã kiểm tra cholesterol trong 5 năm",
+   "mean_abs_shap": 0.07300940155982971
+  },
+  {
+   "feature": "hvy_alcohol_consump",
+   "label_vi": "Uống nhiều rượu bia",
+   "mean_abs_shap": 0.06834375113248825
+  },
+  {
+   "feature": "heart_disease_or_attack",
+   "label_vi": "Bệnh mạch vành hoặc nhồi máu cơ tim",
+   "mean_abs_shap": 0.06436941027641296
+  },
+  {
+   "feature": "diff_walk",
+   "label_vi": "Khó khăn khi đi lại",
+   "mean_abs_shap": 0.05165372043848038
+  },
+  {
+   "feature": "phys_hlth",
+   "label_vi": "Số ngày thể chất kém",
+   "mean_abs_shap": 0.03656204044818878
+  },
+  {
+   "feature": "education",
+   "label_vi": "Trình độ học vấn",
+   "mean_abs_shap": 0.027480531483888626
+  },
+  {
+   "feature": "stroke",
+   "label_vi": "Từng đột quỵ",
+   "mean_abs_shap": 0.021449251100420952
+  },
+  {
+   "feature": "smoker",
+   "label_vi": "Từng hút ≥ 100 điếu",
+   "mean_abs_shap": 0.01881432719528675
+  },
+  {
+   "feature": "fruits",
+   "label_vi": "Ăn trái cây mỗi ngày",
+   "mean_abs_shap": 0.010340908542275429
+  },
+  {
+   "feature": "phys_activity",
+   "label_vi": "Vận động thể lực",
+   "mean_abs_shap": 0.008811308071017265
+  },
+  {
+   "feature": "any_healthcare",
+   "label_vi": "Có bảo hiểm y tế",
+   "mean_abs_shap": 0.008089008741080761
+  },
+  {
+   "feature": "veggies",
+   "label_vi": "Ăn rau mỗi ngày",
+   "mean_abs_shap": 0.007776547223329544
+  },
+  {
+   "feature": "no_docbc_cost",
+   "label_vi": "Không đi khám vì chi phí",
+   "mean_abs_shap": 0.006525035947561264
+  }
+ ]
+}

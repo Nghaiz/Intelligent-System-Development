@@ -1,0 +1,42 @@
+% =====================================================================
+%  Chương 9: Sản phẩm Web App tổng hợp
+% =====================================================================
+\chapter{Sản phẩm Web App tổng hợp}\label{chap:web}
+
+Đồng Tâm AI Lab là ứng dụng web chạy ở \texttt{127.0.0.1:8090}, ghép kết quả của các chương vào một nơi. Trang không có số liệu viết tay: mọi bảng và biểu đồ đọc trực tiếp từ \texttt{outputs/metrics/*.json}, \texttt{outputs/runs.jsonl} và Neo4j, nên con số trên web và trong báo cáo cùng một nguồn. Thiếu dữ liệu thì trang báo thiếu, không điền số thay thế.
+
+\section{Kiến trúc}
+Máy chủ FastAPI cung cấp REST và luồng SSE, giao diện là các mô-đun JavaScript thuần, không cần bước build. Khởi động không nạp LLM, PyTorch hay TensorFlow; mỗi mô hình chỉ nạp ở yêu cầu đầu tiên của trang cần nó, nhờ vậy ứng dụng chạy được cả khi máy đang huấn luyện.
+
+\hinhtikz{ch9_arch}{Kiến trúc ba tầng của Đồng Tâm AI Lab.}{web-arch}
+
+Trang Trợ lý và Agent Arena nhận sự kiện theo thời gian thực. Bộ phát SSE chạy LLM ở luồng riêng, chuyển mọi lỗi thành sự kiện để người dùng đọc được nguyên văn, và từ chối lần chạy thứ hai khi GPU đang bận.
+
+\maNguon{stream__sse}{Bọc lần chạy LLM thành luồng SSE, đóng trang thì dừng generator.}
+
+\section{Các trang chức năng}
+\begin{itemize}
+  \item \textbf{Tổng quan:} vòng đồng tâm, mỗi vòng là một chương, độ dài cung theo số lượt chạy thật.
+  \item \textbf{Đồ thị tri thức:} đồ thị 3D lấy từ Neo4j, nhấp một nút để nạp hàng xóm, kèm bàn điều khiển Cypher chỉ đọc.
+  \item \textbf{Trợ lý GraphRAG:} dải đèn pipeline sáng theo từng sự kiện thật, hiện nguồn đã truy xuất và chọn được LLM.
+  \item \textbf{Agent Arena:} xem ba kiến trúc đa tác tử trao đổi trực tiếp, hoặc phát lại vết thông điệp đã ghi mà không cần nạp LLM.
+  \item \textbf{Model Lab:} biểu mẫu sinh tự động từ \texttt{SPECS} của từng chương, thêm mô hình mới không phải sửa trang.
+  \item \textbf{Data Atlas:} thẻ dataset với nguồn, kích cỡ, phân bố và mẫu dữ liệu.
+  \item \textbf{Experiment Tracker:} xếp hạng mô hình, biểu đồ đánh đổi chất lượng và thời gian, bảng lọc và sắp xếp được.
+  \item \textbf{Live Logs:} nhật ký huấn luyện phát qua SSE, kèm đồng hồ GPU, commit và trạng thái Neo4j.
+\end{itemize}
+Ngoài ra có bảng lệnh Ctrl+K tìm trang, dataset, mô hình; chế độ sáng tối lưu trong \texttt{localStorage}; và giao diện co theo màn hình điện thoại.
+
+\haiUI{home}{Tổng quan}{tracker}{Experiment Tracker}{Trang tổng quan và trang theo dõi thực nghiệm.}{web-home}
+\haiUI{graph}{Đồ thị tri thức}{chat}{Trợ lý GraphRAG}{Đồ thị Neo4j và trợ lý truy xuất.}{web-graph}
+\haiUI{arena}{Agent Arena}{lab}{Model Lab}{Đấu trường tác tử và phòng thử mô hình.}{web-arena}
+\haiUI{atlas}{Data Atlas}{logs}{Live Logs}{Bản đồ dữ liệu và nhật ký trực tiếp.}{web-atlas}
+
+\anhMobile{home_m}{Trang tổng quan trên khung điện thoại 390~px.}{web-mobile}
+
+\section{Kiểm thử}
+Các điểm cuối chính được gọi thử bằng yêu cầu thật, mỗi trang được mở bằng trình duyệt tự động ở khung desktop, trang tổng quan và theo dõi thực nghiệm được thử thêm ở khung điện thoại 390~px, đều kiểm tra lỗi console. Trợ lý và Agent Arena được chạy với LLM thật. Cypher qua web chỉ chấp nhận câu đọc, câu ghi bị từ chối trước khi tới Neo4j. Ứng dụng chỉ nghe ở địa chỉ cục bộ, LLM chạy trên máy nên câu hỏi không rời khỏi thiết bị.
+
+\begin{luuy}{Phạm vi sử dụng}
+Nội dung y tế và đầu tư trên trang chỉ mang tính học thuật, không phải lời khuyên chuyên môn.
+\end{luuy}

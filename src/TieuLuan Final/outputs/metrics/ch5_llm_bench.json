@@ -1,0 +1,67 @@
+{
+ "rows": [
+  {
+   "model": "qwen3-4b",
+   "q": "Thủ đô của Việt Nam là gì? Trả lời một câu.",
+   "a": "Okay, so the user is asking for the capital city of Vietnam. Let me think. I remember that Hanoi is the capital. Wait, but I should double-check to be sure. Sometimes people confuse it with other cities like Ho Chi Minh City, but no, Ho Chi Minh City is the largest city and a",
+   "s": 60.659225799999945,
+   "tok": 64
+  },
+  {
+   "model": "qwen3-4b",
+   "q": "Tom có 3 hộp, mỗi hộp 12 quả. Tom cho đi 7 quả. Còn bao nhiêu quả? Chỉ ghi số.",
+   "a": "Okay, let's see. Tom has 3 boxes, each with 12 apples. He gives away 7 apples. How many are left? Hmm, first I need to figure out the total number of apples he starts with.\n\nSo, 3 boxes times 12 apples per box. Let me calculate",
+   "s": 0.920567100000028,
+   "tok": 64
+  },
+  {
+   "model": "qwen3-4b",
+   "q": "Metformin được dùng để điều trị bệnh gì? Trả lời ngắn.",
+   "a": "Okay, so the user is asking what disease Metformin is used to treat. Let me think. I remember Metformin is a medication, but I need to be precise.\n\nFirst, Metformin is a common drug. I think it's used for type 2 diabetes. Wait, is that right?",
+   "s": 0.8717290999999818,
+   "tok": 64
+  },
+  {
+   "model": "gemma3-4b",
+   "q": "Thủ đô của Việt Nam là gì? Trả lời một câu.",
+   "a": "Hà Nội.",
+   "s": 33.03335780000003,
+   "tok": 5
+  },
+  {
+   "model": "gemma3-4b",
+   "q": "Tom có 3 hộp, mỗi hộp 12 quả. Tom cho đi 7 quả. Còn bao nhiêu quả? Chỉ ghi số.",
+   "a": "21",
+   "s": 0.10323319999997693,
+   "tok": 3
+  },
+  {
+   "model": "gemma3-4b",
+   "q": "Metformin được dùng để điều trị bệnh gì? Trả lời ngắn.",
+   "a": "Đường cao huyết áp và tiền đabetes.",
+   "s": 0.18683920000000853,
+   "tok": 11
+  },
+  {
+   "model": "qwen2.5-1.5b",
+   "q": "Thủ đô của Việt Nam là gì? Trả lời một câu.",
+   "a": "Thủ đô của Việt Nam là Hà Nội.",
+   "s": 24.328221699999972,
+   "tok": 11
+  },
+  {
+   "model": "qwen2.5-1.5b",
+   "q": "Tom có 3 hộp, mỗi hộp 12 quả. Tom cho đi 7 quả. Còn bao nhiêu quả? Chỉ ghi số.",
+   "a": "Tom còn 5 quả.",
+   "s": 0.07026949999999488,
+   "tok": 7
+  },
+  {
+   "model": "qwen2.5-1.5b",
+   "q": "Metformin được dùng để điều trị bệnh gì? Trả lời ngắn.",
+   "a": "Metformin được sử dụng để điều trị bệnh tiểu đường loại 2.",
+   "s": 0.13500049999998964,
+   "tok": 17
+  }
+ ]
+}

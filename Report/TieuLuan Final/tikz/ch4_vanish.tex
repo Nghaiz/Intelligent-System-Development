@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[tieude, text=cBlue] at (3.3,3.95) {Tiêu biến: $\gamma<1$};
+  \foreach \i/\hh in {0/3.0,1/2.0,2/1.35,3/0.9,4/0.6,5/0.4,6/0.26,7/0.17} {
+    \khoibaD{\i*0.86}{0}{0.58}{\hh}{0.5}{cSky}
+  }
+  \node[nhan] at (3.3,-0.42) {lùi từ $T$ về $T{-}7$};
+  \begin{scope}[shift={(8.6,0)}]
+    \node[tieude, text=cRed] at (3.3,3.95) {Bùng nổ: $\gamma>1$};
+    \foreach \i/\hh in {0/0.2,1/0.3,2/0.45,3/0.66,4/1.0,5/1.5,6/2.2,7/3.2} {
+      \khoibaD{\i*0.86}{0}{0.58}{\hh}{0.5}{cRed}
+    }
+    \node[nhan] at (3.3,-0.42) {lùi từ $T$ về $T{-}7$};
+  \end{scope}
+  \node[hop=cTeal, align=center, text width=7cm] at (3.3,-1.45) {LSTM, GRU: đường cộng tính giữ $\partial c_t/\partial c_{t-1}=f_t\approx 1$};
+  \node[hop=cOrange, align=center, text width=6.6cm] at (11.9,-1.45) {Cắt chuẩn: $g\leftarrow g\cdot\min(1,\theta/\|g\|)$};
+\end{tikzpicture}

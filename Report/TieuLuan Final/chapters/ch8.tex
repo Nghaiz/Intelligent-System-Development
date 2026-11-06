@@ -1,0 +1,94 @@
+% =====================================================================
+%  Chương 8 — Tác tử học tăng cường và tác tử dựa trên luật (Agent 02)
+% =====================================================================
+\chapter{Tác tử học tăng cường và tác tử dựa trên luật}\label{chap:rl}
+
+Chương này cô đọng bài tập Agent 02: hai cửa hàng cùng quyết định giữ giá hay giảm giá, một bên dùng Q-learning, một bên dùng
+luật viết tay. Môi trường là bộ mô phỏng theo đề bài~\cite{ch8:lab02}, mọi quan sát đều là \textbf{dữ liệu tổng hợp}. Số liệu dưới đây được chép
+nguyên từ lượt chạy của bài tập đó, không có thí nghiệm mới.
+
+\section{Mô hình hóa}
+
+Ở mỗi bước $t$, cửa hàng $i$ chọn đồng thời $a_i\in\{0,1\}$ (0: giữ giá, 1: giảm giá) sau khi quan sát $s_i=(d_t,c_i)$, với
+$d_t\in\{0,1\}$ là nhu cầu và $c_i=a_{-i}(t-1)$ là hành động trước của đối thủ. Số khách $N_t$ là 10 hoặc 20; số đơn bán được
+$S_i\sim\mathrm{Binomial}(N_t,p_i)$ với $p_i$ ở Hình~\ref{fig:ch8-loop}. Phần thưởng là lợi nhuận với $P=10$, $C=5$, $\delta=0{,}20$; mỗi episode có 20 bước.
+Hai tác tử không trao đổi thông điệp mà ảnh hưởng nhau qua thị trường chung.
+
+\hinhtikz{ch8_loop}{Một bước tương tác: hai tác tử chọn hành động đồng thời, thị trường tính xác suất chuyển đổi, doanh số và phần thưởng.}{ch8-loop}
+
+Tác tử luật giữ giá khi nhu cầu thấp; khi nhu cầu cao, nó chỉ giảm giá nếu đối thủ vừa giảm. Tác tử RL giữ bảng $Q$ tám ô và cập nhật
+theo Q-learning~\cite{ch8:watkins1992} với $\alpha=0{,}10$, $\gamma=0{,}90$, $\varepsilon_e=\max(0{,}02;\,0{,}20\cdot0{,}995^e)$:
+\begin{equation}\label{eq:ch8-q}
+  Q(s_t,a_t)\leftarrow Q(s_t,a_t)+\alpha\bigl[r_t+\gamma\max_{a'}Q(s_{t+1},a')-Q(s_t,a_t)\bigr].
+\end{equation}
+
+\maNguon{ch8_agents__QLearningAgent.learn}{Cập nhật Q-learning theo \eqref{eq:ch8-q}.}
+
+Vì mô hình nhỏ, lợi nhuận kỳ vọng tính được chính xác (Bảng~\ref{tab:ch8-reward}). Với $\delta=20\%$, giữ giá tốt hơn ở ba trên bốn ô, nên không bao giờ giảm giá là
+chính sách tối ưu với giá trị \SL{ch8_model/d20/optimal} mỗi bước, và tác tử luật vốn đã làm đúng như vậy. Với $\delta=5\%$, tối ưu chuyển thành luôn giảm giá
+(\SL{ch8_model/d05/optimal}).
+
+\bang{ch8_reward}{Lợi nhuận kỳ vọng một bước theo $(d,b)$; $b$ là hành động hiện tại của đối thủ.}{ch8-reward}
+
+\section{Thí nghiệm A--E}
+
+Sau huấn luyện 5.000 episode, bảng $Q$ đóng băng, $\varepsilon=0$, đánh giá \SL{ch8_a/steps} bước với seed riêng. Tác tử luật được đặt vào đúng ghế của RL trên cùng chuỗi ngẫu
+nhiên để so cặp. Ngoài thưởng lấy mẫu, mỗi chính sách còn có giá trị chính xác, tính bằng lan truyền phân phối trạng thái.
+
+\textbf{A, B.} Lượt tham chiếu đạt \SL{ch8_a/eval_mean} mỗi bước, tỉ lệ giảm giá \SL{ch8_a/eval_discPct}\%, trùng khít tác tử luật trên cùng chuỗi ngẫu nhiên; giá trị chính xác là \SL{ch8_a/exact}
+(Hình~\ref{fig:ch8-q}). Thưởng huấn luyện tăng từ \SL{ch8_b/first500} (500 episode đầu) lên \SL{ch8_b/last500} (500 episode cuối). Đường học rất nhiễu vì nhiễu Binomial lớn hơn mức cải thiện do học
+(Hình~\ref{fig:ch8-learning}, trái).
+
+\hinhtikz{ch8_qbar3d}{Bảng $Q$ của lượt tham chiếu: ở cả bốn trạng thái, cột giữ giá cao hơn cột giảm giá.}{ch8-q}
+
+\textbf{C, D.} Bảng~\ref{tab:ch8-sweeps} và Hình~\ref{fig:ch8-sweeps}: $\alpha=0{,}50$ cho thưởng thấp nhất và chính sách đổi \SL{ch8_c/0.50/switches} lần, vì mỗi mẫu nhiễu chiếm một nửa
+giá trị cũ; $\alpha=0{,}01$ ổn định nhất nhưng thưởng huấn luyện chỉ \SL{ch8_c/0.01/train_mean}. Không khám phá là cấu hình tệ nhất (\SL{ch8_d/khong/n_opt}/10 seed tối ưu), vì hành động đầu tiên có thưởng dương
+được giữ mãi; lịch thấp tốt nhất vì bảng chỉ có tám ô.
+
+\bang{ch8_sweeps}{Thí nghiệm C, D, E: 10 seed, đánh giá tham lam; ``Đổi CS'' là số lần chính sách đổi khi huấn luyện.}{ch8-sweeps}
+\hinhpdf{ch8_sweeps}{1}{Thưởng đánh giá theo $\alpha$ và theo lịch khám phá; chấm đen là từng seed, nét đỏ là mức tối ưu 35.}{ch8-sweeps}
+
+\textbf{E.} Trên 10 seed, RL đạt \SL{ch8_e/agg/eval_mean} $\pm$ \SL{ch8_e/agg/eval_sd}, luật đạt \SL{ch8_e/agg/rule_mean}; chênh lệch cặp \SL{ch8_e/agg/diff_mean}, khoảng tin cậy 95\%
+$[\SL{ch8_e/agg/ci_lo};\ \SL{ch8_e/agg/ci_hi}]$ chứa 0, nên chưa đủ bằng chứng nói bên nào hơn. \SL{ch8_e/agg/n_opt}/\SL{ch8_e/agg/n} seed đạt tối ưu; một seed học hỏng kéo trung bình xuống
+(Hình~\ref{fig:ch8-learning}, phải).
+
+\hinhpdf{ch8_learning}{1}{Trái: đường học lượt tham chiếu, trung bình trượt 100 episode. Phải: thưởng đánh giá trên mười seed.}{ch8-learning}
+
+\section{Trả lời mười câu hỏi}
+
+\begin{enumerate}
+  \item \textbf{Mô hình hóa.} Tác tử là hai cửa hàng, môi trường là thị trường, trạng thái $(d,c)$, hành động giữ hoặc giảm, thưởng là lợi nhuận. Đây là hệ đa tác tử vì thưởng phụ thuộc hành động đối thủ qua $p_i$ và qua $c_i$.
+  \item \textbf{Học và luật.} RL thích nghi được nhưng tốn khám phá và phụ thuộc seed; luật tất định, dễ đọc nhưng cứng. Ở tham chiếu luật đã tối ưu nên RL chỉ có thể hòa.
+  \item \textbf{Một bước cập nhật.} Với $Q=\SL{ch8_q3/q_old}$, $r=\SL{ch8_q3/r}$, $\max Q'=\SL{ch8_q3/max_next}$: mục tiêu $\SL{ch8_q3/r}+\SL{ch8_q3/gamma}\times\SL{ch8_q3/max_next}=\SL{ch8_q3/target}$, sai số TD \SL{ch8_q3/td}, giá trị mới \SL{ch8_q3/q_new}, khớp nhật ký chương trình.
+  \item \textbf{Khám phá.} Cần ít nhưng không thể bằng 0: $\varepsilon=0$ đạt \SL{ch8_d/khong/eval_mean}, lịch thấp \SL{ch8_d/thap/eval_mean}, lịch cao \SL{ch8_d/cao/eval_mean}.
+  \item \textbf{Phần thưởng.} Giảm giá mất 40\% biên lợi nhuận để đổi lấy 15 điểm phần trăm chuyển đổi. Huấn luyện theo doanh thu làm lợi nhuận tụt còn \SL{ch8_g/doanh_thu/eval_mean}: tác tử tối ưu đúng cái được thưởng.
+  \item \textbf{Đánh giá.} Phải đóng băng bảng $Q$, tắt khám phá, so cặp trên cùng chuỗi ngẫu nhiên và báo cáo qua nhiều seed.
+  \item \textbf{Tốc độ học.} $\alpha$ lớn bám mẫu gần nhất (đổi \SL{ch8_c/0.50/switches} lần), $\alpha$ nhỏ mượt nhưng chậm (\SL{ch8_c/0.01/switches} lần).
+  \item \textbf{Phi dừng.} Khi đối thủ cũng học, tỉ lệ giảm giá huấn luyện lên \SL{ch8_h/agg/train_discPct}\% (so với \SL{ch8_e/agg/train_discPct}\%), không seed nào cả hai về \texttt{0000}; môi trường đổi theo thời gian~\cite{ch8:busoniu2008}.
+  \item \textbf{Giới hạn.} Bốn trạng thái, không tồn kho, và quan sát thiếu hành động trước của chính tác tử, nên hậu quả ``giảm hôm nay, đối thủ giảm ngày mai'' bị ẩn. Mục~\ref{sec:ch8-env} đo tác động.
+  \item \textbf{Tác tử tốt hơn.} Tác tử dựa trên mô hình ở Mục~\ref{sec:ch8-better} đạt tối ưu ở cả năm kịch bản.
+\end{enumerate}
+
+\section{Thay đổi môi trường}\label{sec:ch8-env}
+
+Bảng~\ref{tab:ch8-env} và Hình~\ref{fig:ch8-delta} đổi mức giảm $\delta$, tính bền của nhu cầu và cách thưởng. Ở $\delta=5\%$ RL vượt luật, khoảng tin cậy $[\SL{ch8_f/005/ci_lo};\ \SL{ch8_f/005/ci_hi}]$. Ở
+$\delta=10\%$ RL lại thua rõ $[\SL{ch8_f/010/ci_lo};\ \SL{ch8_f/010/ci_hi}]$: nó giảm giá khi nhu cầu thấp vì lợi trước mắt mà không thấy phản ứng của đối thủ ở bước sau. ``RL hơn luật'' vì vậy không phải mệnh đề chung.
+
+\bang{ch8_env}{Các biến thể môi trường (10 seed; đánh giá luôn theo lợi nhuận).}{ch8-env}
+\hinhpdf{ch8_delta}{1}{Theo mức giảm $\delta$: thưởng của RL, của luật và mức tối ưu; tỉ lệ giảm giá của RL khi đánh giá.}{ch8-delta}
+
+\section{Tác tử cải tiến}\label{sec:ch8-better}
+
+Hai đề xuất nhắm vào lỗ hổng quan sát: Q-learning mở rộng thêm $a_i(t-1)$ vào trạng thái; tác tử dựa trên mô hình ước lượng phản ứng đối thủ, thưởng và nhu cầu từ kinh nghiệm rồi lập kế hoạch đúng 20 bước
+(Hình~\ref{fig:ch8-mb}). Tác tử này đạt tối ưu ở \SL{ch8_q10/giam_5/model/n_opt}/10 seed với $\delta=5\%$, trong khi Q-learning gốc chỉ đạt \SL{ch8_q10/giam_5/q/n_opt}/10 (Bảng~\ref{tab:ch8-q10}, Hình~\ref{fig:ch8-regret}). Đổi lại, nó phải biết
+cấu trúc trạng thái chung và giả định đối thủ dừng.
+
+\hinhtikz{ch8_mb}{Tác tử dựa trên mô hình: thu kinh nghiệm, cập nhật ba mô hình đếm tần suất, quy hoạch động ngược, chọn hành động.}{ch8-mb}
+
+\bang{ch8_q10}{Ba tác tử trong năm kịch bản.}{ch8-q10}
+\hinhpdf{ch8_regret}{1}{Regret mỗi bước của ba tác tử (trung bình mười seed; thấp hơn là tốt hơn).}{ch8-regret}
+
+\FloatBarrier
+\begin{luuy}{Phạm vi kết luận}
+Các kết quả chỉ có giá trị trong mô hình mô phỏng này, không phải kết luận kinh tế.
+\end{luuy}

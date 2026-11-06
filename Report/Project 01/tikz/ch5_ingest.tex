@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \y/\c/\t in {4.2/cOrange/{Wikipedia,\\MedlinePlus, WHO},2.45/cRed/{PDF hướng dẫn\\y khoa},0.7/cBlue/{PubMed, MeSH},-1.05/cPurple/{Hetionet}}{
+    \node[hop=\c, minimum width=30mm, minimum height=12mm] at (1.6,\y) {\t};
+  }
+  \node[hop=cTeal, minimum width=24mm, minimum height=12mm] (ch) at (6.0,3.3) {Làm sạch,\\chunk};
+  \node[hop=cIndigo, minimum width=24mm, minimum height=12mm] (ex) at (6.0,1.2) {LLM trích bộ ba\\có câu bằng chứng};
+  \node[hop=cGreen, minimum width=24mm, minimum height=12mm] (vl) at (6.0,-0.9) {Kiểm ontology,\\kiểm câu trích};
+  \draw[mui] (3.15,4.2) -- (ch.west); \draw[mui] (3.15,2.45) -- (ch.west); \draw[mui] (3.15,0.7) -- (ch.west);
+  \draw[mui] (ch) -- (ex); \draw[mui] (ex) -- (vl);
+  \draw[mui] (3.15,-1.05) -- (vl.west);
+  \node[csdl=cBlue, minimum width=25mm, minimum height=16mm] (ix) at (10.6,3.3) {BM25 + e5\\chỉ mục};
+  \khoibaD{9.1}{-1.8}{3.0}{2.3}{1.0}{cTeal}
+  \node[font=\normalsize\bfseries, text=white, align=center] at (10.6,-0.65) {Neo4j};
+  \draw[mui] (ch) -- (ix);
+  \draw[mui] (vl) -- (9.05,-0.9);
+  \node[hop=cNavy, minimum width=26mm, minimum height=26mm] (s) at (14.5,1.2) {Truy xuất\\lai\\\texttt{search()}};
+  \draw[mui] (ix.east) -- (s);
+  \draw[mui] (12.6,-0.5) -- (s);
+\end{tikzpicture}

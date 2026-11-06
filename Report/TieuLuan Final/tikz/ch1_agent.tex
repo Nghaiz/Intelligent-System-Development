@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[hop=cNavy, minimum width=2.6cm, minimum height=1.2cm] (goal) at (0,0) {Mục tiêu\\người dùng};
+  \khoibaD{2.55}{-0.85}{3.5}{1.7}{0.9}{cPurple}
+  \node[text=white, font=\small\bfseries, align=center] at (4.3,0) {LLM suy nghĩ,\\lập kế hoạch};
+  \node[csdl=cTeal, minimum width=2.6cm, minimum height=1.1cm] (mem) at (4.3,2.2) {Bộ nhớ, RAG};
+  \node[hop=cOrange, minimum width=4.0cm, minimum height=0.75cm] (t1) at (12.2,1.2) {Tìm kiếm, CSDL, đồ thị};
+  \node[hop=cGreen, minimum width=4.0cm, minimum height=0.75cm] (t2) at (12.2,0) {Chạy mã, gọi API};
+  \node[hop=cRed, minimum width=4.0cm, minimum height=0.75cm] (t3) at (12.2,-1.2) {Tác tử chuyên trách};
+  \begin{scope}[on background layer]
+    \node[vung=cSlate, fit=(t1)(t2)(t3), inner sep=6pt, label={[tieude]above:Công cụ (qua MCP)}] (tools) {};
+  \end{scope}
+  \draw[mui] (goal) -- (2.5,0);
+  \draw[muiM=cTeal, {Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}] (4.3,0.95) -- (mem.south);
+  \draw[muiM=cPurple] (6.6,0.45) -- node[nhan, above] {hành động} (tools.west |- 0,0.45);
+  \draw[muiM=cOrange] (tools.west |- 0,-0.45) -- node[nhan, below] {quan sát} (6.6,-0.45);
+\end{tikzpicture}

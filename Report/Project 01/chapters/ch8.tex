@@ -1,0 +1,43 @@
+\chapter{Kết luận và hướng phát triển}\label{chap:ketluan}
+
+\section{Kết quả đạt được}
+
+Đồ án đã hoàn thành DiaNexus, một hệ đa tác tử chạy cục bộ, phủ đủ các khối trong sơ đồ đề bài. CSDL SQLite gồm năm nguồn với 427.710 dòng, kèm 35.126 ảnh võng mạc. Sáu mô hình được so sánh trên ba bài toán, và XGBoost đạt ROC-AUC \SL{ml_summary/screening/served_test/roc_auc} ở bài sàng lọc không cần xét nghiệm. Đồ thị tri thức trên Neo4j có \SL{kg_stats/nodes} nút và \SL{kg_stats/relationships} cạnh, là nền cho truy xuất lai. Chính sách Double DQN giảm số câu hỏi sàng lọc gần một nửa với mức giảm AUC rất nhỏ. Tám vai trò phối hợp qua đồ thị trạng thái có cạnh quay lui, được bảo vệ bởi hệ luật và Critic kiểm bằng mã. Website localhost có mười trang, thể hiện vết chạy của tác tử theo thời gian thực.
+
+Về kiểm thử, 80 ca của \texttt{pytest} đều đạt, và thí nghiệm cắt bỏ 240 lượt cho thấy hệ luật và Critic giữ vai trò an toàn thật: bỏ chúng thì ca khẩn cấp bị bỏ sót hoặc liều thuốc lọt ra câu trả lời.
+
+\section{Những gì đồ án cho thấy}
+
+Bốn kết quả đáng chú ý nhất lại là những kết quả không như kỳ vọng ban đầu:
+
+\begin{itemize}
+  \item Mô hình sâu không thắng XGBoost trên dữ liệu bảng, dù tốn thời gian hơn nhiều.
+  \item DQN không vượt thứ tự câu hỏi cố định về AUC. Giá trị của nó nằm ở việc tự dừng và chi phí suy luận thấp.
+  \item Isotonic không cải thiện hiệu chỉnh ở hai trên ba bài toán, vì XGBoost vốn đã khá chuẩn.
+  \item RRF không vượt vector đơn; chỉ rerank mới cải thiện rõ truy xuất.
+\end{itemize}
+
+Các kết quả này được giữ nguyên trong báo cáo vì chúng cho biết nên đầu tư vào đâu ở bước sau.
+
+\section{Giới hạn}
+
+\begin{itemize}
+  \item Nhãn của bộ \texttt{patients\_lab} gần như sinh theo ngưỡng, nên ROC-AUC cao ở bài có xét nghiệm không phản ánh năng lực thực tế.
+  \item Mô hình võng mạc yếu ở cấp 1 và bộ ảnh không có mã bệnh nhân, nên kết quả có thể lạc quan.
+  \item Bảng chi phí câu hỏi của RL là giả định thiết kế. Các mức $\lambda$ ngoài $0{,}002$ chỉ có 2 seed.
+  \item Mô hình huấn luyện trên dữ liệu nước ngoài; thí nghiệm chéo miền cho thấy xác suất lệch mạnh khi đổi quần thể, và đồ án chưa có dữ liệu người Việt để hiệu chỉnh lại.
+  \item Phần lớn tri thức là tiếng Anh, câu hỏi tiếng Việt trên nguồn tiếng Anh truy xuất còn yếu. Hai tài liệu của Bộ Y tế trong kho là bản 2011 và 2017, chưa có hướng dẫn 5481/QĐ-BYT năm 2020.
+  \item Cạnh do LLM trích có precision chỉ khoảng một nửa, và mẫu chấm do tác tử AI chấm, chưa có chuyên gia kiểm.
+  \item Chưa có bước kiểm đúng sai y khoa trong câu trả lời của LLM, chỉ kiểm được hình thức, số và trích dẫn.
+  \item Máy cá nhân chỉ phục vụ được một yêu cầu nặng mỗi lúc, nên hệ thống là bản trình diễn cho một người dùng, chưa phải dịch vụ.
+\end{itemize}
+
+\section{Hướng phát triển}
+
+\begin{itemize}
+  \item Thu thập dữ liệu người Việt để hiệu chỉnh lại xác suất và kiểm chứng độ tin cậy.
+  \item Tăng độ phân giải ảnh võng mạc và chia tập theo bệnh nhân bằng bộ dữ liệu có mã định danh.
+  \item Mở rộng kho tri thức tiếng Việt và mở rộng trích xuất quan hệ bằng LLM ra toàn bộ kho văn bản.
+  \item Thử RL với mô hình giá trị thông tin có học, thay vì chỉ học từ phần thưởng log-score.
+  \item Đánh giá với bác sĩ và người dùng thật trước khi nghĩ đến bất kỳ ứng dụng lâm sàng nào.
+\end{itemize}

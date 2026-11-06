@@ -1,0 +1,166 @@
+{
+ "n": 4000,
+ "scale": "log-odds",
+ "mean_abs": [
+  {
+   "feature": "number_inpatient",
+   "label_vi": "number_inpatient",
+   "mean_abs_shap": 0.3029305338859558
+  },
+  {
+   "feature": "discharge_disposition_id",
+   "label_vi": "discharge_disposition_id",
+   "mean_abs_shap": 0.22131943702697754
+  },
+  {
+   "feature": "diag_1_group",
+   "label_vi": "diag_1_group",
+   "mean_abs_shap": 0.06950126588344574
+  },
+  {
+   "feature": "age_mid",
+   "label_vi": "age_mid",
+   "mean_abs_shap": 0.05949344485998154
+  },
+  {
+   "feature": "number_diagnoses",
+   "label_vi": "number_diagnoses",
+   "mean_abs_shap": 0.05563479661941528
+  },
+  {
+   "feature": "n_meds_active",
+   "label_vi": "n_meds_active",
+   "mean_abs_shap": 0.05133575573563576
+  },
+  {
+   "feature": "num_medications",
+   "label_vi": "num_medications",
+   "mean_abs_shap": 0.04945274442434311
+  },
+  {
+   "feature": "time_in_hospital",
+   "label_vi": "time_in_hospital",
+   "mean_abs_shap": 0.04790656641125679
+  },
+  {
+   "feature": "number_emergency",
+   "label_vi": "number_emergency",
+   "mean_abs_shap": 0.04427791386842728
+  },
+  {
+   "feature": "insulin",
+   "label_vi": "insulin",
+   "mean_abs_shap": 0.04253685474395752
+  },
+  {
+   "feature": "diag_2_group",
+   "label_vi": "diag_2_group",
+   "mean_abs_shap": 0.041267041116952896
+  },
+  {
+   "feature": "specialty",
+   "label_vi": "specialty",
+   "mean_abs_shap": 0.03884416073560715
+  },
+  {
+   "feature": "num_lab_procedures",
+   "label_vi": "num_lab_procedures",
+   "mean_abs_shap": 0.035920388996601105
+  },
+  {
+   "feature": "diag_3_group",
+   "label_vi": "diag_3_group",
+   "mean_abs_shap": 0.0355071946978569
+  },
+  {
+   "feature": "gender",
+   "label_vi": "gender",
+   "mean_abs_shap": 0.023854393512010574
+  },
+  {
+   "feature": "a1cresult",
+   "label_vi": "a1cresult",
+   "mean_abs_shap": 0.022631222382187843
+  },
+  {
+   "feature": "admission_type_id",
+   "label_vi": "admission_type_id",
+   "mean_abs_shap": 0.02178914099931717
+  },
+  {
+   "feature": "admission_source_id",
+   "label_vi": "admission_source_id",
+   "mean_abs_shap": 0.020692497491836548
+  },
+  {
+   "feature": "num_procedures",
+   "label_vi": "num_procedures",
+   "mean_abs_shap": 0.017971839755773544
+  },
+  {
+   "feature": "number_outpatient",
+   "label_vi": "number_outpatient",
+   "mean_abs_shap": 0.016044404357671738
+  },
+  {
+   "feature": "race",
+   "label_vi": "race",
+   "mean_abs_shap": 0.014301205053925514
+  },
+  {
+   "feature": "metformin",
+   "label_vi": "metformin",
+   "mean_abs_shap": 0.014005664736032486
+  },
+  {
+   "feature": "glipizide",
+   "label_vi": "glipizide",
+   "mean_abs_shap": 0.011138658970594406
+  },
+  {
+   "feature": "glyburide",
+   "label_vi": "glyburide",
+   "mean_abs_shap": 0.00971924513578415
+  },
+  {
+   "feature": "max_glu_serum",
+   "label_vi": "max_glu_serum",
+   "mean_abs_shap": 0.006618880201131105
+  },
+  {
+   "feature": "pioglitazone",
+   "label_vi": "pioglitazone",
+   "mean_abs_shap": 0.0056604184210300446
+  },
+  {
+   "feature": "diabetesmed",
+   "label_vi": "diabetesmed",
+   "mean_abs_shap": 0.005590248852968216
+  },
+  {
+   "feature": "change",
+   "label_vi": "change",
+   "mean_abs_shap": 0.004951841197907925
+  },
+  {
+   "feature": "n_meds_changed",
+   "label_vi": "n_meds_changed",
+   "mean_abs_shap": 0.004706094972789288
+  },
+  {
+   "feature": "glimepiride",
+   "label_vi": "glimepiride",
+   "mean_abs_shap": 0.004232275765389204
+  },
+  {
+   "feature": "rosiglitazone",
+   "label_vi": "rosiglitazone",
+   "mean_abs_shap": 0.0030370675958693027
+  },
+  {
+   "feature": "repaglinide",
+   "label_vi": "repaglinide",
+   "mean_abs_shap": 0.0006115688011050224
+  }
+ ]
+}

@@ -1,0 +1,322 @@
+{
+ "nodes": 108749,
+ "relationships": 902689,
+ "by_label": {
+  "Entity": 34406,
+  "Article": 22518,
+  "Chunk": 51161,
+  "Document": 568,
+  "Threshold": 22,
+  "Feature": 22,
+  "Rule": 44,
+  "Source": 8,
+  "Gene": 9277,
+  "Compound": 1302,
+  "Disease": 53,
+  "Symptom": 157,
+  "Anatomy": 180,
+  "SideEffect": 2346,
+  "PharmacologicClass": 66,
+  "Pathway": 1562,
+  "MolecularFunction": 1814,
+  "CellularComponent": 849,
+  "BiologicalProcess": 8245,
+  "MeshTerm": 8379,
+  "Test": 32,
+  "RiskFactor": 28,
+  "Complication": 87,
+  "Lifestyle": 29
+ },
+ "by_type": {
+  "INTERACTS": 37515,
+  "RESEMBLES": 929,
+  "DOWNREGULATES": 6751,
+  "PRESENTS": 394,
+  "LOCALIZES": 625,
+  "TREATS": 201,
+  "BINDS": 5900,
+  "UPREGULATES": 6106,
+  "ASSOCIATES": 2828,
+  "PALLIATES": 38,
+  "COVARIES": 264,
+  "REGULATES": 6513,
+  "EXPRESSES": 34161,
+  "CAUSES": 18234,
+  "INCLUDES": 142,
+  "PARTICIPATES": 139545,
+  "HAS_MESH": 208066,
+  "FROM_SOURCE": 23086,
+  "CO_OCCURS": 1430,
+  "PART_OF": 51161,
+  "SAME_AS": 696,
+  "MENTIONS": 357832,
+  "HAS_THRESHOLD": 22,
+  "EVIDENCED_BY": 22,
+  "MAPS_TO": 28,
+  "USES_FEATURE": 35,
+  "PREVENTS": 21,
+  "DIAGNOSED_BY": 20,
+  "MONITORED_BY": 16,
+  "AFFECTS": 16,
+  "RISK_FACTOR_FOR": 69,
+  "COMPLICATION_OF": 22,
+  "ASSOCIATED_WITH": 1
+ },
+ "chunks": 51164,
+ "ts": "2026-11-06T12:01:03",
+ "samples": {
+  "thuoc_dieu_tri_t2dm": {
+   "cypher": "MATCH (c:Compound)-[:TREATS]->(d:Disease {name:'type 2 diabetes mellitus'}) RETURN c.name AS thuoc ORDER BY thuoc LIMIT 10",
+   "rows": [
+    {
+     "thuoc": "Acarbose"
+    },
+    {
+     "thuoc": "Bromocriptine"
+    },
+    {
+     "thuoc": "Chlorpropamide"
+    },
+    {
+     "thuoc": "Gliclazide"
+    },
+    {
+     "thuoc": "Glimepiride"
+    },
+    {
+     "thuoc": "Glipizide"
+    },
+    {
+     "thuoc": "Glyburide"
+    },
+    {
+     "thuoc": "Irbesartan"
+    }
+   ],
+   "n": 10
+  },
+  "ty_le_gen_lien_quan": {
+   "cypher": "MATCH (d:Disease {name:'type 2 diabetes mellitus'})-[:ASSOCIATES]->(g:Gene) RETURN count(g) AS so_gen",
+   "rows": [
+    {
+     "so_gen": 275
+    }
+   ],
+   "n": 1
+  },
+  "nguong_hba1c_co_bang_chung": {
+   "cypher": "MATCH (t:Test {id:'T:hba1c'})-[:HAS_THRESHOLD]->(h)-[:EVIDENCED_BY]->(c:Chunk) RETURN h.op AS op, h.value AS value, h.unit AS unit, h.meaning AS y_nghia, c.source AS nguon LIMIT 6",
+   "rows": [
+    {
+     "op": ">=",
+     "value": 48,
+     "unit": "mmol/mol",
+     "y_nghia": "đái tháo đường",
+     "nguon": "who"
+    },
+    {
+     "op": ">=",
+     "value": 6.5,
+     "unit": "%",
+     "y_nghia": "đái tháo đường",
+     "nguon": "niddk"
+    },
+    {
+     "op": "between",
+     "value": [
+      5.7,
+      6.4
+     ],
+     "unit": "%",
+     "y_nghia": "tiền đái tháo đường",
+     "nguon": "niddk"
+    },
+    {
+     "op": "<",
+     "value": 5.7,
+     "unit": "%",
+     "y_nghia": "bình thường",
+     "nguon": "niddk"
+    }
+   ],
+   "n": 4
+  },
+  "dac_trung_den_nguong": {
+   "cypher": "MATCH (f:Feature {name:'hba1c'})-[:MAPS_TO]->(t)-[:HAS_THRESHOLD]->(h) RETURN f.name_vi AS dac_trung, t.name AS xet_nghiem, h.op AS op, h.value AS value, h.meaning AS y_nghia LIMIT 6",
+   "rows": [
+    {
+     "dac_trung": "HbA1c",
+     "xet_nghiem": "HbA1c",
+     "op": ">=",
+     "value": 48,
+     "y_nghia": "đái tháo đường"
+    },
+    {
+     "dac_trung": "HbA1c",
+     "xet_nghiem": "HbA1c",
+     "op": ">=",
+     "value": 6.5,
+     "y_nghia": "đái tháo đường"
+    },
+    {
+     "dac_trung": "HbA1c",
+     "xet_nghiem": "HbA1c",
+     "op": "between",
+     "value": [
+      5.7,
+      6.4
+     ],
+     "y_nghia": "tiền đái tháo đường"
+    },
+    {
+     "dac_trung": "HbA1c",
+     "xet_nghiem": "HbA1c",
+     "op": "<",
+     "value": 5.7,
+     "y_nghia": "bình thường"
+    }
+   ],
+   "n": 4
+  },
+  "mesh_dong_xuat_hien": {
+   "cypher": "MATCH (a:MeshTerm {name:'Diabetes Mellitus, Type 2'})-[r:CO_OCCURS]-(b) RETURN b.name AS mesh, r.articles AS bai ORDER BY bai DESC LIMIT 8",
+   "rows": [
+    {
+     "mesh": "Cardiovascular Diseases",
+     "bai": 804
+    },
+    {
+     "mesh": "Diabetes Mellitus, Type 1",
+     "bai": 755
+    },
+    {
+     "mesh": "Insulin Resistance",
+     "bai": 613
+    },
+    {
+     "mesh": "Sodium-Glucose Transporter 2 Inhibitors",
+     "bai": 555
+    },
+    {
+     "mesh": "Metformin",
+     "bai": 441
+    },
+    {
+     "mesh": "Prediabetic State",
+     "bai": 361
+    },
+    {
+     "mesh": "Diabetic Nephropathies",
+     "bai": 340
+    },
+    {
+     "mesh": "Diabetic Retinopathy",
+     "bai": 337
+    }
+   ],
+   "n": 8
+  },
+  "chunk_nhac_thuoc": {
+   "cypher": "MATCH (c:Chunk)-[:MENTIONS]->(e:Entity {name:'Metformin'}) RETURN c.source AS nguon, count(*) AS so_chunk ORDER BY so_chunk DESC LIMIT 6",
+   "rows": [
+    {
+     "nguon": "europepmc",
+     "so_chunk": 1293
+    },
+    {
+     "nguon": "wikipedia_vi",
+     "so_chunk": 29
+    },
+    {
+     "nguon": "niddk",
+     "so_chunk": 29
+    },
+    {
+     "nguon": "who",
+     "so_chunk": 11
+    },
+    {
+     "nguon": "bo_y_te",
+     "so_chunk": 9
+    },
+    {
+     "nguon": "medlineplus",
+     "so_chunk": 7
+    }
+   ],
+   "n": 6
+  },
+  "canh_llm_bang_chung": {
+   "cypher": "MATCH (a)-[r {origin:'llm'}]->(b) RETURN a.name AS chu_the, type(r) AS quan_he, b.name AS doi_tuong, left(r.evidence, 120) AS bang_chung LIMIT 5",
+   "rows": [
+    {
+     "chu_the": "Metformin",
+     "quan_he": "TREATS",
+     "doi_tuong": "type 2 diabetes mellitus",
+     "bang_chung": "IF goal not achieved INCREASE METFORMIN to 1000 mg 1 x daily IF SYMPTOMATIC and FPG ≥15 mmol/L"
+    },
+    {
+     "chu_the": "Sitagliptin",
+     "quan_he": "CAUSES",
+     "doi_tuong": "Nausea",
+     "bang_chung": "ngoại trừ chứng buồn nôn hiếm gặp, các triệu chứng giống cảm lạnh thông thường và nhạy cảm ánh sáng"
+    },
+    {
+     "chu_the": "Quercetin",
+     "quan_he": "TREATS",
+     "doi_tuong": "Diabetes Mellitus",
+     "bang_chung": "Various studies, especially in recent years, have shown that quercetin has beneficial therapeutic effects in various hum"
+    },
+    {
+     "chu_the": "Roflumilast",
+     "quan_he": "TREATS",
+     "doi_tuong": "Diabetic nephropathy",
+     "bang_chung": "Roflumilast manifested a potential role in diabetic nephropathy as a renoprotective agent."
+    },
+    {
+     "chu_the": "SGLT inhibitors",
+     "quan_he": "TREATS",
+     "doi_tuong": "type 1 diabetes mellitus",
+     "bang_chung": "Adjunctive therapies to insulin for treatment of type 1 diabetes mellitus (T1D) have gained popularity in efforts to ach"
+    }
+   ],
+   "n": 5
+  },
+  "duong_di_gen_thuoc": {
+   "cypher": "MATCH p=(:Compound {name:'Metformin'})-[:BINDS]->(:Gene)<-[:ASSOCIATES]-(:Disease {name:'type 2 diabetes mellitus'}) RETURN [n IN nodes(p) | n.name] AS duong_di LIMIT 5",
+   "rows": [
+    {
+     "duong_di": [
+      "Metformin",
+      "ND1",
+      "type 2 diabetes mellitus"
+     ]
+    }
+   ],
+   "n": 1
+  }
+ },
+ "hetionet": {
+  "seeds": [
+   "atherosclerosis",
+   "chronic kidney failure",
+   "coronary artery disease",
+   "gestational diabetes",
+   "gout",
+   "hypertension",
+   "hypothyroidism",
+   "metabolic syndrome X",
+   "obesity",
+   "type 1 diabetes mellitus",
+   "type 2 diabetes mellitus"
+  ],
+  "edges_full": 2250197,
+  "hop1_nodes": 2114,
+  "core_edges": 63305,
+  "kept_edges": 260000,
+  "kept_nodes": 25754,
+  "budget": 260000
+ },
+ "n_labels": 24,
+ "n_rel_types": 33
+}

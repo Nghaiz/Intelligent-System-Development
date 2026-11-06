@@ -1,0 +1,45 @@
+% =====================================================================
+%  Mở đầu (không đánh số chương)
+% =====================================================================
+\chapter*{Mở đầu}
+\addcontentsline{toc}{chapter}{Mở đầu}
+\markboth{Mở đầu}{Mở đầu}
+
+\section*{Bối cảnh}
+Một hệ thống thông minh ngày nay hiếm khi chỉ là một mô hình. Nó đọc dữ liệu bảng, ảnh và chuỗi thời gian, tra cứu tri thức có cấu trúc, gọi mô hình ngôn
+ngữ lớn (LLM) và phối hợp nhiều tác tử để hoàn thành một nhiệm vụ. Mỗi hình thái thông tin cần một họ kỹ thuật riêng, và chọn sai họ kỹ thuật thường tốn kém hơn
+chọn sai tham số. Lịch sử AI cho thấy điều đó: mỗi thế hệ phương pháp giải được điểm yếu của thế hệ trước rồi lộ ra điểm yếu của mình~\cite{ch1:nilsson2010}.
+
+Tiểu luận này đi qua toàn bộ chuỗi đó, từ học máy cơ bản, CNN, RNN đến đồ thị tri thức, RAG, hệ đa tác tử và mạng nơ-ron đồ thị. Mỗi chương gắn lý thuyết với dữ liệu
+thật, chạy trên máy cá nhân, đo bằng chỉ số rõ ràng và triển khai thành một phần của cùng một Web App.
+
+\section*{Mục tiêu}
+\begin{enumerate}
+  \item Trình bày có hệ thống lịch sử AI và cơ sở lý thuyết của từng họ kỹ thuật, với công thức và hình minh họa.
+  \item Với mỗi chương thực hành, chọn nhiều bộ dữ liệu từ nguồn gốc, mô tả nguồn, kích cỡ, mẫu thực, phân bố và tiền xử lý.
+  \item So sánh ba mô hình trên từng bộ dữ liệu, có đường cơ sở, bằng cùng phép chia và cùng chỉ số; phân tích lỗi.
+  \item Xây đồ thị tri thức thật trên Neo4j, RAG và tác tử chạy với LLM cục bộ, so sánh tác tử đơn với đa tác tử bằng số đo về độ đúng, token và độ trễ.
+  \item Đóng gói các mô hình đã huấn luyện vào một Web App chạy ở localhost.
+\end{enumerate}
+
+\section*{Phương pháp}
+Mọi thực nghiệm đi theo một quy trình: lấy dữ liệu từ nguồn gốc, khảo sát và tiền xử lý, huấn luyện trên tập huấn luyện, chọn mô hình trên tập kiểm định, chỉ dùng tập kiểm thử một
+lần. Hai nguyên tắc được giữ xuyên suốt. Thứ nhất, mọi con số trong báo cáo được đọc tự động từ tệp kết quả do mã sinh ra, và mã in trong báo cáo được trích nguyên văn từ mã đã chạy.
+Thứ hai, không gửi dữ liệu lên dịch vụ đám mây: LLM và cơ sở dữ liệu đồ thị đều chạy cục bộ. Dữ liệu tổng hợp được ghi rõ là tổng hợp; kết quả về y tế và đầu tư chỉ mang tính học thuật,
+không phải lời khuyên.
+
+Máy thực nghiệm dùng CPU Ryzen 9 7945HX 32 luồng, GPU RTX 4060 8~GB, RAM 40~GB, Windows 11. PyTorch và LLM chạy trên GPU, với LLM mặc định là Qwen2.5-7B qua Ollama; scikit-learn, XGBoost, NumPy, Keras và Neo4j chạy trên CPU.
+
+\section*{Bố cục báo cáo}
+Ngoài Mở đầu và Kết luận, báo cáo gồm tám chương chuyên môn và một chương sản phẩm:
+\begin{itemize}
+  \item \textbf{Chương 1. Lịch sử phát triển AI:} từ tiền đề trước 1956 đến tác tử giai đoạn 2025--2026.
+  \item \textbf{Chương 2. Các kỹ thuật học máy cơ bản:} phân loại và hồi quy trên dữ liệu y tế, nhà đất và văn bản tiếng Việt.
+  \item \textbf{Chương 3. Mạng nơ-ron tích chập:} SVHN, ảnh vệ tinh EuroSAT, mô bệnh học PathMNIST; Grad-CAM.
+  \item \textbf{Chương 4. Mạng nơ-ron hồi quy:} cổ phiếu VN30, thời tiết Hà Nội, điện năng hộ gia đình.
+  \item \textbf{Chương 5. Knowledge Graph, Neo4j, RAG và Agent:} đồ thị thật, ba cách truy xuất, ba LLM cục bộ, tác tử ReAct.
+  \item \textbf{Chương 6. Hệ đa tác tử:} so sánh tác tử đơn, Supervisor và Debate.
+  \item \textbf{Chương 7. Deep Graph và GNN:} GCN, GraphSAGE, GAT và dự đoán liên kết.
+  \item \textbf{Chương 8. Tác tử học tăng cường và tác tử luật:} Q-learning trong thị trường giảm giá hai cửa hàng.
+  \item \textbf{Chương 9. Sản phẩm Web App:} ghép các mô hình thành một ứng dụng.
+\end{itemize}

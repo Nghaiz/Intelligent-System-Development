@@ -1,0 +1,158 @@
+\chapter{Mạng nơ-ron tích chập}
+\label{chap:cnn}
+
+Ảnh có cấu trúc không gian: điểm ảnh gần nhau liên quan mạnh, và một nét chữ vẫn là nét chữ dù nằm ở góc nào. Mạng kết nối đầy đủ bỏ qua cấu trúc đó, còn mạng nơ-ron tích chập (CNN) xây nó thành kiến trúc \cite{ch3-lecun1998}. Chương này đi từ phép tích chập tới các kiến trúc hiện đại, đánh giá chúng trên ba miền ảnh khác nhau: chữ số đường phố, ảnh vệ tinh và mô bệnh học.
+
+\section{Cơ sở lý thuyết}
+
+\subsection{Phép tích chập}
+Với ảnh vào $\mathbf{I}$ và kernel $\mathbf{K}$ cỡ $k{\times}k$, đặc trưng tại vị trí $(i,j)$ là tổng có trọng số trên một cửa sổ nhỏ:
+\begin{equation}
+  Z_{ij}=\sum_{u=0}^{k-1}\sum_{v=0}^{k-1}K_{uv}\,I_{i+u,\,j+v}+b .
+\end{equation}
+Thư viện học sâu gọi phép này là tích chập dù về toán học đây là tương quan chéo, vì kernel không bị lật. Hai ý tưởng làm nên hiệu quả của nó: \emph{kết nối cục bộ} (mỗi nơ-ron chỉ nhìn một cửa sổ) và \emph{chia sẻ trọng số} (cùng kernel trượt khắp ảnh). Tầng $N$ kernel $k{\times}k$ trên đầu vào $M$ kênh chỉ có $(k^2M+1)N$ tham số, không phụ thuộc cỡ ảnh, và đầu ra dịch theo đầu vào. Với đầu vào $D$ điểm, padding $p$, bước $s$, cỡ đầu ra là $\lfloor(D+2p-k)/s\rfloor+1$. Hình~\ref{fig:ch3-conv} tính một ví dụ bằng số.
+
+\hinhtikz{ch3_conv_calc}{Ví dụ tính tích chập không padding: kernel Sobel phản hồi mạnh ở nơi cường độ đổi theo chiều ngang}{ch3-conv}
+
+\subsection{Pooling và vùng cảm nhận}
+Max pooling $2{\times}2$ bước 2 giữ giá trị lớn nhất mỗi ô, giảm cỡ bản đồ một nửa theo mỗi chiều, không có tham số và chịu được dịch chuyển nhỏ. Global Average Pooling (GAP) lấy trung bình cả một kênh, thay cho Flatten để số tham số không còn phụ thuộc cỡ ảnh.
+
+\emph{Vùng cảm nhận} là phần ảnh vào ảnh hưởng tới một điểm của tầng đang xét. Với kernel $k_\ell$, bước $s_\ell$, vùng này tăng theo công thức ở Hình~\ref{fig:ch3-rf}: mỗi lần giảm mẫu nhân đôi bước nhảy $j$, nên tầng sau mở rộng vùng nhìn nhanh hơn. Vùng cảm nhận vượt cỡ ảnh $32{\times}32$ nghĩa là tầng cuối đã thấy toàn bộ ảnh, dù trọng số thực tế tập trung ở giữa vùng.
+
+\hinhtikz{ch3_receptive}{Vùng cảm nhận lớn dần theo độ sâu; ba con số tính từ đúng dãy tầng của các mô hình trong chương}{ch3-rf}
+
+\subsection{Chuẩn hóa theo lô}
+Batch Normalization \cite{ch3-ioffe2015} chuẩn hóa mỗi kênh theo lô rồi cho mạng học lại thang đo: $\hat{x}=\gamma\,(x-\mu_B)/\sigma_B+\beta$. Lúc huấn luyện dùng thống kê của lô, lúc suy luận dùng trung bình trượt đã lưu. Nhờ đó bề mặt mất mát mượt hơn, cho phép tốc độ học lớn, và mạng sâu hội tụ ổn định.
+
+\subsection{Kết nối tắt}
+Chồng thêm tầng lên một mạng thẳng có thể làm giảm cả độ đúng trên tập huấn luyện, dù về lý thuyết các tầng thêm có thể học ánh xạ đồng nhất. ResNet \cite{ch3-he2016} đổi mục tiêu của khối: học phần dư $F(\mathbf{x})$ thay vì toàn bộ ánh xạ, $\mathbf{y}=F(\mathbf{x})+\mathbf{x}$. Khi đó $\partial\mathbf{y}/\partial\mathbf{x}=\partial F/\partial\mathbf{x}+\mathbf{I}$, số hạng đồng nhất giữ cho gradient không tắt dần qua nhiều tầng. Khi đổi kích thước hay số kênh, lối tắt dùng Conv $1{\times}1$.
+
+\subsection{Tích chập tách biệt chiều sâu}
+MobileNet \cite{ch3-howard2017} tách tích chập chuẩn thành hai bước: depthwise lọc riêng từng kênh, pointwise $1{\times}1$ trộn các kênh (Hình~\ref{fig:ch3-depth}). Chẳng hạn $k=3$, $M=64$, $N=128$ cần $73.728$ tham số với tích chập chuẩn, còn tách ra chỉ cần $3^2\cdot64+64\cdot128=8.768$, ít hơn khoảng 8,4 lần. MobileNetV2 \cite{ch3-sandler2018} thêm khối \emph{inverted residual}: mở rộng kênh trước khi lọc depthwise, rồi chiếu tuyến tính về ít kênh, vì ReLU trên không gian hẹp làm mất thông tin.
+
+\hinhtikz{ch3_depthwise_3d}{Tích chập chuẩn và tích chập tách biệt chiều sâu, cùng kích thước đầu vào và đầu ra}{ch3-depth}
+
+\subsection{Các kiến trúc thực nghiệm}
+Hình~\ref{fig:ch3-blocks} so ba khối dựng. \textbf{CNN cơ bản} có ba cụm hai lớp Conv kiểu VGG rồi GAP, là mô hình cơ sở với khoảng ba trăm nghìn tham số. \textbf{VGG-11} xếp tám lớp Conv có BN, thay ba lớp FC lớn của bản gốc bằng GAP. \textbf{ResNet-18} dùng stem bước 1 cho ảnh nhỏ và bốn tầng hai khối dư (Hình~\ref{fig:ch3-3d}). \textbf{MobileNetV2} giữ hệ số mở rộng 6, đổi bước của hai nhóm đầu thành 1. Tất cả đều dùng GAP nên số tham số không đổi theo cỡ ảnh.
+
+\hinhtikz{ch3_blocks}{Khối dựng của CNN cơ bản, ResNet-18 và MobileNetV2}{ch3-blocks}
+\hinhtikz{ch3_feature_3d}{ResNet-18 trên ảnh SVHN: mỗi lát là một kênh đặc trưng, kích thước ghi đúng theo mô hình}{ch3-3d}
+
+\subsection{Giải thích dự đoán bằng Grad-CAM}
+Grad-CAM \cite{ch3-selvaraju2017} cho biết vùng nào của ảnh khiến mạng chọn lớp $c$: lấy gradient của điểm lớp theo bản đồ đặc trưng tầng tích chập cuối, trung bình theo không gian được trọng số $\alpha_k^c$ của từng kênh, rồi cộng có trọng số các bản đồ (Hình~\ref{fig:ch3-cam}). Độ phân giải bản đồ nhiệt bằng độ phân giải tầng cuối, nên mạng giảm mẫu nhiều sẽ cho bản đồ thô.
+
+\hinhtikz{ch3_gradcam}{Luồng tính Grad-CAM; ô bản đồ nhiệt ở đây chỉ để minh họa}{ch3-cam}
+
+\section{Dữ liệu}
+Ba bộ dữ liệu đến từ ba miền khác nhau, được giữ đủ số ảnh và đúng cách chia (Bảng~\ref{tab:ch3-overview}). SVHN và EuroSAT dùng lại tệp đã chuẩn bị ở Tiểu luận 01 để khớp từng ảnh với dự đoán đã lưu, PathMNIST tải mới từ Zenodo. Mọi đường dẫn đều đã kiểm tra truy cập được ngày 05/11/2026.
+
+\bang{ch3_overview}{Tổng quan ba bộ dữ liệu ảnh}{ch3-overview}
+
+\subsection{SVHN}
+\textbf{Nguồn.} Street View House Numbers \cite{ch3-netzer2011}, ảnh cắt từ biển số nhà trên Google Street View, bản cropped digits. Trang gốc của Stanford không truy cập được từ máy thực nghiệm; bản công khai: \url{https://huggingface.co/datasets/ufldl-stanford/svhn}. Giấy phép: \SL{ch3_datasets/datasets/0/license}.
+
+\textbf{Kích cỡ.} \SL{ch3_datasets/datasets/0/n_samples} ảnh màu $32{\times}32$, chia sẵn \SL{ch3_datasets/datasets/0/splits/train} ảnh train và \SL{ch3_datasets/datasets/0/splits/test} ảnh test; tệp gốc \SL{ch3_datasets/datasets/0/size_mb} MB.
+
+\hinhpdf{ch3_svhn_grid}{1.0}{Ảnh thật của SVHN, mỗi cột một chữ số. Nhiều ảnh lẫn chữ số bên cạnh ở hai mép}{ch3-svhn-grid}
+\haihinh{ch3_svhn_dist.pdf}{Phân bố lớp}{ch3_svhn_hist.pdf}{Histogram kênh màu}{Phân bố lớp và cường độ điểm ảnh của SVHN}{ch3-svhn-dist}
+
+\nhanxet{Lớp \SL{ch3_datasets/datasets/0/largest} chiếm \SL{ch3_datasets/datasets/0/largest_pctPct}\%, gấp \SL{ch3_datasets/datasets/0/imbalance} lần lớp \SL{ch3_datasets/datasets/0/smallest}: đúng quy luật số tự nhiên có chữ số đầu nhỏ thường gặp hơn, nên F1 macro đáng tin hơn độ đúng. Ba kênh gần trùng nhau, màu gần như không mang thông tin về nhãn; khó khăn nằm ở ánh sáng, độ mờ và chữ số nhiễu ở biên.}
+
+\textbf{Tiền xử lý.} Chia 255, chuẩn hóa theo trung bình và độ lệch chuẩn từng kênh tính trên tập train; dịch ngẫu nhiên $\pm4$ điểm ảnh. Không lật hay xoay vì 6 và 9, 2 và 5 sẽ đổi nghĩa.
+
+\subsection{EuroSAT RGB}
+\textbf{Nguồn.} Ảnh vệ tinh Sentinel-2 phủ châu Âu \cite{ch3-helber2019}, ba băng màu thấy được: \url{https://zenodo.org/records/7711810}. Giấy phép \SL{ch3_datasets/datasets/1/license}.
+
+\textbf{Kích cỡ.} \SL{ch3_datasets/datasets/1/n_samples} ảnh $64{\times}64$ (độ phân giải mặt đất 10 m), 10 lớp phủ; chia phân tầng \SL{ch3_datasets/datasets/1/splits/train} ảnh train và \SL{ch3_datasets/datasets/1/splits/test} ảnh test; tệp gốc \SL{ch3_datasets/datasets/1/size_mb} MB.
+
+\hinhpdf{ch3_eurosat_grid}{1.0}{Ảnh thật của EuroSAT: lớp phân biệt nhau bằng kết cấu nhiều hơn hình dạng}{ch3-euro-grid}
+\haihinh{ch3_eurosat_dist.pdf}{Phân bố lớp}{ch3_eurosat_hist.pdf}{Histogram kênh màu}{Phân bố lớp và cường độ điểm ảnh của EuroSAT}{ch3-euro-dist}
+
+\nhanxet{Dữ liệu khá cân bằng, lệch \SL{ch3_datasets/datasets/1/imbalance} lần. Kênh đỏ trải rộng hơn hẳn hai kênh còn lại vì đất trống và mái nhà đỏ, còn rừng và nước tập trung ở vùng tối. Một số lớp gần nhau về thị giác (cây hằng năm, cây lâu năm, đồng cỏ) là nguồn lỗi dự kiến.}
+
+\textbf{Tiền xử lý.} Chuẩn hóa theo kênh; dịch $\pm4$ điểm, lật hai chiều và chuyển vị, vì ảnh chụp từ trên xuống không có chiều lên trên.
+
+\subsection{PathMNIST}
+\textbf{Nguồn.} Tiêu bản mô đại trực tràng nhuộm H\&E \cite{ch3-kather2019}, chuẩn hóa thành $28{\times}28$ trong MedMNIST v2 \cite{ch3-yang2023}: \url{https://zenodo.org/records/10519652}. Giấy phép \SL{ch3_datasets/datasets/2/license}. Kết quả chỉ mang tính học thuật, không dùng cho chẩn đoán.
+
+\textbf{Kích cỡ.} \SL{ch3_datasets/datasets/2/n_samples} ảnh màu, 9 lớp mô, giữ đúng cách chia của MedMNIST: \SL{ch3_datasets/datasets/2/splits/train} train, \SL{ch3_datasets/datasets/2/splits/val} val, \SL{ch3_datasets/datasets/2/splits/test} test; tệp gốc \SL{ch3_datasets/datasets/2/size_mb} MB.
+
+\hinhpdf{ch3_pathmnist_grid}{1.0}{Ảnh thật của PathMNIST: chín lớp mô cùng tông hồng tím của thuốc nhuộm}{ch3-path-grid}
+\haihinh{ch3_pathmnist_dist.pdf}{Phân bố lớp}{ch3_pathmnist_hist.pdf}{Histogram kênh màu}{Phân bố lớp và cường độ điểm ảnh của PathMNIST}{ch3-path-dist}
+
+\nhanxet{Cả bộ lệch \SL{ch3_datasets/datasets/2/imbalance} lần giữa lớp đông nhất và ít nhất. Điểm cần chú ý: tập test đến từ trung tâm khác tập train \cite{ch3-kather2019}, nên khác biệt thuốc nhuộm và quy trình tạo ra độ lệch miền mà tập val không phản ánh. Đỉnh ở vùng rất sáng của histogram là phần kính không có mô.}
+
+\textbf{Tiền xử lý.} Đệm phản chiếu 2 điểm mỗi cạnh thành $32{\times}32$ vì VGG-11 có năm lần pool, sau đó chuẩn hóa theo kênh; dịch $\pm4$ điểm, lật và chuyển vị vì tiêu bản không có hướng cố định.
+
+\section{Hiện thực trên ba nền tảng}
+Đoạn mã~\ref{code:ch3_scratch__im2col} là lõi của bản NumPy: thay bốn vòng lặp lồng nhau bằng việc cắt lát $k^2$ lần, biến tích chập thành một phép nhân ma trận. Đạo hàm viết tay của mạng thử nhỏ được đối chiếu với sai phân trung tâm, sai số tương đối lớn nhất \SL{ch3_summary/grad_check_max}. Keras chạy CPU vì TensorFlow trên Windows không còn hỗ trợ GPU, kết quả của bản này lấy từ Tiểu luận 01.
+
+\maNguon{ch3_scratch__im2col}{Duỗi các cửa sổ trượt thành ma trận trong bản NumPy}
+
+Khối inverted residual của MobileNetV2 và Grad-CAM viết bằng PyTorch:
+
+\maNguon{ch3_models__InvertedResidual}{Khối inverted residual: mở rộng, depthwise, chiếu tuyến tính}
+\maNguon{ch3_torch__GradCAM}{Grad-CAM trên tầng tích chập cuối của mọi kiến trúc}
+
+\section{Đánh giá và so sánh}
+
+\subsection{Thiết lập}
+Bốn kiến trúc học cùng một công thức trên PyTorch GPU: SGD Nesterov momentum 0,9, lịch OneCycle đỉnh 0,1, weight decay $5\cdot10^{-4}$, lô 256, độ chính xác hỗn hợp bfloat16. Kết quả SVHN (15 epoch) và EuroSAT (30 epoch) lấy lại từ Tiểu luận 01, gồm trọng số, dự đoán và lịch sử; mọi chỉ số được tính lại từ tệp dự đoán và khớp số gốc. PathMNIST huấn luyện mới với đủ \SL{ch3_datasets/datasets/2/splits/train} ảnh train trong \SL{ch3_summary/pathmnist/custom/epochs} epoch, số epoch ít hơn vì GPU dùng chung với các việc khác. Cả ba bộ dùng trọng số epoch cuối, không chọn mô hình theo val hay test. Hai mốc so sánh là đoán lớp đông nhất và hồi quy softmax trên ảnh thu nhỏ.
+
+\bang{ch3_compare}{Kết quả trên tập test của ba bộ dữ liệu}{ch3-compare}
+\hinhpdf{ch3_compare}{1.0}{F1 macro trên test: khoảng cách lớn nhất nằm giữa mô hình tuyến tính và CNN}{ch3-f1}
+
+Thứ hạng trên PathMNIST khác hai bộ còn lại: ResNet-18 đứng cuối nhóm CNN, còn VGG-11 dẫn đầu.
+
+\begin{phathien}{Kết quả chính}
+\begin{itemize}
+\item SVHN: \SL{ch3_summary/svhn/best_arch} đạt F1 macro \SL{ch3_summary/svhn/best_f1}, softmax chỉ đạt \SL{ch3_summary/svhn/softmax/f1}, tức gần như không học được từ điểm ảnh thô.
+\item EuroSAT: \SL{ch3_summary/eurosat/best_arch} đạt F1 macro \SL{ch3_summary/eurosat/best_f1}, softmax đạt \SL{ch3_summary/eurosat/softmax/f1} nhờ màu sắc đã mang nhiều thông tin.
+\item PathMNIST: \SL{ch3_summary/pathmnist/best_arch} đạt F1 macro \SL{ch3_summary/pathmnist/best_f1}, trong khi cùng mô hình đạt độ đúng \SL{ch3_summary/pathmnist/vgg11/last_val} trên val nhưng chỉ \SL{ch3_summary/pathmnist/vgg11/acc} trên test.
+\end{itemize}
+\end{phathien}
+
+\subsection{Đường cong học}
+\hinhpdf{ch3_curves}{1.0}{Độ đúng và loss theo epoch. SVHN và EuroSAT theo dõi trên test (không dùng để chọn mô hình), PathMNIST theo dõi trên val}{ch3-curves}
+
+\nhanxet{SVHN và EuroSAT hội tụ gọn, loss train gần loss theo dõi nên không có dấu hiệu quá khớp nặng. Các gai trên đường EuroSAT của CNN cơ bản rơi vào đoạn tốc độ học cao của OneCycle và biến mất khi tốc độ giảm. PathMNIST với \SL{ch3_summary/pathmnist/custom/epochs} epoch vẫn còn đi lên ở epoch cuối, nên các mô hình này chưa hội tụ hẳn trên val.}
+
+\subsection{Đánh đổi độ đúng và chi phí}
+\haihinh{ch3_tradeoff.pdf}{F1 macro theo số tham số}{ch3_time.pdf}{Giây huấn luyện mỗi epoch}{Chi phí của từng kiến trúc}{ch3-cost}
+
+\nhanxet{Trên SVHN và EuroSAT, tăng từ \SL{ch3_summary/svhn/custom/params} tham số lên \SL{ch3_summary/svhn/resnet18/params} tham số chỉ thêm \SL{ch3_summary/svhn/gain_pct} và \SL{ch3_summary/eurosat/gain_pct} điểm phần trăm độ đúng, đổi lại thời gian huấn luyện gấp vài lần. Độ trễ một ảnh trên CPU của ResNet-18 là \SL{ch3_summary/eurosat/resnet18/ms} ms ở ảnh $64{\times}64$, MobileNetV2 chỉ \SL{ch3_summary/eurosat/mobilenetv2/ms} ms vì stem bước 2 giảm cỡ bản đồ ngay từ đầu.}
+
+\subsection{Phân tích lỗi}
+\haihinh{ch3_cm_svhn.pdf}{SVHN}{ch3_cm_eurosat.pdf}{EuroSAT}{Ma trận nhầm lẫn của mô hình tốt nhất, chuẩn hóa theo hàng (\%)}{ch3-cm}
+\haihinh{ch3_cm_pathmnist.pdf}{Ma trận nhầm lẫn PathMNIST}{ch3_f1_class.pdf}{F1 từng lớp}{Lỗi trên PathMNIST tập trung vào vài lớp}{ch3-path-err}
+
+\nhanxet{Trên SVHN nhầm lẫn nhiều nhất là \SL{ch3_summary/svhn/confusion/true} thành \SL{ch3_summary/svhn/confusion/pred} với \SL{ch3_summary/svhn/confusion/ratePct}\%, ảnh nhiễu nhiều hơn là lỗi hệ thống. EuroSAT nhầm \SL{ch3_summary/eurosat/confusion/true} thành \SL{ch3_summary/eurosat/confusion/pred} (\SL{ch3_summary/eurosat/confusion/ratePct}\%), đúng cặp lớp gần nhau về thị giác đã dự đoán ở phần dữ liệu. PathMNIST nghiêm trọng hơn nhiều: \SL{ch3_summary/pathmnist/confusion/true} bị đoán thành \SL{ch3_summary/pathmnist/confusion/pred} tới \SL{ch3_summary/pathmnist/confusion/ratePct}\%.}
+
+\hinhpdf{ch3_wrong}{1.0}{Ảnh test bị mô hình tốt nhất đoán sai với độ tin cao nhất, ghi lớp thật→lớp đoán (xác suất). Ba hàng lần lượt là SVHN, EuroSAT, PathMNIST}{ch3-wrong}
+
+\begin{luuy}{Lệch miền, không phải quá khớp thông thường}
+Độ đúng trên val của PathMNIST cao vì val cùng nguồn với train. Tập test đến từ trung tâm khác nên phân phối màu nhuộm đổi, và thứ hạng mô hình cũng đổi. Với ảnh y tế, một con số val đẹp không cho biết mô hình có dùng được ở bệnh viện khác hay không.
+\end{luuy}
+
+\subsection{Giải thích bằng Grad-CAM}
+\hinhpdf{ch3_gradcam}{1.0}{Grad-CAM trên ảnh test được đoán đúng; mỗi hàng một bộ, hai cụm ảnh, mỗi cụm gồm ảnh gốc và bản đồ của ba kiến trúc}{ch3-gradcam-real}
+
+\nhanxet{Trên SVHN cả ba mạng tập trung vào chữ số ở giữa ảnh và bỏ qua chữ số lẫn ở hai mép, đúng cách nhãn được gán. Bản đồ của CNN cơ bản sắc nét hơn vì tầng cuối còn $8{\times}8$ điểm so với $4{\times}4$ của ResNet-18 và MobileNetV2. Trên ảnh vệ tinh, mạng bám theo ranh giới thửa ruộng và dòng sông. Trên tiêu bản mô, vùng nóng phủ cấu trúc tuyến thay vì vùng kính trắng. Grad-CAM cho biết mô hình nhìn vào đâu, không chứng minh đó là lý do đúng về mặt y học.}
+
+\subsection{So sánh nền tảng}
+\bang{ch3_platform}{So sánh ba nền tảng: huấn luyện PyTorch và Keras, NumPy suy luận bằng trọng số PyTorch, và hàng cuối là NumPy tự huấn luyện mạng hai tầng}{ch3-platform}
+
+\nhanxet{Cùng kiến trúc, bản Keras đạt \SL{ch3_summary/platform/svhn/keras_acc} trên SVHN, sát PyTorch, nhưng thấp hơn rõ trên EuroSAT (\SL{ch3_summary/platform/eurosat/keras_acc} so với \SL{ch3_summary/platform/eurosat/torch_acc}) và tốn thời gian gấp \SL{ch3_summary/platform/svhn/ratio} đến \SL{ch3_summary/platform/eurosat/ratio} lần vì chạy CPU. Hai bản dùng cùng kiến trúc nhưng khác thư viện tăng cường và khởi tạo mặc định, nên chênh lệch này không nên hiểu là chất lượng của nền tảng. Bản NumPy cho dự đoán trùng PyTorch trên \SL{ch3_summary/numpy_forward/n_img} ảnh test (tỉ lệ trùng \SL{ch3_summary/numpy_forward/agreePct}\%), chậm khoảng mười lần; riêng im2col nhanh hơn bốn vòng lặp lồng nhau từ \SL{ch3_summary/numpy_forward/loop_ms_per_img} xuống \SL{ch3_summary/numpy_forward/im2col_ms_per_img} ms mỗi ảnh ở tầng đầu.}
+
+Hàng cuối của bảng là bản NumPy huấn luyện từ đầu bằng lan truyền ngược viết tay, trên đủ \SL{ch3_summary/short/platform_numpy/n} ảnh SVHN, với mạng hai tầng nhỏ hơn CNN cơ bản và chỉ \SL{ch3_summary/short/platform_numpy/epochs} epoch. Độ đúng đạt \SL{ch3_summary/short/platform_numpy/acc}, F1 macro \SL{ch3_summary/short/platform_numpy/f1}. Con số này chứng minh phần đạo hàm viết tay học được thật, không dùng để xếp hạng với các hàng trên vì kiến trúc và số epoch khác nhau.
+
+\begin{ketqua}{Nhật ký huấn luyện PathMNIST}
+\input{generated/ch3_log_runs}
+\end{ketqua}
+
+\section{Triển khai}
+Mô-đun \texttt{tlf/serve\_ch3.py} nạp lười mô hình và chạy trên CPU: người dùng tải ảnh lên hoặc chọn ảnh mẫu thật trong \texttt{models/ch3/examples/}, chọn kiến trúc, nhận xác suất top-5 và Grad-CAM dạng PNG base64. Đầu vào được kiểm tra cỡ tệp, cỡ ảnh, và ảnh mẫu chỉ chọn theo tên trong danh sách.
+
+\anhUI{ch3_demo}{Trang phân loại ảnh trên Web App}{ch3-demo}
+
+Nhìn chung, CNN nhỏ đã đủ tốt cho ảnh $32{\times}32$; kiến trúc sâu hơn chỉ thêm được ít, còn khả năng tổng quát qua miền dữ liệu mới là thách thức thực sự.

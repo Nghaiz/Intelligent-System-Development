@@ -1,0 +1,31 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % dạng gập
+  \node[cau=cGreen, minimum size=11mm] (h) at (0,0) {$h$};
+  \node[khoiC, minimum width=10mm] (x) at (0,-1.95) {$x_t$};
+  \node[khoiP, minimum width=10mm] (y) at (0,1.95) {$\hat y$};
+  \draw[mui] (x) -- node[left, nhan] {$W_{xh}$} (h);
+  \draw[mui] (h) -- node[left, nhan] {$W_{hy}$} (y);
+  \draw[muiM=cRed] (h.south east) .. controls +(1.3,-0.7) and +(1.3,0.7) .. node[pos=0.5, right, nhan, text=cRed] {$W_{hh}$} (h.north east);
+  \node[tieude] at (0,2.95) {Dạng gập};
+  \node[font=\Huge\bfseries, text=cNavy] at (2.45,0) {$=$};
+  % dạng mở
+  \foreach \lab [count=\i] in {1, 2, 3, T} {
+    \pgfmathsetmacro{\xx}{2.45+2.55*\i}
+    \node[cau=cGreen, minimum size=11mm] (h\i) at (\xx,0) {$h_{\lab}$};
+    \node[khoiC, minimum width=10mm] (x\i) at (\xx,-1.95) {$x_{\lab}$};
+    \draw[mui] (x\i) -- (h\i);
+  }
+  \node[khoiP, minimum width=10mm] (yT) at (h4 |- 0,1.95) {$\hat y$};
+  \draw[mui] (h4) -- (yT);
+  \node[khoiX, minimum width=9mm] (h0) at (3.45,0) {$h_0$};
+  \draw[muiM=cRed] (h0) -- (h1);
+  \draw[muiM=cRed] (h1) -- node[above, nhan, text=cRed] {$W_{hh}$} (h2);
+  \draw[muiM=cRed] (h2) -- node[above, nhan, text=cRed] {$W_{hh}$} (h3);
+  \draw[muiM=cRed, dashed] (h3) -- node[above, nhan, text=cRed] {$\cdots$} (h4);
+  \node[tieude] at (8.8,2.95) {Dạng mở theo thời gian};
+  % đường gradient của BPTT
+  \draw[muiM=cBlue, dashed] (yT.west) -- node[above, nhan, text=cBlue] {BPTT: gradient đi ngược qua mọi bước} (h1 |- yT) -- (h1.north);
+  \begin{scope}[on background layer]
+    \node[vung=cGreen, fit=(x1)(yT)(h1)(h4)] {};
+  \end{scope}
+\end{tikzpicture}

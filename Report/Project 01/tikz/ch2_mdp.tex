@@ -1,0 +1,13 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \khoibaD{0.3}{1.6}{4.4}{2.6}{1.4}{cIndigo}
+  \node[font=\normalsize\bfseries, text=white, align=center] at (2.5,3.5) {Tác tử DQN};
+  \node[font=\small, text=white, align=center] at (2.5,2.5) {$Q_\theta(s,a)$, mục tiêu $\theta^-$,\\bộ nhớ phát lại};
+  \node[hop=cTeal, minimum width=50mm, minimum height=30mm, align=center] (env) at (13.0,2.9) {Môi trường sàng lọc\\hồ sơ thật, đáp án bị che,\\mô hình chịu thiếu\\đặc trưng};
+  \draw[mui] (5.7,3.6) -- node[above, font=\small, align=center] {hành động $a$:\\hỏi câu $k$ hoặc dừng} (env.west |- 0,3.6);
+  \draw[mui] (env.west |- 0,2.3) -- node[below, font=\small, align=center] {trạng thái $s'$, thưởng\\$r=-c_k$ hoặc điểm cuối} (5.7,2.3);
+  \foreach \i/\t/\c in {0/tuổi/cBlue,1/BMI/cTeal,2/huyết áp/cOrange,3/thể lực/cPink,4/\dots/cSlate}{
+    \node[hop=\c, minimum width=19mm, inner sep=2pt] at (1.1+3.2*\i,0.2) {\t};
+  }
+  \foreach \i in {0,1,2,3}{\draw[muiM=cSlate] (2.15+3.2*\i,0.2) -- ++(1.05,0);}
+  \node[nhan] at (7.5,-0.55) {Thứ tự câu hỏi do chính sách chọn theo từng người, không cố định};
+\end{tikzpicture}

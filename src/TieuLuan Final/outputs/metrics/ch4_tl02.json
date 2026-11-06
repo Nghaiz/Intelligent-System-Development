@@ -1,0 +1,64 @@
+{
+ "reused_from": "TieuLuan 02/outputs/metrics/forecast.json",
+ "config": {
+  "window": 30,
+  "hidden": 64,
+  "layers": 2,
+  "dropout": 0.2,
+  "val_start": "2024-01-01",
+  "test_start": "2025-01-01"
+ },
+ "rows": [
+  {
+   "ticker": "FPT",
+   "arch": "lstm",
+   "rmse_ratio": 1.044830806086296,
+   "dir_acc": 0.538860103626943
+  },
+  {
+   "ticker": "FPT",
+   "arch": "bilstm",
+   "rmse_ratio": 1.1535447086419335,
+   "dir_acc": 0.5025906735751295
+  },
+  {
+   "ticker": "VCB",
+   "arch": "lstm",
+   "rmse_ratio": 0.9999881273917909,
+   "dir_acc": 0.4972375690607735
+  },
+  {
+   "ticker": "VCB",
+   "arch": "bilstm",
+   "rmse_ratio": 1.0067711283496585,
+   "dir_acc": 0.5248618784530387
+  },
+  {
+   "ticker": "HPG",
+   "arch": "lstm",
+   "rmse_ratio": 0.9997843152718969,
+   "dir_acc": 0.45799457994579945
+  },
+  {
+   "ticker": "HPG",
+   "arch": "bilstm",
+   "rmse_ratio": 0.9999706162716681,
+   "dir_acc": 0.4796747967479675
+  },
+  {
+   "ticker": "VIC",
+   "arch": "lstm",
+   "rmse_ratio": 1.004766538784576,
+   "dir_acc": 0.403954802259887
+  },
+  {
+   "ticker": "VIC",
+   "arch": "bilstm",
+   "rmse_ratio": 1.0033513913960979,
+   "dir_acc": 0.4096045197740113
+  }
+ ],
+ "ratio_min": 0.9997843152718969,
+ "ratio_max": 1.1535447086419335,
+ "n": 8
+}

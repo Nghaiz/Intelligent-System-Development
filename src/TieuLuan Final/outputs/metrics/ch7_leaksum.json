@@ -1,0 +1,10 @@
+{
+ "cora_gcn_drop": 0.02444802292095616,
+ "cora_sage_drop": 0.030099430276671724,
+ "photo_gcn_drop": 0.058498852813450575,
+ "photo_sage_drop": 0.1274052070394085,
+ "elliptic_mlp_random": 0.8247205379736087,
+ "elliptic_mlp_temporal": 0.47042475969248415,
+ "elliptic_gcn_random": 0.7937869231254318,
+ "elliptic_gcn_temporal": 0.5303129906167638
+}

@@ -1,0 +1,15 @@
+\begin{tikzpicture}
+  % mỗi khối là một cây nông học phần dư của tổng trước nó
+  \foreach \i/\x/\c/\h/\t in {0/0/cSlate/2.3/{$F_0$\\hằng số}, 1/3.15/cBlue/1.9/{cây $h_1$}, 2/6.3/cSky/1.5/{cây $h_2$}, 3/9.45/cTeal/1.15/{cây $h_3$}}{
+    \khoibaD{\x}{0}{2.0}{\h}{0.75}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\x+1.0,\h*0.5) {\t};
+  }
+  \foreach \x/\y/\lb in {2.2/0.75/{$r^{(1)}$}, 5.35/0.75/{$r^{(2)}$}, 8.5/0.75/{$r^{(3)}$}}{
+    \draw[muiM=cRed] (\x+0.1,\y) -- (\x+0.9,\y) node[midway, above, font=\small, text=cRed] {\lb};
+  }
+  \node[font=\Large\bfseries, text=cNavy] at (12.2,0.75) {$\cdots$};
+  \node[hop=cGreen, font=\small\bfseries, minimum height=9mm] at (14.0,0.75) {$F_M$};
+  % sai số giảm dần
+  \draw[decorate, decoration={brace, amplitude=5pt}, thick, cNavy] (0,2.95) -- (11.9,2.95)
+    node[midway, above=6pt, font=\small, text=cNavy] {$F_m=F_{m-1}+\eta\,h_m$: mỗi cây sửa phần sai còn lại, $\eta$ càng nhỏ càng cần nhiều cây};
+\end{tikzpicture}

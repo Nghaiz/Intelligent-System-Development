@@ -1,0 +1,174 @@
+{
+ "datasets": [
+  {
+   "id": "cora",
+   "name": "Cora",
+   "source": "Planetoid (Yang et al., 2016)",
+   "url": "https://github.com/kimiyoung/planetoid",
+   "task": "Phân loại chủ đề bài báo",
+   "n_samples": 2708,
+   "n_features": 1433,
+   "size_mb": 0.55,
+   "license": "MIT (kho Planetoid)",
+   "note": "Nút là bài báo, cạnh là trích dẫn, đặc trưng là túi từ nhị phân.",
+   "sample_rows": [
+    {
+     "node": 3,
+     "label": "Case_Based",
+     "degree": 1,
+     "nnz": 21,
+     "neighbors": [
+      2544
+     ],
+     "neighbor_labels": [
+      "Case_Based"
+     ]
+    },
+    {
+     "node": 18,
+     "label": "Genetic_Algorithms",
+     "degree": 5,
+     "nnz": 5,
+     "neighbors": [
+      139,
+      1560
+     ],
+     "neighbor_labels": [
+      "Genetic_Algorithms",
+      "Genetic_Algorithms"
+     ]
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "Case_Based",
+     "Genetic_Algorithms",
+     "Neural_Networks",
+     "Probabilistic_Methods",
+     "Reinforcement_Learning",
+     "Rule_Learning",
+     "Theory"
+    ],
+    "values": [
+     351,
+     217,
+     418,
+     818,
+     426,
+     298,
+     180
+    ]
+   }
+  },
+  {
+   "id": "photo",
+   "name": "Amazon Photo",
+   "source": "Shchur et al., 2018 (gnn-benchmark)",
+   "url": "https://github.com/shchur/gnn-benchmark",
+   "task": "Phân loại nhóm sản phẩm",
+   "n_samples": 7650,
+   "n_features": 745,
+   "size_mb": 16.32,
+   "license": "MIT (kho gnn-benchmark)",
+   "note": "Nút là sản phẩm, cạnh là thường được mua cùng nhau. Bộ gốc không công bố tên lớp.",
+   "sample_rows": [
+    {
+     "node": 16,
+     "label": "Lớp 0",
+     "degree": 1,
+     "nnz": 54,
+     "neighbors": [
+      7505
+     ],
+     "neighbor_labels": [
+      "Lớp 0"
+     ]
+    },
+    {
+     "node": 12,
+     "label": "Lớp 1",
+     "degree": 8,
+     "nnz": 69,
+     "neighbors": [
+      880,
+      2282
+     ],
+     "neighbor_labels": [
+      "Lớp 1",
+      "Lớp 1"
+     ]
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "Lớp 0",
+     "Lớp 1",
+     "Lớp 2",
+     "Lớp 3",
+     "Lớp 4",
+     "Lớp 5",
+     "Lớp 6",
+     "Lớp 7"
+    ],
+    "values": [
+     369,
+     1686,
+     703,
+     915,
+     882,
+     823,
+     1941,
+     331
+    ]
+   }
+  },
+  {
+   "id": "elliptic",
+   "name": "Elliptic Bitcoin",
+   "source": "Weber et al., 2019, bản sao PyG",
+   "url": "https://data.pyg.org/datasets/elliptic/elliptic_txs_features.csv.zip",
+   "task": "Phát hiện giao dịch phi pháp theo thời gian",
+   "n_samples": 203769,
+   "n_features": 165,
+   "size_mb": 665.15,
+   "license": "Không ghi rõ, Elliptic công bố cho nghiên cứu",
+   "note": "Chọn thay ogbn-arxiv vì có chia theo thời gian thật và lệch lớp nặng. Dùng toàn bộ đồ thị; nút là giao dịch, cạnh là dòng tiền, phần lớn nút không có nhãn.",
+   "sample_rows": [
+    {
+     "node": 232629023,
+     "label": "illicit",
+     "step": 1,
+     "degree": 1,
+     "f1": -0.192,
+     "f2": 0.593
+    },
+    {
+     "node": 232438397,
+     "label": "licit",
+     "step": 1,
+     "degree": 161,
+     "f1": 0.132,
+     "f2": 6.974
+    },
+    {
+     "node": 230425980,
+     "label": "chưa biết",
+     "step": 1,
+     "degree": 2,
+     "f1": -0.191,
+     "f2": -0.183
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "licit",
+     "illicit"
+    ],
+    "values": [
+     42019,
+     4545
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % (a) xuyên đồ thị, (b) quy nạp, (c) thời gian
+  \tikzset{tr/.style={circle, fill=cBlue, draw=cBlue!60!black, minimum size=3.2mm, inner sep=0pt},
+           te/.style={circle, fill=cRed, draw=cRed!60!black, minimum size=3.2mm, inner sep=0pt},
+           un/.style={circle, fill=gray!40, draw=gray, minimum size=3.2mm, inner sep=0pt}}
+  \begin{scope}
+    \node[vung=cBlue, minimum width=4.7cm, minimum height=3.2cm] at (2.3,1.5) {};
+    \node[tieude] at (2.3,3.4) {(a) Xuyên đồ thị};
+    \foreach \n/\x/\y/\s in {a/0.6/2.2/tr, b/1.5/0.9/tr, c/2.2/2.3/un, d/3.2/1.0/te, e/3.9/2.2/te, f/2.4/0.5/un}
+      \node[\s] (a\n) at (\x,\y) {};
+    \foreach \u/\v in {a/b, a/c, b/c, c/d, d/e, c/e, b/f, d/f} \draw[gray!70, thick] (a\u) -- (a\v);
+    \node[nhan, text width=4.5cm, align=center, anchor=north] at (2.3,-0.3) {thấy đặc trưng, cạnh của nút test; chỉ giấu nhãn (Cora, Photo)};
+  \end{scope}
+  \begin{scope}[xshift=5.4cm]
+    \node[vung=cOrange, minimum width=4.7cm, minimum height=3.2cm] at (2.3,1.5) {};
+    \node[tieude] at (2.3,3.4) {(b) Quy nạp};
+    \foreach \n/\x/\y/\s in {a/0.6/2.2/tr, b/1.5/0.9/tr, c/2.2/2.3/un, f/2.4/0.5/un}
+      \node[\s] (b\n) at (\x,\y) {};
+    \foreach \n/\x/\y in {d/3.3/1.0, e/4.0/2.2} \node[te, opacity=0.55] (b\n) at (\x,\y) {};
+    \foreach \u/\v in {a/b, a/c, b/c, b/f} \draw[gray!70, thick] (b\u) -- (b\v);
+    \foreach \u/\v in {c/d, d/e, c/e, d/f} \draw[cRed, thick, dashed] (b\u) -- (b\v);
+    \node[nhan, text width=4.5cm, align=center, anchor=north] at (2.3,-0.3) {cạnh đỏ đứt: cắt lúc học, chỉ khôi phục lúc đo test};
+  \end{scope}
+  \begin{scope}[xshift=10.8cm]
+    \node[vung=cTeal, minimum width=4.7cm, minimum height=3.2cm] at (2.3,1.5) {};
+    \node[tieude] at (2.3,3.4) {(c) Theo thời gian};
+    \filldraw[draw=cBlue!70!black, fill=cBlue!25, rounded corners=2pt] (0.4,1.1) rectangle ++(1.4,0.9);
+    \filldraw[draw=cOrange!70!black, fill=cOrange!25, rounded corners=2pt] (1.9,1.1) rectangle ++(0.95,0.9);
+    \filldraw[draw=cRed!70!black, fill=cRed!25, rounded corners=2pt] (2.95,1.1) rectangle ++(1.25,0.9);
+    \node[font=\footnotesize] at (1.1,1.55) {train};
+    \node[font=\footnotesize] at (2.37,1.55) {val};
+    \node[font=\footnotesize] at (3.57,1.55) {test};
+    \node[font=\footnotesize] at (1.1,0.8) {bước 1--29};
+    \node[font=\footnotesize] at (2.37,0.8) {30--34};
+    \node[font=\footnotesize] at (3.57,0.8) {35--49};
+    \draw[muiM=cNavy] (0.4,2.3) -- (4.1,2.3) node[midway, above, nhan] {thời gian};
+    \node[nhan, text width=4.5cm, align=center, anchor=north] at (2.3,-0.3) {z-score tính trên quá khứ (Elliptic)};
+  \end{scope}
+\end{tikzpicture}

@@ -1,0 +1,240 @@
+{
+ "vn30": {
+  "sessions": 64149,
+  "tickers": 30,
+  "pairs": 435,
+  "pairs_kept": 232,
+  "date_min": "2018-01-01",
+  "date_max": "2026-10-30",
+  "node_rows": 157,
+  "edge_rows": 398,
+  "chunks": 722,
+  "mention_rows": 0,
+  "stat_rows": 3211,
+  "seconds": 5.0
+ },
+ "hotpot": {
+  "questions": 1000,
+  "paragraphs": 9769,
+  "node_rows": 18672,
+  "edge_rows": 56213,
+  "chunks": 9769,
+  "mention_rows": 56213,
+  "stat_rows": 0,
+  "seconds": 15.0
+ },
+ "graph": {
+  "nodes": 50234,
+  "relationships": 175010,
+  "by_label": [
+   {
+    "label": "Entity",
+    "n": 29805
+   },
+   {
+    "label": "TextEntity",
+    "n": 18672
+   },
+   {
+    "label": "Chunk",
+    "n": 17218
+   },
+   {
+    "label": "ChunkHotpot",
+    "n": 9769
+   },
+   {
+    "label": "ChunkHetionet",
+    "n": 6727
+   },
+   {
+    "label": "Gene",
+    "n": 6027
+   },
+   {
+    "label": "MonthStat",
+    "n": 2958
+   },
+   {
+    "label": "Pathway",
+    "n": 1146
+   },
+   {
+    "label": "MolecularFunction",
+    "n": 994
+   },
+   {
+    "label": "SideEffect",
+    "n": 974
+   },
+   {
+    "label": "Compound",
+    "n": 967
+   },
+   {
+    "label": "ChunkVn30",
+    "n": 722
+   },
+   {
+    "label": "CellularComponent",
+    "n": 481
+   },
+   {
+    "label": "YearStat",
+    "n": 253
+   },
+   {
+    "label": "Anatomy",
+    "n": 150
+   },
+   {
+    "label": "Disease",
+    "n": 130
+   },
+   {
+    "label": "Month",
+    "n": 106
+   },
+   {
+    "label": "Symptom",
+    "n": 94
+   },
+   {
+    "label": "Company",
+    "n": 30
+   },
+   {
+    "label": "PharmacologicClass",
+    "n": 13
+   },
+   {
+    "label": "Sector",
+    "n": 11
+   },
+   {
+    "label": "Year",
+    "n": 9
+   },
+   {
+    "label": "MarketIndex",
+    "n": 1
+   }
+  ],
+  "by_type": [
+   {
+    "type": "MENTIONS",
+    "n": 56213
+   },
+   {
+    "type": "LINKS_TO",
+    "n": 55817
+   },
+   {
+    "type": "ABOUT",
+    "n": 17501
+   },
+   {
+    "type": "PARTICIPATES",
+    "n": 12525
+   },
+   {
+    "type": "INTERACTS",
+    "n": 11019
+   },
+   {
+    "type": "ASSOCIATES",
+    "n": 3945
+   },
+   {
+    "type": "CAUSES",
+    "n": 3096
+   },
+   {
+    "type": "HAS_MONTH",
+    "n": 2958
+   },
+   {
+    "type": "OF_MONTH",
+    "n": 2958
+   },
+   {
+    "type": "EXPRESSES",
+    "n": 2096
+   },
+   {
+    "type": "BINDS",
+    "n": 2065
+   },
+   {
+    "type": "UPREGULATES",
+    "n": 913
+   },
+   {
+    "type": "DOWNREGULATES",
+    "n": 811
+   },
+   {
+    "type": "LOCALIZES",
+    "n": 746
+   },
+   {
+    "type": "REGULATES",
+    "n": 682
+   },
+   {
+    "type": "PRESENTS",
+    "n": 416
+   },
+   {
+    "type": "HAS_YEAR",
+    "n": 253
+   },
+   {
+    "type": "OF_YEAR",
+    "n": 253
+   },
+   {
+    "type": "CORRELATED",
+    "n": 232
+   },
+   {
+    "type": "TREATS",
+    "n": 140
+   },
+   {
+    "type": "RESEMBLES",
+    "n": 135
+   },
+   {
+    "type": "IN_YEAR",
+    "n": 106
+   },
+   {
+    "type": "MEMBER_OF",
+    "n": 30
+   },
+   {
+    "type": "IN_SECTOR",
+    "n": 30
+   },
+   {
+    "type": "INCLUDES",
+    "n": 26
+   },
+   {
+    "type": "PALLIATES",
+    "n": 24
+   },
+   {
+    "type": "COVARIES",
+    "n": 20
+   }
+  ]
+ },
+ "hetionet": {
+  "edges_full": 2250197,
+  "seed_hop1": 505,
+  "edges_kept": 38659,
+  "nodes_kept": 10976
+ }
+}

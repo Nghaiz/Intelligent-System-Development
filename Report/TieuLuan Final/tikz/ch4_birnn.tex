@@ -1,0 +1,36 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % BiLSTM bên trái
+  \foreach \i in {1,...,4} {
+    \pgfmathsetmacro{\xx}{1.75*\i}
+    \node[khoiC, minimum width=9mm] (x\i) at (\xx,0) {$x_{\i}$};
+    \node[cau=cBlue, minimum size=9mm] (f\i) at (\xx,1.5) {};
+    \node[cau=cPink, minimum size=9mm] (b\i) at (\xx,3.0) {};
+    \draw[mui, black!60] (x\i) -- (f\i);
+    \draw[mui, black!60] (x\i.west) to[bend left=30] (b\i.west);
+  }
+  \foreach \i/\j in {1/2,2/3,3/4} {
+    \draw[muiM=cBlue] (f\i) -- (f\j);
+    \draw[muiM=cPink] (b\j) -- (b\i);
+  }
+  \node[khoiP] (y) at (9.1,2.25) {$[\overrightarrow{h}_T;\overleftarrow{h}_1]$};
+  \draw[mui, cBlue] (f4) -- (y.south west);
+  \draw[mui, cPink] (b1.north) to[out=35, in=115] (y.north);
+  \node[tieude] at (4.4,4.8) {BiLSTM đọc hai chiều trong cửa sổ quá khứ};
+  % mặt nạ dropout bên phải: hai lớp 3D lệch nhau
+  \begin{scope}[shift={(11.2,0.2)}]
+    \node[tieude] at (1.95,4.6) {Mặt nạ theo bước};
+    \foreach \t in {0,...,5} { \foreach \u in {0,...,4} {
+      \pgfmathtruncatemacro{\off}{mod(\t*7+\u*\u*3+\t*\u,3)==0 ? 1 : 0}
+      \ifnum\off=1 \fill[cRed!70, draw=white] (\t*0.42,2.0+\u*0.34) rectangle ++(0.42,0.34);
+      \else \fill[cSky!35, draw=white] (\t*0.42,2.0+\u*0.34) rectangle ++(0.42,0.34); \fi
+    }}
+    \foreach \t in {0,...,5} { \foreach \u in {0,...,4} {
+      \pgfmathtruncatemacro{\off}{(\u==1 || \u==3) ? 1 : 0}
+      \ifnum\off=1 \fill[cRed!70, draw=white] (\t*0.42,0+\u*0.34) rectangle ++(0.42,0.34);
+      \else \fill[cSky!35, draw=white] (\t*0.42,0+\u*0.34) rectangle ++(0.42,0.34); \fi
+    }}
+    \node[font=\small, anchor=west] at (2.6,2.85) {thường};
+    \node[font=\small, anchor=west, align=left] at (2.6,0.85) {hồi quy};
+    \draw[mui] (0,-0.2) -- node[below, font=\small] {bước $t$} (2.52,-0.2);
+  \end{scope}
+\end{tikzpicture}

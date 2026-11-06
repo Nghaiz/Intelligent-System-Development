@@ -1,0 +1,31 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % bốn mặt phẳng nghiêng: ba miền và tầng chunk
+  \foreach \y/\c/\t in {0/cSlate/{Tầng tri thức: :Chunk, chỉ mục vector, chỉ mục toàn văn},
+                        2.5/cPurple/{HotpotQA: thực thể và tài liệu},
+                        5.0/cOrange/{VN30: công ty, ngành, chỉ số theo kỳ},
+                        7.5/cGreen/{Hetionet: tiểu đồ thị đái tháo đường}}{
+    \filldraw[draw=\c!70!black, thick, top color=\c!12, bottom color=\c!40, blur shadow={shadow blur steps=5}]
+      (0,\y) -- (11.4,\y) -- (14.6,\y+1.75) -- (3.2,\y+1.75) -- cycle;
+    \node[font=\small\bfseries\sffamily, text=\c!55!black, anchor=west] at (0.15,\y+0.2) {\t};
+  }
+  % Hetionet
+  \node[cau=cBlue, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (c) at (6.0,8.75) {Compound};
+  \node[cau=cGreen, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (d) at (9.0,8.75) {Disease};
+  \node[cau=cTeal, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (g) at (12.3,8.6) {Gene};
+  \draw[muiM=cGreen!60!black] (c) -- node[above, font=\scriptsize] {TREATS} (d);
+  \draw[muiM=cGreen!60!black] (d) -- node[above, font=\scriptsize] {ASSOCIATES} (g);
+  % VN30
+  \node[cau=cOrange, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (co) at (6.0,6.25) {Company};
+  \node[cau=cYellow, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (se) at (9.0,6.25) {Sector};
+  \node[cau=cRed, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (ys) at (12.3,6.1) {YearStat};
+  \draw[muiM=cOrange!70!black] (co) -- node[above, font=\scriptsize] {IN\_SECTOR} (se);
+  \draw[muiM=cOrange!70!black] (co) to[bend right=16] node[below, font=\scriptsize, pos=0.62] {HAS\_YEAR} (ys);
+  % Hotpot
+  \node[cau=cPurple, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (e1) at (6.0,3.75) {Entity};
+  \node[cau=cPurple, font=\tiny\bfseries, minimum size=11mm, inner sep=0pt] (e2) at (10.2,3.75) {Entity};
+  \draw[muiM=cPurple!70!black] (e1) -- node[above, font=\scriptsize] {LINKS\_TO} (e2);
+  % chunk
+  \node[csdl=cTeal, minimum height=9mm, minimum width=13mm, font=\scriptsize] (ch) at (7.2,1.0) {Chunk};
+  \node[hop=cSlate, font=\scriptsize, anchor=west] at (8.6,1.0) {embedding 768 chiều};
+  \draw[muiM=cSlate, dashed] (ch.north east) to[bend right=10] node[right, font=\scriptsize, pos=0.4] {ABOUT, MENTIONS} (e2.south);
+\end{tikzpicture}

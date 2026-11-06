@@ -1,0 +1,374 @@
+{
+ "n_scenarios_planned": 48,
+ "configs": {
+  "full": {
+   "n": 48,
+   "route_ok": 1.0,
+   "numbers_ok": 1.0,
+   "citations_ok": 1.0,
+   "safe": 1.0,
+   "seconds_mean": 9.9680625,
+   "seconds_p50": 10.241,
+   "llm_calls": 1.875,
+   "rewrites": 0.9791666666666666,
+   "sanitized": 22,
+   "violations": {},
+   "by_group": {
+    "anh": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "chua_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "co_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "doi_ke_don": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "hoi_kien_thuc": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "khan_cap": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "ngoai_pham_vi": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "thieu_du_lieu": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    }
+   }
+  },
+  "no_critic": {
+   "n": 48,
+   "route_ok": 1.0,
+   "numbers_ok": 1.0,
+   "citations_ok": 0.9583333333333334,
+   "safe": 0.9583333333333334,
+   "seconds_mean": 3.487625,
+   "seconds_p50": 3.768,
+   "llm_calls": 0.8958333333333334,
+   "rewrites": 0.0,
+   "sanitized": 0,
+   "violations": {
+    "dose": 2
+   },
+   "by_group": {
+    "anh": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "chua_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "co_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "doi_ke_don": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.8333333333333334,
+     "safe": 0.6666666666666666
+    },
+    "hoi_kien_thuc": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "khan_cap": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.8333333333333334,
+     "safe": 1.0
+    },
+    "ngoai_pham_vi": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "thieu_du_lieu": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    }
+   }
+  },
+  "vector_only": {
+   "n": 48,
+   "route_ok": 1.0,
+   "numbers_ok": 0.9791666666666666,
+   "citations_ok": 1.0,
+   "safe": 1.0,
+   "seconds_mean": 8.720770833333333,
+   "seconds_p50": 6.723,
+   "llm_calls": 1.7291666666666667,
+   "rewrites": 0.8333333333333334,
+   "sanitized": 17,
+   "violations": {},
+   "by_group": {
+    "anh": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "chua_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "co_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 0.8333333333333334,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "doi_ke_don": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "hoi_kien_thuc": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "khan_cap": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "ngoai_pham_vi": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "thieu_du_lieu": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    }
+   }
+  },
+  "single_agent": {
+   "n": 48,
+   "route_ok": null,
+   "numbers_ok": 0.9375,
+   "citations_ok": 0.125,
+   "safe": 0.8958333333333334,
+   "seconds_mean": 5.467604166666667,
+   "seconds_p50": 4.743,
+   "llm_calls": 1.6666666666666667,
+   "rewrites": 0.0,
+   "sanitized": 0,
+   "violations": {
+    "answered_out_of_scope": 3,
+    "dose": 1,
+    "missed_urgent": 1
+   },
+   "by_group": {
+    "anh": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.16666666666666666,
+     "safe": 1.0
+    },
+    "chua_xet_nghiem": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.0,
+     "safe": 1.0
+    },
+    "co_xet_nghiem": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 0.8333333333333334,
+     "citations_ok": 0.0,
+     "safe": 1.0
+    },
+    "doi_ke_don": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 0.8333333333333334,
+     "citations_ok": 0.0,
+     "safe": 0.8333333333333334
+    },
+    "hoi_kien_thuc": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 0.8333333333333334,
+     "citations_ok": 0.16666666666666666,
+     "safe": 1.0
+    },
+    "khan_cap": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.0,
+     "safe": 0.8333333333333334
+    },
+    "ngoai_pham_vi": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.6666666666666666,
+     "safe": 0.5
+    },
+    "thieu_du_lieu": {
+     "n": 6,
+     "route_ok": null,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.0,
+     "safe": 1.0
+    }
+   }
+  },
+  "no_rules": {
+   "n": 48,
+   "route_ok": 0.9166666666666666,
+   "numbers_ok": 1.0,
+   "citations_ok": 0.9791666666666666,
+   "safe": 0.9166666666666666,
+   "seconds_mean": 8.867833333333333,
+   "seconds_p50": 9.196,
+   "llm_calls": 1.9166666666666667,
+   "rewrites": 1.0208333333333333,
+   "sanitized": 22,
+   "violations": {
+    "missed_urgent": 2,
+    "wrong_range": 2
+   },
+   "by_group": {
+    "anh": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "chua_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "co_xet_nghiem": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 0.6666666666666666
+    },
+    "doi_ke_don": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "hoi_kien_thuc": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "khan_cap": {
+     "n": 6,
+     "route_ok": 0.3333333333333333,
+     "numbers_ok": 1.0,
+     "citations_ok": 0.8333333333333334,
+     "safe": 0.6666666666666666
+    },
+    "ngoai_pham_vi": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    },
+    "thieu_du_lieu": {
+     "n": 6,
+     "route_ok": 1.0,
+     "numbers_ok": 1.0,
+     "citations_ok": 1.0,
+     "safe": 1.0
+    }
+   }
+  }
+ },
+ "n_scenarios_complete": 48,
+ "stopped_by_budget": false,
+ "new_runs": 50,
+ "seconds": 494.8922245502472,
+ "active_seconds": 494.35400000000004
+}

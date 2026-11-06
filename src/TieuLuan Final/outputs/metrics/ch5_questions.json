@@ -1,0 +1,30 @@
+{
+ "hetionet": {
+  "n": 153,
+  "by_type": {
+   "filter_2hop": 43,
+   "count_1hop": 43,
+   "lookup_1hop": 19,
+   "intersect_2hop": 48
+  },
+  "gold_per_q": 1.6
+ },
+ "vn30": {
+  "n": 208,
+  "by_type": {
+   "lookup_1hop": 58,
+   "stat_1hop": 92,
+   "aggregate_2hop": 27,
+   "compare_2hop": 31
+  },
+  "gold_per_q": 1.28
+ },
+ "hotpot": {
+  "n": 1000,
+  "by_type": {
+   "comparison": 193,
+   "bridge": 807
+  },
+  "gold_per_q": 2.0
+ }
+}

@@ -1,0 +1,31 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - link [ref=f1e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=f1e8]:
+        - text: Đồng Tâm
+        - emphasis [ref=f1e9]: AI Lab
+    - navigation "Trang chính" [ref=f1e10]:
+      - link "Tổng quan" [ref=f1e11] [cursor=pointer]:
+        - /url: /
+      - link "Đồ thị tri thức" [ref=f1e12] [cursor=pointer]:
+        - /url: /graph
+      - link "Trợ lý GraphRAG" [ref=f1e13] [cursor=pointer]:
+        - /url: /chat
+      - link "Agent Arena" [ref=f1e14] [cursor=pointer]:
+        - /url: /arena
+      - link "Model Lab" [ref=f1e15] [cursor=pointer]:
+        - /url: /lab
+      - link "Data Atlas" [ref=f1e16] [cursor=pointer]:
+        - /url: /atlas
+      - link "Experiment Tracker" [ref=f1e17] [cursor=pointer]:
+        - /url: /tracker
+      - link "Live Logs" [ref=f1e18] [cursor=pointer]:
+        - /url: /logs
+    - generic [ref=f1e19]:
+      - button "Tìm Ctrl K" [ref=f1e20] [cursor=pointer]
+      - button "Đổi nền" [ref=f1e21] [cursor=pointer]: ◐
+  - main [ref=f1e22]
+  - contentinfo [ref=f1e23]:
+    - generic [ref=f1e24]: Đang đọc trạng thái máy...
+    - generic [ref=f1e25]: Chạy cục bộ ở 127.0.0.1, không gửi dữ liệu ra ngoài.

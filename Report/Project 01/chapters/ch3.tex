@@ -1,0 +1,60 @@
+\chapter{Dữ liệu và cơ sở dữ liệu}\label{chap:dulieu}
+
+\section{Các nguồn dữ liệu}
+
+DiaNexus dùng năm bộ dữ liệu bảng và một bộ ảnh đáy mắt. Mỗi bộ phục vụ một câu hỏi khác nhau, nên hệ thống không gộp chúng thành một bảng mà giữ nguyên ý nghĩa nhãn của từng nguồn. Bảng~\ref{tab:nguon} tóm tắt quy mô sau khi làm sạch.
+
+\begin{table}[!htbp]\centering\caption{Năm bộ dữ liệu bảng trong CSDL}\label{tab:nguon}
+\small\setlength{\tabcolsep}{4pt}\begin{tabular}{@{}lrrrrl@{}}\toprule
+\textbf{Bảng} & \textbf{Dòng thô} & \textbf{Dòng sạch} & \textbf{Cột} & \textbf{Dương (\%)} & \textbf{Bài toán}\\\midrule
+\texttt{patients\_lab} & \SL{data_summary/patients_lab/rows_raw} & \SL{data_summary/patients_lab/rows_clean} & \SL{data_summary/patients_lab/n_columns} & \SL{data_summary/patients_lab/positive_ratePct} & Chẩn đoán có xét nghiệm\\
+\texttt{brfss} & \SL{data_summary/brfss/rows_raw} & \SL{data_summary/brfss/rows_clean} & \SL{data_summary/brfss/n_columns} & \SL{data_summary/brfss/positive_ratePct} & Sàng lọc tự khai, RL\\
+\texttt{hospital} & \SL{data_summary/hospital/rows_raw} & \SL{data_summary/hospital/rows_clean} & \SL{data_summary/hospital/n_columns} & \SL{data_summary/hospital/positive_ratePct} & Tái nhập viện 30 ngày\\
+\texttt{pima} & \SL{data_summary/pima/rows_raw} & \SL{data_summary/pima/rows_clean} & \SL{data_summary/pima/n_columns} & \SL{data_summary/pima/positive_ratePct} & Đối chuẩn chéo miền\\
+\texttt{frankfurt} & \SL{data_summary/frankfurt/rows_raw} & \SL{data_summary/frankfurt/rows_clean} & \SL{data_summary/frankfurt/n_columns} & \SL{data_summary/frankfurt/positive_ratePct} & Đối chuẩn chéo miền\\\bottomrule
+\end{tabular}\end{table}
+
+Bộ \texttt{brfss} là khảo sát hành vi sức khỏe của CDC, gồm các câu tự khai nên phù hợp cho sàng lọc khi người dùng chưa đi xét nghiệm. Bộ \texttt{hospital} ghi các lần nhập viện tại 130 bệnh viện Hoa Kỳ~\cite{strack}, bổ sung góc nhìn sau điều trị. Bộ Pima~\cite{pima} và một tập ngoài 2.000 dòng cùng lược đồ (bảng \texttt{frankfurt}, được dùng lại từ bài tập trước, nguồn gốc chưa xác minh được) nhỏ nhưng có ích để thử mô hình trên quần thể khác với lúc huấn luyện.
+
+\section{Thiết kế CSDL}
+
+Toàn bộ dữ liệu nằm trong một tệp SQLite ở chế độ WAL, nên web và tác tử đọc ghi đồng thời được. Lược đồ chia hai nhóm như Hình~\ref{fig:erd}: bảng dữ liệu chỉ đọc sau khi nạp, và bảng vận hành ghi lại mọi phiên làm việc. Nhờ bảng \texttt{agent\_events}, mọi lượt chạy của hệ tác tử đều phát lại được trên website.
+
+\hinhtikz{ch3_erd}{Lược đồ CSDL: bảng dữ liệu và bảng vận hành}{erd}
+
+\maNguon{db__connect}{Mở kết nối SQLite: bật WAL, khóa ngoại và bảo đảm đủ bảng vận hành}
+
+\section{Làm sạch và chống rò rỉ}
+
+Làm sạch không đơn thuần là xóa dòng lỗi, mỗi quyết định đều thay đổi điều mô hình học được:
+
+\begin{itemize}
+  \item \texttt{patients\_lab} có \SL{data_summary/patients_lab/duplicates_raw} dòng trùng. Giữ lại thì một hồ sơ có thể nằm ở cả train và test, làm số đo đẹp giả tạo.
+  \item \texttt{brfss} loại \SL{data_summary/brfss/dropped_duplicates} dòng trùng, tỉ lệ dương tăng từ \SL{data_summary/brfss/positive_rate_rawPct}\% lên \SL{data_summary/brfss/positive_ratePct}\%, tức các dòng trùng chủ yếu thuộc lớp âm.
+  \item \texttt{hospital} loại \SL{data_summary/hospital/dropped_dead_or_hospice} lần xuất viện đã tử vong hoặc chuyển chăm sóc cuối đời, vì những ca này không thể tái nhập viện. Cột \texttt{weight} thiếu tới \SL{data_summary/hospital/weight_missing_ratePct}\% nên bị bỏ.
+  \item \texttt{pima}, \texttt{frankfurt} dùng số 0 để ghi giá trị thiếu ở các cột sinh lý, ví dụ \SL{data_summary/pima/zero_as_missing/insulin} dòng insulin của Pima. Các số 0 này được đổi thành giá trị thiếu.
+\end{itemize}
+
+Bẫy lớn nhất nằm ở \texttt{hospital}: \SL{data_summary/hospital/rows_clean} lần nhập viện chỉ thuộc về \SL{data_summary/hospital/patients} bệnh nhân. Chia ngẫu nhiên theo dòng sẽ để cùng một người ở cả train và test, nên đồ án chia theo \texttt{patient\_nbr}. Kiểm tra sau khi chia cho thấy số bệnh nhân trùng giữa các tập là \SL{data_summary/hospital/patient_overlap_between_splits}.
+
+\section{Khám phá dữ liệu}
+
+Lớp dương ở cả năm bộ lệch nhau rất xa, từ \SL{data_summary/patients_lab/positive_ratePct}\% đến \SL{data_summary/frankfurt/positive_ratePct}\% (Hình~\ref{fig:balance}). Vì vậy ngưỡng phân loại không dùng chung được giữa các nguồn, và Mục~\ref{sec:crossdomain} sẽ đo chính hiệu ứng này.
+
+\hinhpdf{data_label_balance}{0.80}{Tỉ lệ lớp dương của năm bộ dữ liệu}{balance}
+
+Hình~\ref{fig:ratetest} cho một phát hiện quan trọng về bộ \texttt{patients\_lab}. Khi HbA1c từ 6,8 trở lên hoặc đường huyết từ 200 trở lên, tỉ lệ bệnh là đúng 100\%; dưới hai mức này tỉ lệ chỉ quanh 8\%. Nhãn của bộ này gần như sinh theo luật, nên điểm AUC rất cao ở chương sau phản ánh việc mô hình tìm lại ngưỡng, không phải năng lực dự đoán lâm sàng. Đây là giới hạn của dữ liệu và báo cáo ghi nhận rõ thay vì coi con số đó là thành tích.
+
+\hinhpdf{data_lab_rate_by_test}{0.92}{Tỉ lệ đái tháo đường theo từng mức HbA1c và đường huyết: bước nhảy tới 100\%}{ratetest}
+
+Tuổi và BMI cho xu hướng nhất quán trên cả dữ liệu xét nghiệm lẫn khảo sát CDC (Hình~\ref{fig:age}). Với \texttt{brfss}, sức khỏe tự đánh giá và huyết áp cao tương quan mạnh nhất với bệnh (Hình~\ref{fig:brfsscorr}), nghĩa là các câu hỏi đơn giản vẫn mang nhiều thông tin. Đây là cơ sở cho sàng lọc thích ứng ở Chương~\ref{chap:tactu}.
+
+\haihinh{data_rate_by_age.pdf}{Theo nhóm tuổi}{data_rate_by_bmi.pdf}{Theo BMI}{Tỉ lệ đái tháo đường tăng theo tuổi và BMI trên hai nguồn độc lập}{age}
+
+\hinhpdf{data_brfss_corr}{0.90}{Mười đặc trưng tương quan mạnh nhất với nhãn trong bảng \texttt{brfss}}{brfsscorr}
+
+Với \texttt{hospital}, số lần nội trú năm trước là tín hiệu rõ nhất của tái nhập viện (Hình~\ref{fig:readmit}), còn chẩn đoán chính tạo chênh lệch rất ít. Điều này báo trước đây là bài toán khó.
+
+\hinhpdf{data_hospital_readmit}{0.92}{Tỉ lệ tái nhập viện dưới 30 ngày theo số lần nội trú và chẩn đoán chính}{readmit}
+
+Bộ ảnh đáy mắt lấy từ \SL{data_retina/source}, cỡ \SL{data_retina/image_size}\,px, gồm \SL{data_retina/splits/train/n} ảnh train, \SL{data_retina/splits/val/n} ảnh val và \SL{data_retina/splits/test/n} ảnh test, chia năm cấp bệnh và lệch mạnh về cấp 0.

@@ -1,0 +1,41 @@
+\chapter{Website DiaNexus}\label{chap:web}
+
+\section{Kiến trúc triển khai}
+
+Sản phẩm chạy hoàn toàn trên localhost tại \texttt{127.0.0.1:8097}, gồm máy chủ FastAPI và giao diện tĩnh, không dùng CDN nên không có dữ liệu nào rời khỏi máy. Hình~\ref{fig:stack} là bốn tầng của hệ thống. Khởi động máy chủ không nạp mô hình, mô hình chỉ được nạp ở yêu cầu đầu tiên cần đến nó.
+
+\hinhtikz{ch7_stack}{Bốn tầng triển khai cục bộ của DiaNexus}{stack}
+
+Máy chỉ có khoảng 47 GB bộ nhớ commit nên website phải tự bảo vệ: mỗi lúc chỉ một yêu cầu nặng được chạy, lần nạp mô hình đầu tiên phải đặt chỗ bộ nhớ trước. Khi không đủ bộ nhớ, API trả 503 với thông báo rõ ràng thay vì làm sập máy.
+
+\maNguon{lazy__heavy_turn}{Cổng giới hạn yêu cầu nặng của web}
+
+\section{Các trang chức năng}
+
+Giao diện lấy cảm hứng từ màn hình theo dõi đầu giường bệnh: nền tối xanh ngọc, điểm nhấn san hô, thanh sinh hiệu trên cùng hiện trạng thái thật của Neo4j, Ollama, GPU, bộ nhớ và CSDL. Đường tín hiệu chạy theo tải GPU và phẳng đi khi mất kết nối. Mười trang chia theo bốn nhóm: tổng hợp, lâm sàng, tri thức và vận hành. Trang Tổng quan (Hình~\ref{fig:wover}) cho thấy hai nhánh dữ liệu và tri thức hội tụ về hệ tác tử bằng số liệu sống.
+
+\anhUI{web_overview}{Trang Tổng quan: số liệu sống và sơ đồ hai nhánh}{wover}
+
+Trang Hội chẩn (Hình~\ref{fig:wconsult}) là nơi thể hiện rõ nhất tính đa tác tử. Mỗi sự kiện của tác tử được đẩy về trình duyệt qua Server-Sent Events, người dùng thấy lần lượt Supervisor định tuyến, Knowledge truy xuất, Critic kiểm tra, và có thể bấm vào trích dẫn \texttt{[n]} để xem nguồn.
+
+\anhUI{web_consult}{Trang Hội chẩn: dòng thời gian tác tử trực tiếp và trích dẫn}{wconsult}
+
+Trang Sàng lọc thích ứng (Hình~\ref{fig:wscreen}) là tính năng mới của đồ án: mỗi câu hỏi do chính sách RL chọn, thước xác suất nhảy theo từng đáp án và hiển thị giá trị $Q$ của các câu hỏi ứng viên.
+
+\anhUI{web_screen}{Trang Sàng lọc thích ứng: chính sách RL chọn từng câu hỏi}{wscreen}
+
+Trang Phòng thí nghiệm nguy cơ (Hình~\ref{fig:wrisk}) cho kéo thanh trượt để thấy nguy cơ đổi ngay lập tức. Tính năng song sinh số đặt hồ sơ hiện tại cạnh hồ sơ sau khi đạt mục tiêu, kèm SHAP và các luật đã kích hoạt.
+
+\anhUI{web_risk}{Phòng thí nghiệm nguy cơ: what-if, SHAP và song sinh số}{wrisk}
+
+Trang Võng mạc (Hình~\ref{fig:wretina}) có thanh trượt so sánh ảnh gốc với Grad-CAM. Trang Đồ thị tri thức (cùng Hình~\ref{fig:wretina}) đọc trực tiếp từ Neo4j, vẽ không gian 3D, bấm vào nút để mở rộng lân cận và hiện đúng câu Cypher đã chạy.
+
+\haiUI{web_retina}{Võng mạc: phân cấp và Grad-CAM}{web_graph}{Đồ thị tri thức 3D từ Neo4j}{Hai trang trực quan của DiaNexus}{wretina}
+
+Trang Dữ liệu duyệt bảng SQLite theo phân trang, đọc qua kết nối chỉ đọc. Trang Thí nghiệm so sánh mọi lượt chạy từ nhật ký. Trang Nhật ký hiển thị log thật theo thời gian thực và phát lại vết tác tử đã lưu.
+
+\haiUI{web_data}{Duyệt CSDL và thống kê cột}{web_logs}{Log trực tiếp và phát lại vết}{Hai trang vận hành: dữ liệu và nhật ký}{wops}
+
+\section{Kiểm thử và an toàn}
+
+Website được kiểm bằng trình duyệt tự động ở hai cỡ màn hình 1440 và 390 px, ghi lỗi console và độ tràn ngang của từng trang vào tệp kết quả. API chỉ nghe ở địa chỉ cục bộ, SQLite mở ở chế độ chỉ đọc, tên bảng đi qua danh sách trắng, truy vấn dùng tham số, ảnh tải lên giới hạn 8 MB và kiểm chữ ký tệp, nên bảng tùy ý hoặc tệp không phải ảnh đều bị từ chối.

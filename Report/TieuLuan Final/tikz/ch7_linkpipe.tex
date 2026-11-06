@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[csdl=cTeal, minimum width=18mm, minimum height=20mm] (neo) at (0.9,1.3) {Neo4j\\Hetionet};
+  \node[khoiC, text width=2.5cm, anchor=west] (sp) at (2.5,2.1) {chia 80/10/10 theo \emph{cặp nút}};
+  \node[khoiR, text width=2.5cm, anchor=west] (ng) at (2.5,0.4) {âm tráo sang nút \emph{cùng kiểu}};
+  \draw[mui] (neo) -- (sp.west); \draw[mui] (neo) -- (ng.west);
+  \tensorbaD{6.1}{0.5}{0.8}{2.0}{1.0}{cBlue}{nhúng\\$h^{(0)}$}
+  \draw[mui] (7.65,1.5) -- (8.35,1.5);
+  \tensorbaD{8.4}{0.5}{0.8}{2.0}{1.0}{cPurple}{R-GCN\\lớp 1}
+  \draw[mui] (9.95,1.5) -- (10.65,1.5);
+  \tensorbaD{10.7}{0.5}{0.8}{2.0}{1.0}{cIndigo}{R-GCN\\lớp 2}
+  \draw[mui] (12.25,1.5) -- (12.9,1.5);
+  \draw[mui] (sp.east) -- (6.05,1.6);
+  \node[khoiG, text width=2.1cm, anchor=west] at (12.9,1.5) {$\sigma(z_s^{\top}\mathrm{diag}(r)z_t)$\\AUC, AP};
+\end{tikzpicture}

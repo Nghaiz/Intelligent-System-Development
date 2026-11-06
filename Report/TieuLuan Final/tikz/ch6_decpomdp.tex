@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % môi trường là khối 3D, trạng thái toàn cục ẩn với mọi tác tử
+  \khoibaD{6.0}{0.0}{3.6}{4.5}{2.0}{cSlate}
+  \node[font=\small\bfseries, text=white, align=center] at (7.8,2.9) {Môi trường};
+  \node[font=\small, text=white, align=center] at (7.8,1.8) {trạng thái ẩn $s_t$\\$P(s_{t+1}\mid s_t,\mathbf{a}_t)$};
+  % ba tác tử, mỗi tác tử một khối 3D nhỏ, hai mũi tên song song tới mặt trước môi trường
+  \foreach \y/\c/\i in {3.45/cBlue/1, 1.75/cTeal/2, 0.05/cOrange/N} {
+    \khoibaD{0.2}{\y}{2.2}{1.05}{0.8}{\c}
+    \node[font=\small\bfseries, text=white] at (1.3,\y+0.53) {Tác tử $\i$};
+    \draw[muiM=\c!75!black] (6.0,\y+0.8) -- node[fill=white, inner sep=1pt, font=\small, text=\c!45!black] {quan sát $o^{\i}_t$} (2.95,\y+0.8);
+    \draw[muiM=\c!75!black] (2.95,\y+0.25) -- node[fill=white, inner sep=1pt, font=\small, text=\c!45!black] {hành động $a^{\i}_t$} (6.0,\y+0.25);
+  }
+  \node[font=\small, text=black!70] at (1.3,1.4) {$\vdots$};
+  % phần thưởng chung
+  \node[hop=cGreen, minimum width=3.2cm] (r) at (13.6,3.8) {Phần thưởng chung\\$R(s_t,\mathbf{a}_t)$};
+  \node[hop=cPurple, minimum width=3.2cm] (j) at (13.6,1.2) {Mục tiêu\\$\max_{\pi}\ \mathbb{E}\sum_t\gamma^t R$};
+  \draw[mui] (10.75,3.8) -- (r.west);
+  \draw[mui] (r) -- (j);
+\end{tikzpicture}

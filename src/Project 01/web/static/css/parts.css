@@ -1,0 +1,113 @@
+/* Thành phần dùng chung: khối "đạo trình", nút, trường nhập, bảng, trạng thái đang chuẩn bị, thanh đóng góp. */
+.lead { border-top: 1px solid var(--line-2); padding-top: var(--s2); min-width: 0; }
+.lead > h2, .lead > header > h2 { font: 700 .86rem/1.3 var(--disp); font-stretch: 92%; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.lead > header { display: flex; justify-content: space-between; gap: var(--s3); align-items: baseline; flex-wrap: wrap; }
+.lead > h2 + *, .lead > header + * { margin-top: var(--s3); }
+.sheet { background: var(--surface); border: 1px solid var(--line); padding: var(--s4); min-width: 0; }
+.note { color: var(--ink-2); font-size: .92rem; }
+.mono { font-family: var(--mono); }
+.grow { flex: 1; }
+.row { display: flex; gap: var(--s2); align-items: center; flex-wrap: wrap; }
+
+.btn, .btn-ghost, .seg button, .chip {
+  border-radius: var(--radius); cursor: pointer; transition: background .12s, border-color .12s, color .12s, transform .08s;
+}
+.btn { background: var(--coral); color: var(--coral-ink); border: 1px solid var(--coral); padding: 9px 16px; font-weight: 600; min-height: 42px; }
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+.btn-ghost { background: transparent; border: 1px solid var(--line-2); padding: 6px 10px; font-size: .9rem; min-height: 34px; }
+.btn-ghost:hover { border-color: var(--teal); }
+.btn-ghost[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: var(--teal-ink); }
+
+input[type="text"], input[type="number"], input[type="search"], textarea, select {
+  width: 100%; min-height: 42px; padding: 8px 10px; background: var(--surface-2); border: 1px solid var(--line-2);
+  border-radius: var(--radius); font-size: 1rem;
+}
+textarea { resize: vertical; min-height: 72px; }
+input:focus, textarea:focus, select:focus { border-color: var(--teal); outline: 0; box-shadow: inset 0 -2px var(--teal); }
+label.field { display: grid; gap: 4px; font-size: .88rem; color: var(--ink-2); min-width: 0; }
+
+.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: var(--radius); flex-wrap: wrap; }
+.seg button { background: none; border: 0; padding: 6px 12px; min-height: 34px; font-size: .92rem; }
+.seg button + button { border-left: 1px solid var(--line-2); }
+.seg button:hover { background: var(--surface-3); }
+.seg button[aria-pressed="true"] { background: var(--teal); color: var(--teal-ink); font-weight: 600; }
+
+.chip { display: inline-flex; gap: 6px; align-items: center; background: none; border: 1px solid var(--line-2); padding: 3px 8px; font-size: .84rem; min-height: 28px; }
+.chip:hover { border-color: var(--teal); }
+.chip[aria-pressed="true"] { background: var(--surface-3); border-color: var(--teal); }
+.chip i { width: 9px; height: 9px; font-style: normal; flex: none; }
+
+input[type="range"] { width: 100%; accent-color: var(--coral); height: 26px; background: none; }
+
+.pending {
+  padding: var(--s4); border: 1px dashed var(--line-2); color: var(--ink-2); display: grid; gap: var(--s1);
+  background: repeating-linear-gradient(135deg, transparent 0 7px, var(--grid-b) 7px 8px);
+}
+.pending b { font: 700 .85rem/1.2 var(--disp); letter-spacing: .08em; text-transform: uppercase; color: var(--warn); }
+.pending.err b { color: var(--urgent); }
+.pending span { overflow-wrap: anywhere; }
+
+.tbl-wrap { overflow: auto; border: 1px solid var(--line); background: var(--surface); max-height: 520px; }
+table.tbl { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.tbl th { position: sticky; top: 0; z-index: 1; background: var(--surface-2); text-align: left; font: 600 .78rem var(--disp); font-stretch: 92%; letter-spacing: .03em; padding: 7px 10px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+.tbl th[data-col] { cursor: pointer; }
+.tbl th[data-col]:hover, .tbl th[aria-sort="ascending"] { color: var(--coral); }
+.tbl td { padding: 5px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+.tbl td.n { font-family: var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+.tbl tr:hover td { background: var(--surface-2); }
+.tbl tr[aria-selected="true"] td { background: var(--surface-3); }
+
+.stat b { display: block; font: 500 clamp(1.6rem, 2.6vw, 2.3rem)/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .88rem; color: var(--ink-2); }
+.stat.wait b { color: var(--ink-3); font-size: 1rem; line-height: 2.1; }
+
+/* Thanh đóng góp SHAP: hai phía quanh trục giữa, hướng màu có kèm dấu số nên không chỉ dựa vào màu */
+.shap { display: grid; gap: 3px; }
+.shap-row { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 4.2em; gap: var(--s2); align-items: center; font-size: .9rem; }
+.shap-row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shap-row .val { font: 400 .84rem var(--mono); text-align: right; }
+.shap-track { position: relative; height: 14px; background: linear-gradient(var(--line-2), var(--line-2)) center / 1px 100% no-repeat; }
+.shap-bar { position: absolute; top: 2px; bottom: 2px; background: var(--coral); border-radius: 0 3px 3px 0; transition: left .25s var(--ease), width .25s var(--ease); }
+.shap-bar.neg { background: var(--teal); border-radius: 3px 0 0 3px; }
+
+.gauge { position: relative; height: 22px; background: var(--surface-2); border: 1px solid var(--line-2); }
+.gauge .fill { position: absolute; inset: 0 auto 0 0; background: var(--coral); transition: width .45s var(--ease); }
+.gauge .cut { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--ink); transition: left .3s; }
+.gauge-scale { display: flex; justify-content: space-between; font: 400 .76rem var(--mono); color: var(--ink-3); margin-top: 3px; }
+
+.rule { display: grid; grid-template-columns: auto 1fr; gap: var(--s2); padding: 6px 0; border-top: 1px solid var(--line); font-size: .93rem; }
+.rule b { font: 700 .72rem/1.7 var(--disp); letter-spacing: .06em; text-transform: uppercase; }
+.rule[data-sev="urgent"] b { color: var(--urgent); }
+.rule[data-sev="warn"] b { color: var(--warn); }
+.rule[data-sev="info"] b { color: var(--teal); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .84rem; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; }
+.chart { width: 100%; height: 300px; }
+
+/* Băng nhiều đạo trình: mỗi tác tử một đường, sự kiện là các vạch theo thời gian */
+.strip { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.lane { display: grid; grid-template-columns: 96px 1fr; background: var(--surface); min-height: 26px; }
+.lane > span { font: 600 .74rem/26px var(--disp); font-stretch: 90%; padding: 0 8px; color: var(--ink-2); border-right: 1px solid var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lane.on > span { color: var(--ink); box-shadow: inset 2px 0 var(--coral); }
+.track { position: relative; overflow: hidden; background-image: linear-gradient(90deg, var(--grid-b) 1px, transparent 1px); background-size: 10% 100%; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line-2); }
+.tick { position: absolute; top: 3px; bottom: 3px; width: 3px; margin-left: -1px; background: var(--ink-3); border: 0; padding: 0; cursor: pointer; transition: left .2s linear; }
+.tick::after { content: ""; position: absolute; inset: -3px -5px; }
+.tick[data-k="llm"] { background: var(--teal); top: 1px; bottom: 1px; width: 4px; }
+.tick[data-k="tool"] { background: var(--warn); }
+.tick[data-k="decision"] { background: var(--coral); transform: rotate(45deg); top: 8px; bottom: 8px; width: 10px; margin-left: -5px; }
+.tick[data-k="error"] { background: var(--urgent); top: 0; bottom: 0; width: 5px; }
+.events { margin: var(--s2) 0 0; padding: 0; list-style: none; max-height: 240px; overflow: auto; font-size: .88rem; }
+.events li { display: grid; grid-template-columns: 3.6em 6em 1fr; gap: var(--s2); padding: 3px 0; border-top: 1px solid var(--line); }
+.events li time { font: 400 .8rem var(--mono); color: var(--ink-3); }
+.events li b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.events li[data-k="error"] { color: var(--urgent); }
+
+@media (max-width: 900px) {
+  .lane { grid-template-columns: 76px 1fr; }
+  .shap-row { grid-template-columns: minmax(0, 8em) minmax(0, 1fr) 3.8em; }
+  .tbl-wrap { max-height: 420px; }
+}

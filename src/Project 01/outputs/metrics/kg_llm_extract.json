@@ -1,0 +1,46 @@
+{
+ "chunks_processed": 404,
+ "funnel": {
+  "raw_edges": 667,
+  "accepted": 313,
+  "rej_domain_range": 87,
+  "fixed_direction": 81,
+  "rej_evidence_not_in_text": 196,
+  "rej_schema": 21,
+  "rej_ontology": 22,
+  "dup": 26,
+  "rej_self": 2
+ },
+ "accepted": 313,
+ "gpu_seconds": 2013.48,
+ "sec_per_chunk": 4.983861386138614,
+ "tokens_per_sec": 22.021077934719987,
+ "by_rel": {
+  "TREATS": 39,
+  "PREVENTS": 21,
+  "CAUSES": 83,
+  "DIAGNOSED_BY": 20,
+  "MONITORED_BY": 16,
+  "AFFECTS": 16,
+  "RISK_FACTOR_FOR": 69,
+  "COMPLICATION_OF": 22,
+  "PRESENTS": 26,
+  "ASSOCIATED_WITH": 1
+ },
+ "by_source": {
+  "europepmc": 60,
+  "medlineplus": 66,
+  "wikipedia_vi": 33,
+  "niddk": 73,
+  "cdc": 27,
+  "medlineplus_vi": 1,
+  "bo_y_te": 26,
+  "who": 27
+ },
+ "by_lang": {
+  "en": 253,
+  "vi": 60
+ },
+ "new_entities": 242,
+ "model": "qwen2.5-7b"
+}

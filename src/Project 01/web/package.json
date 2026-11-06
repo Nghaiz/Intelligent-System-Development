@@ -1,0 +1,16 @@
+{
+  "name": "dianexus-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web DiaNexus: thư viện npm được chép vào static/vendor để chạy cục bộ, không CDN.",
+  "type": "module",
+  "scripts": { "vendor": "node vendor.mjs" },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.2.0",
+    "@fontsource/ibm-plex-mono": "^5.2.0",
+    "@fontsource/ibm-plex-sans": "^5.2.0",
+    "3d-force-graph": "^1.80.2",
+    "echarts": "^6.1.0",
+    "three": "^0.187.0"
+  }
+}

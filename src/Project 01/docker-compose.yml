@@ -1,0 +1,24 @@
+# Neo4j của Project 01, volume có tên riêng. WSL của máy chỉ có 3 GB nên heap và page cache đặt nhỏ.
+services:
+  neo4j:
+    image: neo4j:5.26-community
+    container_name: dnx-neo4j
+    ports:
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/dianexus2026
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1g
+      NEO4J_server_memory_pagecache_size: 512m
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    volumes:
+      - dnx_neo4j_data:/data
+      - dnx_neo4j_logs:/logs
+      - dnx_neo4j_import:/import
+    restart: "no"
+volumes:
+  dnx_neo4j_data:
+  dnx_neo4j_logs:
+  dnx_neo4j_import:

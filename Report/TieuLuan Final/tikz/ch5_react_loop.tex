@@ -1,0 +1,22 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[cau=cRed, minimum size=14mm, font=\scriptsize\bfseries, align=center] (q) at (-0.6,0) {Câu\\ hỏi};
+  \node[diamond, aspect=1.7, draw=cOrange!70!black, top color=cOrange!15, bottom color=cOrange!45, thick, font=\scriptsize,
+        align=center, inner sep=0pt, blur shadow={shadow blur steps=5}] (g) at (2.9,0) {chẩn đoán,\\ kê đơn?};
+  \node[hop=cRed, text width=3.0cm, font=\scriptsize] (ref) at (2.9,-3.1) {Từ chối, không gọi LLM};
+  \node[khoiP, text width=2.2cm] (th) at (6.8,1.7) {\textbf{Thought}\\ LLM suy nghĩ};
+  \node[khoiC, text width=2.2cm] (ac) at (10.8,1.7) {\textbf{Action}\\ chọn công cụ};
+  \node[khoiT, text width=2.4cm] (ob) at (8.8,-1.1) {\textbf{Observation}\\ kết quả công cụ};
+  \node[csdl=cBlue, minimum width=13mm, minimum height=10mm, font=\scriptsize] (c1) at (14.3,3.0) {cypher};
+  \node[csdl=cTeal, minimum width=13mm, minimum height=10mm, font=\scriptsize] (c2) at (14.3,1.2) {vector};
+  \node[csdl=cGreen, minimum width=13mm, minimum height=10mm, font=\scriptsize] (c3) at (14.3,-0.6) {tính toán};
+  \node[hop=cGreen, text width=3.3cm, font=\scriptsize] (fin) at (8.8,-3.6) {\textbf{Final}: đáp án, nguồn, vết suy luận};
+  \draw[mui] (q) -- (g);
+  \draw[mui] (g) -- node[nhan, right, font=\scriptsize] {có} (ref);
+  \draw[mui] (g) |- node[nhan, above, font=\scriptsize, pos=0.75] {không} (th);
+  \draw[mui] (th) -- (ac);
+  \foreach \c in {c1,c2,c3}\draw[muiM=cSlate] (ac.east) -- (\c.west);
+  \draw[mui] (c3.south) |- (ob.east);
+  \draw[mui] (ob) -- (th);
+  \draw[muiM=cGreen] (th.south west) to[bend right=30] node[nhan, left, font=\scriptsize, pos=0.55] {đủ dữ liệu} (fin.west);
+  \node[nhan, font=\scriptsize] at (11.6,-2.0) {tối đa 4 lượt};
+\end{tikzpicture}

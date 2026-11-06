@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \tikzset{chu/.style={font=\footnotesize, align=center, text=black!85}}
+  \foreach \k/\c in {0/cRed,1/cGreen,2/cBlue}{\khoibaD{0+0.12*\k}{0}{0.08}{1.9}{1.9}{\c}}
+  \node[chu] at (0.9,-0.35) {ảnh $\mathbf{x}$};
+  \node[khoi, minimum width=1.5cm, minimum height=1.1cm, align=center] (cnn) at (3.15,0.95) {Các tầng\\tích chập};
+  \draw[mui] (1.75,0.95) -- (cnn.west);
+  \foreach \k in {0,...,5}{\khoibaD{4.75+0.18*\k}{0.35}{0.13}{1.05}{1.05}{cPurple}}
+  \node[chu] at (5.6,-0.35) {bản đồ $A^k$};
+  \draw[mui] (cnn.east) -- (4.7,0.95);
+  \node[khoiC, minimum width=1.5cm, align=center] (y) at (8.6,0.95) {điểm lớp\\$y^c$};
+  \draw[mui] (6.75,0.95) -- (y.west);
+  \node[khoiG, align=center, minimum width=3.6cm] (al) at (5.6,3.25) {$\alpha_k^c=\frac{1}{Z}\sum_{ij}\frac{\partial y^c}{\partial A_{ij}^k}$};
+  \draw[muiM=cRed, dashed] (y.north) |- node[pos=0.72, above, font=\footnotesize, text=cRed!80!black] {gradient} (al.east);
+  \node[khoiP, align=center, minimum width=4.3cm] (l) at (11.3,3.25) {$L^c=\mathrm{ReLU}\big(\sum_k\alpha_k^cA^k\big)$};
+  \draw[mui] (9.0,3.25) -- (l.west);
+  \draw[muiM=cPurple, dashed] (5.6,1.95) -- (al.south);
+  % bản đồ nhiệt minh họa: ô nóng ở giữa
+  \begin{scope}[shift={(10.35,0)}]
+    \shade[inner color=cRed, outer color=cBlue!70] (0,0) rectangle (1.9,1.9);
+    \draw[gray!80] (0,0) rectangle (1.9,1.9);
+    \node[chu] at (0.95,-0.35) {nội suy, phủ lên ảnh};
+  \end{scope}
+  \draw[mui] (11.3,2.75) -- (11.3,1.98);
+\end{tikzpicture}

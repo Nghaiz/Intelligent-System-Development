@@ -1,0 +1,182 @@
+{
+ "rows": [
+  {
+   "mae": 1.8573113679885864,
+   "rmse": 2.2349472045898438,
+   "r2": -0.0017812252044677734,
+   "ci_lo": 2.198876756429672,
+   "ci_hi": 2.268586206436157,
+   "dataset": "Vietnam Housing",
+   "model": "Dummy",
+   "family": "dummy",
+   "framework": "scikit-learn",
+   "seconds": 0.0004076999999824693,
+   "val_score": -2.2153525352478027,
+   "params": {},
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 0.0004076999999824693
+  },
+  {
+   "mae": 1.1629303693771362,
+   "rmse": 1.4944642782211304,
+   "r2": 0.5520707368850708,
+   "ci_lo": 1.45636428296566,
+   "ci_hi": 1.5296407729387282,
+   "dataset": "Vietnam Housing",
+   "model": "LogReg/Ridge",
+   "family": "linear",
+   "framework": "scikit-learn",
+   "seconds": 0.011235599999963597,
+   "val_score": -1.4856306314468384,
+   "params": {
+    "alpha": 0.1
+   },
+   "threshold": null,
+   "grid_size": 4,
+   "search_seconds": 0.032901399999900605
+  },
+  {
+   "mae": 1.1590107341844282,
+   "rmse": 1.5051196240578129,
+   "r2": 0.5456606338297748,
+   "ci_lo": 1.4663292107646535,
+   "ci_hi": 1.5428122170403455,
+   "dataset": "Vietnam Housing",
+   "model": "Linear SVM",
+   "family": "svm",
+   "framework": "scikit-learn",
+   "seconds": 0.9238630999999486,
+   "val_score": -1.4926455743171496,
+   "params": {
+    "C": 1
+   },
+   "threshold": null,
+   "grid_size": 3,
+   "search_seconds": 1.1230269000000135
+  },
+  {
+   "mae": 1.2326692458392963,
+   "rmse": 1.5977474096319322,
+   "r2": 0.48801813780060765,
+   "ci_lo": 1.5604432053970771,
+   "ci_hi": 1.635296784344803,
+   "dataset": "Vietnam Housing",
+   "model": "Cây quyết định",
+   "family": "tree",
+   "framework": "scikit-learn",
+   "seconds": 0.1463214999999991,
+   "val_score": -1.5972844008831952,
+   "params": {
+    "max_depth": 10,
+    "min_samples_leaf": 20
+   },
+   "threshold": null,
+   "grid_size": 6,
+   "search_seconds": 0.8233369999998104
+  },
+  {
+   "mae": 1.1023711750015144,
+   "rmse": 1.443216252862341,
+   "r2": 0.5822647217250294,
+   "ci_lo": 1.4064373512467843,
+   "ci_hi": 1.4819691404665614,
+   "dataset": "Vietnam Housing",
+   "model": "Random Forest",
+   "family": "rf",
+   "framework": "scikit-learn",
+   "seconds": 2.559534699999972,
+   "val_score": -1.41333604115472,
+   "params": {
+    "max_depth": 20,
+    "min_samples_leaf": 2
+   },
+   "threshold": null,
+   "grid_size": 6,
+   "search_seconds": 11.922281399999974
+  },
+  {
+   "mae": 1.05513334274292,
+   "rmse": 1.3973853588104248,
+   "r2": 0.6083747148513794,
+   "ci_lo": 1.3630048871040343,
+   "ci_hi": 1.4350839883089066,
+   "dataset": "Vietnam Housing",
+   "model": "XGBoost",
+   "family": "xgb",
+   "framework": "xgboost",
+   "seconds": 1.4015523000000485,
+   "val_score": -1.3409382104873657,
+   "params": {
+    "max_depth": 7,
+    "reg_lambda": 5
+   },
+   "threshold": null,
+   "grid_size": 6,
+   "search_seconds": 7.67501730000015,
+   "n_trees": 497
+  }
+ ],
+ "best": {
+  "family": "xgb",
+  "name": "XGBoost",
+  "threshold": null
+ },
+ "importance": {
+  "rows": [
+   {
+    "feature": "Area",
+    "drop": 0.459076722462972
+   },
+   {
+    "feature": "District",
+    "drop": 0.1328622301419576
+   },
+   {
+    "feature": "Ward",
+    "drop": 0.09283500909805298
+   },
+   {
+    "feature": "Floors",
+    "drop": 0.09153707822163899
+   },
+   {
+    "feature": "Province_Hà Nội",
+    "drop": 0.0682483712832133
+   },
+   {
+    "feature": "Access Road",
+    "drop": 0.06404254833857219
+   },
+   {
+    "feature": "Street",
+    "drop": 0.044052441914876304
+   },
+   {
+    "feature": "Province_Hồ Chí Minh",
+    "drop": 0.029529293378194172
+   },
+   {
+    "feature": "Bathrooms",
+    "drop": 0.028052151203155518
+   },
+   {
+    "feature": "Bedrooms",
+    "drop": 0.010850032170613607
+   },
+   {
+    "feature": "missingindicator_Floors",
+    "drop": 0.006355027357737224
+   },
+   {
+    "feature": "Legal status_Sale contract",
+    "drop": 0.005336960156758626
+   }
+  ]
+ },
+ "random_split": {
+  "mae": 0.9482374787330627,
+  "rmse": 1.289371371269226,
+  "r2": 0.6626805067062378
+ }
+}

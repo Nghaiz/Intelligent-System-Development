@@ -1,0 +1,25 @@
+\begin{tikzpicture}[x=0.5cm,y=0.5cm]
+  % lưới ba tầng nhìn xiên: một điểm tầng sâu nhìn thấy vùng lớn dần trên ảnh vào
+  \newcommand{\luoi}[6]{%
+    \begin{scope}[shift={(#1,#2)}, yslant=0.32, xslant=-0.55]
+      \fill[#4!10] (0,0) rectangle (#3,#3);
+      \fill[#4!55] (#5,#5) rectangle (#6,#6);
+      \draw[gray!70, thin] (0,0) grid (#3,#3);
+      \draw[#4!70!black, line width=1.1pt] (#5,#5) rectangle (#6,#6);
+    \end{scope}}
+  \luoi{3}{0}{9}{cBlue}{2}{7}
+  \luoi{4.5}{7.2}{7}{cGreen}{2}{5}
+  \luoi{5.5}{13.6}{5}{cOrange}{2}{3}
+  \node[nhan, anchor=west, text width=4.7cm] at (13.5,17.2) {\textbf{Tầng 2:} một điểm thấy vùng $5{\times}5$ trên ảnh vào};
+  \node[nhan, anchor=west, text width=4.7cm] at (13.5,10.7) {\textbf{Tầng 1:} Conv $3{\times}3$, một điểm thấy vùng $3{\times}3$};
+  \node[nhan, anchor=west, text width=4.7cm] at (13.5,3.8) {\textbf{Ảnh vào}};
+  % công thức, số thật tính từ kiến trúc
+  \node[draw=cNavy, fill=softgray, rounded corners=3pt, anchor=north west, text width=5.9cm, font=\small, align=left] at (23.6,19.0) {%
+    \textbf{Công thức đệ quy}\\[3pt]
+    $j_\ell=j_{\ell-1}\,s_\ell,\quad j_0=1$\\[2pt]
+    $r_\ell=r_{\ell-1}+(k_\ell-1)\,j_{\ell-1}$\\[6pt]
+    \textbf{Tầng cuối của ba mạng}\\[2pt]
+    CNN cơ bản: \SL{ch3_summary/rf/custom} điểm ảnh\\
+    ResNet-18: \SL{ch3_summary/rf/resnet18} điểm ảnh\\
+    MobileNetV2: \SL{ch3_summary/rf/mobilenetv2} điểm ảnh};
+\end{tikzpicture}

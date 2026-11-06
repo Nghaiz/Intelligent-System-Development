@@ -1,0 +1,154 @@
+% Chương 6: Hệ đa tác tử. Mọi con số qua \SL{...} hoặc bảng generated/.
+\chapter{Hệ đa tác tử}\label{chap:ch6}
+
+Chương 5 dừng ở một tác tử ReAct dùng công cụ. Chương này đặt câu hỏi tiếp theo: chia việc cho nhiều tác tử có làm hệ thống đúng hơn không, và phải trả bao nhiêu token cho phần đúng thêm đó? Lý thuyết đi trước, sau đó ba kiến trúc được tự cài trên cùng một LLM cục bộ và đo trên ba dataset, có kiểm định cặp vì cỡ mẫu nhỏ.
+
+\section{Mô hình hình thức của hệ đa tác tử}
+
+\subsection{Dec-POMDP}
+Khi nhiều tác tử cùng theo đuổi một mục tiêu nhưng mỗi tác tử chỉ thấy một phần sự việc, khung chuẩn là quá trình quyết định Markov quan sát một phần phi tập trung (Dec-POMDP) \cite{ch6bernstein2002,ch6oliehoek2016}:
+\begin{equation}
+\mathcal{M}=\langle \mathcal{I},\mathcal{S},\{\mathcal{A}^i\},P,R,\{\Omega^i\},O,\gamma\rangle .
+\end{equation}
+Ở đây $\mathcal{I}$ là tập $N$ tác tử, $\mathcal{S}$ là không gian trạng thái, $\mathcal{A}^i$ là tập hành động của tác tử $i$. Hành động chung $\mathbf{a}_t=(a^1_t,\dots,a^N_t)$ đưa hệ sang trạng thái mới theo $P(s_{t+1}\mid s_t,\mathbf{a}_t)$. Mọi tác tử nhận chung phần thưởng $R(s_t,\mathbf{a}_t)$, còn quan sát riêng $o^i_t\in\Omega^i$ sinh từ $O(\mathbf{o}_t\mid s_{t+1},\mathbf{a}_t)$. Chính sách $\pi^i$ chỉ được dựa trên lịch sử riêng $h^i_t$, và mục tiêu là
+\begin{equation}
+\pi^*=\arg\max_{\pi}\ \mathbb{E}\Big[\sum_{t=0}^{T}\gamma^t R(s_t,\mathbf{a}_t)\Big],\qquad \pi=(\pi^1,\dots,\pi^N),\ \ a^i_t\sim\pi^i(\cdot\mid h^i_t).
+\end{equation}
+Với chân trời hữu hạn và từ hai tác tử trở lên, bài toán này thuộc lớp NEXP-đầy đủ \cite{ch6bernstein2002}, khó hơn hẳn POMDP một tác tử. Đó là lý do hệ thực tế không tìm chính sách tối ưu mà áp đặt cấu trúc phối hợp cố định, như các kiến trúc ở mục~\ref{sec:ch6-topo}.
+
+\hinhtikz{ch6_decpomdp}{Dec-POMDP: mỗi tác tử chỉ thấy quan sát riêng, cùng tác động lên trạng thái ẩn và chia chung phần thưởng.}{ch6-decpomdp}
+
+Áp vào tác tử LLM, phép ánh xạ khá thẳng: trạng thái ẩn là đáp án đúng, quan sát riêng là phần ngữ cảnh mỗi tác tử được nhìn thấy, hành động là văn bản hoặc lời gọi công cụ, phần thưởng là đúng hay sai ở cuối. Khác biệt là chính sách không học được ở đây: nó được cố định bởi system prompt cộng trọng số LLM, nên thiết kế kiến trúc thay cho việc tối ưu $\pi$.
+
+\subsection{Markov game và cân bằng Nash}
+Khi mỗi tác tử có phần thưởng riêng $R^i$, ta có Markov game \cite{ch6littman1994}: hợp tác hoàn toàn là trường hợp $R^1=\dots=R^N$, đối kháng tổng không là $R^1=-R^2$. Không còn một tối ưu chung, nên lời giải là cân bằng Nash \cite{ch6nash1951}, nơi không tác tử nào được lợi khi đơn phương đổi chính sách:
+\begin{equation}
+J^i(\pi^{i*},\pi^{-i*})\ \ge\ J^i(\pi^{i},\pi^{-i*})\qquad \forall \pi^i,\ \forall i .
+\end{equation}
+Debate mượn hình thức đối kháng này nhưng mục tiêu cuối vẫn là hợp tác: hai bên phản biện nhau để trọng tài có đáp án tốt hơn, không phải để một bên thắng.
+
+\subsection{Kiến trúc nhận thức BDI}
+Dec-POMDP mô tả hệ nhìn từ ngoài; BDI mô tả một tác tử nhìn từ trong. Xuất phát từ lý thuyết lý trí thực tiễn của Bratman \cite{ch6bratman1987} và được Rao, Georgeff đưa thành kiến trúc \cite{ch6rao1995}, mô hình gồm niềm tin (điều tác tử tin là đúng), mong muốn (trạng thái muốn đạt) và ý định (kế hoạch đã cam kết). Điểm đáng giá là cam kết: tác tử không cân nhắc lại mọi thứ ở mỗi bước, trừ khi niềm tin thay đổi đủ để bỏ ý định. Vòng ReAct \cite{ch6yao2023} gần với mô hình này: lịch sử Observation đóng vai niềm tin, system prompt đóng vai mong muốn, Action là ý định một bước.
+
+\hinhtikz{ch6_bdi}{Chu trình BDI: nhận thức cập nhật niềm tin, cân nhắc chọn ý định, ý định sinh hành động.}{ch6-bdi}
+
+\section{Kiến trúc phối hợp và giao thức}\label{sec:ch6-topo}
+
+\subsection{Bốn cấu trúc phối hợp}
+Hình~\ref{fig:ch6-topologies} so sánh các cấu trúc chương này bàn tới.
+\begin{itemize}
+\item \textbf{Single ReAct:} một tác tử, ít chi phí phối hợp nhất, nhưng không ai kiểm tra lại nó.
+\item \textbf{Supervisor:} một tác tử điều phối giao việc cho chuyên gia và tổng hợp. Luồng dễ kiểm soát; cái giá là điều phối sai thì cả đội sai theo.
+\item \textbf{Hierarchical:} Supervisor nhiều tầng, gốc giao cho trưởng nhóm, trưởng nhóm giao cho người làm. Hợp với bài toán lớn; mỗi tầng thêm một lần tóm tắt và một lần mất thông tin. Chương không đo kiến trúc này vì bài toán ở đây không đủ lớn để cần tới hai tầng.
+\item \textbf{Debate:} các tác tử ngang hàng giải độc lập rồi đọc chéo \cite{ch6du2023,ch6liang2023}. Sai sót của một bên có cơ hội bị bên kia bắt, với điều kiện hai bên không sai giống nhau.
+\end{itemize}
+Điều kiện cuối là mấu chốt. Hai tác tử chạy cùng một LLM chỉ khác prompt thì sai số tương quan cao, nên lợi ích của biểu quyết nhỏ hơn nhiều so với hai nguồn độc lập.
+
+\hinhtikz{ch6_topologies}{Bốn cấu trúc phối hợp; chương này cài (a), (b), (d).}{ch6-topologies}
+
+\subsection{Giao thức trao đổi}
+FIPA-ACL \cite{ch6fipa2002} chuẩn hóa thông điệp theo lý thuyết hành vi ngôn ngữ: mỗi thông điệp mang một \emph{performative} như \texttt{request}, \texttt{inform}, \texttt{propose}, kèm người gửi, người nhận, nội dung và bản thể học dùng để hiểu nội dung. Tác tử LLM hiện đại đổi phần nội dung hình thức đó lấy văn bản tự do cộng vài dòng có cấu trúc. Hệ ở đây theo hướng tối giản: thông điệp là một JSON phẳng \texttt{\{type, from, to, content, tokens\}}, và các hành vi được quy ước bằng từ khóa trong nội dung (\texttt{ASSIGN}, \texttt{PASS}, \texttt{FAIL}, \texttt{Action}, \texttt{Final Answer}).
+
+Mỗi lượt gọi LLM phải gửi lại toàn bộ ngữ cảnh mà tác tử đó cần, vì LLM không giữ trạng thái. Tổng chi phí một câu hỏi là
+\begin{equation}
+T=\sum_{c\in\text{lượt gọi}}\big(|\text{prompt}_c|+|\text{output}_c|\big),
+\end{equation}
+nên thêm tác tử làm tăng token gần như tuyến tính theo số lượt gọi, bất kể lượt đó có đóng góp gì.
+
+\subsection{Ba framework phổ biến}
+Bảng~\ref{tab:ch6-framework} chỉ ghi điều đọc được trực tiếp trong README chính thức của từng dự án, truy cập ngày 05/11/2026. Hệ của chương không dùng framework nào: tự cài để đếm được từng token và giữ mã trong phạm vi trích được vào báo cáo.
+
+\begin{table}[!htbp]\centering\caption{Đặc điểm đã kiểm chứng từ README của ba framework.}\label{tab:ch6-framework}
+{\small\begin{tabular}{L{2.6cm}L{4.3cm}L{4.3cm}L{4.3cm}}
+\toprule
+Tiêu chí & LangGraph \cite{ch6langgraph} & AutoGen \cite{ch6autogen} & CrewAI \cite{ch6crewai}\\
+\midrule
+Tư tưởng & Điều phối cấp thấp cho tác tử có trạng thái, lấy cảm hứng từ Pregel và Apache Beam & Tác tử phân tầng: Core API truyền thông điệp, AgentChat cho hội thoại nhóm & Crews theo vai trò cộng Flows hướng sự kiện \\
+Phối hợp & Tự định nghĩa bằng đồ thị & Hội thoại hai tác tử hoặc nhóm & Quy trình tuần tự hoặc phân cấp có quản lý \\
+Bền vững và con người & Durable execution, human-in-the-loop, bộ nhớ ngắn và dài hạn & Hoạt động tự chủ hoặc cùng con người & Flows kiểm soát luồng chính xác \\
+Tình trạng & Đang phát triển, dùng được không cần LangChain & Đã lưu trữ, không còn bảo trì; khuyên chuyển sang Microsoft Agent Framework & Đang phát triển \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\section{Dữ liệu}
+Bảng~\ref{tab:ch6-datasets} tóm tắt ba dataset, bảng~\ref{tab:ch6-samples} cho một mẫu thực của mỗi tập. GSM8K \cite{ch6cobbe2021} là toán lời văn bậc phổ thông, đáp án là một số. PubMedQA \cite{ch6jin2019} là câu hỏi nghiên cứu y sinh kèm tóm tắt bài báo, nhãn yes, no hoặc maybe do chuyên gia gán. Ca lâm sàng là dữ liệu \textbf{tổng hợp} do chính báo cáo sinh ra.
+
+\bang{ch6_datasets}{Ba dataset của Chương 6. Hai tập công khai có giấy phép MIT.}{ch6-datasets}
+\bang{ch6_samples}{Mẫu đầu ra thực của từng dataset (đã cắt ngắn).}{ch6-samples}
+
+\begin{luuy}{Dữ liệu tổng hợp, không phải tư vấn y tế}
+Ca lâm sàng được sinh từ \SL{ch6_compare/n_rules} luật cứng về thuốc (Metformin theo eGFR và rượu, Lisinopril, Spironolactone, Ibuprofen, Propranolol, Hydrochlorothiazide, Amlodipine). Ngưỡng được rút gọn cho mục đích đo tác tử, nhãn đúng hay sai là đầu ra của hàm luật, không có bác sĩ nào duyệt. Không dùng cho bất kỳ quyết định y khoa nào.
+\end{luuy}
+
+\textbf{Tiền xử lý.} Mỗi tập được xáo bằng hạt giống cố định rồi lấy các câu đầu, nên mọi kiến trúc gặp đúng cùng câu hỏi và so sánh theo cặp được. Đáp án GSM8K lấy số sau dấu \texttt{\#\#\#\#}; đáp án của mô hình lấy số cuối cùng sau \texttt{Final Answer}. Với PubMedQA, các đoạn tóm tắt được nối lại và đưa nguyên vào prompt. Ca lâm sàng chứa đủ mọi chỉ số dù thuốc chỉ liên quan vài chỉ số, các giá trị lấy mẫu dày quanh ngưỡng, hai lớp cân bằng. Phân bố ở hình~\ref{fig:ch6-dist}.
+
+\hinhpdf{ch6_dist}{0.97}{Phân bố trên tập con dùng đo: số bước lời giải GSM8K, nhãn PubMedQA và nhãn ca tổng hợp.}{ch6-dist}
+
+\nhanxet{PubMedQA lệch lớp nên độ đúng phải đọc cùng F1 macro và lớp đa số. GSM8K không có lớp đa số, baseline của nó là một lượt gọi LLM.}
+
+\clearpage
+\section{Cài đặt}
+\subsection{Tác tử là generator}
+Hình~\ref{fig:ch6-stack3d} là các tầng của hệ. Điểm thiết kế chính: mỗi kiến trúc là một generator Python, \texttt{yield Call} để xin LLM trả lời, \texttt{yield Note} để ghi thông điệp không tốn token. Tác tử không tự gọi LLM nên không tự khai được token của mình. Lớp \texttt{Run} giữ sổ, vì vậy cùng một mã kiến trúc chạy được theo hai cách: \texttt{run\_to\_end} khi đánh giá, \texttt{stream} phát từng thông điệp cho Web App qua SSE. Mô hình là Qwen2.5-7B chạy qua Ollama trên GPU; token ra lấy từ Ollama, token vào đếm lại bằng tokenizer của mô hình.
+
+\hinhtikz{ch6_stack3d}{Các tầng của hệ đa tác tử tự cài.}{ch6-stack3d}
+
+\subsection{Ba kiến trúc}
+\textbf{Single ReAct} (đoạn mã~\ref{code:ch6_arch__react}) lặp Thought, Action, Observation. Mỗi miền có một công cụ: \texttt{calc} tính biểu thức qua cây cú pháp nên không chạy được mã tùy ý, \texttt{find} tìm câu trong tóm tắt, \texttt{guideline} trả luật của thuốc. Luật không nằm trong đề, nên trên ca lâm sàng tác tử buộc phải gọi công cụ mới có căn cứ. Hết lượt mà chưa kết luận thì tác tử bị buộc viết một dòng \texttt{Final Answer}; vẫn chưa có nhãn thì bị hỏi lại đúng nhãn, các lượt này cũng được tính token. Luật đọc nhãn nằm một chỗ (\texttt{conclusion\_word}), dùng chung lúc chạy và lúc chấm. Trên ca tiếng Việt, mọi lệnh cho tác tử cũng bằng tiếng Việt.
+
+\maDai{ch6_arch__react}{Vòng ReAct, dùng lại làm thân của mọi chuyên gia và tác tử tranh luận.}
+
+\textbf{Supervisor} (đoạn mã~\ref{code:ch6_arch__supervisor}): điều phối đọc đề và ghi dòng \texttt{ASSIGN}, tối đa hai chuyên gia chạy ReAct với cùng công cụ, kiểm chứng độc lập trả \texttt{PASS} hoặc \texttt{FAIL} kèm lỗi cụ thể, bị bác thì làm lại một lần.
+
+\maDai{ch6_arch__supervisor}{Kiến trúc Supervisor.}
+
+\textbf{Debate} (đoạn mã~\ref{code:ch6_arch__debate}): tác tử A giải trực tiếp, tác tử B được dặn hoài nghi và giải theo đường khác để giảm tương quan sai số. Chỉ hai nhãn đọc được và trùng nhau mới là đồng thuận, khi đó dừng ngay, không tốn lượt trọng tài; còn lại thì đọc chéo một vòng, vẫn chưa đồng thuận thì trọng tài quyết.
+
+\maDai{ch6_arch__debate}{Kiến trúc Debate.}
+
+\section{Đánh giá}
+\subsection{Thiết lập đo}
+Mọi kiến trúc dùng cùng mô hình \texttt{\SL{ch6_compare/model}}, nhiệt độ 0, trên cùng \SL{ch6_compare/summary/gsm8k/single/n} câu GSM8K, \SL{ch6_compare/summary/pubmed/single/n} câu PubMedQA và \SL{ch6_compare/summary/clinical/single/n} ca tổng hợp. Thêm một baseline một lượt gọi, không công cụ, không suy luận. Cỡ mẫu nhỏ nên độ đúng kèm khoảng tin cậy Wilson 95\%; so sánh hai kiến trúc dùng kiểm định McNemar chính xác trên các câu hai bên bất đồng, hiệu độ đúng có khoảng bootstrap, và $p$ được hiệu chỉnh Holm vì có chín phép so sánh. Toàn bộ thông điệp nằm ở \texttt{data/ch6/runs/*.jsonl}, kết quả chấm lại được từ các tệp này.
+
+\bang{ch6_compare}{So sánh các kiến trúc trên ba dataset (qwen2.5-7b).}{ch6-compare}
+\hinhpdf{ch6_acc}{0.97}{Độ đúng và khoảng tin cậy Wilson 95\%.}{ch6-acc}
+\bang{ch6_pairs}{Kiểm định cặp McNemar; thắng là số câu kiến trúc bên phải đúng còn bên trái sai.}{ch6-pairs}
+\hinhpdf{ch6_cost}{0.8}{Đánh đổi giữa token và độ đúng.}{ch6-cost}
+
+\subsection{Phân tích}
+\textbf{Đa tác tử không thắng.} Single ReAct cao nhất hoặc ngang hàng cao nhất trên cả ba dataset: GSM8K \SL{ch6_compare/summary/gsm8k/single/accuracyPct}\% (Supervisor \SL{ch6_compare/summary/gsm8k/supervisor/accuracyPct}\%, Debate \SL{ch6_compare/summary/gsm8k/debate/accuracyPct}\%), PubMedQA \SL{ch6_compare/summary/pubmed/single/accuracyPct}\% (\SL{ch6_compare/summary/pubmed/supervisor/accuracyPct}\%, \SL{ch6_compare/summary/pubmed/debate/accuracyPct}\%), ca lâm sàng \SL{ch6_compare/summary/clinical/single/accuracyPct}\% (\SL{ch6_compare/summary/clinical/supervisor/accuracyPct}\%, \SL{ch6_compare/summary/clinical/debate/accuracyPct}\%). Tuy vậy, chưa so sánh nào đạt mức 5\% sau hiệu chỉnh Holm. Giá trị $p$ nhỏ nhất là \SL{ch6_compare/best_pair/p} (Holm \SL{ch6_compare/best_pair/p_holm}), ứng với Debate so với ReAct trên PubMedQA: Debate thắng \SL{ch6_compare/best_pair/wins} câu, thua \SL{ch6_compare/best_pair/losses} câu. Với \SL{ch6_compare/n_questions} câu mỗi tập, kết luận vững là không thấy lợi ích của đa tác tử trên mô hình này; chưa đủ để nói đa tác tử chắc chắn kém hơn.
+
+\textbf{Chi phí thì rõ ràng.} So với ReAct, Supervisor tốn gấp \SL{ch6_compare/summary/gsm8k/supervisor/tokens_x_s} lần token trên GSM8K, \SL{ch6_compare/summary/pubmed/supervisor/tokens_x_s} lần trên PubMedQA và \SL{ch6_compare/summary/clinical/supervisor/tokens_x_s} lần trên ca lâm sàng; Debate tốn gấp \SL{ch6_compare/summary/gsm8k/debate/tokens_x_s}, \SL{ch6_compare/summary/pubmed/debate/tokens_x_s} và \SL{ch6_compare/summary/clinical/debate/tokens_x_s} lần. Bước nhảy đáng giá nhất không nằm ở số tác tử mà ở công cụ: so với một lượt gọi, vòng ReAct nâng độ đúng từ \SL{ch6_compare/summary/gsm8k/direct/accuracyPct}\% lên \SL{ch6_compare/summary/gsm8k/single/accuracyPct}\% trên GSM8K và từ \SL{ch6_compare/summary/clinical/direct/accuracyPct}\% lên \SL{ch6_compare/summary/clinical/single/accuracyPct}\% trên ca lâm sàng.
+
+\textbf{Kiểm chứng bác gần như mọi thứ.} Verifier trả FAIL ở \SL{ch6_compare/diagnostics/gsm8k/verifier_fail_ratePct}\% lượt trên GSM8K, \SL{ch6_compare/diagnostics/pubmed/verifier_fail_ratePct}\% trên PubMedQA và \SL{ch6_compare/diagnostics/clinical/verifier_fail_ratePct}\% trên ca lâm sàng. Nó không có công cụ, chỉ suy luận lại bằng chính LLM đó. Tác dụng của lượt làm lại tùy miền: GSM8K sửa đúng \SL{ch6_compare/diagnostics/gsm8k/rev_fixed} câu, làm hỏng \SL{ch6_compare/diagnostics/gsm8k/rev_broken}; PubMedQA sửa \SL{ch6_compare/diagnostics/pubmed/rev_fixed}, hỏng \SL{ch6_compare/diagnostics/pubmed/rev_broken}; ca lâm sàng chỉ sửa \SL{ch6_compare/diagnostics/clinical/rev_fixed} mà hỏng \SL{ch6_compare/diagnostics/clinical/rev_broken}. Như vậy lượt làm lại có ích ở hai miền đầu nhưng Supervisor vẫn dưới ReAct, còn trên ca lâm sàng nó là nguyên nhân chính của khoảng cách.
+
+\textbf{Tranh luận ít khi xảy ra đúng chỗ.} Hai tác tử bất đồng ở \SL{ch6_compare/diagnostics/gsm8k/disputed_ratePct}\% câu GSM8K, \SL{ch6_compare/diagnostics/pubmed/disputed_ratePct}\% câu PubMedQA và \SL{ch6_compare/diagnostics/clinical/disputed_ratePct}\% ca lâm sàng. Trên PubMedQA, khi hai bên đồng thuận thì độ đúng chỉ là \SL{ch6_compare/diagnostics/pubmed/consensus_accPct}\%: cùng một LLM nên sai giống nhau, hoặc một bên nhận sai dù đang đúng. Trọng tài chọn đúng \SL{ch6_compare/diagnostics/pubmed/disputed_correct} trong \SL{ch6_compare/diagnostics/pubmed/disputed} ca PubMedQA, nhưng \SL{ch6_compare/diagnostics/clinical/disputed_correct} trong \SL{ch6_compare/diagnostics/clinical/disputed} ca lâm sàng.
+
+\textbf{Trên ca lâm sàng,} ReAct và Debate vượt lớp đa số \SL{ch6_compare/majority/clinicalPct}\%, Supervisor thì không. Lỗi còn lại chủ yếu là so số: vết ở mục sau có tác tử cho rằng eGFR 62 nằm trong khoảng 30--45. Đây là giới hạn của mô hình, không sửa được bằng cách thêm tác tử cùng mô hình.
+
+\begin{luuy}{Giới hạn của phép đo}
+\begin{itemize}
+\item Mỗi dataset \SL{ch6_compare/n_questions} câu, khoảng tin cậy còn rộng; một LLM, nhiệt độ 0, nên các tác tử không độc lập thật sự.
+\item Lượt đo đầu có lỗi cài đặt và đã bị loại khỏi báo cáo: lượt ép kết luận quá ngắn khiến \SL{ch6_compare/before_fix/supervisor_no_answerPct}\% câu của Supervisor trên ca lâm sàng không có nhãn; lệnh tiếng Anh trên đề tiếng Việt làm \SL{ch6_compare/before_fix/foreign_ratePct}\% lượt trôi sang tiếng Trung; hai bên cùng không có nhãn bị xem là đồng thuận. Sau khi sửa và đo lại, mọi câu đều có nhãn đọc được, tỉ lệ trôi ngôn ngữ còn \SL{ch6_compare/diagnostics/clinical/foreign_ratePct}\%. Vết cũ giữ ở \texttt{data/ch6/runs\_n30}.
+\item Verifier không có công cụ; cho nó tra được luật có thể đổi kết quả của Supervisor, chương chưa đo phương án này.
+\end{itemize}
+\end{luuy}
+
+Tiểu luận 03 từng đo GSM8K với mô hình khác, \SL{ch6_compare/prior_gsm8k/model}: hệ đa tác tử đạt \SL{ch6_compare/prior_gsm8k/multi_accPct}\% trên \SL{ch6_compare/prior_gsm8k/n} câu, một tác tử suy luận từng bước đạt \SL{ch6_compare/prior_gsm8k/cot_accPct}\% trên \SL{ch6_compare/prior_gsm8k/cot_n} câu. Hai tập câu khác nhau nên không gộp số, nhưng chiều kết quả giống ở đây.
+
+\section{Kịch bản minh họa: hội chẩn đa chuyên khoa}
+Vết dưới đây lấy nguyên từ lượt đánh giá, không dựng riêng. Ca tổng hợp là: \emph{\input{generated/ch6_case}} Nhãn theo luật: \textbf{\SL{ch6_scenario/gold}} (\texttt{dung} là đơn hợp lệ). Nội dung dài bị cắt ở \texttt{[...]}, chữ Hán mô hình tự sinh được thay bằng nhãn \texttt{[chữ Hán]}, bản đầy đủ ở \texttt{outputs/metrics/ch6\_scenario.json}. Ca này không phải tư vấn y tế.
+
+\begin{vetsuyluan}{Supervisor: điều phối, chuyên khoa, kiểm chứng}
+\input{generated/ch6_trace_supervisor}
+\end{vetsuyluan}
+\begin{vetsuyluan}{Debate: hai tác tử và trọng tài}
+\input{generated/ch6_trace_debate}
+\end{vetsuyluan}
+
+Cả ba kiến trúc đều ra nhãn đúng ở ca này: \SL{ch6_scenario/summary/single/tokens} token với ReAct, \SL{ch6_scenario/summary/supervisor/tokens} với Supervisor, \SL{ch6_scenario/summary/debate/tokens} với Debate. Nhưng nhãn đúng không có nghĩa là lý do đúng: theo luật, đơn sai vì bệnh nhân uống từ 3 ly rượu/ngày, trong khi chuyên khoa Thận và tác tử B lại xếp eGFR 62 vào khoảng 30--45, tác tử A viện dẫn kali, còn Verifier trả FAIL cả hai lần với một nhãn đúng. Hình thức hội chẩn không tự đảm bảo chất lượng suy luận. Web App phát trực tiếp các thông điệp kiểu này qua \texttt{tlf/serve\_ch6.py}, hàm \texttt{run(arch, question, model)}.
+
+\section{Tóm tắt chương}
+Chương đã trình bày Dec-POMDP, Markov game, BDI, các cấu trúc phối hợp và tự cài ba kiến trúc trên một LLM cục bộ. Kết quả đo thật đi ngược kỳ vọng phổ biến: với Qwen2.5-7B, thêm tác tử làm token tăng nhiều lần mà độ đúng không tăng, và Single ReAct có công cụ vẫn cao nhất hoặc ngang hàng cao nhất. Đa tác tử chỉ có cơ hội khi các tác tử thực sự khác nhau về thông tin hoặc công cụ, và khi bên kiểm chứng có căn cứ độc lập thay vì chỉ suy luận lại.
+

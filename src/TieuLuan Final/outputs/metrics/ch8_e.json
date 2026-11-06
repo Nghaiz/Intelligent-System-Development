@@ -1,0 +1,126 @@
+{
+ "agg": {
+  "eval_mean": 34.21255,
+  "eval_sd": 2.450442096733665,
+  "exact_mean": 34.23144445419312,
+  "exact_sd": 2.4303860331036273,
+  "n_opt": 9,
+  "n": 10,
+  "eval_disc": 0.08183,
+  "train_mean": 33.61560899999999,
+  "train_last": 33.71933,
+  "train_disc": 0.16427799999999998,
+  "rule_mean": 34.96785,
+  "exact_rule": 35.0,
+  "optimal": 35.0,
+  "best": 35.0,
+  "regret": 0.7685555458068848,
+  "switches": 557.2,
+  "diff_mean": -0.7553,
+  "diff_sd": 2.388468316725177,
+  "ci_lo": -2.4637885999999996,
+  "ci_hi": 0.9531885999999997
+ },
+ "seeds": [
+  {
+   "seed": 7,
+   "eval_mean": 34.672,
+   "rule_mean": 34.672,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0000",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 17,
+   "eval_mean": 34.9885,
+   "rule_mean": 34.9885,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0000",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 27,
+   "eval_mean": 35.105,
+   "rule_mean": 35.105,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0001",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 37,
+   "eval_mean": 27.253499999999978,
+   "rule_mean": 34.8065,
+   "paired_diff": -7.553,
+   "paired_se": 0.10054760883922885,
+   "exact": 27.314444541931152,
+   "policy": "1110",
+   "eval_disc": 0.8183
+  },
+  {
+   "seed": 47,
+   "eval_mean": 34.9555,
+   "rule_mean": 34.9555,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0100",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 57,
+   "eval_mean": 35.143,
+   "rule_mean": 35.143,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0100",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 67,
+   "eval_mean": 35.0935,
+   "rule_mean": 35.0935,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0100",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 77,
+   "eval_mean": 34.746,
+   "rule_mean": 34.746,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0000",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 87,
+   "eval_mean": 35.1385,
+   "rule_mean": 35.1385,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0100",
+   "eval_disc": 0.0
+  },
+  {
+   "seed": 97,
+   "eval_mean": 35.03,
+   "rule_mean": 35.03,
+   "paired_diff": 0.0,
+   "paired_se": 0.0,
+   "exact": 35.0,
+   "policy": "0000",
+   "eval_disc": 0.0
+  }
+ ]
+}

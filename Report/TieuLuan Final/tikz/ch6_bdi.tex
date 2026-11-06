@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[hop=cSlate, minimum width=2.5cm, minimum height=11mm] (env) at (0,0) {Môi trường\\thông điệp};
+  \node[hop=cBlue, minimum width=2.9cm, minimum height=13mm] (b) at (4.1,1.5) {\textbf{Beliefs}\\niềm tin};
+  \node[hop=cOrange, minimum width=2.9cm, minimum height=13mm] (d) at (8.6,1.5) {\textbf{Desires}\\mong muốn};
+  \node[hop=cRed, minimum width=2.9cm, minimum height=13mm] (i) at (13.1,1.5) {\textbf{Intentions}\\ý định đã cam kết};
+  \node[csdl=cTeal, minimum width=24mm, minimum height=15mm] (p) at (8.6,-1.5) {Thư viện\\kế hoạch};
+  \node[hop=cGreen, minimum width=2.9cm, minimum height=11mm] (a) at (13.1,-1.5) {Hành động\\gọi công cụ, gửi tin};
+  \draw[mui] (env) -- node[above left, nhan] {nhận thức} (b);
+  \draw[mui] (b) -- (d);
+  \node[nhan] at (6.35,2.5) {sinh lựa chọn};
+  \draw[mui] (d) -- (i);
+  \node[nhan] at (10.85,2.5) {cân nhắc};
+  \draw[mui] (p) -- (i);
+  \draw[mui] (i) -- (a);
+  \draw[mui] (b.south) |- (p.west);
+  \draw[muiM=cSlate, rounded corners=5pt] (a.south) -- ++(0,-1.0) -| node[below, pos=0.25, nhan] {tác động lên môi trường, vòng lặp tiếp theo} (env.south);
+\end{tikzpicture}

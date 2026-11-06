@@ -1,0 +1,151 @@
+\chapter{Mạng nơ-ron hồi quy}
+\label{chap:rnn}
+
+Mạng nơ-ron hồi quy (RNN) xử lý dữ liệu có thứ tự: giá cổ phiếu, thời tiết, tải điện. Chương này đi từ lý thuyết BPTT và tiêu biến gradient đến dự báo thật trên ba nguồn dữ liệu. Thước đo xuyên suốt là một câu hỏi đơn giản: mô hình có thắng được việc lấy lại giá trị vừa quan sát hay không.
+
+\section{Cơ sở lý thuyết}
+
+\subsection{Tensor chuỗi và RNN cơ bản}
+Mẫu trong bảng hay ảnh thường được xem là độc lập, còn hai quan sát liền kề của một chuỗi thì không. Một lô cửa sổ là tensor $\mathbf{X}\in\mathbb{R}^{B\times T\times D}$ (Hình~\ref{fig:ch4_tensor}): $B$ mẫu, mỗi mẫu $T$ bước, mỗi bước $D$ đặc trưng. RNN Elman~\cite{elman1990} giữ trạng thái ẩn $h_t$ làm bộ nhớ và dùng chung một bộ trọng số ở mọi bước (Hình~\ref{fig:ch4_unfold}):
+\begin{equation}
+h_t=\tanh(W_{xh}x_t+W_{hh}h_{t-1}+b_h),\qquad \hat y=W_{hy}h_T+b_y .
+\end{equation}
+
+\hinhtikz{ch4_tensor}{Tensor đầu vào $B\times T\times D$ và đầu ra dự báo trực tiếp $H$ bước.}{ch4_tensor}
+\hinhtikz{ch4_unfold}{RNN ở dạng gập và dạng mở theo thời gian; trọng số dùng chung ở mọi bước.}{ch4_unfold}
+
+\subsection{BPTT, tiêu biến và bùng nổ gradient}
+Mở mạng theo thời gian ta có một đồ thị sâu $T$ lớp, và lan truyền ngược trên đồ thị đó gọi là BPTT~\cite{werbos1990}. Quy tắc dây chuyền cho
+\begin{equation}
+\frac{\partial L}{\partial W_{hh}}=\sum_{k=1}^{T}\frac{\partial L}{\partial h_T}\Big(\prod_{j=k+1}^{T}\frac{\partial h_j}{\partial h_{j-1}}\Big)\frac{\partial^{+} h_k}{\partial W_{hh}},
+\qquad \frac{\partial h_j}{\partial h_{j-1}}=\mathrm{diag}(1-h_j^2)\,W_{hh}^{\top}.
+\end{equation}
+Vì $|1-h^2|\le 1$, nếu giá trị kỳ dị lớn nhất của $W_{hh}$ nhỏ hơn 1 thì tích Jacobi co lại theo cấp số mũ của khoảng cách $T-k$: bước xa gần như không nhận được tín hiệu học. Ngược lại, tích có thể tăng vọt~\cite{bengio1994} (Hình~\ref{fig:ch4_vanish}). Bùng nổ được xử lý bằng cắt chuẩn gradient~\cite{pascanu2013}, $g\leftarrow g\cdot\min(1,\theta/\|g\|)$, giữ nguyên hướng và chỉ giới hạn độ dài bước; thực nghiệm dùng $\theta=1$. Tiêu biến thì phải sửa ở kiến trúc.
+
+\hinhtikz{ch4_vanish}{Tích Jacobi co hoặc giãn theo khoảng cách thời gian, cùng hướng khắc phục.}{ch4_vanish}
+
+\subsection{LSTM và GRU}
+LSTM~\cite{hochreiter1997} thêm ô nhớ $c_t$ được cập nhật theo phép cộng, có ba cổng sigmoid điều tiết (Hình~\ref{fig:ch4_lstm}):
+\begin{equation}
+\begin{aligned}
+f_t&=\sigma(W_f[h_{t-1},x_t]+b_f), & i_t&=\sigma(W_i[h_{t-1},x_t]+b_i),\\
+o_t&=\sigma(W_o[h_{t-1},x_t]+b_o), & \tilde c_t&=\tanh(W_c[h_{t-1},x_t]+b_c),\\
+c_t&=f_t\odot c_{t-1}+i_t\odot\tilde c_t, & h_t&=o_t\odot\tanh(c_t).
+\end{aligned}
+\end{equation}
+Khi $f_t\approx 1$ thì $\partial c_t/\partial c_{t-1}\approx 1$, gradient đi qua nhiều bước mà không co lại. GRU~\cite{cho2014} gộp ô nhớ với trạng thái ẩn và chỉ dùng hai cổng (Hình~\ref{fig:ch4_gru}):
+\begin{equation}
+\begin{aligned}
+z_t&=\sigma(W_z[h_{t-1},x_t]), & r_t&=\sigma(W_r[h_{t-1},x_t]),\\
+\tilde h_t&=\tanh(W_h[r_t\odot h_{t-1},x_t]), & h_t&=(1-z_t)\odot h_{t-1}+z_t\odot\tilde h_t .
+\end{aligned}
+\end{equation}
+
+\hinhtikz{ch4_lstm}{Ô LSTM: đường ô nhớ phía trên và ba cổng.}{ch4_lstm}
+\hinhtikz{ch4_gru}{Ô GRU: hai cổng, một trạng thái.}{ch4_gru}
+
+\subsection{BiLSTM và recurrent dropout}
+BiLSTM~\cite{schuster1997} chạy một LSTM xuôi và một LSTM ngược rồi nối hai trạng thái. Trong dự báo, chiều ngược chỉ đọc lại cửa sổ đã quan sát, không thấy tương lai thật, nên vẫn hợp lệ. Dropout thường đổi mặt nạ ở mỗi bước và làm nhiễu bộ nhớ; recurrent dropout~\cite{gal2016} giữ một mặt nạ cho cả chuỗi (Hình~\ref{fig:ch4_birnn}). Keras có sẵn qua tham số \texttt{recurrent\_dropout}; \texttt{nn.LSTM} của PyTorch không có, nên mô hình PyTorch ở đây chỉ đặt Dropout sau trạng thái ẩn cuối.
+
+\hinhtikz{ch4_birnn}{Trái: BiLSTM trong cửa sổ quá khứ. Phải: mặt nạ dropout thường và mặt nạ recurrent dropout.}{ch4_birnn}
+
+
+\section{Dữ liệu và tiền xử lý}
+\subsection{Quy trình chung, không rò rỉ}
+Cả sáu chuỗi đi qua một quy trình (Hình~\ref{fig:ch4_split}): chia theo thời gian 70/15/15, mean và std của đặc trưng chỉ khớp trên hàng thuộc train, cửa sổ trượt bước 1, không xáo trộn qua ranh giới. Nhãn là phần thay đổi so với điểm cuối cửa sổ, chia cho độ lệch chuẩn của từng bước trên train:
+\begin{equation}
+\mathbf{Y}_{t,k}=(y_{t+k}-y_t)/\mathrm{sd}_k,\quad k=1,\dots,H .
+\end{equation}
+Với cổ phiếu $y$ là log giá. Như vậy đầu ra 0 đúng bằng Persistence, mô hình chỉ học phần vượt baseline. Giá 2026 cao gấp nhiều lần giá 2012, nên đặc trưng giá đều là tỉ số, không phải mức.
+
+\hinhtikz{ch4_split}{Chia theo thời gian, khớp thống kê trên train và cửa sổ trượt.}{ch4_split}
+
+\subsection{VN30: FPT, VCB, HPG, VIC}
+\textbf{Nguồn:} Yahoo Finance qua \texttt{yfinance}, \url{https://finance.yahoo.com/quote/FPT.VN/history/}, giá đã điều chỉnh cổ tức và chia tách. \textbf{Kích cỡ:} \SL{ch4_datasets/datasets/0/n_samples} dòng từ \SL{ch4_datasets/datasets/0/date_start} đến \SL{ch4_datasets/datasets/0/date_end} (FPT \SL{ch4_datasets/datasets/0/per_ticker/FPT}, VCB \SL{ch4_datasets/datasets/0/per_ticker/VCB}, HPG \SL{ch4_datasets/datasets/0/per_ticker/HPG}, VIC \SL{ch4_datasets/datasets/0/per_ticker/VIC} phiên), \SL{ch4_datasets/datasets/0/size_mb} MB, lưu ở \texttt{data/ch4/vn30\_prices.csv}. Sau khi loại phiên khối lượng 0 và các hàng đầu chưa đủ chỉ báo, FPT còn \SL{ch4_summary/FPT/n_rows} hàng. Tám đặc trưng: lợi suất, gap mở cửa, thân nến, biên độ, khối lượng tương đối, độ lệch so với SMA20, RSI14 và độ biến động 20 phiên. $T=60$, $H=10$. Bảng~\ref{tab:ch4_sample_vn30} là bốn dòng FPT thật, Hình~\ref{fig:ch4_eda_vn30} là chuỗi, phân bố và ACF.
+
+\bang{ch4_sample_vn30}{Mẫu thực của FPT (VNĐ, đã điều chỉnh).}{ch4_sample_vn30}
+\hinhpdf{ch4_eda_vn30}{1.0}{VN30: giá chuẩn hóa về 1 ở phiên đầu, lợi suất ngày gộp bốn mã, ACF của FPT.}{ch4_eda_vn30}
+
+\nhanxet{Phân bố lợi suất nhọn và có đuôi dày, biên $\pm 7\,\%$ của HoSE cắt phần đuôi. ACF của lợi suất dao động sát 0, còn ACF của trị tuyệt đối dương rõ: biến động có quán tính, hướng thì gần như không. Đây là lý do nên chờ đợi Persistence khó bị đánh bại ở một bước.}
+
+\subsection{Thời tiết Hà Nội theo giờ}
+\textbf{Nguồn:} Open-Meteo Archive API, \url{https://open-meteo.com/en/docs/historical-weather-api}, tái phân tích ERA5~\cite{hersbach2020} ở ô lưới gần Hà Nội, không phải trạm đo. \textbf{Kích cỡ:} \SL{ch4_datasets/datasets/1/n_samples} giờ từ \SL{ch4_datasets/datasets/1/date_start} đến \SL{ch4_datasets/datasets/1/date_end}, \SL{ch4_datasets/datasets/1/size_mb} MB, \SL{ch4_datasets/datasets/1/missing} ô thiếu; nhiệt độ từ \SL{ch4_datasets/datasets/1/temp_min} đến \SL{ch4_datasets/datasets/1/temp_max}\,°C. Mười đặc trưng gồm nhiệt độ, ẩm, áp suất, gió, log mưa, mây cùng sin, cos của giờ và ngày trong năm. $T=72$, $H=24$.
+
+\bang{ch4_sample_weather}{Mẫu thực của chuỗi thời tiết.}{ch4_sample_weather}
+\hinhpdf{ch4_eda_weather}{1.0}{Thời tiết Hà Nội: trung bình ngày, phân bố, ACF tới 168 giờ.}{ch4_eda_weather}
+
+\nhanxet{Chuỗi có chu kỳ năm và chu kỳ ngày rất rõ, ACF giữ ở mức cao và nhấp nhô theo 24 giờ, phân bố có đuôi về phía lạnh. Tín hiệu mạnh, nên kỳ vọng mô hình vượt xa baseline.}
+
+\subsection{Household Power Consumption}
+\textbf{Nguồn:} UCI id 235~\cite{uci235}, \url{https://archive.ics.uci.edu/dataset/235}, một hộ ở Sceaux, Pháp. \textbf{Kích cỡ:} \SL{ch4_datasets/datasets/2/n_minutes} phút đo (\SL{ch4_datasets/datasets/2/raw_mb} MB khi giải nén, thiếu \SL{ch4_datasets/datasets/2/missing_pct}\,\%), gộp đủ thành \SL{ch4_datasets/datasets/2/n_samples} giờ từ \SL{ch4_datasets/datasets/2/date_start} đến \SL{ch4_datasets/datasets/2/date_end}. Tiền xử lý: \SL{ch4_datasets/datasets/2/missing_hours} giờ không có phút nào đo được; lỗ tới 6 giờ nội suy tuyến tính, lỗ dài lấy cùng giờ tuần trước. Mười đặc trưng gồm công suất tác dụng, phản kháng, điện áp, ba công tơ phụ, sin, cos của giờ và thứ. $T=72$, $H=24$.
+
+\bang{ch4_sample_power}{Mẫu thực của chuỗi điện theo giờ.}{ch4_sample_power}
+\hinhpdf{ch4_eda_power}{1.0}{Công suất hộ gia đình: trung bình ngày, phân bố, ACF tới 168 giờ.}{ch4_eda_power}
+
+\nhanxet{Phân bố lệch phải với nhiều giờ nền thấp và các đỉnh ngắn khi bật thiết bị lớn. ACF có đỉnh tại bội của 24 giờ, và đỉnh 168 giờ cao tương đương đỉnh 24 giờ, cho thấy nhịp tuần. Khác với thời tiết, phần dao động ngẫu nhiên lớn, nên MAPE sẽ cao vì mẫu số nhỏ vào ban đêm.}
+
+\section{Hiện thực}
+Bốn kiến trúc PyTorch dùng chung một khung (Đoạn mã~\ref{code:ch4_torch__SeqRegressor}): một lớp hồi quy, Dropout, Linear ra $H$ giá trị. Dự báo trực tiếp tránh việc phải đoán các đặc trưng tương lai như kiểu đệ quy. Cổ phiếu dùng 32 đơn vị ẩn, Dropout 0,3, lô 64, weight decay; chuỗi theo giờ dùng 64 đơn vị, Dropout 0,1, lô 256. Tất cả dùng Adam, cắt chuẩn 1, dừng sớm theo MSE validation, một hạt giống.
+
+\maNguon{ch4_torch__SeqRegressor}{Mô hình hồi quy nhiều bước bằng PyTorch.}
+
+Trái tim của bản NumPy là hàm \texttt{backward} (Đoạn mã~\ref{code:ch4_scratch__RNNScratch.backward}): đi ngược từ $T$ về 1, nhân đạo hàm $\tanh$ và $W_{hh}$ đúng như công thức của BPTT, cộng dồn gradient vào trọng số dùng chung.
+
+\maNguon{ch4_scratch__RNNScratch.backward}{BPTT viết tay trên NumPy.}
+
+\begin{ketqua}{Kiểm tra bản NumPy trên toàn bộ FPT}
+Sai số tương đối lớn nhất so với sai phân trung tâm: \SL{ch4_theory/grad_check_max}\par
+Tham số: \SL{ch4_theory/numpy_params}; dừng ở epoch \SL{ch4_theory/numpy_epochs}; \SL{ch4_theory/numpy_seconds} giây CPU\par
+RMSE test một bước: \SL{ch4_summary/numpy_rmse} VNĐ; Persistence: \SL{ch4_summary/FPT/rmse_pers} VNĐ
+\end{ketqua}
+
+Keras dựng cùng cấu trúc bằng \texttt{layers.LSTM} (Đoạn mã~\ref{code:ch4_keras__build_keras_model}), chạy CPU trên FPT. Bảng~\ref{tab:ch4_frameworks} đối chiếu ba khung trên cùng phép chia.
+
+\maNguon{ch4_keras__build_keras_model}{Mô hình Keras tương đương.}
+\bang{ch4_frameworks}{NumPy và Keras so với PyTorch cùng kiến trúc trên FPT.}{ch4_frameworks}
+
+\section{Đánh giá}
+\subsection{Kết quả một bước}
+Mô hình được chọn cho mỗi chuỗi có MSE validation thấp nhất, không nhìn test. Kiểm định Diebold-Mariano~\cite{diebold1995} so sai số bình phương với Persistence; hướng đúng chỉ tính trên các điểm giá thật có đổi.
+
+\bang{ch4_detail}{Tập test, dự báo một bước trên FPT (VNĐ), nhiệt độ (°C), công suất (kW). In đậm là RMSE thấp nhất của chuỗi.}{ch4_detail}
+\bang{ch4_tickers}{Bốn mã VN30: RMSE một bước theo kiến trúc (VNĐ) và mô hình được chọn. Cột Đa số là tỉ lệ của hướng phổ biến hơn trong test.}{ch4_tickers}
+\hinhpdf{ch4_skill}{1.0}{Mức giảm RMSE so với Persistence. Hai trục khác thang đo vì độ lớn chênh nhau nhiều lần.}{ch4_skill}
+
+\begin{phathien}{Giá cổ phiếu: không thắng được Persistence}
+Trên \SL{ch4_summary/n_tickers} mã, mô hình chọn theo validation chỉ có \SL{ch4_summary/stocks_beat} mã nhích hơn Persistence và \SL{ch4_summary/stocks_significant} mã có ý nghĩa thống kê ở mức 5\,\%. FPT: \SL{ch4_summary/FPT/best} đạt RMSE \SL{ch4_summary/FPT/rmse} so với \SL{ch4_summary/FPT/rmse_pers} VNĐ, $p=\SL{ch4_summary/FPT/dm_p}$; hướng đúng \SL{ch4_summary/FPT/dir_accPct}\,\%, thấp hơn mức đoán theo hướng phổ biến \SL{ch4_summary/FPT/majorityPct}\,\%. Đường dự báo trông bám sát giá thật (Hình~\ref{fig:ch4_forecast}) chỉ vì nó gần như lặp lại giá hôm trước. Kết quả phù hợp với ACF lợi suất gần 0, và kết quả đối chiếu độc lập của Tiểu luận 02 trên cùng bốn mã (cửa sổ 30, hai lớp, \SL{ch4_tl02/n} mô hình) cũng có tỉ số RMSE so với baseline từ \SL{ch4_tl02/ratio_min} đến \SL{ch4_tl02/ratio_max}. Đây là kết quả học thuật, không phải khuyến nghị đầu tư.
+\end{phathien}
+
+Hai chuỗi vật lý thì khác hẳn. Nhiệt độ giảm RMSE \SL{ch4_summary/weather/skill_pct}\,\% so với Persistence (\SL{ch4_summary/weather/rmse} so với \SL{ch4_summary/weather/rmse_pers}\,°C), công suất giảm \SL{ch4_summary/power/skill_pct}\,\%, cả hai với $p<0{,}001$ và hướng đúng \SL{ch4_summary/weather/dir_accPct}\,\%, \SL{ch4_summary/power/dir_accPct}\,\%. Bốn kiến trúc chênh nhau rất ít so với khoảng cách tới baseline, và RNN thường không thua: với cửa sổ 72 giờ, phần lớn thông tin nằm ở vài giờ cuối.
+
+\hinhpdf{ch4_forecast}{1.0}{Dự báo một bước cuối tập test của mô hình được chọn.}{ch4_forecast}
+\hinhpdf{ch4_curves}{1.0}{MSE chuẩn hóa theo epoch: nét liền là validation, nét chấm là train.}{ch4_curves}
+
+Hình~\ref{fig:ch4_curves} giải thích vì sao: ở FPT, MSE validation chững ngay từ các epoch đầu rồi tăng trong khi train giảm, tức mạng chỉ học thuộc nhiễu; ở chuỗi theo giờ cả hai cùng giảm rồi đi ngang.
+
+\subsection{Gradient trên mô hình thật}
+Hình~\ref{fig:ch4_sensitivity} đo $\|\partial\hat y_1/\partial x_{T-k}\|$ trên test. Ở trễ \SL{ch4_theory/lag} giờ của chuỗi nhiệt độ, độ nhạy tương đối của RNN là \SL{ch4_theory/weather/rnn}, của LSTM là \SL{ch4_theory/weather/lstm}, của GRU là \SL{ch4_theory/weather/gru}: đường RNN rơi nhanh nhất, đúng như lý thuyết. Công suất thì không có trật tự đó (RNN \SL{ch4_theory/power/rnn}, LSTM \SL{ch4_theory/power/lstm}), vì độ nhạy còn phụ thuộc mô hình học được gì, không chỉ phụ thuộc kiến trúc. Trên bản NumPy, $\|\delta_t\|$ giảm còn \SL{ch4_theory/delta_ratio} lần giá trị ban đầu sau cả cửa sổ (Hình~\ref{fig:ch4_norms}).
+
+\hinhpdf{ch4_sensitivity}{1.0}{Độ nhạy đầu ra theo độ trễ, chuẩn hóa về 1 tại bước cuối.}{ch4_sensitivity}
+\hinhpdf{ch4_norms}{0.9}{Chuẩn của $\delta_t$ trong BPTT NumPy khi lùi về đầu cửa sổ, RNN trên FPT.}{ch4_norms}
+
+\subsection{Dự báo nhiều bước và khoảng dao động}
+Hình~\ref{fig:ch4_horizon} cho RMSE theo bước. FPT: bốn kiến trúc bám sát Persistence và nhỉnh hơn về sai số ở tầm xa, không có lợi thế nào. Nhiệt độ: Persistence vọt lên giữa chu kỳ ngày rồi tụt về tại bước 24, baseline mùa vụ giữ ngang, còn cả bốn kiến trúc thấp hơn hai baseline. Công suất có dạng tương tự. Khoảng 90\,\% lấy từ phân vị sai số validation theo từng bước; độ phủ trên test ở Bảng~\ref{tab:ch4_horizon}. Độ phủ thực của cổ phiếu lệch khỏi 90\,\% (FPT \SL{ch4_summary/FPT/coveragePct}\,\%, VIC \SL{ch4_summary/VIC/coveragePct}\,\%) có thể vì biến động giai đoạn test khác giai đoạn validation; chuỗi nhiệt độ đạt \SL{ch4_summary/weather/coveragePct}\,\%.
+
+\hinhpdf{ch4_horizon}{1.0}{RMSE test theo bước dự báo.}{ch4_horizon}
+\bang{ch4_horizon}{Sai số ở bước cuối $H$ và khoảng 90\,\% (độ phủ trên test, độ rộng trung bình theo đơn vị gốc).}{ch4_horizon}
+\hinhpdf{ch4_fan}{1.0}{Một lần dự báo trực tiếp giữa tập test, kèm khoảng 90\,\%.}{ch4_fan}
+
+\subsection{Phân tích lỗi}
+Hình~\ref{fig:ch4_errors} tách MAE một bước. FPT: nhóm biến động thấp có sai số nhỏ hơn hai nhóm còn lại, và ở cả ba nhóm mô hình ngang Persistence. Nhiệt độ: lợi thế ổn định qua các tháng. Công suất: lợi thế lớn nhất ở các giờ chuyển trạng thái buổi sáng, khi Persistence trễ một nhịp; buổi tối đỉnh bật tắt thiết bị vẫn khó đoán với cả hai.
+
+\hinhpdf{ch4_errors}{1.0}{MAE một bước theo nhóm của mô hình được chọn và Persistence.}{ch4_errors}
+
+\section{Triển khai}
+\texttt{tlf/serve\_ch4.py} trả chuỗi quá khứ, dự báo $N$ bước và khoảng 90\,\% cho từng mã và từng chuỗi, nạp mô hình từ \texttt{models/ch4/} và chạy CPU. Giao diện in kèm RMSE test của mô hình và của Persistence, để người dùng thấy ngay khi mô hình không thắng baseline.
+
+\anhUI{ch4_forecast}{Trang dự báo chuỗi thời gian trên Web App.}{ch4_ui}
+
+\begin{luuy}{Giới hạn}
+Mỗi cấu hình chỉ chạy một hạt giống nên khác biệt nhỏ giữa kiến trúc không đủ để xếp hạng. Keras chỉ chạy LSTM trên FPT, NumPy chỉ chạy RNN trên FPT. Thí nghiệm recurrent dropout chưa chạy, phần đó mới dừng ở lý thuyết. Lịch phiên tương lai trên Web App mới bỏ cuối tuần, chưa trừ ngày lễ.
+\end{luuy}

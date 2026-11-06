@@ -1,0 +1,35 @@
+\begin{tikzpicture}[x=0.82cm,y=0.82cm]
+  \tikzset{ot/.style={draw=gray!60, minimum size=0.82cm, inner sep=0pt, font=\normalsize, anchor=center}}
+  % ảnh vào 5×5
+  \node[tieude] at (2.5,5.45) {Ảnh vào $5{\times}5$};
+  \foreach \h [count=\r from 0] in {{1,2,0,1,3},{0,1,3,2,1},{2,3,1,0,2},{1,0,2,3,1},{3,1,0,1,2}}{
+    \foreach \v [count=\c from 0] in \h{
+      \pgfmathtruncatemacro{\tr}{(\r<3 && \c<3) ? 1 : 0}
+      \ifnum\tr=1 \node[ot, fill=cSky!35] at (\c+0.5,4.5-\r) {\v};
+      \else \node[ot, fill=softgray] at (\c+0.5,4.5-\r) {\v}; \fi}}
+  \draw[cBlue, line width=2pt, rounded corners=1pt] (0,2) rectangle (3,5);
+  % kernel
+  \node[font=\Large\bfseries, text=cNavy] at (5.8,2.5) {$*$};
+  \begin{scope}[shift={(6.6,1)}]
+    \node[tieude] at (1.5,4.45) {Kernel $\mathbf{K}$};
+    \foreach \h [count=\r from 0] in {{-1,0,1},{-2,0,2},{-1,0,1}}{
+      \foreach \v [count=\c from 0] in \h{
+        \pgfmathtruncatemacro{\dau}{\v<0 ? 1 : (\v>0 ? 2 : 0)}
+        \ifcase\dau \node[ot, fill=lightGray] at (\c+0.5,2.5-\r) {$\v$};
+        \or \node[ot, fill=cRed!28] at (\c+0.5,2.5-\r) {$\v$};
+        \or \node[ot, fill=cGreen!30] at (\c+0.5,2.5-\r) {$\v$}; \fi}}
+  \end{scope}
+  \node[font=\Large\bfseries, text=cNavy] at (10.3,2.5) {$=$};
+  % đầu ra
+  \begin{scope}[shift={(11,1)}]
+    \node[tieude] at (1.5,4.45) {Đầu ra $3{\times}3$};
+    \foreach \h [count=\r from 0] in {{4,-2,0},{2,-2,-1},{-2,3,1}}{
+      \foreach \v [count=\c from 0] in \h{
+        \pgfmathtruncatemacro{\tr}{(\r==0 && \c==0) ? 1 : 0}
+        \ifnum\tr=1 \node[ot, fill=cOrange!55, font=\normalsize\bfseries] at (\c+0.5,2.5-\r) {$\v$};
+        \else \node[ot, fill=cOrange!12] at (\c+0.5,2.5-\r) {$\v$}; \fi}}
+    \draw[cRed, line width=2pt, rounded corners=1pt] (0,2) rectangle (1,3);
+  \end{scope}
+  \node[draw=cNavy, fill=softgray, rounded corners=3pt, font=\small, anchor=north, text width=11.8cm, align=center] at (7,-0.25)
+   {Ô đầu: $(-1)\cdot1+0\cdot2+1\cdot0+(-2)\cdot0+0\cdot1+2\cdot3+(-1)\cdot2+0\cdot3+1\cdot1=4$};
+\end{tikzpicture}

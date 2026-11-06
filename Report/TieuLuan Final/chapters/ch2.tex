@@ -1,0 +1,207 @@
+% =====================================================================
+%  Chương 2: Các kỹ thuật học máy cơ bản
+%  Số liệu từ \SL{ch2_*}; mã trích từ src/TieuLuan Final/{tlf,scripts}/
+% =====================================================================
+\chapter{Các kỹ thuật học máy cơ bản}\label{chap:ml}
+
+Theo Mitchell \cite{ch2:mitchell1997}, chương trình \emph{học} từ kinh nghiệm $E$ đối với nhiệm vụ $T$ và độ đo $P$ nếu hiệu năng trên $T$, đo bằng $P$, tốt lên nhờ $E$. Chương này tóm tắt các thuật toán nền tảng rồi kiểm chứng chúng trên ba bài toán khác dạng: phân loại nhị phân dữ liệu y tế, hồi quy giá nhà Việt Nam và phân loại cảm xúc tiếng Việt. Mọi con số trong chương do mã chạy thật sinh ra.
+
+\section{Cơ sở lý thuyết}\label{sec:ml-theory}
+\subsection{Học có giám sát và quy trình chống rò rỉ}
+Tập dữ liệu gồm $n$ cặp $\{(\mathbf{x}_i,y_i)\}_{i=1}^n$. Huấn luyện là cực tiểu rủi ro thực nghiệm, thường kèm hạng chính quy hóa:
+\begin{equation}
+  \hat{\boldsymbol\theta}=\arg\min_{\boldsymbol\theta}\frac1n\sum_{i=1}^n\ell\big(f_{\boldsymbol\theta}(\mathbf{x}_i),y_i\big)+\lambda R(\boldsymbol\theta).
+\end{equation}
+Khi không có nghiệm đóng, tham số được cập nhật theo hạ gradient $\boldsymbol\theta\leftarrow\boldsymbol\theta-\eta\nabla_{\boldsymbol\theta}J$. Sai số kỳ vọng phân rã thành thiên lệch bình phương, phương sai và nhiễu không giảm được \cite{ch2:geman1992}, nên mô hình quá đơn giản thì chưa khớp, quá phức tạp thì quá khớp.
+
+Điểm yếu thường gặp nhất không nằm ở thuật toán mà ở \emph{rò rỉ dữ liệu} (data leakage) \cite{ch2:kaufman2012}: thông tin của tập test lọt vào lúc huấn luyện làm điểm số đẹp hơn thực tế. Chương này giữ quy trình ở Hình~\ref{fig:ch2-pipeline} cho cả ba bài: làm sạch không dùng nhãn trước, chia tập, chỉ fit biến đổi trên train, chọn siêu tham số và ngưỡng trên validation, và chỉ đo test một lần.
+
+\hinhtikz{ch2_pipeline}{Quy trình bảy bước áp dụng cho cả ba dataset; val và test chỉ đi qua biến đổi đã fit trên train}{ch2-pipeline}
+
+\subsection{Hồi quy tuyến tính và hồi quy logistic}
+Hồi quy tuyến tính dự đoán $\hat y=\mathbf{w}^\top\mathbf{x}+b$ và cực tiểu sai số bình phương. Ridge \cite{ch2:hoerl1970} thêm phạt $\lambda\|\mathbf{w}\|_2^2$, nghiệm đóng trở thành
+\begin{equation}
+  \mathbf{w}^*=(X^\top X+\lambda I)^{-1}X^\top\mathbf{y},
+\end{equation}
+ổn định hơn khi các đặc trưng tương quan mạnh, như các cột one-hot trong bài giá nhà.
+
+Hồi quy logistic \cite{ch2:cox1958} đưa tổ hợp tuyến tính qua sigmoid và ước lượng bằng hợp lý cực đại, tương đương cực tiểu entropy chéo. Với $K$ lớp, softmax thay cho sigmoid:
+\begin{equation}
+  P(y=k\mid\mathbf{x})=\frac{\exp(\mathbf{w}_k^\top\mathbf{x})}{\sum_{j}\exp(\mathbf{w}_j^\top\mathbf{x})},\qquad
+  J=-\frac1n\sum_{i=1}^n\log P(y_i\mid\mathbf{x}_i).
+\end{equation}
+Nhãn được quyết định bằng cách so xác suất với ngưỡng $t$. Khi lớp lệch, ngưỡng 0,5 thường không tốt nhất, nên $t$ được chọn trên validation (Hình~\ref{fig:ch2-linear}, phải).
+
+\hinhtikz{ch2_linear}{Trái: đường hồi quy và phần dư (đoạn đỏ) mà MSE cực tiểu. Phải: sigmoid và ngưỡng quyết định}{ch2-linear}
+
+\subsection{Cây quyết định và rừng ngẫu nhiên}
+Cây quyết định \cite{ch2:breiman1984,ch2:quinlan1986} chia không gian đặc trưng theo các ngưỡng, ở mỗi nút chọn phép tách làm giảm độ vẩn đục nhiều nhất. Với $p_k$ là tỷ lệ lớp $k$ trong nút $t$ và $N_L$, $N_R$ là số mẫu hai nhánh con:
+\begin{equation}
+  G(t)=1-\sum_{k}p_k^2,\qquad \Delta G=G(t)-\frac{N_L}{N_t}G(t_L)-\frac{N_R}{N_t}G(t_R).
+\end{equation}
+Với hồi quy, độ vẩn đục là phương sai của $y$ trong nút. Cây dễ diễn giải nhưng phương sai cao. Random Forest \cite{ch2:breiman2001} huấn luyện nhiều cây trên mẫu bootstrap, mỗi nút chỉ xét một tập con đặc trưng ngẫu nhiên, rồi lấy trung bình (Hình~\ref{fig:ch2-tree}). Nếu $B$ cây có phương sai $\sigma^2$ và tương quan từng đôi $\rho$, phương sai của trung bình là $\rho\sigma^2+(1-\rho)\sigma^2/B$: thêm cây chỉ giảm số hạng sau, còn chọn đặc trưng ngẫu nhiên giảm chính $\rho$.
+
+\hinhtikz{ch2_tree}{Một cây quyết định và rừng tổng hợp nhiều cây trên các mẫu bootstrap}{ch2-tree}
+
+\subsection{Máy vector hỗ trợ}
+SVM \cite{ch2:cortes1995} tìm siêu phẳng có lề lớn nhất, cho phép vi phạm qua biến nới lỏng $\xi_i$:
+\begin{equation}
+  \min_{\mathbf{w},b,\boldsymbol\xi}\ \frac12\|\mathbf{w}\|^2+C\sum_{i}\xi_i\quad\text{với}\quad y_i(\mathbf{w}^\top\mathbf{x}_i+b)\ge1-\xi_i,\ \ \xi_i\ge0.
+\end{equation}
+Chỉ các mẫu nằm trên hoặc trong lề (vector hỗ trợ) quyết định nghiệm (Hình~\ref{fig:ch2-svm}). Thủ thuật kernel như $k(\mathbf{x},\mathbf{x}')=\exp(-\gamma\|\mathbf{x}-\mathbf{x}'\|^2)$ cho biên phi tuyến nhưng chi phí tăng ít nhất theo bình phương số mẫu, nên thực nghiệm ở đây dùng SVM tuyến tính, hợp với văn bản nhiều chiều \cite{ch2:joachims1998}.
+
+\hinhtikz{ch2_svm}{SVM lề mềm: siêu phẳng, hai biên lề, vector hỗ trợ và một mẫu lọt vào lề}{ch2-svm}
+
+\subsection{Gradient boosting}
+Boosting \cite{ch2:friedman2001} xây cây tuần tự. Ở vòng $m$, cây $h_m$ khớp gradient âm của mất mát, với MSE chính là phần dư, rồi được cộng vào mô hình theo tốc độ học $\eta$:
+\begin{equation}
+  r_i^{(m)}=-\left.\frac{\partial\ell(y_i,F)}{\partial F}\right|_{F=F_{m-1}(\mathbf{x}_i)},\qquad F_m(\mathbf{x})=F_{m-1}(\mathbf{x})+\eta\,h_m(\mathbf{x}).
+\end{equation}
+Rừng chủ yếu giảm phương sai, còn boosting giảm thiên lệch (Hình~\ref{fig:ch2-boost}). XGBoost \cite{ch2:chen2016} dùng thêm đạo hàm bậc hai và phạt độ phức tạp của cây. Số cây không chọn tay mà dừng sớm theo validation.
+
+\hinhtikz{ch2_boost}{Gradient boosting: mỗi cây nông học phần dư $r^{(m)}$ của tổng các cây trước}{ch2-boost}
+
+\subsection{MLP và lan truyền ngược}
+Mạng truyền thẳng tính $\mathbf{a}^{(l)}=\mathbf{W}^{(l)}\mathbf{h}^{(l-1)}+\mathbf{b}^{(l)}$ và $\mathbf{h}^{(l)}=\mathbf{a}^{(l)}\odot\mathbf{m}^{(l)}$, trong đó $\mathbf{m}^{(l)}$ là mặt nạ của ReLU nhân với mặt nạ dropout \cite{ch2:srivastava2014}. Lan truyền ngược \cite{ch2:rumelhart1986} áp dụng quy tắc chuỗi từ đầu ra về đầu vào. Đặt $\boldsymbol\delta^{(l)}=\partial\mathcal{L}/\partial\mathbf{h}^{(l)}$, ta có
+\begin{equation}
+  \boldsymbol\delta^{(l-1)}=\mathbf{W}^{(l)\top}\big(\boldsymbol\delta^{(l)}\odot\mathbf{m}^{(l)}\big),\qquad
+  \frac{\partial\mathcal{L}}{\partial\mathbf{W}^{(l)}}=\big(\boldsymbol\delta^{(l)}\odot\mathbf{m}^{(l)}\big)\,\mathbf{h}^{(l-1)\top}.
+\end{equation}
+Chi phí tính gradient vì vậy chỉ cỡ một lượt lan truyền thuận, thay vì một lượt cho mỗi tham số như sai phân. Tham số được cập nhật bằng Adam \cite{ch2:kingma2015}. Hình~\ref{fig:ch2-mlp} là kiến trúc dùng chung trên NumPy, Keras và PyTorch.
+
+\hinhtikz{ch2_mlp}{MLP hai tầng ẩn và hai chiều truyền: thuận tính đầu ra, ngược nhân chuỗi đạo hàm}{ch2-mlp}
+
+\maNguon{ch2_mlp_numpy__NumpyMLP.backward}{Lan truyền ngược viết tay trên NumPy, đúng theo công thức trên}
+
+Đoạn mã này được đối chiếu với sai phân trung tâm trên \SL{ch2_gradcheck/n_params} tham số của một mạng nhỏ; kết quả ở mục~\ref{sec:ml-mlp}.
+
+\subsection{Độ đo đánh giá}
+Với TP, FP, FN của mỗi lớp, Precision $=\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$, Recall $=\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$, F1 là trung bình điều hòa của hai đại lượng. \textbf{F1 macro} lấy trung bình không trọng số trên các lớp nên lớp hiếm được tính ngang lớp đông; đây là chỉ số chính của hai bài phân loại. ROC-AUC \cite{ch2:fawcett2006} đo khả năng xếp hạng, không phụ thuộc ngưỡng. Với hồi quy, chỉ số chính là RMSE, kèm MAE và $R^2=1-\sum_i(y_i-\hat y_i)^2/\sum_i(y_i-\bar y)^2$. Mọi chỉ số chính đi kèm khoảng tin cậy 95\,\% bằng bootstrap trên test (500 lần lấy lại mẫu): hai mô hình có khoảng chồng nhau nhiều thì chưa đủ cơ sở nói mô hình này hơn.
+
+\section{Thiết lập thực nghiệm}\label{sec:ml-setup}
+Bảng~\ref{tab:ch2-overview} tóm tắt ba bộ dữ liệu. Trên mỗi bộ, Dummy làm mốc, rồi đến LogReg hoặc Ridge, Linear SVM, cây quyết định, Random Forest, XGBoost và MLP trên ba nền tảng. Mọi mô hình huấn luyện trên toàn bộ tập train, không lấy mẫu con. Housing được quét lưới nhỏ, chọn theo validation. CDC và VSFC dùng một cấu hình cố định cho mỗi họ để tiết kiệm tài nguyên, nên kết quả của chúng chưa phải mức tốt nhất có thể; với VSFC, cấu hình rừng được đặt không giới hạn độ sâu vì văn bản thưa cần cây sâu. XGBoost của CDC và VSFC dùng tốc độ học 0,1 và tối đa 500 cây, Housing dùng 0,05 và tối đa 1.500 cây. Các mô hình cổ điển và Keras chạy CPU tối đa 8 luồng; MLP PyTorch chạy GPU.
+
+\bang{ch2_overview}{Tổng quan ba dataset (số liệu gốc trước làm sạch)}{ch2-overview}
+
+\maNguon{ch2_classic__ONE_CONFIG}{Cấu hình cố định dùng cho CDC và VSFC}
+
+% ---------------------------------------------------------------------
+\section{CDC Diabetes: sàng lọc nguy cơ tiểu đường}\label{sec:ml-cdc}
+\subsection{Nguồn và kích cỡ}
+Bộ \emph{CDC Diabetes Health Indicators} \cite{ch2:ds_cdc} (UCI id 891, \href{https://archive.ics.uci.edu/dataset/891/cdc+diabetes+health+indicators}{liên kết}) lấy từ khảo sát qua điện thoại BRFSS 2015 của CDC Hoa Kỳ. Bộ gồm \SL{ch2_datasets/cdc/n_raw} hồ sơ, \SL{ch2_datasets/datasets/0/n_features} đặc trưng, \SL{ch2_datasets/datasets/0/size_mb} MB. Nhãn \texttt{Diabetes\_binary} cho biết người trả lời có tiểu đường hoặc tiền tiểu đường. Vì dữ liệu chủ yếu do người trả lời tự khai, kết quả ở đây chỉ mang tính học thuật, không dùng cho chẩn đoán.
+
+\bang{ch2_cdc_sample}{Năm hồ sơ thực của CDC Diabetes (một phần các cột)}{ch2-cdc-sample}
+
+\subsection{Phân bố và nhận xét}
+\haihinh{ch2_cdc_age}{Tỷ lệ bệnh theo nhóm tuổi}{ch2_cdc_bmi}{BMI theo nhãn}{CDC Diabetes: nguy cơ tăng theo tuổi, phân bố BMI của nhóm bệnh lệch phải}{ch2-cdc-eda}
+
+\nhanxet{Dữ liệu không có ô trống (\SL{ch2_datasets/cdc/missing}) nhưng có \SL{ch2_datasets/cdc/n_dup} hồ sơ trùng khít. Sau khi bỏ trùng còn \SL{ch2_datasets/cdc/n_clean} hồ sơ, tỷ lệ dương \SL{ch2_datasets/cdc/pos_ratePct}\,\%, cao hơn con số \SL{ch2_datasets/cdc/raw_pos_ratePct}\,\% trước khi bỏ trùng vì hồ sơ trùng phần lớn là người khỏe. Trung vị BMI của nhóm bệnh là \SL{ch2_datasets/cdc/bmi_med_posRaw}, nhóm không bệnh là \SL{ch2_datasets/cdc/bmi_med_negRaw}. Dữ liệu không có HbA1c hay đường huyết, nên bài toán khó hơn hẳn các bộ có chỉ số xét nghiệm.}
+
+\subsection{Tiền xử lý chống rò rỉ}
+Hồ sơ trùng phải bỏ \emph{trước} khi chia, nếu không cùng một hồ sơ có thể nằm ở cả train và test. Chia phân tầng 70/15/15 rồi mới fit \texttt{StandardScaler} trên train cho bảy cột có thứ bậc; 14 cột nhị phân giữ nguyên. Ngưỡng quyết định được quét trên validation theo F1 macro.
+
+\maNguon{ch2_data__cdc_split}{Chia tập trước, fit bộ chuẩn hóa chỉ trên train}
+\maNguon{ch2_metrics__best_threshold}{Chọn ngưỡng trên validation; test không tham gia}
+
+\subsection{Kết quả và phân tích lỗi}
+\bang{ch2_cdc_compare}{CDC Diabetes trên test, ngưỡng chọn trên validation; F1 macro kèm khoảng tin cậy 95\,\%}{ch2-cdc-compare}
+
+\haihinh{ch2_cdc_compare}{F1 macro trên test}{ch2_cdc_imp}{Tầm quan trọng hoán vị}{CDC Diabetes: so sánh mô hình và các đặc trưng XGBoost dựa vào nhiều nhất}{ch2-cdc-res}
+
+\nhanxet{Accuracy dễ gây nhầm ở đây: Dummy luôn đoán ``không bệnh'' đạt accuracy \SL{ch2_summary/cdc/dummy/accuracy}, cao hơn XGBoost (\SL{ch2_summary/cdc/xgb/accuracy}), nhưng F1 macro chỉ \SL{ch2_summary/cdc/dummy/f1_macro} và không phát hiện được ca nào. XGBoost cao nhất với F1 macro \SL{ch2_summary/cdc/xgb/f1_macro}, AUC \SL{ch2_summary/cdc/xgb/roc_auc}, nhưng khoảng tin cậy của nó chồng với MLP và Random Forest, nên chưa đủ cơ sở nói nó hơn hai mô hình này. LogReg đạt \SL{ch2_summary/cdc/linear/f1_macro}, kém chưa tới 0,01. Với dữ liệu khảo sát này, các họ mô hình gần như chạm cùng một trần. Riêng ngưỡng lại có tác dụng rõ: cùng XGBoost, ngưỡng 0,5 cho F1 macro \SL{ch2_cdc_threshold/at_05/f1_macro}, recall \SL{ch2_cdc_threshold/at_05/recall}; ngưỡng chọn trên validation cho \SL{ch2_cdc_threshold/at_best/f1_macro} và recall \SL{ch2_cdc_threshold/at_best/recall}.}
+
+\haihinh{ch2_cdc_roc}{Đường ROC}{ch2_cdc_cm}{Ma trận nhầm lẫn XGBoost, chuẩn hóa theo hàng}{CDC Diabetes: bốn đường ROC gần trùng nhau; ở ngưỡng đã chọn, gần một nửa ca dương vẫn bị bỏ sót}{ch2-cdc-err}
+
+\nhanxet{Ở ngưỡng \SL{ch2_summary/cdc/threshold}, XGBoost có recall \SL{ch2_summary/cdc/xgb/recall_pos}, precision \SL{ch2_summary/cdc/xgb/precision_pos}. Trong sàng lọc, bỏ sót ca bệnh thường đắt hơn báo động nhầm, nên ngưỡng thực tế có thể đặt thấp hơn tùy chi phí xét nghiệm. Các đặc trưng hàng đầu ở Hình~\ref{fig:ch2-cdc-res}b khớp hiểu biết y khoa, nhưng đây là liên hệ thống kê, không phải quan hệ nhân quả.}
+
+% ---------------------------------------------------------------------
+\section{Vietnam Housing: ước lượng giá nhà}\label{sec:ml-housing}
+\subsection{Nguồn và kích cỡ}
+Bộ \emph{House Price Prediction Dataset Vietnam 2024} \cite{ch2:ds_housing} (\href{https://www.kaggle.com/datasets/nguyentiennhan/vietnam-housing-dataset-2024}{Kaggle}, giấy phép CC0) gồm \SL{ch2_datasets/housing/n} tin rao bán nhà, \SL{ch2_datasets/datasets/1/n_features} đặc trưng, \SL{ch2_datasets/datasets/1/size_mb} MB. Nhãn \texttt{Price} tính bằng tỷ đồng.
+
+\bang{ch2_housing_sample}{Năm tin rao thực (PN: phòng ngủ; HĐMB: hợp đồng mua bán; dấu gạch: tin không ghi)}{ch2-housing-sample}
+
+\subsection{Phân bố và nhận xét}
+\haihinh{ch2_housing_price}{Phân bố giá}{ch2_housing_area}{Giá theo diện tích}{Vietnam Housing: giá trải trong khoảng hẹp và có dấu hiệu bị cắt ở hai đầu}{ch2-housing-eda}
+
+\nhanxet{Giá nằm trọn trong khoảng \SL{ch2_datasets/housing/price_minRaw} đến \SL{ch2_datasets/housing/price_max} tỷ đồng, trung bình \SL{ch2_datasets/housing/price_mean}, độ lệch chuẩn \SL{ch2_datasets/housing/price_std}. Khoảng hẹp này cho thấy dữ liệu đã được lọc từ trước, nên mô hình không dùng được cho nhà ngoài khoảng đó. \SL{ch2_datasets/housing/top2_sharePct}\,\% tin thuộc Hà Nội và TP.~Hồ Chí Minh. Dữ liệu thiếu nhiều: \SL{ch2_datasets/housing/balcony_missingPct}\,\% tin không ghi hướng ban công, \SL{ch2_datasets/housing/furniture_missingPct}\,\% không ghi nội thất. Tương quan Pearson giữa diện tích và giá chỉ \SL{ch2_datasets/housing/corr_area} (Hình~\ref{fig:ch2-housing-eda}b): cùng diện tích, giá khác nhau rất xa tùy vị trí, nên mô hình cần kết hợp diện tích với vị trí.}
+
+\subsection{Tiền xử lý chống rò rỉ}
+Cột \texttt{Address} có \SL{ch2_datasets/housing/n_address} giá trị khác nhau, được tách thành tỉnh, quận, phường và đường. Có hai bẫy rò rỉ. Thứ nhất, cùng một địa chỉ xuất hiện trong nhiều tin, có \SL{ch2_datasets/housing/near_dup} tin gần như trùng lặp, nên chia ngẫu nhiên theo tin sẽ để mô hình thấy gần như chính căn nhà ở test. Vì vậy dữ liệu được chia \emph{theo địa chỉ}: số địa chỉ chung giữa train và test là \SL{ch2_datasets/housing/address_overlap}. Thứ hai, mã hóa quận, phường, đường theo giá trung bình \cite{ch2:micci2001} dùng chính nhãn, nên dùng \texttt{TargetEncoder} với fit chéo năm phần trên train. Cột số được lấy log, điền trung vị và thêm cờ thiếu, vì việc tin không ghi một trường cũng là thông tin.
+
+\maNguon{ch2_data__parse_address}{Tách địa chỉ tự do thành năm cột vị trí}
+\maNguon{ch2_data__group_split_idx}{Chia theo nhóm địa chỉ: tin cùng địa chỉ nằm trọn một phần}
+
+\subsection{Kết quả và phân tích lỗi}
+\bang{ch2_housing_compare}{Vietnam Housing trên test, đơn vị tỷ đồng; RMSE kèm khoảng tin cậy 95\,\%}{ch2-housing-compare}
+
+\haihinh{ch2_housing_compare}{RMSE trên test}{ch2_housing_imp}{Tầm quan trọng hoán vị}{Vietnam Housing: so sánh mô hình và các đặc trưng XGBoost dựa vào nhiều nhất}{ch2-housing-res}
+
+\nhanxet{XGBoost cho RMSE \SL{ch2_summary/housing/xgb/rmse}, $R^2$ \SL{ch2_summary/housing/xgb/r2}, khoảng tin cậy không chồng với Ridge (\SL{ch2_summary/housing/linear/rmse}), nên phần hơn là có thật. Dummy có RMSE \SL{ch2_summary/housing/dummy/rmse}. Mọi mô hình đều giảm được khoảng một phần ba sai số so với mốc, nhưng sai số trung bình \SL{ch2_summary/housing/xgb/mae} tỷ đồng vẫn lớn so với giá trung bình \SL{ch2_datasets/housing/price_mean} tỷ. Diện tích đứng đầu về tầm quan trọng dù tương quan tuyến tính thấp: giá phụ thuộc vào tích diện tích với đơn giá khu vực, kiểu tương tác mà cây bắt được còn Ridge thì không.}
+
+\begin{phathien}{Cách chia tập làm đổi kết quả}
+Cùng cấu hình XGBoost, chia ngẫu nhiên theo tin cho $R^2$ \SL{ch2_res_housing_classic/random_split/r2}, RMSE \SL{ch2_res_housing_classic/random_split/rmse}; chia theo địa chỉ cho $R^2$ \SL{ch2_summary/housing/xgb/r2}, RMSE \SL{ch2_summary/housing/xgb/rmse}. Chênh lệch này là phần lạc quan giả do cùng địa chỉ xuất hiện ở cả hai phía, và số theo địa chỉ mới là ước lượng cho một căn ở địa chỉ chưa từng thấy.
+\end{phathien}
+
+\haihinh{ch2_housing_pred}{Dự đoán so với giá thật}{ch2_housing_bias}{Sai lệch theo khoảng giá}{Lỗi của XGBoost: dự đoán co về giữa, nhà rẻ bị đoán cao, nhà đắt bị đoán thấp}{ch2-housing-err}
+
+\nhanxet{Hình~\ref{fig:ch2-housing-err} cho thấy mô hình co dự đoán về trung bình: thiếu thông tin như chất lượng nhà và vị trí cụ thể trong ngõ, nó đoán an toàn quanh mức giữa. Đây là giới hạn của dữ liệu tin rao hơn là của thuật toán, và giải thích vì sao các họ mô hình khác nhau cùng dừng quanh một mức sai số.}
+
+% ---------------------------------------------------------------------
+\section{UIT-VSFC: cảm xúc phản hồi sinh viên}\label{sec:ml-vsfc}
+\subsection{Nguồn và kích cỡ}
+UIT-VSFC \cite{ch2:vsfc2018} (\href{https://huggingface.co/datasets/uitnlp/vietnamese_students_feedback}{Hugging Face}) gồm \SL{ch2_datasets/datasets/2/n_samples} câu phản hồi của sinh viên về môn học và giảng viên, \SL{ch2_datasets/datasets/2/size_mb} MB, gán ba nhãn cảm xúc. Thẻ dữ liệu ghi giấy phép \emph{unknown}, nhóm tác giả phát hành cho mục đích nghiên cứu. Giữ nguyên phân chia gốc: \SL{ch2_datasets/vsfc/n_train} train, \SL{ch2_datasets/vsfc/n_val} validation, \SL{ch2_datasets/vsfc/n_test} test.
+
+\bang{ch2_vsfc_sample}{Năm câu thực trong tập test của UIT-VSFC}{ch2-vsfc-sample}
+
+\subsection{Phân bố và nhận xét}
+\haihinh{ch2_vsfc_label}{Phân bố nhãn}{ch2_vsfc_len}{Độ dài câu}{UIT-VSFC: lớp trung tính rất hiếm, câu ngắn}{ch2-vsfc-eda}
+
+\nhanxet{Lớp trung tính chỉ chiếm \SL{ch2_datasets/vsfc/neutral_ratePct}\,\%, nên accuracy không phản ánh được khả năng nhận ra lớp này và F1 macro là chỉ số chính. Câu ngắn, trung vị \SL{ch2_datasets/vsfc/len_medRaw} âm tiết. Tên riêng đã được che bằng các token \texttt{wzjwz...} (\SL{ch2_datasets/vsfc/masked} câu). Không câu test nào trùng với train (\SL{ch2_datasets/vsfc/test_in_train}).}
+
+\subsection{Tiền xử lý chống rò rỉ}
+Văn bản được đưa về chữ thường, gom token che tên thành một token, bỏ số và dấu câu, giữ dấu tiếng Việt. Không bỏ từ dừng, vì danh sách từ dừng thường chứa ``không'' mà từ này đảo cảm xúc. TF-IDF dùng từ đơn và cặp liền kề: tiếng Việt viết tách âm tiết nên cặp giữ được cả ``giáo viên'' lẫn ``không hay''. Từ điển và IDF chỉ fit trên train. Mô hình tuyến tính dùng toàn bộ đặc trưng; cây và MLP dùng 5.000 đặc trưng chọn bằng $\chi^2$, cũng chỉ fit trên train. Do lớp lệch, mọi mô hình dùng trọng số lớp nghịch đảo tần suất.
+
+\maNguon{ch2_data__vsfc_split}{TF-IDF và chọn đặc trưng fit trên train của phân chia gốc}
+
+\subsection{Kết quả và phân tích lỗi}
+\bang{ch2_vsfc_compare}{UIT-VSFC trên test; F1 macro kèm khoảng tin cậy 95\,\%}{ch2-vsfc-compare}
+
+\haihinh{ch2_vsfc_compare}{F1 macro trên test}{ch2_vsfc_cm}{Ma trận nhầm lẫn XGBoost, chuẩn hóa theo hàng}{UIT-VSFC: so sánh mô hình và lỗi của XGBoost}{ch2-vsfc-res}
+
+\nhanxet{XGBoost đạt F1 macro \SL{ch2_summary/vsfc/xgb/f1_macro}, Dummy chỉ \SL{ch2_summary/vsfc/dummy/f1_macro}, nhưng khoảng tin cậy chồng với cả ba bản MLP nên nhóm dẫn đầu là ngang nhau. Linear SVM minh họa rõ giới hạn của accuracy: accuracy \SL{ch2_summary/vsfc/svm/accuracy} cao nhất bảng, trong khi F1 macro \SL{ch2_summary/vsfc/svm/f1_macro} thấp vì F1 lớp trung tính chỉ \SL{ch2_vsfc_detail/f1_class/svm/1}. Khoảng cách giữa các mô hình gần như nằm hết ở lớp hiếm: F1 của XGBoost cho ba lớp tiêu cực, trung tính, tích cực là \SL{ch2_vsfc_detail/f1_class/xgb/0}, \SL{ch2_vsfc_detail/f1_class/xgb/1}, \SL{ch2_vsfc_detail/f1_class/xgb/2}. Bảng~\ref{tab:ch2-vsfc-terms} cho thấy từ đặc trưng hợp lý: ``nhiệt tình'', ``dễ hiểu'' cho lớp tích cực; ``khó'', ``chưa'', ``không'' cho lớp tiêu cực. Bốn câu ở Bảng~\ref{tab:ch2-vsfc-errors} chỉ là ví dụ minh họa, không phải thống kê: có câu mô tả không rõ thái độ và câu cần ngữ cảnh mà túi từ và cặp từ không nắm được.}
+
+\bang{ch2_vsfc_terms}{Từ đặc trưng của từng lớp, đọc từ hệ số LogReg}{ch2-vsfc-terms}
+
+\bang{ch2_vsfc_errors}{Bốn câu XGBoost đoán sai, lấy nguyên văn từ test}{ch2-vsfc-errors}
+
+% ---------------------------------------------------------------------
+\section{MLP trên NumPy, Keras và PyTorch}\label{sec:ml-mlp}
+Cả ba bản dùng cùng kiến trúc 128--64 với ReLU và dropout, cùng Adam, tốc độ học, cỡ lô và dừng sớm theo validation. Khác nhau chỉ ở bộ khởi tạo, nguồn số ngẫu nhiên và nơi tính toán: NumPy và Keras chạy CPU, PyTorch chạy GPU. Housing và VSFC chạy ba seed, CDC chạy một seed để giữ trần tài nguyên. Trước khi huấn luyện, gradient viết tay được kiểm tra bằng sai phân trung tâm:
+
+\begin{ketqua}{Kiểm tra gradient (grad\_check)}
+số tham số: \SL{ch2_gradcheck/n_params}\\
+||số học - lan truyền ngược|| / (||số học|| + ||lan truyền ngược||) = \SL{ch2_gradcheck/rel_error}
+\end{ketqua}
+
+\maNguon{ch2_mlp_numpy__grad_check}{Đối chiếu lan truyền ngược với sai phân trung tâm}
+
+\bang{ch2_mlp}{MLP trên ba nền tảng; chỉ số chính là F1 macro (CDC, VSFC) hoặc RMSE (Housing), trung bình theo seed}{ch2-mlp}
+
+\hinhpdf{ch2_mlp_curves}{0.98}{Mất mát validation theo epoch của seed cuối trên ba nền tảng}{ch2-mlp-curves}
+
+\nhanxet{Sai số tương đối \SL{ch2_gradcheck/rel_error} cho thấy lan truyền ngược viết tay khớp với đạo hàm số. Ba nền tảng cho chỉ số gần như nhau: RMSE Housing từ \SL{ch2_summary/housing/mlp_torch/rmse} đến \SL{ch2_summary/housing/mlp_keras/rmse}, F1 macro VSFC từ \SL{ch2_summary/vsfc/mlp_torch/f1_macro} đến \SL{ch2_summary/vsfc/mlp_keras/f1_macro}, F1 macro CDC từ \SL{ch2_summary/cdc/mlp_numpy/f1_macro} đến \SL{ch2_summary/cdc/mlp_torch/f1_macro}, các hiệu số đều nhỏ so với khoảng tin cậy. Thư viện không làm đổi kết quả khi cấu hình giống nhau; điều nó đổi là công sức viết mã và thời gian chạy. Cột thời gian chỉ mang tính tham khảo vì máy được chia sẻ với các thực nghiệm khác trong lúc chạy.}
+
+% ---------------------------------------------------------------------
+\section{Tổng kết và triển khai}\label{sec:ml-summary}
+\begin{phathien}{Ba kết luận từ ba bài toán}
+\textbf{Chênh lệch giữa các mô hình mạnh nhỏ hơn chênh lệch do xử lý dữ liệu.} XGBoost đứng đầu cả ba bài (F1 macro \SL{ch2_summary/cdc/xgb/f1_macro} trên CDC, RMSE \SL{ch2_summary/housing/xgb/rmse} trên Housing, F1 macro \SL{ch2_summary/vsfc/xgb/f1_macro} trên VSFC) nhưng khoảng tin cậy của nó chồng với các mô hình mạnh khác; chỉ ở Housing nó tách rõ khỏi mô hình tuyến tính. Trong khi đó, chọn ngưỡng và cách chia tập làm đổi kết quả rõ hơn.
+
+\textbf{Mốc Dummy và khoảng tin cậy là bắt buộc.} Không có mốc thì không thấy accuracy \SL{ch2_summary/cdc/dummy/accuracy} của CDC là vô nghĩa; không có khoảng tin cậy thì dễ đọc hiệu số 0,001 thành thắng lợi.
+
+\textbf{Giới hạn nằm ở dữ liệu.} CDC thiếu chỉ số xét nghiệm, Housing thiếu đặc điểm cụ thể của căn nhà, VSFC thiếu mẫu trung tính. Muốn cải thiện đáng kể cần dữ liệu tốt hơn trước khi cần mô hình phức tạp hơn.
+\end{phathien}
+
+Ba mô hình tốt nhất theo validation được lưu thành Pipeline gồm tiền xử lý và mô hình trong \texttt{models/ch2/}, phục vụ Web App qua \texttt{tlf/serve\_ch2.py}. Mô hình nạp lười một lần, chạy CPU và không cần TensorFlow. Đầu vào được kiểm tra miền giá trị, ô số để trống trong bài giá nhà đi qua đúng nhánh trung vị và cờ thiếu như lúc huấn luyện. Kết quả y tế và giá nhà đều kèm ghi chú giới hạn. Ảnh giao diện ở Chương~9.
+
+\maNguon{serve_ch2__predict_sentiment}{Dịch vụ dự đoán cảm xúc: nạp lười, kiểm tra đầu vào, trả nhãn và xác suất}
