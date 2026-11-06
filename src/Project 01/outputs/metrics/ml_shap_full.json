@@ -1,0 +1,46 @@
+{
+ "n": 4000,
+ "scale": "log-odds",
+ "mean_abs": [
+  {
+   "feature": "hba1c",
+   "label_vi": "HbA1c",
+   "mean_abs_shap": 1.952642798423767
+  },
+  {
+   "feature": "glucose",
+   "label_vi": "Đường huyết",
+   "mean_abs_shap": 1.4119377136230469
+  },
+  {
+   "feature": "age",
+   "label_vi": "Tuổi",
+   "mean_abs_shap": 0.7749089002609253
+  },
+  {
+   "feature": "bmi",
+   "label_vi": "Chỉ số khối cơ thể (BMI)",
+   "mean_abs_shap": 0.36804547905921936
+  },
+  {
+   "feature": "smoking",
+   "label_vi": "Hút thuốc",
+   "mean_abs_shap": 0.1744481474161148
+  },
+  {
+   "feature": "sex",
+   "label_vi": "Giới tính",
+   "mean_abs_shap": 0.12963685393333435
+  },
+  {
+   "feature": "hypertension",
+   "label_vi": "Tăng huyết áp",
+   "mean_abs_shap": 0.11383586376905441
+  },
+  {
+   "feature": "heart_disease",
+   "label_vi": "Bệnh tim",
+   "mean_abs_shap": 0.08704913407564163
+  }
+ ]
+}

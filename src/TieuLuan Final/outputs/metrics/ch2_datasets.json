@@ -1,0 +1,284 @@
+{
+ "datasets": [
+  {
+   "id": "cdc",
+   "name": "CDC Diabetes Health Indicators",
+   "source": "UCI Machine Learning Repository, id 891",
+   "url": "https://archive.ics.uci.edu/dataset/891/cdc+diabetes+health+indicators",
+   "task": "Phân loại nhị phân",
+   "n_samples": 253680,
+   "n_features": 21,
+   "size_mb": 12.87,
+   "license": "Xem trang UCI; chưa xác minh được qua API",
+   "note": "Khảo sát BRFSS 2015, tự khai báo; bỏ hồ sơ trùng khít trước khi chia.",
+   "sample_rows": [
+    {
+     "Diabetes_binary": 0,
+     "BMI": 23,
+     "HighBP": 1,
+     "HighChol": 0,
+     "GenHlth": 2,
+     "PhysHlth": 0,
+     "Age": 13,
+     "Income": 6
+    },
+    {
+     "Diabetes_binary": 1,
+     "BMI": 22,
+     "HighBP": 0,
+     "HighChol": 0,
+     "GenHlth": 2,
+     "PhysHlth": 5,
+     "Age": 9,
+     "Income": 8
+    },
+    {
+     "Diabetes_binary": 0,
+     "BMI": 26,
+     "HighBP": 1,
+     "HighChol": 1,
+     "GenHlth": 2,
+     "PhysHlth": 0,
+     "Age": 11,
+     "Income": 6
+    },
+    {
+     "Diabetes_binary": 1,
+     "BMI": 39,
+     "HighBP": 1,
+     "HighChol": 0,
+     "GenHlth": 4,
+     "PhysHlth": 0,
+     "Age": 11,
+     "Income": 5
+    },
+    {
+     "Diabetes_binary": 0,
+     "BMI": 22,
+     "HighBP": 0,
+     "HighChol": 0,
+     "GenHlth": 1,
+     "PhysHlth": 0,
+     "Age": 10,
+     "Income": 8
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "Không",
+     "Có"
+    ],
+    "values": [
+     194377,
+     35097
+    ]
+   },
+   "stats": {
+    "n_raw": 253680,
+    "n_clean": 229474,
+    "n_dup": 24206,
+    "n_pos": 35097,
+    "pos_rate": 0.1529454317264701,
+    "raw_pos_rate": 0.13933301797540207,
+    "missing": 0,
+    "n_test": 34422,
+    "bmi_med_pos": 31.0,
+    "bmi_med_neg": 27.0
+   }
+  },
+  {
+   "id": "housing",
+   "name": "Vietnam Housing 2024",
+   "source": "Kaggle, nguyentiennhan",
+   "url": "https://www.kaggle.com/datasets/nguyentiennhan/vietnam-housing-dataset-2024",
+   "task": "Hồi quy",
+   "n_samples": 30229,
+   "n_features": 11,
+   "size_mb": 3.37,
+   "license": "CC0: Public Domain",
+   "note": "Tin rao bán, giá trong khoảng 1 đến 11,5 tỷ đồng.",
+   "sample_rows": [
+    {
+     "Address": "Đường Minh Khai, Phường Minh Khai, Hai Bà Trưng, Hà Nội",
+     "Area": 36.0,
+     "Floors": 4.0,
+     "Bedrooms": 2.0,
+     "Legal status": "Sale contract",
+     "Price": 6.0
+    },
+    {
+     "Address": "11A, Đường Nguyễn Hiền, Phường 4, Quận 3, Hồ Chí Minh",
+     "Area": 30.0,
+     "Floors": 2.0,
+     "Bedrooms": 1.0,
+     "Legal status": "Have certificate",
+     "Price": 5.6
+    },
+    {
+     "Address": "Đường Phạm Tu, Phường Phước Mỹ, Sơn Trà, Đà Nẵng",
+     "Area": 56.0,
+     "Floors": 3.0,
+     "Bedrooms": 3.0,
+     "Legal status": "Have certificate",
+     "Price": 6.85
+    },
+    {
+     "Address": "Đường Ngọc Hồi, Xã Ngũ Hiệp, Thanh Trì, Hà Nội",
+     "Area": 60.0,
+     "Floors": 5.0,
+     "Bedrooms": 6.0,
+     "Legal status": "Have certificate",
+     "Price": 8.3
+    },
+    {
+     "Address": "Phường Bình Chuẩn, Thuận An, Bình Dương",
+     "Area": 60.0,
+     "Floors": NaN,
+     "Bedrooms": NaN,
+     "Legal status": NaN,
+     "Price": 3.7
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "0.999-3",
+     "3-5",
+     "5-7",
+     "7-9",
+     "9-11.5"
+    ],
+    "values": [
+     3587,
+     7768,
+     9483,
+     6881,
+     2510
+    ]
+   },
+   "stats": {
+    "n": 30229,
+    "n_address": 10265,
+    "n_province": 107,
+    "n_district": 452,
+    "price_mean": 5.872078136888418,
+    "price_med": 5.9,
+    "price_min": 1.0,
+    "price_max": 11.5,
+    "price_std": 2.211877216785133,
+    "area_med": 56.0,
+    "corr_area": 0.09759326314934197,
+    "n_train": 21194,
+    "n_val": 4484,
+    "n_test": 4551,
+    "address_overlap": 0,
+    "top2_share": 0.7153395745807006,
+    "balcony_missing": 0.8264580369843528,
+    "furniture_missing": 0.46706804723940587,
+    "frontage_missing": 0.3825465612491316,
+    "near_dup": 1322
+   }
+  },
+  {
+   "id": "vsfc",
+   "name": "UIT-VSFC",
+   "source": "Hugging Face, uitnlp/vietnamese_students_feedback",
+   "url": "https://huggingface.co/datasets/uitnlp/vietnamese_students_feedback",
+   "task": "Phân loại ba lớp",
+   "n_samples": 16175,
+   "n_features": 1,
+   "size_mb": 0.64,
+   "license": "Thẻ dữ liệu ghi unknown, nhóm UIT phát hành cho nghiên cứu",
+   "note": "Giữ nguyên phân chia gốc của tác giả.",
+   "sample_rows": [
+    {
+     "sentence": "vì em đã gần như không có được gì !",
+     "sentiment": "Tiêu cực"
+    },
+    {
+     "sentence": "thầy rất đúng giờ !",
+     "sentiment": "Tích cực"
+    },
+    {
+     "sentence": "nên tăng cường thời gian tiếp xúc các thiết bị thực tế .",
+     "sentiment": "Tiêu cực"
+    },
+    {
+     "sentence": "nhiệt tình , dạy hay .",
+     "sentiment": "Tích cực"
+    },
+    {
+     "sentence": "đôi lúc cô có kể vài câu chuyện hay liên quan đến bài học , hầu hết các tiết học cô luôn mỉm cười nên khi học cảm thấy thoải mái .",
+     "sentiment": "Tích cực"
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "Tiêu cực",
+     "Trung tính",
+     "Tích cực"
+    ],
+    "values": [
+     7439,
+     698,
+     8038
+    ]
+   },
+   "stats": {
+    "n_train": 11426,
+    "n_val": 1583,
+    "n_test": 3166,
+    "neutral_rate": 0.04315301391035549,
+    "len_mean": 12.559381761978361,
+    "len_med": 10.0,
+    "len_max": 150,
+    "test_in_train": 0,
+    "masked": 302
+   }
+  }
+ ],
+ "cdc": {
+  "n_raw": 253680,
+  "n_clean": 229474,
+  "n_dup": 24206,
+  "n_pos": 35097,
+  "pos_rate": 0.1529454317264701,
+  "raw_pos_rate": 0.13933301797540207,
+  "missing": 0,
+  "n_test": 34422,
+  "bmi_med_pos": 31.0,
+  "bmi_med_neg": 27.0
+ },
+ "housing": {
+  "n": 30229,
+  "n_address": 10265,
+  "n_province": 107,
+  "n_district": 452,
+  "price_mean": 5.872078136888418,
+  "price_med": 5.9,
+  "price_min": 1.0,
+  "price_max": 11.5,
+  "price_std": 2.211877216785133,
+  "area_med": 56.0,
+  "corr_area": 0.09759326314934197,
+  "n_train": 21194,
+  "n_val": 4484,
+  "n_test": 4551,
+  "address_overlap": 0,
+  "top2_share": 0.7153395745807006,
+  "balcony_missing": 0.8264580369843528,
+  "furniture_missing": 0.46706804723940587,
+  "frontage_missing": 0.3825465612491316,
+  "near_dup": 1322
+ },
+ "vsfc": {
+  "n_train": 11426,
+  "n_val": 1583,
+  "n_test": 3166,
+  "neutral_rate": 0.04315301391035549,
+  "len_mean": 12.559381761978361,
+  "len_med": 10.0,
+  "len_max": 150,
+  "test_in_train": 0,
+  "masked": 302
+ }
+}

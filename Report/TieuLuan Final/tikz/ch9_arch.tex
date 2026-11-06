@@ -1,0 +1,20 @@
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm,
+  tang/.style={rounded corners=5pt, draw=#1!70!black, top color=#1!12, bottom color=#1!34, drop shadow={opacity=.25}, minimum height=1.05cm, align=center},
+  mui/.style={-{Stealth[length=7pt]}, line width=1.1pt, draw=black!55}]
+  % Tầng giao diện
+  \foreach \x/\t/\c in {0/Tổng quan/orange, 2.75/Đồ thị 3D/teal, 5.5/Trợ lý/red, 8.25/Arena/blue, 11/Lab/violet, 13.75/Atlas, Tracker, Logs/olive}{}
+  \node[tang=orange, minimum width=2.5cm] (a) at (0,5.2) {Tổng quan};
+  \node[tang=teal, minimum width=2.5cm] (b) at (2.7,5.2) {Đồ thị 3D};
+  \node[tang=red, minimum width=2.5cm] (c) at (5.4,5.2) {Trợ lý};
+  \node[tang=blue, minimum width=2.5cm] (d) at (8.1,5.2) {Arena};
+  \node[tang=violet, minimum width=2.5cm] (e) at (10.8,5.2) {Lab, Atlas,\\ Tracker, Logs};
+  % Tầng máy chủ
+  \node[tang=ptitblue, minimum width=13.3cm, minimum height=1.2cm] (api) at (5.4,3) {\textbf{FastAPI}: REST, luồng SSE, nạp \texttt{serve\_chN} lười};
+  \foreach \n in {a,b,c,d,e}{\draw[mui, <->] (\n.south) -- (\n.south |- api.north);}
+  % Tầng dữ liệu
+  \node[tang=teal, minimum width=2.9cm] (n) at (-0.1,0.8) {Neo4j\\ đồ thị tri thức};
+  \node[tang=red, minimum width=2.9cm] (o) at (3.3,0.8) {Ollama\\ LLM trên GPU};
+  \node[tang=orange, minimum width=2.9cm] (m) at (6.7,0.8) {Mô hình\\ \texttt{models/}};
+  \node[tang=olive, minimum width=3.9cm] (j) at (10.6,0.8) {\texttt{metrics/*.json},\\ \texttt{runs.jsonl}, log};
+  \foreach \n in {n,o,m,j}{\draw[mui, <->] (\n.north) -- (\n.north |- api.south);}
+\end{tikzpicture}

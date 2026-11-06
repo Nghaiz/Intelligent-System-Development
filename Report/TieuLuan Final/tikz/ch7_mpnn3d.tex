@@ -1,0 +1,28 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ba mặt phẳng nghiêng: cùng một đồ thị ở ba lớp mạng
+  \foreach \L/\col/\yy in {0/cBlue/0, 1/cOrange/2.45, 2/cGreen/4.9}{
+    \begin{scope}[yshift=\yy cm, xslant=0.75]
+      \filldraw[draw=\col!70!black, top color=\col!8, bottom color=\col!30, thick, rounded corners=4pt,
+                blur shadow={shadow blur steps=6, shadow opacity=25}] (0,0) rectangle (7,1.75);
+      \foreach \n/\x/\y in {a/0.8/0.9, b/2.2/1.4, c/3.5/0.85, d/2.1/0.35, e/4.9/1.3, f/5.9/0.5}
+        \coordinate (\n\L) at (\x,\y);
+      \foreach \u/\v in {a/b, a/d, b/c, d/c, c/e, c/f, e/f}
+        \draw[gray!65, thick] (\u\L) -- (\v\L);
+    \end{scope}
+    \node[font=\small\bfseries\sffamily, text=\col!70!black, anchor=east] at (-0.15,\yy+0.75) {lớp $\ell=\L$};
+  }
+  \foreach \L in {0,1,2}{
+    \foreach \n/\c in {a/cSky, b/cPink, d/cLime, e/cPurple, f/cYellow}
+      \shade[ball color=\c] (\n\L) circle (0.15);
+    \shade[ball color=cRed] (c\L) circle (0.21);
+  }
+  \foreach \n in {b,d,e,f} \draw[muiM=cBlue!80!black, thick, shorten >=3pt, shorten <=3pt] (\n0) -- (c1);
+  \draw[muiM=cRed, thick, dashed, shorten >=3pt] (c0) -- (c1);
+  \foreach \n in {b,d,e,f} \draw[muiM=cOrange!85!black, thick, shorten >=3pt, shorten <=3pt] (\n1) -- (c2);
+  \draw[muiM=cRed, thick, dashed, shorten >=3pt] (c1) -- (c2);
+  \draw[muiM=gray, thick, dotted, shorten >=3pt] (a0) -- (b1);
+  \draw[muiM=gray, thick, dotted, shorten >=3pt] (a0) -- (d1);
+  \node[khoiR, text width=4.6cm, anchor=west] at (9.6,6.1) {\textbf{Cập nhật}: $h_v^{(\ell+1)}=\phi\big(h_v^{(\ell)},m_v^{(\ell)}\big)$};
+  \node[khoiC, text width=4.6cm, anchor=west] at (9.6,3.7) {\textbf{Gộp}: $m_v^{(\ell)}=\bigoplus_{u\in\mathcal N(v)}\psi\big(h_u^{(\ell)},h_v^{(\ell)}\big)$};
+  \node[khoi, text width=4.6cm, anchor=west] at (9.6,1.2) {\textbf{Đầu vào}: $h_v^{(0)}=x_v$. Nét chấm: sau 2 lớp nút đỏ nghe được nút cách 2 bước};
+\end{tikzpicture}

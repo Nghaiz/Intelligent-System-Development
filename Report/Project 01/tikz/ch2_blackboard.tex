@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \khoibaD{5.2}{2.3}{5.0}{1.9}{1.5}{cNavy}
+  \node[font=\normalsize\bfseries, text=white, align=center] at (7.7,3.25) {Bảng đen\\(trạng thái chung)};
+  \foreach \x/\y/\n/\c in {1.4/5.4/Supervisor/cRed,5.5/6.2/Intake/cBlue,9.9/6.2/Risk/cIndigo,14.0/5.4/Retina/cPink,
+                           1.4/1.2/Knowledge/cTeal,5.5/0.4/RuleGuard/cYellow,9.9/0.4/Advisor/cGreen,14.0/1.2/Critic/cOrange}{
+    \node[cau=\c, minimum size=23mm, font=\scriptsize\bfseries, inner sep=0pt] (a\n) at (\x,\y) {\n};
+  }
+  \foreach \n/\tx/\ty in {Supervisor/5.2/3.8,Intake/6.4/4.2,Risk/8.8/4.2,Retina/11.2/4.4,Knowledge/5.2/2.7,RuleGuard/6.4/2.3,Advisor/8.8/2.3,Critic/10.2/2.5}{
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick, cSlate!70] (a\n) -- (\tx,\ty);
+  }
+  \draw[muiM=cRed, dashed] (aCritic.south west) to[bend left=25] node[below, font=\small, text=cRed!70!black] {viết lại} (aAdvisor.south east);
+\end{tikzpicture}

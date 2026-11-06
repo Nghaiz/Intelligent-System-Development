@@ -1,0 +1,31 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % ba vùng
+  \node[vung=cBlue, minimum width=3.4cm, minimum height=5.1cm] (zl) at (1.7,0.1) {};
+  \node[vung=cTeal, minimum width=6.9cm, minimum height=5.1cm] (zm) at (7.95,0.1) {};
+  \node[vung=cOrange, minimum width=3.4cm, minimum height=5.1cm] (zr) at (14.2,0.1) {};
+  \node[tieude] at (1.7,2.95) {Cửa hàng 1};
+  \node[tieude] at (7.95,2.95) {Thị trường};
+  \node[tieude] at (14.2,2.95) {Cửa hàng 2};
+  % tác tử: khối 3D
+  \khoibaD{0.45}{0.45}{2.2}{1.4}{0.9}{cBlue}
+  \node[text=white, font=\small\bfseries, align=center] at (1.55,1.15) {Q-learning};
+  \khoibaD{13.1}{0.45}{2.2}{1.4}{0.9}{cOrange}
+  \node[text=white, font=\small\bfseries, align=center] at (14.2,1.15) {Tác tử luật};
+  \node[khoi, minimum width=2.9cm] (qt) at (1.7,-1.15) {bảng $Q$ $4\times2$,\\$\varepsilon$-greedy};
+  \node[khoiC, minimum width=2.9cm] (rl) at (14.2,-1.15) {$d=1\wedge c=1$\\$\Rightarrow$ giảm giá};
+  % thị trường
+  \node[khoiT, minimum width=6.1cm] (dm) at (7.95,1.75) {nhu cầu $d_t$, khách $N_t\in\{10,20\}$};
+  \node[khoiG, minimum width=6.1cm] (cv) at (7.95,0.45) {$p_i=0{,}30+0{,}25d+0{,}15a_i-0{,}10a_{-i}$};
+  \node[khoiP, minimum width=6.1cm] (sl) at (7.95,-1.05) {$S_i\sim\mathrm{Bin}(N_t,p_i)$\\$r_i=S_i[P(1-\delta a_i)-C]$};
+  \draw[mui] (dm) -- (cv);
+  \draw[mui] (cv) -- (sl);
+  % luồng: trạng thái đi ra từ nhu cầu, hành động đi vào xác suất chuyển đổi
+  \draw[muiM=cBlue] (dm.west |- 0,1.65) -- node[above, nhan] {$s_1$} (3.2,1.65);
+  \draw[muiM=cBlue] (3.2,0.6) -- node[above, nhan] {$a_1$} (cv.west |- 0,0.6);
+  \draw[muiM=cOrange] (dm.east |- 0,1.65) -- node[above, nhan] {$s_2$} (13.05,1.65);
+  \draw[muiM=cOrange] (13.05,0.6) -- node[above, nhan] {$a_2$} (cv.east |- 0,0.6);
+  \draw[muiM=cRed] (sl.west) -- node[above, nhan] {$r_1$} (qt.east |- sl.west);
+  \draw[muiM=cRed, dashed] (sl.east) -- node[above, nhan] {$r_2$} (rl.west |- sl.east);
+  \draw[mui, cBlue] (qt) -- (1.7,0.42);
+  \draw[mui, cOrange] (rl) -- (14.2,0.42);
+\end{tikzpicture}

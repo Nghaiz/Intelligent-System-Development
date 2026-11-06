@@ -1,0 +1,30 @@
+\chapter{Tổng quan đề tài}\label{chap:tongquan}
+
+\section{Bối cảnh và bài toán}
+
+Đái tháo đường là bệnh mạn tính tiến triển âm thầm: nhiều người chỉ biết mình mắc bệnh khi đã có biến chứng ở mắt, thận hoặc tim mạch~\cite{idf}. Muốn hỗ trợ một người dân thật sự, hệ thống phải làm được ba việc rất khác nhau. Việc thứ nhất là ước lượng nguy cơ từ hồ sơ, tức bài toán phân loại trên dữ liệu có cấu trúc. Việc thứ hai là giải thích và tư vấn bằng tri thức y khoa có nguồn rõ ràng, tức bài toán truy xuất. Việc thứ ba là quyết định nên hỏi gì tiếp theo, vì người dùng không có sẵn đủ xét nghiệm và cũng không kiên nhẫn trả lời hàng chục câu.
+
+Một mô hình đơn lẻ chỉ trả về một xác suất, còn một chatbot đơn lẻ dễ nêu con số không có nguồn. Đồ án xây dựng \textbf{DiaNexus}, một hệ đa tác tử trong đó mỗi phần việc do một vai trò riêng đảm nhận, kết quả được kiểm tra chéo rồi mới đến tay người dùng. Hệ thống chạy hoàn toàn cục bộ trên máy cá nhân và chỉ mang tính tham khảo, không thay thế chẩn đoán của bác sĩ.
+
+\section{Ánh xạ sơ đồ đề bài sang hệ thống}
+
+Đề bài cho sơ đồ hai nhánh. Nhánh dữ liệu đi từ cơ sở dữ liệu qua học máy, học sâu tới dự đoán và phân loại. Nhánh tri thức đi từ PDF, trang web qua cơ sở tri thức, RAG tới tác tử. Hai nhánh hợp lại tại tác tử, có sự hỗ trợ của luật, công cụ và học tăng cường. Hình~\ref{fig:board} cho thấy cách DiaNexus hiện thực sơ đồ này, Bảng~\ref{tab:anhxa} chỉ rõ từng khối nằm ở đâu trong mã nguồn.
+
+\hinhtikz{ch1_board}{Sơ đồ đề bài và cách DiaNexus hiện thực từng khối}{board}
+
+\input{generated/ch1_anhxa}
+
+\section{Mục tiêu và đóng góp riêng}
+
+Đồ án đặt ra các mục tiêu có thể đo được, mỗi mục tiêu ứng với một phần đánh giá ở các chương sau:
+
+\begin{enumerate}
+  \item Xây dựng CSDL nhiều nguồn và so sánh mô hình cổ điển với mô hình sâu trên ba bài toán: chẩn đoán có xét nghiệm, sàng lọc không xét nghiệm, tái nhập viện.
+  \item Phân cấp bệnh võng mạc đái tháo đường từ ảnh đáy mắt và giải thích bằng Grad-CAM.
+  \item Dựng đồ thị tri thức thật trên Neo4j từ nhiều nguồn, kết hợp với truy xuất lai và đo bằng các chỉ số xếp hạng.
+  \item Huấn luyện chính sách học tăng cường chọn câu hỏi sàng lọc theo từng người, trên dữ liệu thật chứ không phải môi trường giả lập.
+  \item Chứng minh giá trị của từng thành phần bằng thí nghiệm cắt bỏ trên cùng bộ kịch bản.
+  \item Triển khai website localhost có theo dõi tác tử trực tiếp, nhật ký và dữ liệu.
+\end{enumerate}
+
+Điểm mới của đồ án là \textbf{sàng lọc thích ứng}: tác tử học cách đặt ít câu hỏi hơn mà vẫn giữ được chất lượng dự đoán, thứ tự câu hỏi và thời điểm dừng thay đổi theo từng người. Mọi con số trong báo cáo được sinh tự động từ tệp kết quả của lần chạy thực tế, đoạn mã được trích nguyên văn từ mã nguồn đã chạy.

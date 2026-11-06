@@ -1,0 +1,20 @@
+\begin{tikzpicture}
+  % hàng trên: dữ liệu đi qua các chốt chống rò rỉ
+  \foreach \i/\x/\c/\t in {1/0/cBlue/{Dữ liệu\\thô}, 2/3.6/cSky/{Bỏ trùng,\\tách vị trí}, 3/7.2/cTeal/{Chia theo\\nhóm/tầng}, 4/10.8/cGreen/{Fit biến đổi\\chỉ trên train}}{
+    \khoibaD{\x}{3.0}{2.75}{1.45}{0.7}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\x+1.37,3.72) {\t};
+    \node[buoc=cRed] at (\x+0.1,4.6) {\i};
+  }
+  % hàng dưới: chọn và đo
+  \foreach \i/\x/\c/\t in {7/0/cPurple/{Lưu mô hình,\\Web App}, 6/3.6/cPink/{Đo test\\đúng một lần}, 5/7.2/cOrange/{Chọn tham số,\\ngưỡng trên val}}{
+    \khoibaD{\x}{0}{2.75}{1.45}{0.7}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\x+1.37,0.72) {\t};
+    \node[buoc=cRed] at (\x+0.1,1.6) {\i};
+  }
+  \khoibaD{10.8}{0}{2.75}{1.45}{0.7}{cYellow}
+  \node[font=\small\bfseries, text=black, align=center] at (12.17,0.72) {Baseline và\\sáu họ mô hình};
+  \foreach \x in {2.75,6.35,9.95}{\draw[mui] (\x+0.38,3.72) -- (\x+0.82,3.72);}
+  \foreach \x in {2.75,6.35,9.95}{\draw[mui] (\x+0.82,0.72) -- (\x+0.38,0.72);}
+  \draw[mui] (12.17,2.95) -- (12.17,1.95);
+  \draw[muiM=cRed, dashed] (8.57,2.95) -- (8.57,1.95) node[midway, right, font=\small, text=cRed] {val, test chỉ transform};
+\end{tikzpicture}

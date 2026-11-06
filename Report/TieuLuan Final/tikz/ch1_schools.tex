@@ -1,0 +1,26 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[hop=cNavy, minimum width=6.4cm, minimum height=0.85cm, font=\normalsize\bfseries\sffamily] (root) at (7.75,3.15)
+    {Năm trường phái trong AI};
+  \foreach \i/\c/\ten/\y/\a in {
+      0/cBlue/{Ký hiệu}/{logic, luật,\\suy diễn}/{Logic Theorist,\\MYCIN, Cyc},
+      1/cOrange/{Kết nối}/{nơ-ron,\\lan truyền ngược}/{Perceptron,\\CNN, Transformer},
+      2/cTeal/{Xác suất}/{suy luận\\Bayes, thống kê}/{mạng Bayes,\\HMM, SVM},
+      3/cGreen/{Tiến hóa}/{chọn lọc,\\đột biến}/{giải thuật\\di truyền},
+      4/cPurple/{Hành vi}/{cảm nhận,\\phần thưởng}/{robot Brooks,\\Q-learning, AlphaGo}} {
+    \pgfmathsetmacro{\x}{\i*3.14}
+    % khối đầu cột giả 3D
+    \khoibaD{\x}{0.95}{2.62}{1.0}{0.62}{\c}
+    \node[text=white, font=\small\bfseries\sffamily] at (\x+1.31,1.45) {\ten};
+    \draw[muiM=\c!70!black] (root.south) -- ++(0,-0.26) -| (\x+1.45,2.22);
+    \node[hop=\c!55!white, text width=2.58cm, minimum height=1.25cm] (y\i) at (\x+1.31,-0.15) {\y};
+    \node[hop=\c!30!white, text width=2.58cm, minimum height=1.25cm] (a\i) at (\x+1.31,-1.75) {\a};
+    \draw[muiM=\c!70!black] (\x+1.31,0.95) -- (y\i.north);
+    \draw[muiM=\c!70!black] (y\i) -- (a\i);
+    \draw[muiM=\c!70!black] (a\i.south) -- ++(0,-0.48);
+  }
+  % hội tụ
+  \shade[left color=cBlue!55, middle color=cYellow!60, right color=cPurple!55, rounded corners=4pt, draw=cNavy, thick]
+    (0,-4.2) rectangle (15.2,-2.98);
+  \node[font=\small\bfseries, align=center] at (7.6,-3.59)
+    {Sau 2020 các trường phái hội tụ: mạng nơ-ron học biểu diễn,\\đồ thị tri thức cấp sự kiện, học tăng cường tinh chỉnh hành vi};
+\end{tikzpicture}

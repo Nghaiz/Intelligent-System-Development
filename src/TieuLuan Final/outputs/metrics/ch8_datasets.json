@@ -1,0 +1,86 @@
+{
+ "datasets": [
+  {
+   "id": "market",
+   "name": "Thị trường giảm giá hai cửa hàng (mô phỏng)",
+   "source": "Bài Agent 02 của chính tác giả (src/Agent 02, Report/Agent 02)",
+   "url": "",
+   "task": "Học tăng cường: chọn giữ giá hoặc giảm giá để tối đa lợi nhuận",
+   "n_samples": 100000,
+   "n_features": 2,
+   "size_mb": 0.77,
+   "license": "Tự sinh, dữ liệu tổng hợp",
+   "note": "Dữ liệu tổng hợp: mọi quan sát do bộ mô phỏng sinh; không có dữ liệu bán hàng thật. n_samples là số bước huấn luyện của lượt tham chiếu, phân bố là số lần thăm từng trạng thái (d, c).",
+   "sample_rows": [
+    {
+     "t": 1,
+     "d": 0,
+     "c": 0,
+     "a_rl": 0,
+     "a_luat": 0,
+     "r_rl": 20.0,
+     "r_luat": 15.0
+    },
+    {
+     "t": 2,
+     "d": 0,
+     "c": 0,
+     "a_rl": 0,
+     "a_luat": 0,
+     "r_rl": 10.0,
+     "r_luat": 10.0
+    },
+    {
+     "t": 3,
+     "d": 1,
+     "c": 0,
+     "a_rl": 0,
+     "a_luat": 0,
+     "r_rl": 40.0,
+     "r_luat": 50.0
+    },
+    {
+     "t": 4,
+     "d": 0,
+     "c": 0,
+     "a_rl": 0,
+     "a_luat": 0,
+     "r_rl": 25.0,
+     "r_luat": 25.0
+    },
+    {
+     "t": 5,
+     "d": 1,
+     "c": 0,
+     "a_rl": 0,
+     "a_luat": 0,
+     "r_rl": 35.0,
+     "r_luat": 45.0
+    },
+    {
+     "t": 6,
+     "d": 0,
+     "c": 0,
+     "a_rl": 0,
+     "a_luat": 0,
+     "r_rl": 15.0,
+     "r_luat": 10.0
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "(0, 0)",
+     "(0, 1)",
+     "(1, 0)",
+     "(1, 1)"
+    ],
+    "values": [
+     46923,
+     3175,
+     46622,
+     3280
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,40 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % bốn cách nhìn một đồ thị 5 nút; ô L_sym tính bằng pgfmath, không gõ tay
+  \node[tieude] at (1.3,3.75) {Đồ thị $G$};
+  \node[cau=cBlue] (n1) at (0.2,2.85) {1};
+  \node[cau=cOrange] (n2) at (2.2,3.0) {2};
+  \node[cau=cGreen] (n3) at (1.25,1.55) {3};
+  \node[cau=cPurple] (n4) at (0.1,0.3) {4};
+  \node[cau=cRed] (n5) at (2.5,0.45) {5};
+  \foreach \u/\v in {n1/n2, n1/n3, n2/n3, n3/n4, n3/n5, n2/n5} \draw[very thick, cSlate] (\u) -- (\v);
+  \def\cs{0.56}
+  \begin{scope}[xshift=3.5cm, yshift=0.3cm]
+    \node[tieude] at (1.4,3.45) {Ma trận kề $A$};
+    \foreach \r [count=\i from 0] in {{0,1,1,0,0},{1,0,1,0,1},{1,1,0,1,1},{0,0,1,0,0},{0,1,1,0,0}}{
+      \foreach \val [count=\j from 0] in \r {
+        \ifnum\val=1 \fill[cBlue!60] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs);
+        \else \fill[cBlue!7] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs); \fi
+        \draw[white] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs);
+        \node[font=\small] at (\j*\cs+0.28,2.24-\i*\cs+0.28) {\val};}}
+  \end{scope}
+  \begin{scope}[xshift=6.7cm, yshift=0.3cm]
+    \node[tieude] at (1.4,3.45) {Ma trận bậc $D$};
+    \foreach \d [count=\i from 0] in {2,3,4,1,2}{
+      \foreach \j in {0,...,4}{
+        \ifnum\i=\j \fill[cOrange!65] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs);
+          \node[font=\small] at (\j*\cs+0.28,2.24-\i*\cs+0.28) {\d};
+        \else \fill[cOrange!7] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs); \fi
+        \draw[white] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs);}}
+  \end{scope}
+  \begin{scope}[xshift=9.9cm, yshift=0.3cm]
+    \node[tieude] at (2.9,3.45) {$L_{\mathrm{sym}}=I-D^{-1/2}AD^{-1/2}$};
+    \def\degs{{2,3,4,1,2}}
+    \foreach \r [count=\i from 0] in {{0,1,1,0,0},{1,0,1,0,1},{1,1,0,1,1},{0,0,1,0,0},{0,1,1,0,0}}{
+      \foreach \val [count=\j from 0] in \r {
+        \pgfmathsetmacro{\vv}{\i==\j ? 100 : 100*\val/sqrt(\degs[\i]*\degs[\j])}
+        \ifnum\i=\j \fill[cGreen!\vv!white] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs);
+        \else \fill[cRed!\vv!white] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs); \fi
+        \draw[white] (\j*\cs,2.24-\i*\cs) rectangle ++(\cs,\cs);}}
+    \node[khoiX, text width=2.5cm, font=\footnotesize, anchor=west] at (3.0,1.5) {ô đỏ đậm là $|L_{ij}|$ lớn; trị riêng trong $[0,2]$};
+  \end{scope}
+\end{tikzpicture}

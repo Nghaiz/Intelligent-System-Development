@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[cau=cRed, minimum size=14mm, font=\scriptsize\bfseries, align=center] (q) at (0,0) {Câu\\ hỏi};
+  \node[khoiC, text width=3.0cm] (fts) at (3.6,1.5) {Liên kết thực thể\\ \texttt{entity\_names}};
+  \node[khoiP, text width=3.0cm] (vec) at (3.6,-1.5) {Hạt vector top-5\\ \texttt{vec\_<miền>}};
+  \node[csdl=cTeal, minimum width=20mm, minimum height=17mm] (db) at (7.6,0) {Neo4j};
+  \node[khoiG, text width=3.4cm] (exp) at (12.2,1.5) {Mở rộng 1 bước,\\ tối đa 120 láng giềng};
+  \node[khoi, text width=3.4cm] (rank) at (12.2,-1.5) {Xếp hạng\\ $\cos(q,c)+0{,}15\,h$};
+  \node[khoiT, text width=3.0cm] (ctx) at (7.6,-4.0) {Top-4 chunk đánh số};
+  \node[hop=cGreen, text width=3.2cm] (llm) at (12.2,-4.0) {LLM cục bộ\\ trả lời kèm nguồn};
+  \draw[mui] (q) -- (fts); \draw[mui] (q) -- (vec);
+  \draw[mui] (fts) -- (db); \draw[mui] (vec) -- (db);
+  \draw[mui] (db) -- (exp); \draw[mui] (exp) -- (rank);
+  \draw[mui] (rank) -- (ctx); \draw[mui] (ctx) -- (llm);
+  \foreach \i/\n in {1/fts,2/vec,3/exp,4/rank,5/ctx}{\node[buoc] at (\n.north west) {\i};}
+  \node[nhan, text width=5.4cm, anchor=north west] at (-1.0,-2.9) {$h$: số thực thể của câu hỏi mà chunk trực tiếp nhắc tới. Chunk khớp nhiều thực thể được đẩy lên dù cosin thấp.};
+\end{tikzpicture}

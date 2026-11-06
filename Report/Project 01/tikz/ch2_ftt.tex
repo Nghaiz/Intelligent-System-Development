@@ -1,0 +1,24 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[tieude] at (1.1,6.0) {Hồ sơ};
+  \foreach \i/\t/\c in {0/tuổi/cBlue,1/BMI/cTeal,2/HbA1c/cOrange,3/hút thuốc/cPink}{
+    \node[hop=\c, minimum width=20mm] (f\i) at (1.1,5.0-1.15*\i) {\t};
+    \pgfmathsetmacro{\yy}{4.65-1.15*\i}
+    \khoibaD{4.0}{\yy}{1.5}{0.62}{0.55}{\c}
+    \draw[mui] (f\i.east) -- (3.95,5.0-1.15*\i);
+  }
+  \khoibaD{4.0}{5.45}{1.5}{0.62}{0.55}{cRed}
+  \node[font=\small\bfseries, text=cRed!70!black, anchor=east] at (3.9,5.78) {[CLS]};
+  \draw[very thick, cNavy, decorate, decoration={brace, amplitude=6pt}] (6.1,6.25) -- (6.1,1.05);
+  \foreach \k/\c in {0/cIndigo,1/cPurple,2/cIndigo}{
+    \pgfmathsetmacro{\xx}{6.9+1.45*\k}
+    \khoibaD{\xx}{1.2}{0.95}{4.7}{1.0}{\c}
+  }
+  \node[font=\small\bfseries, text=white, rotate=90] at (7.37,3.55) {tự chú ý};
+  \node[font=\small\bfseries, text=white, rotate=90] at (8.82,3.55) {FFN};
+  \node[font=\small\bfseries, text=white, rotate=90] at (10.27,3.55) {tự chú ý};
+  \node[font=\small, text=black!75] at (8.8,0.75) {$L$ khối Transformer};
+  \draw[mui] (11.5,3.55) -- (12.4,3.55) node[above, midway, font=\small] {CLS};
+  \node[hop=cGreen, minimum width=16mm, minimum height=16mm] (h) at (13.3,3.55) {Tuyến\\tính};
+  \node[cau=cRed, minimum size=13mm] (p) at (15.3,3.55) {$\hat p$};
+  \draw[mui] (h) -- (p);
+\end{tikzpicture}

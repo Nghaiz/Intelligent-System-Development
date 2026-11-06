@@ -1,0 +1,351 @@
+{
+ "source": "neo4j",
+ "nodes": 10976,
+ "triples": 38659,
+ "relations": 23,
+ "node_kinds": 10,
+ "kinds": {
+  "rows": [
+   {
+    "kind": "Gene",
+    "n": 6027
+   },
+   {
+    "kind": "Pathway",
+    "n": 1146
+   },
+   {
+    "kind": "MolecularFunction",
+    "n": 994
+   },
+   {
+    "kind": "SideEffect",
+    "n": 974
+   },
+   {
+    "kind": "Compound",
+    "n": 967
+   },
+   {
+    "kind": "CellularComponent",
+    "n": 481
+   },
+   {
+    "kind": "Anatomy",
+    "n": 150
+   },
+   {
+    "kind": "Disease",
+    "n": 130
+   },
+   {
+    "kind": "Symptom",
+    "n": 94
+   },
+   {
+    "kind": "PharmacologicClass",
+    "n": 13
+   }
+  ]
+ },
+ "rels": {
+  "rows": [
+   {
+    "rel": "GiG",
+    "n": 11019
+   },
+   {
+    "rel": "GpPW",
+    "n": 5675
+   },
+   {
+    "rel": "GpMF",
+    "n": 3979
+   },
+   {
+    "rel": "DaG",
+    "n": 3945
+   },
+   {
+    "rel": "CcSE",
+    "n": 3096
+   },
+   {
+    "rel": "GpCC",
+    "n": 2871
+   },
+   {
+    "rel": "AeG",
+    "n": 2096
+   },
+   {
+    "rel": "CbG",
+    "n": 2065
+   },
+   {
+    "rel": "DlA",
+    "n": 746
+   },
+   {
+    "rel": "Gr>G",
+    "n": 682
+   },
+   {
+    "rel": "DuG",
+    "n": 650
+   },
+   {
+    "rel": "DdG",
+    "n": 594
+   },
+   {
+    "rel": "DpS",
+    "n": 416
+   },
+   {
+    "rel": "AuG",
+    "n": 251
+   },
+   {
+    "rel": "AdG",
+    "n": 208
+   },
+   {
+    "rel": "CtD",
+    "n": 140
+   },
+   {
+    "rel": "CrC",
+    "n": 114
+   },
+   {
+    "rel": "PCiC",
+    "n": 26
+   },
+   {
+    "rel": "CpD",
+    "n": 24
+   },
+   {
+    "rel": "DrD",
+    "n": 21
+   },
+   {
+    "rel": "GcG",
+    "n": 20
+   },
+   {
+    "rel": "CuG",
+    "n": 12
+   },
+   {
+    "rel": "CdG",
+    "n": 9
+   }
+  ]
+ },
+ "train": 30923,
+ "val": 3862,
+ "test": 3874,
+ "models": {
+  "rows": [
+   {
+    "model": "Adamic-Adar",
+    "auc": 0.6424693035901791,
+    "auc_std": 0.0023497495378563727,
+    "ap": 0.6408192930057737,
+    "ap_std": 0.003973837883432687,
+    "seconds": 3.6161158666667084,
+    "n_seeds": 3
+   },
+   {
+    "model": "Tích bậc",
+    "auc": 0.7248319901309687,
+    "auc_std": 0.0015833225843277028,
+    "ap": 0.7440478693598065,
+    "ap_std": 0.002493845690206833,
+    "seconds": 0.03915826666661815,
+    "n_seeds": 3
+   },
+   {
+    "model": "DistMult (không truyền tin)",
+    "auc": 0.838983821393335,
+    "auc_std": 0.0073107211983489545,
+    "ap": 0.8427707914136887,
+    "ap_std": 0.006225614620647475,
+    "seconds": 212.80285703333357,
+    "n_seeds": 3,
+    "params": 1409152
+   },
+   {
+    "model": "GCN + DistMult",
+    "auc": 0.7672197782388265,
+    "auc_std": 0.007541160915206587,
+    "ap": 0.7919146973253719,
+    "ap_std": 0.007827164318221206,
+    "seconds": 181.9484960666667,
+    "n_seeds": 3,
+    "params": 1442176
+   },
+   {
+    "model": "R-GCN + DistMult",
+    "auc": 0.7990024604744489,
+    "auc_std": 0.007453032296980867,
+    "ap": 0.8157652895718009,
+    "ap_std": 0.000752425706241341,
+    "seconds": 160.41467783333306,
+    "n_seeds": 3,
+    "params": 1453952
+   }
+  ]
+ },
+ "clean": {
+  "model": "R-GCN + DistMult",
+  "auc": 0.7990024604744489,
+  "auc_std": 0.007453032296980867,
+  "ap": 0.8157652895718009,
+  "ap_std": 0.000752425706241341,
+  "seconds": 160.41467783333306,
+  "n_seeds": 3,
+  "params": 1453952
+ },
+ "leaky": {
+  "model": "R-GCN, cạnh test lọt vào đồ thị",
+  "auc": 0.9186362898041693,
+  "auc_std": 0.0038671154351193294,
+  "ap": 0.9046347968214493,
+  "ap_std": 0.004484380811314279,
+  "seconds": 0.0,
+  "n_seeds": 3
+ },
+ "per_relation": {
+  "rows": [
+   {
+    "rel": "GiG",
+    "auc": 0.7557313922265481,
+    "n": 1127
+   },
+   {
+    "rel": "DaG",
+    "auc": 0.7467027699681941,
+    "n": 381
+   },
+   {
+    "rel": "CbG",
+    "auc": 0.6650000921025541,
+    "n": 211
+   },
+   {
+    "rel": "CcSE",
+    "auc": 0.7777034800913091,
+    "n": 303
+   },
+   {
+    "rel": "GpPW",
+    "auc": 0.8506876439929556,
+    "n": 551
+   },
+   {
+    "rel": "CtD",
+    "auc": 0.608843537414966,
+    "n": 11
+   }
+  ]
+ },
+ "history": [
+  {
+   "epoch": 20,
+   "loss": 0.9636982083320618,
+   "val_auc": 0.6351890748696416
+  },
+  {
+   "epoch": 40,
+   "loss": 0.6677162647247314,
+   "val_auc": 0.6892006151641256
+  },
+  {
+   "epoch": 60,
+   "loss": 0.5801354050636292,
+   "val_auc": 0.710240345251412
+  },
+  {
+   "epoch": 80,
+   "loss": 0.5515472888946533,
+   "val_auc": 0.7260706036133717
+  },
+  {
+   "epoch": 100,
+   "loss": 0.508066713809967,
+   "val_auc": 0.7392710675208198
+  },
+  {
+   "epoch": 120,
+   "loss": 0.482474148273468,
+   "val_auc": 0.7569174452318076
+  },
+  {
+   "epoch": 140,
+   "loss": 0.4435272216796875,
+   "val_auc": 0.7667776910346359
+  },
+  {
+   "epoch": 160,
+   "loss": 0.4324052333831787,
+   "val_auc": 0.7845072398043211
+  },
+  {
+   "epoch": 180,
+   "loss": 0.40173742175102234,
+   "val_auc": 0.791332261574287
+  },
+  {
+   "epoch": 200,
+   "loss": 0.39005085825920105,
+   "val_auc": 0.7959932267045273
+  }
+ ],
+ "candidates": {
+  "rows": [
+   {
+    "name": "Sildenafil",
+    "score": 0.9997124075889587,
+    "held_out_true": false
+   },
+   {
+    "name": "Octreotide",
+    "score": 0.985808253288269,
+    "held_out_true": false
+   },
+   {
+    "name": "Sitagliptin",
+    "score": 0.9748542308807373,
+    "held_out_true": true
+   },
+   {
+    "name": "Drospirenone",
+    "score": 0.819693922996521,
+    "held_out_true": false
+   },
+   {
+    "name": "Norethindrone",
+    "score": 0.661170244216919,
+    "held_out_true": false
+   },
+   {
+    "name": "Miglitol",
+    "score": 0.5669316649436951,
+    "held_out_true": true
+   },
+   {
+    "name": "Levonorgestrel",
+    "score": 0.5605733394622803,
+    "held_out_true": false
+   },
+   {
+    "name": "Dipyridamole",
+    "score": 0.5457658171653748,
+    "held_out_true": false
+   }
+  ]
+ }
+}

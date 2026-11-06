@@ -1,0 +1,24 @@
+{
+ "chunks": 51164,
+ "by_source": {
+  "bo_y_te": 84,
+  "cdc": 391,
+  "europepmc": 43690,
+  "medlineplus": 2296,
+  "medlineplus_vi": 101,
+  "niddk": 1122,
+  "who": 307,
+  "wikipedia_vi": 3173
+ },
+ "by_lang": {
+  "vi": 3358,
+  "en": 47806
+ },
+ "docs": 23064,
+ "words_mean": 128.74210382300055,
+ "words_median": 149.0,
+ "words_max": 210,
+ "words_min": 15,
+ "path": "D:\\Python\\Intelligent-System-Development\\src\\Project 01\\data\\kb\\chunks.jsonl",
+ "chunking": "theo câu, ≤180 từ, chồng lấn ≤30 từ"
+}

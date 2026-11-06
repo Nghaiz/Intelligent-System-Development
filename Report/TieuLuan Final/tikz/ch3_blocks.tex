@@ -1,0 +1,36 @@
+\begin{tikzpicture}[node distance=0.34cm, every node/.style={font=\small}]
+  % (a) khối cơ bản
+  \node[tieude] at (0,0.95) {(a) CNN cơ bản};
+  \node[cau=cSlate] (a0) at (0,0) {$\mathbf{x}$};
+  \node[khoi, below=of a0, minimum width=3.4cm] (a1) {Conv $3{\times}3$, BN, ReLU};
+  \node[khoi, below=of a1, minimum width=3.4cm] (a2) {Conv $3{\times}3$, BN, ReLU};
+  \node[khoiP, below=of a2, minimum width=3.4cm] (a3) {MaxPool, Dropout};
+  \node[khoiX, below=of a3, minimum width=3.4cm, align=center] (a4) {Lặp 3 lần: 32, 64, 128};
+  \node[khoiC, below=of a4, minimum width=3.4cm] (a5) {GAP, FC 128, FC $K$};
+  \foreach \p/\q in {a0/a1,a1/a2,a2/a3,a3/a4,a4/a5}{\draw[mui] (\p) -- (\q);}
+  % (b) khối dư
+  \begin{scope}[xshift=5.1cm]
+  \node[tieude] at (0,0.95) {(b) Khối dư};
+  \node[cau=cSlate] (b0) at (0,0) {$\mathbf{x}$};
+  \node[khoi, below=of b0, minimum width=3.3cm] (b1) {Conv $3{\times}3$, BN, ReLU};
+  \node[khoi, below=of b1, minimum width=3.3cm] (b2) {Conv $3{\times}3$, BN};
+  \node[cau=cOrange, below=0.5cm of b2] (b3) {$+$};
+  \node[khoiR, below=0.4cm of b3, minimum width=3.3cm] (b4) {ReLU};
+  \node[below=0.3cm of b4, font=\small] {$\mathbf{y}=\mathrm{ReLU}\big(F(\mathbf{x})+\mathbf{x}\big)$};
+  \foreach \p/\q in {b0/b1,b1/b2,b2/b3,b3/b4}{\draw[mui] (\p) -- (\q);}
+  \draw[muiM=cOrange!85!black, line width=1.8pt, rounded corners=9pt] (b0.east) -- ++(1.75,0) |- (b3.east);
+  \node[font=\footnotesize, anchor=south, text=cOrange!70!black] at (1.0,0.05) {lối tắt};
+  \end{scope}
+  % (c) inverted residual
+  \begin{scope}[xshift=11.1cm]
+  \node[tieude] at (0,0.95) {(c) Inverted residual};
+  \node[cau=cSlate] (c0) at (0,0) {$\mathbf{x}$};
+  \node[khoiG, below=of c0, minimum width=3.7cm] (c1) {Conv $1{\times}1$ mở rộng $t$ lần};
+  \node[khoiT, below=of c1, minimum width=3.7cm] (c2) {Depthwise $3{\times}3$};
+  \node[khoiG, below=of c2, minimum width=3.7cm] (c3) {Conv $1{\times}1$ tuyến tính};
+  \node[cau=cOrange, below=0.5cm of c3] (c4) {$+$};
+  \node[below=0.3cm of c4, align=center, font=\footnotesize] {lối tắt chỉ có khi stride $1$\\và số kênh không đổi};
+  \foreach \p/\q in {c0/c1,c1/c2,c2/c3,c3/c4}{\draw[mui] (\p) -- (\q);}
+  \draw[muiM=cOrange!85!black, line width=1.8pt, rounded corners=9pt] (c0.east) -- ++(2.1,0) |- (c4.east);
+  \end{scope}
+\end{tikzpicture}

@@ -1,0 +1,92 @@
+\chapter{Cơ sở lý thuyết}\label{chap:lythuyet}
+
+\section{Đái tháo đường và tiêu chí chẩn đoán}
+
+Đái tháo đường là nhóm rối loạn chuyển hóa có đặc trưng tăng đường huyết mạn tính do thiếu insulin, kháng insulin hoặc cả hai. Típ 2 chiếm đa số và gắn chặt với tuổi, béo phì, ít vận động. Bảng~\ref{tab:ada} tóm tắt các ngưỡng thường dùng theo Hiệp hội Đái tháo đường Hoa Kỳ~\cite{ada2025}. Biến chứng vi mạch ở võng mạc là lý do đồ án bổ sung nhánh xử lý ảnh đáy mắt~\cite{gulshan}.
+
+\begin{table}[!htbp]\centering\caption{Ngưỡng chẩn đoán theo ADA}\label{tab:ada}
+\begin{tabular}{@{}lcc@{}}\toprule
+\textbf{Xét nghiệm} & \textbf{Tiền đái tháo đường} & \textbf{Đái tháo đường}\\\midrule
+HbA1c (\%) & 5,7--6,4 & $\ge 6{,}5$\\
+Đường huyết lúc đói (mg/dL) & 100--125 & $\ge 126$\\
+Nghiệm pháp 2 giờ (mg/dL) & 140--199 & $\ge 200$\\\bottomrule
+\end{tabular}\end{table}
+
+\section{Học máy trên dữ liệu bảng}
+
+Với tập $\{(\mathbf{x}_i,y_i)\}$ mất cân bằng, mô hình tối thiểu hóa entropy chéo có trọng số lớp, trong đó $w_+$ tăng ảnh hưởng của lớp dương:
+\begin{equation}
+\mathcal{L}=-\frac{1}{N}\sum_{i=1}^{N}\big[w_+\,y_i\log\hat p_i+(1-y_i)\log(1-\hat p_i)\big].
+\end{equation}
+
+Rừng ngẫu nhiên giảm phương sai bằng trung bình nhiều cây~\cite{rf}. XGBoost cộng dần các cây, mỗi cây khớp gradient của hàm mất mát với số hạng phạt độ phức tạp $\Omega(f)=\gamma T+\tfrac12\lambda\|w\|^2$~\cite{xgboost}.
+
+Tác tử đọc xác suất cho người dùng nên xác suất phải đáng tin. Hiệu chỉnh isotonic tìm hàm đơn điệu $g$ tối thiểu $\sum_i(y_i-g(\hat p_i))^2$ trên tập kiểm định~\cite{isotonic}. Độ lệch được đo bằng sai số hiệu chỉnh kỳ vọng trên $M$ khoảng~\cite{calib}:
+\begin{equation}
+\mathrm{ECE}=\sum_{m=1}^{M}\frac{|B_m|}{N}\,\big|\mathrm{acc}(B_m)-\mathrm{conf}(B_m)\big|.
+\end{equation}
+
+Giải thích từng dự đoán dùng SHAP: đầu ra được phân rã thành $f(\mathbf{x})=\phi_0+\sum_j\phi_j$, với $\phi_j$ là đóng góp Shapley của đặc trưng $j$~\cite{shap}. Vì đích lệch lớp nên đồ án ưu tiên PR-AUC và F1 hơn accuracy; ngưỡng phân loại chỉ chọn trên tập kiểm định, tập kiểm tra khóa tới bước cuối.
+
+\section{Học sâu cho bảng và ảnh}
+
+FT-Transformer biến mỗi đặc trưng thành một token rồi cho các token tương tác qua tự chú ý~\cite{ftt}, như Hình~\ref{fig:ftt}. Đặc trưng số $x_j$ được nhúng thành $\mathbf{t}_j=x_j\mathbf{w}_j+\mathbf{b}_j$. Khối chú ý tính
+\begin{equation}
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d}}\right)V.
+\end{equation}
+
+\hinhtikz{ch2_ftt}{FT-Transformer: mỗi đặc trưng là một token, token CLS đưa ra dự đoán}{ftt}
+
+Với ảnh, mạng tích chập trích đặc trưng phân cấp, kết nối tắt của ResNet giúp mạng sâu vẫn học được~\cite{resnet}. Grad-CAM chỉ ra vùng ảnh ảnh hưởng đến quyết định bằng trung bình gradient của từng kênh~\cite{gradcam}:
+\begin{equation}
+\alpha_k^{c}=\frac{1}{Z}\sum_{i,j}\frac{\partial y^{c}}{\partial A^{k}_{ij}},\qquad
+L^{c}=\mathrm{ReLU}\Big(\sum_k\alpha_k^{c}A^{k}\Big).
+\end{equation}
+
+\hinhtikz{ch2_cnn}{Mạng tích chập phân cấp bệnh võng mạc và đường Grad-CAM}{cnn}
+
+Nhãn võng mạc có thứ tự nên đồ án dùng hệ số Kappa bậc hai, phạt nặng khi đoán lệch nhiều cấp:
+\begin{equation}
+\kappa=1-\frac{\sum_{ij}w_{ij}O_{ij}}{\sum_{ij}w_{ij}E_{ij}},\qquad w_{ij}=\frac{(i-j)^2}{(K-1)^2}.
+\end{equation}
+
+\section{Đồ thị tri thức và RAG}
+
+Đồ thị tri thức biểu diễn sự kiện thành các bộ ba (chủ thể, quan hệ, đối tượng) trên đồ thị có hướng có nhãn~\cite{kg}. DiaNexus tổ chức đồ thị thành bốn tầng nối với nhau bằng cạnh liên tầng (Hình~\ref{fig:kg3d}), nhờ đó một đặc trưng trong CSDL đi được tới xét nghiệm, ngưỡng và câu bằng chứng.
+
+\hinhtikz{ch2_kg3d}{Bốn tầng của đồ thị tri thức}{kg3d}
+
+RAG đưa văn bản truy xuất vào ngữ cảnh của mô hình sinh để câu trả lời bám tài liệu~\cite{rag}. BM25 chấm tài liệu $d$ theo từ khóa~\cite{bm25}:
+\begin{equation}
+\mathrm{BM25}(q,d)=\sum_{t\in q}\mathrm{IDF}(t)\,\frac{f(t,d)(k_1+1)}{f(t,d)+k_1\big(1-b+b\,|d|/\overline{|d|}\big)}.
+\end{equation}
+Truy xuất vector so độ tương tự cosin giữa hai embedding. Mỗi cách có điểm mù riêng, nên các danh sách được hợp lại bằng Reciprocal Rank Fusion~\cite{rrf}, chỉ dùng thứ hạng và không cần chuẩn hóa điểm (Hình~\ref{fig:ragflow}):
+\begin{equation}
+\mathrm{RRF}(d)=\sum_{r\in R}\frac{1}{k+\mathrm{rank}_r(d)}.
+\end{equation}
+
+\hinhtikz{ch2_rag}{Truy xuất lai: ba bộ truy xuất, hợp RRF rồi xếp hạng lại}{ragflow}
+
+\section{Hệ luật}
+
+Hệ luật suy diễn tiến lặp lại phép khớp: nếu điều kiện của luật thỏa mãn trên tập sự kiện thì thêm kết luận vào tập đó, cho tới khi không có gì mới. Luật không học từ dữ liệu nhưng có hai ưu điểm mà mô hình thống kê không có: mỗi kết luận truy ngược được về một điều khoản có nguồn, và hành vi là tất định. Vì vậy luật giữ các việc không được phép sai, như dấu hiệu khẩn cấp hay chống chỉ định thuốc.
+
+\section{Học tăng cường}
+
+Bài toán ra quyết định tuần tự được mô hình hóa bằng MDP $(\mathcal{S},\mathcal{A},P,r,\gamma)$~\cite{sutton}. Q-learning cập nhật bảng giá trị theo phương trình Bellman~\cite{qlearning}:
+\begin{equation}
+Q(s,a)\leftarrow Q(s,a)+\eta\big[r+\gamma\max_{a'}Q(s',a')-Q(s,a)\big].
+\end{equation}
+Khi không gian trạng thái lớn, DQN xấp xỉ $Q$ bằng mạng nơ-ron, dùng bộ nhớ phát lại và mạng đích~\cite{dqn}. Double DQN giảm ước lượng quá cao bằng cách tách chọn hành động khỏi đánh giá hành động~\cite{ddqn}:
+\begin{equation}
+y=r+\gamma\,Q_{\theta^-}\big(s',\arg\max_{a'}Q_{\theta}(s',a')\big).
+\end{equation}
+Chọn câu hỏi sàng lọc là dạng phân loại với đặc trưng có chi phí~\cite{costly}: tác tử trả giá cho mỗi câu hỏi và nhận thưởng theo chất lượng kết luận cuối (Hình~\ref{fig:mdp}).
+
+\hinhtikz{ch2_mdp}{Sàng lọc thích ứng dưới dạng MDP}{mdp}
+
+\section{Tác tử và hệ đa tác tử}
+
+Tác tử cảm nhận môi trường và hành động để đạt mục tiêu~\cite{aima}. Tác tử dùng LLM lặp vòng suy luận, gọi công cụ, quan sát~\cite{react}. Hệ đa tác tử chia việc cho các tác tử chuyên trách, phối hợp qua thông điệp hoặc một trạng thái chung~\cite{wooldridge}. Sự khác biệt với một đường ống tuần tự nằm ở chỗ luồng điều khiển được quyết định lúc chạy và có thể quay lui. Hình~\ref{fig:blackboard} là mô hình bảng đen của DiaNexus, các cạnh đỏ là vòng phản hồi.
+
+\hinhtikz{ch2_blackboard}{Mô hình bảng đen và các vòng phản hồi của hệ đa tác tử}{blackboard}

@@ -1,0 +1,261 @@
+{
+ "datasets": [
+  {
+   "id": "svhn",
+   "name": "SVHN",
+   "source": "Stanford UFLDL, mục cropped digits; tệp dùng lại từ Tiểu luận 01",
+   "url": "https://huggingface.co/datasets/ufldl-stanford/svhn",
+   "task": "Nhận dạng chữ số trên biển số nhà, 10 lớp",
+   "n_samples": 99289,
+   "n_features": 3072,
+   "size_mb": 174.1,
+   "license": "Chỉ dùng phi thương mại",
+   "note": "Giữ đúng tệp của Tiểu luận 01 để khớp thứ tự ảnh với dự đoán đã lưu; chưa dùng tập extra.",
+   "reused_from": "src/TieuLuan 01/data/vision/svhn.npz",
+   "image_size": 32,
+   "n_classes": 10,
+   "splits": {
+    "train": 73257,
+    "test": 26032
+   },
+   "sample_rows": [
+    {
+     "file": "svhn_3_lop0.png",
+     "label": "0",
+     "split": "test",
+     "index": 3
+    },
+    {
+     "file": "svhn_10_lop3.png",
+     "label": "3",
+     "split": "test",
+     "index": 10
+    },
+    {
+     "file": "svhn_4_lop6.png",
+     "label": "6",
+     "split": "test",
+     "index": 4
+    },
+    {
+     "file": "svhn_6_lop9.png",
+     "label": "9",
+     "split": "test",
+     "index": 6
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "values": [
+     6692,
+     18960,
+     14734,
+     11379,
+     9981,
+     9266,
+     7704,
+     7614,
+     6705,
+     6254
+    ]
+   },
+   "imbalance": 3.0316597377678285,
+   "largest": "1",
+   "smallest": "9",
+   "largest_pct": 0.19095770931321698,
+   "smallest_pct": 0.06298784356776682,
+   "mean": [
+    0.441128134727478,
+    0.447302907705307,
+    0.47594672441482544
+   ],
+   "std": [
+    0.1977088451385498,
+    0.20135989785194397,
+    0.1969604343175888
+   ]
+  },
+  {
+   "id": "eurosat",
+   "name": "EuroSAT RGB",
+   "source": "Helber và cộng sự, Zenodo record 7711810; tệp dùng lại từ Tiểu luận 01",
+   "url": "https://zenodo.org/records/7711810",
+   "task": "Phân loại lớp phủ mặt đất từ ảnh Sentinel-2, 10 lớp",
+   "n_samples": 27000,
+   "n_features": 12288,
+   "size_mb": 90.3,
+   "license": "MIT",
+   "note": "Bộ gốc không chia sẵn; dùng cách chia phân tầng 80/20 của Tiểu luận 01.",
+   "reused_from": "src/TieuLuan 01/data/vision/eurosat.npz",
+   "image_size": 64,
+   "n_classes": 10,
+   "splits": {
+    "train": 21600,
+    "test": 5400
+   },
+   "sample_rows": [
+    {
+     "file": "eurosat_0_lop0.png",
+     "label": "Cây hằng năm",
+     "split": "test",
+     "index": 0
+    },
+    {
+     "file": "eurosat_1800_lop3.png",
+     "label": "Đường cao tốc",
+     "split": "test",
+     "index": 1800
+    },
+    {
+     "file": "eurosat_3200_lop6.png",
+     "label": "Cây lâu năm",
+     "split": "test",
+     "index": 3200
+    },
+    {
+     "file": "eurosat_4800_lop9.png",
+     "label": "Biển, hồ",
+     "split": "test",
+     "index": 4800
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "Cây hằng năm",
+     "Rừng",
+     "Thảm cỏ",
+     "Đường cao tốc",
+     "Công nghiệp",
+     "Đồng cỏ",
+     "Cây lâu năm",
+     "Dân cư",
+     "Sông",
+     "Biển, hồ"
+    ],
+    "values": [
+     3000,
+     3000,
+     3000,
+     2500,
+     2500,
+     2000,
+     2500,
+     3000,
+     2500,
+     3000
+    ]
+   },
+   "imbalance": 1.5,
+   "largest": "Cây hằng năm",
+   "smallest": "Đồng cỏ",
+   "largest_pct": 0.1111111111111111,
+   "smallest_pct": 0.07407407407407407,
+   "mean": [
+    0.33776023983955383,
+    0.38252681493759155,
+    0.38611435890197754
+   ],
+   "std": [
+    0.19864460825920105,
+    0.1333124041557312,
+    0.11212654411792755
+   ]
+  },
+  {
+   "id": "pathmnist",
+   "name": "PathMNIST",
+   "source": "MedMNIST v2, Zenodo record 10519652",
+   "url": "https://zenodo.org/records/10519652",
+   "task": "Phân loại mô đại trực tràng nhuộm H&E, 9 lớp (chỉ mang tính học thuật)",
+   "n_samples": 107180,
+   "n_features": 2352,
+   "size_mb": 196.1,
+   "license": "CC BY 4.0",
+   "note": "Giữ nguyên ba phần do MedMNIST chia; tập test đến từ trung tâm khác tập train.",
+   "reused_from": null,
+   "image_size": 28,
+   "n_classes": 9,
+   "splits": {
+    "train": 89996,
+    "val": 10004,
+    "test": 7180
+   },
+   "sample_rows": [
+    {
+     "file": "pathmnist_7_lop0.png",
+     "label": "Mô mỡ",
+     "split": "test",
+     "index": 7
+    },
+    {
+     "file": "pathmnist_17_lop2.png",
+     "label": "Mảnh vụn",
+     "split": "test",
+     "index": 17
+    },
+    {
+     "file": "pathmnist_19_lop5.png",
+     "label": "Cơ trơn",
+     "split": "test",
+     "index": 19
+    },
+    {
+     "file": "pathmnist_0_lop8.png",
+     "label": "Biểu mô ung thư",
+     "split": "test",
+     "index": 0
+    }
+   ],
+   "distribution": {
+    "labels": [
+     "Mô mỡ",
+     "Nền",
+     "Mảnh vụn",
+     "Lympho",
+     "Chất nhầy",
+     "Cơ trơn",
+     "Niêm mạc thường",
+     "Mô đệm ung thư",
+     "Biểu mô ung thư"
+    ],
+    "values": [
+     11745,
+     11413,
+     11851,
+     12191,
+     9931,
+     14128,
+     9504,
+     10867,
+     15550
+    ]
+   },
+   "imbalance": 1.6361531986531987,
+   "largest": "Biểu mô ung thư",
+   "smallest": "Niêm mạc thường",
+   "largest_pct": 0.14508303788020152,
+   "smallest_pct": 0.08867325993655532,
+   "mean": [
+    0.738174319267273,
+    0.5351577401161194,
+    0.7089961767196655
+   ],
+   "std": [
+    0.12286747246980667,
+    0.17650434374809265,
+    0.1242217868566513
+   ]
+  }
+ ]
+}

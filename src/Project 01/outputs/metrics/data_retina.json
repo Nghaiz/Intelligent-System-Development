@@ -1,0 +1,36 @@
+{
+ "source": "youssefedweqd/Diabetic_Retinopathy_Detection (Hugging Face)",
+ "image_size": 224,
+ "splits": {
+  "train": {
+   "n": 25290,
+   "class_counts": [
+    18583,
+    1759,
+    3811,
+    628,
+    509
+   ]
+  },
+  "val": {
+   "n": 2810,
+   "class_counts": [
+    2065,
+    195,
+    423,
+    70,
+    57
+   ]
+  },
+  "test": {
+   "n": 7026,
+   "class_counts": [
+    5162,
+    489,
+    1058,
+    175,
+    142
+   ]
+  }
+ }
+}

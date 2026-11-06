@@ -1,0 +1,218 @@
+% =====================================================================
+%  Chương 7 — Deep Graph và mạng nơ-ron đồ thị
+% =====================================================================
+\chapter{Deep Graph và mạng nơ-ron đồ thị}\label{chap:gnn}
+
+Các chương trước làm việc trên bảng, lưới ảnh và chuỗi, nơi mỗi mẫu có vị trí cố định. Bài báo trích dẫn nhau, sản phẩm được
+mua cùng nhau hay tiền chạy qua các giao dịch thì không có thứ tự như vậy: số láng giềng thay đổi tùy nút, và đánh số lại nút
+không làm đồ thị khác đi. Chương này xây GCN, GraphSAGE, GAT trên ba đồ thị thật, đo chúng với hai đường cơ sở, rồi dự đoán
+liên kết trên đồ thị Hetionet đã nạp vào Neo4j ở Chương~5.
+
+\section{Cơ sở toán học}
+
+Đồ thị vô hướng $G=(V,E)$ có $N$ nút được mô tả bởi ma trận kề $A$ ($A_{ij}=1$ khi có cạnh), ma trận bậc đường chéo
+$D_{ii}=\sum_j A_{ij}$ và ma trận đặc trưng $X\in\mathbb R^{N\times F}$ (Hình~\ref{fig:ch7-repr}). Laplacian $L=D-A$ và dạng
+chuẩn hóa đối xứng $L_{\mathrm{sym}}=I-D^{-1/2}AD^{-1/2}$ đo độ gồ ghề của tín hiệu $x$ trên đồ thị:
+\begin{equation}
+x^{\top}L_{\mathrm{sym}}\,x=\sum_{(i,j)\in E}\Big(\frac{x_i}{\sqrt{D_{ii}}}-\frac{x_j}{\sqrt{D_{jj}}}\Big)^2 .
+\end{equation}
+$L_{\mathrm{sym}}$ đối xứng nửa xác định dương, trị riêng nằm trong $[0,2]$, số trị riêng 0 bằng số thành phần liên thông.
+Lọc tín hiệu theo phổ cần phân rã trị riêng $O(N^3)$; Kipf và Welling xấp xỉ bậc một rồi thêm tự khuyên
+$\tilde A=A+I$, $\tilde D=D+I$, được phép truyền một lớp chỉ tốn $O(|E|)$~\cite{ch7:kipf2017}:
+\begin{equation}
+H^{(\ell+1)}=\sigma\big(\hat A\,H^{(\ell)}W^{(\ell)}\big),\qquad \hat A=\tilde D^{-1/2}\tilde A\tilde D^{-1/2}.
+\end{equation}
+Chuẩn hóa hai phía làm trọng số cạnh bằng $1/\sqrt{\tilde d_i\tilde d_j}$: nút trung tâm nhiều cạnh không áp đảo láng giềng,
+còn tự khuyên giữ lại thông tin của chính nút.
+
+\hinhtikz{ch7_graph_repr}{Bốn cách nhìn một đồ thị 5 nút: cấu trúc, ma trận kề, ma trận bậc và Laplacian chuẩn hóa.}{ch7-repr}
+
+\textbf{Truyền thông điệp (MPNN).} Gilmer và cộng sự gộp phần lớn GNN vào một khuôn~\cite{ch7:gilmer2017}
+(Hình~\ref{fig:ch7-mpnn}): mỗi cạnh sinh thông điệp $\psi$, mỗi nút gộp thông điệp bằng phép $\bigoplus$ không phụ thuộc thứ tự
+(tổng, trung bình, cực đại), rồi cập nhật trạng thái bằng $\phi$. Sau $L$ lớp, một nút nghe được vùng cách nó $L$ bước.
+Ba kiến trúc khác nhau ở cách gán trọng số cho láng giềng:
+\begin{align}
+\text{GCN:}\quad & h_v'=\sigma\Big(\sum_{u\in\mathcal N(v)\cup\{v\}}\frac{1}{\sqrt{\tilde d_u\tilde d_v}}\,Wh_u\Big),\\
+\text{GraphSAGE:}\quad & h_v'=\sigma\big(W_1h_v+W_2\,\mathrm{mean}\{h_u: u\in\mathcal S(v)\}\big),\\
+\text{GAT:}\quad & h_v'=\big\Vert_{k=1}^{K}\sigma\Big(\sum_{u}\alpha^{k}_{vu}W^{k}h_u\Big).
+\end{align}
+GCN cố định trọng số theo bậc. GraphSAGE~\cite{ch7:hamilton2017} tách riêng trọng số của chính nút và lấy mẫu tập láng giềng
+$\mathcal S(v)$ lúc học, nên áp được cho nút chưa từng thấy. GAT~\cite{ch7:velickovic2018} học hệ số chú ý $\alpha_{vu}$ từ
+chính đặc trưng hai đầu cạnh (Hình~\ref{fig:ch7-gat}).
+
+\hinhtikz{ch7_mpnn3d}{Truyền thông điệp qua ba lớp: cùng một đồ thị, nút đỏ gộp thông tin láng giềng ở lớp trước.}{ch7-mpnn}
+
+\hinhtikz{ch7_gcn3d}{GCN hai lớp cho phân loại nút: $Z=\hat A\,\mathrm{ReLU}(\hat AXW^{(0)})W^{(1)}$.}{ch7-gcn}
+
+\hinhtikz{ch7_gat}{Tính hệ số chú ý của GAT và ghép nhiều đầu chú ý.}{ch7-gat}
+
+\section{Ba đồ thị thực nghiệm}
+
+\textbf{Nguồn.} \emph{Cora} lấy từ kho Planetoid~\cite{ch7:yang2016}
+(\url{https://github.com/kimiyoung/planetoid}, bản dữ liệu dùng lại từ Tiểu luận 03): nút là bài báo, cạnh là trích dẫn,
+đặc trưng là túi từ nhị phân. \emph{Amazon Photo} của Shchur và cộng sự~\cite{ch7:shchur2018}
+(\url{https://github.com/shchur/gnn-benchmark}): nút là sản phẩm, cạnh nối hai sản phẩm hay được mua cùng nhau; bộ gốc không
+công bố tên lớp nên ghi Lớp 0 đến Lớp 7. \emph{Elliptic Bitcoin}~\cite{ch7:weber2019}, tải bản sao của PyG
+(\url{https://data.pyg.org/datasets/elliptic/}): nút là giao dịch, cạnh là dòng tiền, đặc trưng là 165 thuộc tính đã ẩn danh.
+Tôi chọn Elliptic thay ogbn-arxiv vì bộ này có chiều thời gian thật và lệch lớp nặng, tức hai cái bẫy đánh giá mà Cora
+không có. Cả ba dùng toàn bộ đồ thị. Bảng~\ref{tab:ch7-data} là số đo thật trên dữ liệu đã tải.
+
+\bang{ch7_datasets}{Kích cỡ và tính chất đồ thị. Bậc, đồng dạng tính sau khi đối xứng hóa cạnh; đồng dạng trên Elliptic chỉ tính cạnh có nhãn ở hai đầu.}{ch7-data}
+
+\hinhpdf{ch7_data}{1.0}{Phân bố lớp (hàng trên) và phân bố bậc thang log-log (hàng dưới). Elliptic chỉ đếm nút có nhãn.}{ch7-dist}
+
+\bang{ch7_samples}{Nút mẫu thật của Cora và Amazon Photo: nút đầu tiên của hai lớp đầu.}{ch7-mau}
+
+\bang{ch7_samples_ell}{Giao dịch mẫu thật của Elliptic. Đặc trưng đã z-score bằng thống kê các bước 1 đến 29.}{ch7-mau-ell}
+
+\nhanxet{Đồng dạng cạnh (homophily) của Cora và Photo lần lượt là \SL{ch7_data/cora/edge_homophily} và
+\SL{ch7_data/photo/edge_homophily}, nên trung bình láng giềng là phép lọc có lợi. Đuôi bậc dài: Cora có nút bậc
+\SL{ch7_data/cora/deg_max}, Photo có nút bậc \SL{ch7_data/photo/deg_max} cùng \SL{ch7_data/photo/isolated} nút cô lập mà GNN
+chỉ thấy đặc trưng của chính chúng. Elliptic có đồng dạng thô \SL{ch7_data/elliptic/edge_homophily} nhưng chỉ
+\SL{ch7_data/elliptic/adj_homophily} sau hiệu chỉnh, vì \SL{ch7_data/elliptic/imbalance} giao dịch licit mới có một illicit nên
+hai đầu cạnh trùng nhãn phần nhiều do tình cờ. Chỉ \SL{ch7_data/elliptic/labeled} trên \SL{ch7_data/elliptic/nodes} nút có nhãn.
+Đồ thị này tách thành đúng \SL{ch7_data/elliptic/components} thành phần liên thông ứng với \SL{ch7_data/elliptic_time/steps}
+bước thời gian, số cạnh vắt qua hai bước là \SL{ch7_data/elliptic_time/cross_step_edges}.}
+
+\textbf{Tiền xử lý.} Cạnh được đối xứng hóa, bỏ tự khuyên. Cora, Photo chia mỗi hàng đặc trưng cho tổng của hàng, phép biến
+đổi theo từng nút nên không học gì từ test. Elliptic z-score bằng trung bình, độ lệch của riêng các bước 1 đến 29.
+Cora dùng phép chia chuẩn \SL{ch7_data/cora/train}/\SL{ch7_data/cora/val}/\SL{ch7_data/cora/test}. Photo không có phép chia
+chuẩn nên lấy 20 nút mỗi lớp cho train, 30 cho val, còn lại test, mỗi seed một phép chia. Elliptic chia theo thời gian:
+\SL{ch7_data/elliptic/train} nút có nhãn ở bước 1--29, \SL{ch7_data/elliptic/val} ở bước 30--34, \SL{ch7_data/elliptic/test}
+ở bước 35--49, kèm trọng số lớp nghịch đảo tần suất trong hàm mất mát.
+
+\section{Hiện thực: GCN từ đầu và PyTorch thuần}
+
+Bản NumPy không dùng autograd hay ma trận thưa: $\hat A$ là mảng dày $N\times N$, đạo hàm suy tay theo quy tắc chuỗi. Với
+$G=\partial\mathcal L/\partial Z$ ta có $\partial\mathcal L/\partial W^{(1)}=H^{(1)\top}\hat A^{\top}G$, rồi đi ngược qua dropout
+và ReLU để được $\partial\mathcal L/\partial W^{(0)}$ (Đoạn mã~\ref{code:ch7_numpy__GCNNumpy.loss_grads}). Hàm \texttt{grad\_check}
+so đạo hàm này với sai phân trung tâm trên đồ thị ngẫu nhiên 12 nút, sai lệch lớn nhất \SL{ch7_numpy/grad_check_max_error}.
+
+\maNguon{ch7_numpy__GCNNumpy.loss_grads}{Lan truyền ngược viết tay của GCN NumPy.}
+
+\maNguon{ch7_gnn__gcn_norm_adj}{Tính $\hat A$ thưa bằng PyTorch thuần, dùng cho mọi lớp GCN.}
+
+\maNguon{ch7_gnn__GATLayer.forward}{Lớp GAT: điểm cạnh, softmax theo nút đích, gộp có trọng số.}
+
+\begin{ketqua}{Đầu ra thực của GCN NumPy trên Cora: ba seed đầu và trung bình \SL{ch7_numpy/n_seeds} seed}
+numpy 0 0.817 26.7 s\\
+numpy 1 0.822 25.7 s\\
+numpy 2 0.814 25.8 s\\
+trung bình độ đúng \SL{ch7_numpy/accuracy}, F1 macro \SL{ch7_numpy/f1_macro}
+\end{ketqua}
+
+\section{Đánh giá ba mô hình trên ba đồ thị}
+
+\subsection{So sánh với đường cơ sở}
+
+MLP chỉ dùng đặc trưng; Label Propagation (LP) chỉ dùng cạnh, lặp $F\leftarrow\alpha SF+(1-\alpha)Y$~\cite{ch7:zhou2004} với $\alpha$
+chọn trên val. Mô hình hai lớp, ẩn 64 chiều (Elliptic 128), Adam, chọn trọng số theo F1 macro của val, dừng sớm; riêng test chỉ đo
+một lần ở cuối. GraphSAGE lấy mẫu tối đa 10 láng giềng (Photo 25) khi học. Các siêu tham số Photo, Elliptic được chỉnh trên val.
+Mỗi cấu hình chạy \SL{ch7_node/cora/gcn/n_seeds} seed trên GPU.
+
+\bang{ch7_compare}{Phân loại nút, trung bình trên các seed. Elliptic đo bằng chia thời gian, cột F1 illicit là thước đo thật của bài toán.}{ch7-compare}
+
+\hinhpdf{ch7_compare}{1.0}{F1 macro của năm phương pháp trên ba đồ thị, thanh sai số là độ lệch chuẩn giữa các seed.}{ch7-compare}
+
+\begin{phathien}{Đọc kết quả}
+Trên Cora, GCN đạt F1 macro \SL{ch7_node/cora/gcn/f1_macro}, hơn MLP \SL{ch7_summary/cora/gcn_vs_mlp}; bản NumPy đạt
+\SL{ch7_numpy/f1_macro}, khớp bản PyTorch, cho thấy đạo hàm viết tay đúng. Trên Photo, \SL{ch7_summary/photo/best} dẫn đầu với
+\SL{ch7_summary/photo/best_f1}, hơn MLP \SL{ch7_summary/photo/gain_vs_mlp}. LP không dùng đặc trưng mà vẫn đạt
+\SL{ch7_node/cora/lp/f1_macro} trên Cora và \SL{ch7_node/photo/lp/f1_macro} trên Photo, nghĩa là riêng cấu trúc đã mang nhiều
+thông tin nhãn. Trên Elliptic, LP cho F1 illicit bằng \SL{ch7_node/elliptic/lp/illicit_f1} vì nhãn lan tới \SL{ch7_node/elliptic/lp/reached}
+phần nút test: không cạnh nào nối hai bước thời gian, nên nhãn quá khứ không có đường đi tới tương lai, và độ đúng
+\SL{ch7_node/elliptic/lp/accuracy} của nó chỉ là tỷ lệ lớp đa số.
+\end{phathien}
+
+Trên Elliptic, mọi GNN đều học quy nạp vì đồ thị test không dính với đồ thị train. Tốt nhất là \SL{ch7_summary/elliptic/best}, F1
+illicit \SL{ch7_node/elliptic/sage/illicit_f1}; GAT chỉ đạt \SL{ch7_node/elliptic/gat/illicit_f1}, thấp hơn cả MLP
+\SL{ch7_node/elliptic/mlp/illicit_f1} dù tốn thời gian nhất. Hình~\ref{fig:ch7-elliptic} cho biết lý do tổng thể không cao: F1
+trung bình của GCN là \SL{ch7_summary/elliptic/before43/gcn} ở các bước 35--42 rồi rơi xuống
+\SL{ch7_summary/elliptic/after43/gcn} từ bước 43. Weber và cộng sự cũng ghi nhận cú rơi tại đây, trùng thời điểm một chợ đen lớn
+đóng cửa~\cite{ch7:weber2019}: kiểu gian lận đổi, và không mô hình nào trong năm mô hình theo kịp.
+
+\hinhpdf{ch7_elliptic}{1.0}{Trái: số giao dịch illicit theo bước, nét đứt ngăn train, val, test. Phải: F1 illicit trên test theo bước, trung bình các seed.}{ch7-elliptic}
+
+\hinhpdf{ch7_err}{1.0}{Phân tích lỗi: độ đúng test theo tỷ lệ láng giềng cùng nhãn của nút (seed 0).}{ch7-err}
+
+\nhanxet{Phân tích lỗi cho thấy GNN giỏi ở đâu và hỏng ở đâu (Hình~\ref{fig:ch7-err}). Ở nhóm nút có trên 75\,\% láng giềng cùng nhãn,
+GCN đạt \SL{ch7_summary/cora/high_gcn} trên Cora, so với MLP \SL{ch7_summary/cora/high_mlp}. Ở nhóm dưới 25\,\%, tình thế đảo
+ngược: GCN \SL{ch7_summary/cora/low_gcn} so với MLP \SL{ch7_summary/cora/low_mlp} trên \SL{ch7_summary/cora/low_n} nút Cora, và
+\SL{ch7_summary/photo/low_gcn} so với \SL{ch7_summary/photo/low_mlp} trên \SL{ch7_summary/photo/low_n} nút Photo. Láng giềng khác
+nhãn kéo biểu diễn về lớp sai, đúng cái giá phải trả của phép làm trơn.}
+
+\subsection{Over-smoothing theo độ sâu}
+
+Số liệu độ sâu trên Cora lấy lại nguyên từ Tiểu luận 03 (cùng dữ liệu, GCN ẩn 64, 3 seed), không chạy lại. Hai lớp đạt
+\SL{ch7_summary/depth2}; tám lớp còn \SL{ch7_summary/depth8}, còn nối tắt giữ được \SL{ch7_summary/depth8_res}. Bỏ hẳn việc học, nhân
+$\hat A$ lặp lại làm khoảng cách cosine trung bình MAD~\cite{ch7:chen2020} giữa các nút tụt từ \SL{ch7_summary/mad0} xuống
+\SL{ch7_summary/mad64}: $\hat A^k$ hội tụ về vector riêng trội, nên mọi nút cùng thành phần liên thông dần trùng nhau
+(Hình~\ref{fig:ch7-depth}).
+
+\hinhpdf{ch7_depth}{1.0}{Over-smoothing trên Cora: độ đúng theo số lớp, và MAD của $\hat A^kX$ không qua huấn luyện.}{ch7-depth}
+
+\subsection{Biểu diễn học được: t-SNE}
+
+Hình~\ref{fig:ch7-tsne} chiếu đặc trưng thô và lớp ẩn GCN xuống hai chiều (3.000 nút với Photo, Elliptic; Cora lấy từ Tiểu luận 03).
+Silhouette tính trên vector gốc theo nhãn thật: Cora tăng từ \SL{ch7_summary/sil/cora_raw} lên \SL{ch7_summary/sil/cora_gcn}, Photo
+từ \SL{ch7_summary/sil/photo_raw} lên \SL{ch7_summary/sil/photo_gcn}, Elliptic từ \SL{ch7_summary/sil/ell_raw} lên
+\SL{ch7_summary/sil/ell_gcn}.
+
+\hinhpdf{ch7_tsne}{1.0}{t-SNE của đặc trưng thô (trên) và biểu diễn ẩn GCN (dưới), màu là nhãn thật.}{ch7-tsne}
+
+\section{Chống rò rỉ dữ liệu trên đồ thị}
+
+Đồ thị có ba kiểu rò rỉ mà dữ liệu bảng không có (Hình~\ref{fig:ch7-leak}). Học xuyên đồ thị cho mô hình thấy đặc trưng và cạnh của
+nút test lúc truyền tin; đây là giả định hợp lệ khi đồ thị đóng, nhưng lạc quan nếu nút mới đến sau. Học quy nạp cắt mọi cạnh chạm
+nút giữ lại, do \texttt{graph\_views} thực hiện (Đoạn mã~\ref{code:ch7_gnn__graph_views}): train không thấy val, test; val không thấy test.
+Với dữ liệu có thời gian, chia ngẫu nhiên cho mô hình học từ tương lai.
+
+\hinhtikz{ch7_leak}{Ba cách dựng phép chia: xuyên đồ thị, quy nạp và theo thời gian.}{ch7-leak}
+
+\maNguon{ch7_gnn__graph_views}{Ba góc nhìn đồ thị cho học quy nạp.}
+
+\bang{ch7_leak}{Đo rò rỉ. Cora, Photo: mức 1 là xuyên đồ thị, mức 2 là quy nạp. Elliptic: mức 1 là chia theo thời gian, mức 2 là chia ngẫu nhiên.}{ch7-leak}
+
+\begin{phathien}{Mức lạc quan của từng phép chia}
+Trên đồ thị đóng, cắt cạnh tới nút chưa thấy làm F1 macro giảm \SL{ch7_leaksum/cora_gcn_drop} với GCN trên Cora và tới \SL{ch7_leaksum/photo_sage_drop} với GraphSAGE trên Photo. Elliptic nặng hơn nhiều: chia ngẫu nhiên cho MLP F1 illicit \SL{ch7_leaksum/elliptic_mlp_random} nhưng chia theo thời gian chỉ còn \SL{ch7_leaksum/elliptic_mlp_temporal}, GCN từ \SL{ch7_leaksum/elliptic_gcn_random} còn \SL{ch7_leaksum/elliptic_gcn_temporal}. Với dữ liệu gian lận, con số từ phép chia ngẫu nhiên không nói được gì về khả năng dùng thật.
+\end{phathien}
+
+\section{Dự đoán liên kết trên Hetionet từ Neo4j}
+
+Làn Chương 5 đã nạp tiểu đồ thị Hetionet~\cite{ch7:himmelstein2017} quanh đái tháo đường vào Neo4j, nên tôi đọc thẳng cạnh bằng Cypher
+(nguồn: \SL{ch7_link/source}), không tải lại tệp. Đồ thị có \SL{ch7_link/nodes} nút thuộc \SL{ch7_link/node_kinds} kiểu,
+\SL{ch7_link/triples} bộ ba thuộc \SL{ch7_link/relations} quan hệ. Bài toán: cho $(s,r,t)$, cạnh này có thật không?
+
+\hinhtikz{ch7_linkpipe}{Quy trình dự đoán liên kết từ Neo4j tới AUC, AP.}{ch7-link}
+
+Tách cạnh là chỗ dễ rò rỉ nhất. Hai nút có thể nối bằng nhiều quan hệ, nên tôi chia theo \emph{cặp nút} (Đoạn
+mã~\ref{code:ch7_link__split_pairs}): \SL{ch7_link/train}/\SL{ch7_link/val}/\SL{ch7_link/test} bộ ba, đồ thị truyền tin chỉ gồm cạnh
+train. Mẫu âm tráo đầu hoặc đuôi sang nút cùng kiểu và loại mọi bộ ba đã biết; tráo tự do sẽ dễ hơn nhiều vì chỉ cần nhận ra kiểu nút.
+R-GCN~\cite{ch7:schlichtkrull2018} gán mỗi quan hệ một vector đường chéo $d_r$, giải mã bằng DistMult.
+
+\maNguon{ch7_link__split_pairs}{Tách cạnh theo cặp nút không thứ tự.}
+
+\bang{ch7_link}{Dự đoán liên kết, 3 seed, âm cùng kiểu. Dòng cuối cố ý để cạnh test lọt vào đồ thị truyền tin khi đo.}{ch7-linkres}
+
+\begin{phathien}{Mô hình đơn giản thắng, và rò rỉ cho số đẹp giả}
+DistMult không truyền tin đạt AUC \SL{ch7_summary/link_distmult}, cao hơn R-GCN \SL{ch7_link/clean/auc}. Với số cạnh train hiện có
+nhúng nút tự do đã đủ học; hai lớp truyền tin trên đồ thị không có đặc trưng nút chưa đem lại lợi ích với số epoch
+ngắn này. Heuristic Tích bậc đạt \SL{ch7_summary/link_pa}, tức một phần lớn tín hiệu chỉ là nút nào nhiều cạnh. Cùng mô hình R-GCN đã huấn
+luyện, chỉ đưa cạnh test vào đồ thị truyền tin khi đo, AUC nhảy lên \SL{ch7_link/leaky/auc}, tăng \SL{ch7_summary/leak_auc_gain}: con
+số đẹp nhất bảng là con số sai.
+\end{phathien}
+
+AUC theo quan hệ dao động mạnh: cao nhất là gen tham gia đường truyền (GpPW), thấp nhất là hợp chất điều trị bệnh (CtD), quan hệ có
+ít cạnh test nhất. Khi xếp hạng hợp chất cho \emph{đái tháo đường type 2} bằng mô hình seed 0, trong tám ứng viên đầu ngoài cạnh
+train có Sitagliptin và Miglitol, đúng là hai cạnh Hetionet đã giấu đi trong val, test; những ứng viên khác như Sildenafil
+hay Drospirenone chỉ là giả thuyết của mô hình. Kết quả này chỉ mang tính học thuật, không phải khuyến nghị y khoa.
+
+\section{Triển khai và tóm tắt}
+
+\texttt{tlf/serve\_ch7.py} nạp đồ thị và trọng số GCN, GAT lười trên CPU, không cần PyG. Với một nút, nó trả nhãn thật, xác suất dự đoán,
+đồ thị con 1 đến 2 bước, trọng số mỗi cạnh ($\alpha$ của GAT, $\hat A_{vu}$ của GCN) và danh sách thông điệp vào nút để Web App vẽ
+truyền thông điệp (ảnh ở Chương~9).
+
+Chương này xác nhận GNN vượt đường cơ sở khi cạnh đồng dạng và phép đo trung thực, đồng thời chỉ ra ba giới hạn đo được: nút lạc giữa
+láng giềng khác nhãn, kiểu gian lận đổi theo thời gian, và đồ thị thưa không đặc trưng nơi mô hình nông thắng. Phép chia, không phải
+kiến trúc, quyết định con số có đáng tin hay không.

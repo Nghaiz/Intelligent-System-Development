@@ -1,0 +1,38 @@
+{
+ "examples": {
+  "ch2_sentiment_neg": {
+   "label": "Tiêu cực",
+   "probs": {
+    "Tiêu cực": 0.9587323665618896,
+    "Trung tính": 0.0004079329955857247,
+    "Tích cực": 0.040859680622816086
+   },
+   "model": "XGBoost"
+  },
+  "ch2_diabetes": {
+   "label": "Nguy cơ thấp",
+   "probs": {
+    "Không tiểu đường": 0.7181385457515717,
+    "Tiểu đường": 0.28186145424842834
+   },
+   "threshold": 0.30000000000000004,
+   "model": "XGBoost",
+   "note": "Kết quả mang tính học thuật, không thay thế chẩn đoán của bác sĩ."
+  },
+  "ch2_housing": {
+   "label": "6,10 tỷ đồng",
+   "value": 6.095386505126953,
+   "model": "XGBoost",
+   "note": "Ước lượng theo dữ liệu tin rao 2024, giá bị chặn trong khoảng 1 đến 11,5 tỷ đồng."
+  },
+  "ch2_sentiment": {
+   "label": "Tích cực",
+   "probs": {
+    "Tiêu cực": 0.0016468851827085018,
+    "Trung tính": 7.85657248343341e-05,
+    "Tích cực": 0.998274564743042
+   },
+   "model": "XGBoost"
+  }
+ }
+}

@@ -1,0 +1,572 @@
+{
+ "cora": {
+  "nodes": 2708,
+  "edges": 5278,
+  "features": 1433,
+  "classes": 7,
+  "deg_mean": 3.8980797636632203,
+  "deg_median": 3.0,
+  "deg_max": 168,
+  "isolated": 0,
+  "density": 0.0014399999126942077,
+  "components": 78,
+  "largest_cc": 2485,
+  "edge_homophily": 0.8099659085273743,
+  "node_homophily": 0.8251578211784363,
+  "adj_homophily": 0.7710854370510585,
+  "class_counts": [
+   351,
+   217,
+   418,
+   818,
+   426,
+   298,
+   180
+  ],
+  "class_names": [
+   "Case_Based",
+   "Genetic_Algorithms",
+   "Neural_Networks",
+   "Probabilistic_Methods",
+   "Reinforcement_Learning",
+   "Rule_Learning",
+   "Theory"
+  ],
+  "degree_curve": {
+   "rows": [
+    {
+     "deg": 1.0,
+     "count": 485
+    },
+    {
+     "deg": 2.0,
+     "count": 583
+    },
+    {
+     "deg": 3.0,
+     "count": 942
+    },
+    {
+     "deg": 5.0,
+     "count": 412
+    },
+    {
+     "deg": 7.0,
+     "count": 190
+    },
+    {
+     "deg": 11.0,
+     "count": 49
+    },
+    {
+     "deg": 16.0,
+     "count": 27
+    },
+    {
+     "deg": 23.0,
+     "count": 12
+    },
+    {
+     "deg": 35.0,
+     "count": 4
+    },
+    {
+     "deg": 52.0,
+     "count": 2
+    },
+    {
+     "deg": 77.0,
+     "count": 1
+    },
+    {
+     "deg": 114.0,
+     "count": 1
+    }
+   ]
+  },
+  "imbalance": 4.544444444444444,
+  "labeled": 2708,
+  "train": 140,
+  "val": 500,
+  "test": 1000
+ },
+ "photo": {
+  "nodes": 7650,
+  "edges": 119081,
+  "features": 745,
+  "classes": 8,
+  "deg_mean": 31.132287581699348,
+  "deg_median": 22.0,
+  "deg_max": 1434,
+  "isolated": 115,
+  "density": 0.004070112116838717,
+  "components": 136,
+  "largest_cc": 7487,
+  "edge_homophily": 0.8272436261177063,
+  "node_homophily": 0.8492579460144043,
+  "adj_homophily": 0.7850189915451071,
+  "class_counts": [
+   369,
+   1686,
+   703,
+   915,
+   882,
+   823,
+   1941,
+   331
+  ],
+  "class_names": [
+   "Lớp 0",
+   "Lớp 1",
+   "Lớp 2",
+   "Lớp 3",
+   "Lớp 4",
+   "Lớp 5",
+   "Lớp 6",
+   "Lớp 7"
+  ],
+  "degree_curve": {
+   "rows": [
+    {
+     "deg": 1.0,
+     "count": 173
+    },
+    {
+     "deg": 2.0,
+     "count": 205
+    },
+    {
+     "deg": 3.0,
+     "count": 457
+    },
+    {
+     "deg": 5.0,
+     "count": 823
+    },
+    {
+     "deg": 9.0,
+     "count": 1204
+    },
+    {
+     "deg": 16.0,
+     "count": 1699
+    },
+    {
+     "deg": 29.0,
+     "count": 1884
+    },
+    {
+     "deg": 50.0,
+     "count": 711
+    },
+    {
+     "deg": 88.0,
+     "count": 252
+    },
+    {
+     "deg": 153.0,
+     "count": 90
+    },
+    {
+     "deg": 268.0,
+     "count": 27
+    },
+    {
+     "deg": 469.0,
+     "count": 6
+    },
+    {
+     "deg": 820.0,
+     "count": 4
+    }
+   ]
+  },
+  "imbalance": 5.86404833836858,
+  "labeled": 7650
+ },
+ "elliptic": {
+  "nodes": 203769,
+  "edges": 234355,
+  "features": 165,
+  "classes": 2,
+  "deg_mean": 2.3002026804862368,
+  "deg_median": 2.0,
+  "deg_max": 473,
+  "isolated": 0,
+  "density": 1.1288341056918834e-05,
+  "components": 49,
+  "largest_cc": 7880,
+  "edge_homophily": 0.9536915421485901,
+  "node_homophily": 0.9491918683052063,
+  "adj_homophily": 0.5162449860961847,
+  "class_counts": [
+   42019,
+   4545
+  ],
+  "class_names": [
+   "licit",
+   "illicit"
+  ],
+  "degree_curve": {
+   "rows": [
+    {
+     "deg": 1.0,
+     "count": 70341
+    },
+    {
+     "deg": 2.0,
+     "count": 90544
+    },
+    {
+     "deg": 3.0,
+     "count": 29132
+    },
+    {
+     "deg": 4.0,
+     "count": 8802
+    },
+    {
+     "deg": 7.0,
+     "count": 2206
+    },
+    {
+     "deg": 11.0,
+     "count": 1272
+    },
+    {
+     "deg": 17.0,
+     "count": 859
+    },
+    {
+     "deg": 28.0,
+     "count": 269
+    },
+    {
+     "deg": 44.0,
+     "count": 178
+    },
+    {
+     "deg": 71.0,
+     "count": 123
+    },
+    {
+     "deg": 114.0,
+     "count": 33
+    },
+    {
+     "deg": 184.0,
+     "count": 9
+    },
+    {
+     "deg": 295.0,
+     "count": 1
+    }
+   ]
+  },
+  "imbalance": 9.245104510451045,
+  "labeled": 46564,
+  "train": 26381,
+  "val": 3513,
+  "test": 16670
+ },
+ "elliptic_time": {
+  "rows": [
+   {
+    "step": 1,
+    "illicit": 17,
+    "licit": 2130,
+    "unknown": 5733
+   },
+   {
+    "step": 2,
+    "illicit": 18,
+    "licit": 1099,
+    "unknown": 3427
+   },
+   {
+    "step": 3,
+    "illicit": 11,
+    "licit": 1268,
+    "unknown": 5342
+   },
+   {
+    "step": 4,
+    "illicit": 30,
+    "licit": 1410,
+    "unknown": 4253
+   },
+   {
+    "step": 5,
+    "illicit": 8,
+    "licit": 1874,
+    "unknown": 4921
+   },
+   {
+    "step": 6,
+    "illicit": 5,
+    "licit": 480,
+    "unknown": 3843
+   },
+   {
+    "step": 7,
+    "illicit": 102,
+    "licit": 1101,
+    "unknown": 4845
+   },
+   {
+    "step": 8,
+    "illicit": 67,
+    "licit": 1098,
+    "unknown": 3292
+   },
+   {
+    "step": 9,
+    "illicit": 248,
+    "licit": 530,
+    "unknown": 4218
+   },
+   {
+    "step": 10,
+    "illicit": 18,
+    "licit": 954,
+    "unknown": 5755
+   },
+   {
+    "step": 11,
+    "illicit": 131,
+    "licit": 565,
+    "unknown": 3600
+   },
+   {
+    "step": 12,
+    "illicit": 16,
+    "licit": 490,
+    "unknown": 1541
+   },
+   {
+    "step": 13,
+    "illicit": 291,
+    "licit": 518,
+    "unknown": 3719
+   },
+   {
+    "step": 14,
+    "illicit": 43,
+    "licit": 374,
+    "unknown": 1605
+   },
+   {
+    "step": 15,
+    "illicit": 147,
+    "licit": 471,
+    "unknown": 3021
+   },
+   {
+    "step": 16,
+    "illicit": 128,
+    "licit": 402,
+    "unknown": 2445
+   },
+   {
+    "step": 17,
+    "illicit": 99,
+    "licit": 712,
+    "unknown": 2574
+   },
+   {
+    "step": 18,
+    "illicit": 52,
+    "licit": 337,
+    "unknown": 1587
+   },
+   {
+    "step": 19,
+    "illicit": 80,
+    "licit": 665,
+    "unknown": 2761
+   },
+   {
+    "step": 20,
+    "illicit": 260,
+    "licit": 640,
+    "unknown": 3391
+   },
+   {
+    "step": 21,
+    "illicit": 100,
+    "licit": 541,
+    "unknown": 2896
+   },
+   {
+    "step": 22,
+    "illicit": 158,
+    "licit": 1605,
+    "unknown": 4131
+   },
+   {
+    "step": 23,
+    "illicit": 53,
+    "licit": 1134,
+    "unknown": 2978
+   },
+   {
+    "step": 24,
+    "illicit": 137,
+    "licit": 989,
+    "unknown": 3466
+   },
+   {
+    "step": 25,
+    "illicit": 118,
+    "licit": 476,
+    "unknown": 1720
+   },
+   {
+    "step": 26,
+    "illicit": 96,
+    "licit": 421,
+    "unknown": 2006
+   },
+   {
+    "step": 27,
+    "illicit": 24,
+    "licit": 182,
+    "unknown": 883
+   },
+   {
+    "step": 28,
+    "illicit": 85,
+    "licit": 199,
+    "unknown": 1369
+   },
+   {
+    "step": 29,
+    "illicit": 329,
+    "licit": 845,
+    "unknown": 3101
+   },
+   {
+    "step": 30,
+    "illicit": 83,
+    "licit": 441,
+    "unknown": 1959
+   },
+   {
+    "step": 31,
+    "illicit": 106,
+    "licit": 604,
+    "unknown": 2106
+   },
+   {
+    "step": 32,
+    "illicit": 342,
+    "licit": 981,
+    "unknown": 3202
+   },
+   {
+    "step": 33,
+    "illicit": 23,
+    "licit": 418,
+    "unknown": 2710
+   },
+   {
+    "step": 34,
+    "illicit": 37,
+    "licit": 478,
+    "unknown": 1971
+   },
+   {
+    "step": 35,
+    "illicit": 182,
+    "licit": 1159,
+    "unknown": 4166
+   },
+   {
+    "step": 36,
+    "illicit": 33,
+    "licit": 1675,
+    "unknown": 4685
+   },
+   {
+    "step": 37,
+    "illicit": 40,
+    "licit": 458,
+    "unknown": 2808
+   },
+   {
+    "step": 38,
+    "illicit": 111,
+    "licit": 645,
+    "unknown": 2135
+   },
+   {
+    "step": 39,
+    "illicit": 81,
+    "licit": 1102,
+    "unknown": 1577
+   },
+   {
+    "step": 40,
+    "illicit": 112,
+    "licit": 1099,
+    "unknown": 3270
+   },
+   {
+    "step": 41,
+    "illicit": 116,
+    "licit": 1016,
+    "unknown": 4210
+   },
+   {
+    "step": 42,
+    "illicit": 239,
+    "licit": 1915,
+    "unknown": 4986
+   },
+   {
+    "step": 43,
+    "illicit": 24,
+    "licit": 1346,
+    "unknown": 3693
+   },
+   {
+    "step": 44,
+    "illicit": 24,
+    "licit": 1567,
+    "unknown": 3384
+   },
+   {
+    "step": 45,
+    "illicit": 5,
+    "licit": 1216,
+    "unknown": 4377
+   },
+   {
+    "step": 46,
+    "illicit": 2,
+    "licit": 710,
+    "unknown": 2807
+   },
+   {
+    "step": 47,
+    "illicit": 22,
+    "licit": 824,
+    "unknown": 4275
+   },
+   {
+    "step": 48,
+    "illicit": 36,
+    "licit": 435,
+    "unknown": 2483
+   },
+   {
+    "step": 49,
+    "illicit": 56,
+    "licit": 420,
+    "unknown": 1978
+   }
+  ],
+  "cross_step_edges": 0,
+  "steps": 49
+ }
+}

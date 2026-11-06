@@ -1,0 +1,29 @@
+\begin{tikzpicture}[x=1cm,y=1cm, nut/.style={cau=#1, minimum size=21mm, font=\scriptsize\bfseries, inner sep=0pt}]
+  \node[nut=cRed] (sup) at (0.8,5.0) {Supervisor};
+  \node[nut=cBlue] (int) at (4.6,6.6) {Intake};
+  \node[nut=cYellow] (rg) at (4.6,3.2) {RuleGuard};
+  \node[nut=cIndigo] (ris) at (8.2,6.6) {Risk};
+  \node[nut=cPink] (ret) at (11.2,6.6) {Retina};
+  \node[nut=cTeal] (kn) at (8.2,1.6) {Knowledge};
+  \node[nut=cGreen] (adv) at (11.6,1.6) {Advisor};
+  \node[nut=cOrange] (cr) at (14.9,1.6) {Critic};
+  \node[hop=cSlate, minimum width=19mm, minimum height=11mm] (end) at (14.9,5.2) {Kết thúc};
+  \draw[mui] (sup) -- (int);
+  \draw[mui] (sup.south) to[bend right=30] (kn.south west);
+  \draw[mui] (int) -- (rg);
+  \draw[mui] (int) -- (ris);
+  \draw[mui] (rg) -- (ris);
+  \draw[mui] (rg) -- (kn);
+  \draw[mui] (ris) -- (ret);
+  \draw[mui] (ris) -- (kn);
+  \draw[mui] (ret) -- (kn);
+  \draw[mui] (kn) -- (adv);
+  \draw[mui] (adv) -- (cr);
+  \draw[mui] (cr) -- (end);
+  \draw[mui] (kn.north west) to[bend right=8] (rg.east);
+  \draw[muiM=cRed, dashed] (ris.north west) to[bend right=30] node[above, font=\small, text=cRed!70!black] {thiếu dữ liệu} (int.north east);
+  \draw[muiM=cRed, dashed] (kn.south east) to[out=-60, in=-120, looseness=5] node[below, font=\small, text=cRed!70!black] {mở rộng truy vấn} (kn.south);
+  \draw[muiM=cRed, dashed] (cr.south west) to[bend left=22] node[below, font=\small, text=cRed!70!black] {viết lại} (adv.south east);
+  \draw[muiM=cRed, dashed] (cr.north west) to[bend right=22] node[above, font=\small, text=cRed!70!black] {thiếu bằng chứng} (kn.north east);
+  \draw[muiM=cSlate] (int.east) ++(0.2,0.65) to[out=20, in=120] (end.north);
+\end{tikzpicture}

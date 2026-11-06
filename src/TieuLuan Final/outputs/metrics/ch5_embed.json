@@ -1,0 +1,8 @@
+{
+ "hotpot": {
+  "chunks": 9769,
+  "questions": 1000,
+  "seconds": 151.3,
+  "per_s": 64.6
+ }
+}

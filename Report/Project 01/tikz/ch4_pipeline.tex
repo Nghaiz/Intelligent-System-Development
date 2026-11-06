@@ -1,0 +1,15 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \x/\c/\t in {0.2/cBlue/{Chia\\train, val,\\test},3.35/cTeal/{Huấn luyện\\trên train},6.5/cIndigo/{Hiệu chỉnh\\isotonic\\trên val},9.65/cPurple/{Chọn ngưỡng\\và mô hình\\trên val}}{
+    \khoibaD{\x}{1.5}{2.5}{1.9}{0.8}{\c}
+    \node[font=\small\bfseries, text=white, align=center] at (\x+1.25,2.45) {\t};
+  }
+  \khoibaD{12.8}{1.5}{2.5}{1.9}{0.8}{cRed}
+  \node[font=\small\bfseries, text=white, align=center] at (14.05,2.45) {Mở khóa\\test\\một lần};
+  \foreach \x in {3.02,6.17,9.32,12.47}{\draw[mui] (\x,2.45) -- ++(0.3,0);}
+  \node[hop=cOrange, minimum width=66mm, align=center] (cpu) at (3.9,0.45) {CPU 32 luồng: LR, RF, XGBoost, EDA};
+  \node[hop=cGreen, minimum width=66mm, align=center] (gpu) at (11.4,0.45) {GPU 8 GB: MLP, ResNet bảng, FT-T, CNN};
+  \draw[muiM=cSlate, dashed] (cpu.north) -- (4.6,1.45);
+  \draw[muiM=cSlate, dashed] (gpu.north) -- (5.0,1.45);
+  \node[nhan] at (7.7,4.35) {Ranh giới chống rò rỉ: mọi quyết định xong trước khi nhìn tập test};
+  \draw[cRed, very thick, dashed] (12.62,1.25) -- (12.62,4.05);
+\end{tikzpicture}

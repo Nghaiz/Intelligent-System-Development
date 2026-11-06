@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \y/\c/\t in {0/cSlate/{Tầng dữ liệu: Feature nối với cột của CSDL},1.55/cTeal/{Tầng bằng chứng: Article, Chunk, MeSH},3.1/cOrange/{Tầng y sinh: Disease, Compound, Gene, Symptom},4.65/cRed/{Tầng lâm sàng: Test, Threshold, Rule}}{
+    \begin{scope}[yshift=\y cm]
+      \filldraw[draw=\c!70!black, fill=\c!30, opacity=0.92] (0,0) -- (11,0) -- (14,1.1) -- (3,1.1) -- cycle;
+      \node[font=\small\bfseries, text=\c!50!black] at (7,0.45) {\t};
+    \end{scope}
+  }
+  \draw[muiM=cPink, dashed] (2.2,0.6) to[bend left=12] (2.8,2.2);
+  \draw[muiM=cPink, dashed] (11.6,2.2) to[bend right=12] (11.2,3.7);
+  \draw[muiM=cPink, dashed] (2.6,3.7) to[bend left=12] (3.0,5.3);
+  \node[hop=cPink, align=center] at (14.4,3.2) {cạnh\\liên tầng};
+\end{tikzpicture}

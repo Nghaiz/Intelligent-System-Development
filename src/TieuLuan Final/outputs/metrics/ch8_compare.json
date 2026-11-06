@@ -1,0 +1,185 @@
+{
+ "rows": [
+  {
+   "dataset": "Tham chiếu",
+   "model": "Luật",
+   "framework": "NumPy",
+   "exact_value": 35.0,
+   "regret": 0.0,
+   "n_opt": null,
+   "seconds": 0.0
+  },
+  {
+   "dataset": "Tham chiếu",
+   "model": "Q-learning (d, c)",
+   "framework": "NumPy",
+   "exact_value": 34.23144445419312,
+   "regret": 0.7685555458068848,
+   "n_opt": 9,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Tham chiếu",
+   "model": "Q-learning mở rộng",
+   "framework": "NumPy",
+   "exact_value": 34.30438632965088,
+   "regret": 0.6956136703491211,
+   "n_opt": 7,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Tham chiếu",
+   "model": "Dựa trên mô hình",
+   "framework": "NumPy",
+   "exact_value": 35.0,
+   "regret": 0.0,
+   "n_opt": 10,
+   "seconds": 30.731645367999935
+  },
+  {
+   "dataset": "δ = 5%",
+   "model": "Luật",
+   "framework": "NumPy",
+   "exact_value": 35.0,
+   "regret": 2.3500000000000085,
+   "n_opt": null,
+   "seconds": 0.0
+  },
+  {
+   "dataset": "δ = 5%",
+   "model": "Q-learning (d, c)",
+   "framework": "NumPy",
+   "exact_value": 36.84183874130249,
+   "regret": 0.5081612586975112,
+   "n_opt": 2,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "δ = 5%",
+   "model": "Q-learning mở rộng",
+   "framework": "NumPy",
+   "exact_value": 36.84375237464904,
+   "regret": 0.5062476253509537,
+   "n_opt": 2,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "δ = 5%",
+   "model": "Dựa trên mô hình",
+   "framework": "NumPy",
+   "exact_value": 37.35000000000001,
+   "regret": 0.0,
+   "n_opt": 10,
+   "seconds": 30.731645367999935
+  },
+  {
+   "dataset": "Đối thủ ăn miếng trả miếng",
+   "model": "Luật",
+   "framework": "NumPy",
+   "exact_value": 35.0,
+   "regret": 0.0,
+   "n_opt": null,
+   "seconds": 0.0
+  },
+  {
+   "dataset": "Đối thủ ăn miếng trả miếng",
+   "model": "Q-learning (d, c)",
+   "framework": "NumPy",
+   "exact_value": 33.7494549369812,
+   "regret": 1.250545063018799,
+   "n_opt": 7,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Đối thủ ăn miếng trả miếng",
+   "model": "Q-learning mở rộng",
+   "framework": "NumPy",
+   "exact_value": 34.24015371322632,
+   "regret": 0.7598462867736817,
+   "n_opt": 8,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Đối thủ ăn miếng trả miếng",
+   "model": "Dựa trên mô hình",
+   "framework": "NumPy",
+   "exact_value": 35.0,
+   "regret": 0.0,
+   "n_opt": 10,
+   "seconds": 30.731645367999935
+  },
+  {
+   "dataset": "Đối thủ luôn giảm giá",
+   "model": "Luật",
+   "framework": "NumPy",
+   "exact_value": 23.225,
+   "regret": 4.524999999999999,
+   "n_opt": null,
+   "seconds": 0.0
+  },
+  {
+   "dataset": "Đối thủ luôn giảm giá",
+   "model": "Q-learning (d, c)",
+   "framework": "NumPy",
+   "exact_value": 27.628750000000004,
+   "regret": 0.12124999999999524,
+   "n_opt": 3,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Đối thủ luôn giảm giá",
+   "model": "Q-learning mở rộng",
+   "framework": "NumPy",
+   "exact_value": 26.66763885498047,
+   "regret": 1.082361145019529,
+   "n_opt": 0,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Đối thủ luôn giảm giá",
+   "model": "Dựa trên mô hình",
+   "framework": "NumPy",
+   "exact_value": 27.750000000000007,
+   "regret": -7.105427357601002e-15,
+   "n_opt": 10,
+   "seconds": 30.731645367999935
+  },
+  {
+   "dataset": "Nhu cầu bền",
+   "model": "Luật",
+   "framework": "NumPy",
+   "exact_value": 35.0,
+   "regret": -7.105427357601002e-15,
+   "n_opt": null,
+   "seconds": 0.0
+  },
+  {
+   "dataset": "Nhu cầu bền",
+   "model": "Q-learning (d, c)",
+   "framework": "NumPy",
+   "exact_value": 33.897807909134976,
+   "regret": 1.1021920908650145,
+   "n_opt": 6,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Nhu cầu bền",
+   "model": "Q-learning mở rộng",
+   "framework": "NumPy",
+   "exact_value": 34.628190042960284,
+   "regret": 0.3718099570397044,
+   "n_opt": 7,
+   "seconds": 4.7605766066667154
+  },
+  {
+   "dataset": "Nhu cầu bền",
+   "model": "Dựa trên mô hình",
+   "framework": "NumPy",
+   "exact_value": 35.0,
+   "regret": -7.105427357601002e-15,
+   "n_opt": 10,
+   "seconds": 30.731645367999935
+  }
+ ],
+ "primary": "exact_value"
+}

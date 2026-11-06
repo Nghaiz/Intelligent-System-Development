@@ -1,0 +1,10 @@
+{
+ "batch": 2000,
+ "top_k": 4,
+ "ctx_words": 170,
+ "rrf_c": 60,
+ "boost": 0.15,
+ "fanout": 120,
+ "max_steps": 4,
+ "first_load_s": 106.7
+}

@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % khối tensor 3D (lô, thời gian, đặc trưng) vẽ bằng các lát cửa sổ
+  \foreach \b/\col in {3/cPurple, 2/cBlue, 1/cTeal, 0/cGreen} {
+    \pgfmathsetmacro{\ox}{\b*0.62}
+    \pgfmathsetmacro{\oy}{\b*0.42}
+    \fill[black!25, blur shadow={shadow blur steps=5, shadow opacity=25}] (\ox,\oy) rectangle ++(4.8,2.4);
+    \foreach \t in {0,...,9} {
+      \foreach \f in {0,...,5} {
+        \pgfmathsetmacro{\shade}{22+9*\f}
+        \fill[\col!\shade, draw=white, line width=0.4pt] (\ox+\t*0.48,\oy+\f*0.40) rectangle ++(0.48,0.40);
+      }
+    }
+    \draw[\col!60!black, thick] (\ox,\oy) rectangle ++(4.8,2.4);
+  }
+  \draw[mui] (0,-0.32) -- node[below, font=\small] {thời gian, $T$ bước} (4.8,-0.32);
+  \draw[mui] (-0.32,0) -- node[left, font=\small, align=right] {đặc trưng\\$D$} (-0.32,2.4);
+  \draw[mui] (5.05,0.05) -- node[right, font=\small, pos=0.55] {lô $B$} (6.75,1.2);
+  \node[khoiX, align=left, anchor=west] (a) at (8.05,2.55)
+    {$\mathbf{X}\in\mathbb{R}^{B\times T\times D}$\\[2pt] PyTorch: \texttt{batch\_first=True}\\ Keras: \texttt{Input((T, D))}};
+  \node[khoiP, align=left, anchor=north west] (b) at (8.05,1.05)
+    {$\hat{\mathbf{Y}}\in\mathbb{R}^{B\times H}$\\ dự báo trực tiếp $H$ bước};
+  \draw[mui, cPurple] (a.south) -- node[right, font=\small] {mạng hồi quy} (a.south |- b.north);
+\end{tikzpicture}

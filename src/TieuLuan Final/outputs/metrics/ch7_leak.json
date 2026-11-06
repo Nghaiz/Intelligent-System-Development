@@ -1,0 +1,52 @@
+{
+ "inductive": {
+  "rows": [
+   {
+    "dataset": "cora",
+    "model": "gcn",
+    "transductive": 0.8117255312042891,
+    "inductive": 0.787277508283333,
+    "inductive_std": 0.005791741167537396
+   },
+   {
+    "dataset": "cora",
+    "model": "sage",
+    "transductive": 0.8002096299818833,
+    "inductive": 0.7701101997052116,
+    "inductive_std": 0.006019126550426304
+   },
+   {
+    "dataset": "photo",
+    "model": "gcn",
+    "transductive": 0.860779261608841,
+    "inductive": 0.8022804087953904,
+    "inductive_std": 0.03289129441588759
+   },
+   {
+    "dataset": "photo",
+    "model": "sage",
+    "transductive": 0.8841151559054605,
+    "inductive": 0.756709948866052,
+    "inductive_std": 0.07211918047507478
+   }
+  ]
+ },
+ "temporal": {
+  "rows": [
+   {
+    "model": "mlp",
+    "random_f1": 0.8247205379736087,
+    "random_std": 0.006524414572411013,
+    "temporal_f1": 0.47042475969248415,
+    "temporal_std": 0.019476610069067275
+   },
+   {
+    "model": "gcn",
+    "random_f1": 0.7937869231254318,
+    "random_std": 0.012691758152331284,
+    "temporal_f1": 0.5303129906167638,
+    "temporal_std": 0.04024389138154416
+   }
+  ]
+ }
+}

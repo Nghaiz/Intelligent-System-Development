@@ -1,0 +1,24 @@
+\begin{tikzpicture}[lv/.style={hop=#1, font=\footnotesize\bfseries, minimum height=6mm, inner sep=2.5pt}, c/.style={thick, cNavy}]
+  % trái: một cây
+  \node[tieude] at (2.9,5.25) {Một cây: chia theo ngưỡng};
+  \node[lv=cBlue] (a) at (2.9,4.3) {$x_j\le\theta$ ?};
+  \node[lv=cSky] (b) at (1.15,2.75) {$x_k\le\phi$ ?};
+  \node[lv=cRed] (c) at (4.65,2.75) {lá: $p=0{,}8$};
+  \node[lv=cGreen] (d) at (0.0,1.2) {$p=0{,}1$};
+  \node[lv=cOrange] (e) at (2.3,1.2) {$p=0{,}4$};
+  \draw[c] (a) -- node[left, font=\footnotesize]{đúng} (b);
+  \draw[c] (a) -- node[right, font=\footnotesize]{sai} (c);
+  \draw[c] (b) -- (d); \draw[c] (b) -- (e);
+  % phải: rừng, mỗi cây là một mẫu bootstrap
+  \node[tieude] at (10.75,5.25) {Rừng: nhiều cây, lấy trung bình};
+  \node[csdl=cTeal, minimum width=15mm, minimum height=11mm] (d0) at (6.9,2.9) {Train};
+  \foreach \i/\y/\cl in {1/4.2/cBlue, 2/2.9/cOrange, 3/1.6/cPurple}{
+    \coordinate (t\i) at (10.0,\y);
+    \fill[\cl!70, draw=\cl!60!black] ($(t\i)+(-0.75,-0.42)$) -- ($(t\i)+(0.75,-0.42)$) -- ($(t\i)+(0,0.5)$) -- cycle;
+    \fill[cBrown] ($(t\i)+(-0.1,-0.62)$) rectangle ($(t\i)+(0.1,-0.42)$);
+    \draw[mui] (d0.east) -- ($(t\i)+(-0.82,0)$);
+    \draw[mui] ($(t\i)+(0.82,0)$) -- (12.6,2.9);
+  }
+  \node[cau=cGreen, minimum size=13mm, align=center] at (13.1,2.9) {TB /\\bầu};
+  \node[nhan, align=center, font=\footnotesize] at (10.0,0.5) {mỗi cây học một mẫu bootstrap, mỗi nút xét $m$ đặc trưng ngẫu nhiên};
+\end{tikzpicture}

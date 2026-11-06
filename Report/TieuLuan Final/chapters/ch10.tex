@@ -1,0 +1,30 @@
+% =====================================================================
+%  Kết luận (không đánh số chương)
+% =====================================================================
+\chapter*{Kết luận}
+\addcontentsline{toc}{chapter}{Kết luận}
+\markboth{Kết luận}{Kết luận}
+
+\section*{Kết quả đạt được}
+Tiểu luận đã đi hết chuỗi kỹ thuật của một hệ thống thông minh: lược sử AI, học máy trên dữ liệu bảng và văn bản, CNN trên ảnh, RNN trên chuỗi thời gian, đồ thị tri thức Neo4j với RAG và tác tử
+chạy LLM cục bộ, hệ đa tác tử, mạng nơ-ron đồ thị, học tăng cường, và một Web App ghép các phần lại. Bảng~\ref{tab:kl-best} lấy trực tiếp từ tệp kết quả của từng chương, nêu mô hình tốt nhất theo chỉ số chính trên mỗi bộ dữ liệu.
+
+\bang{ch10_best}{Giá trị tốt nhất trên tập kiểm thử của từng bộ dữ liệu, chỉ để đối chiếu; mô hình đại diện của mỗi chương được chọn trên tập kiểm định.}{kl-best}
+
+Ở Chương 8, tác tử dựa trên mô hình đạt giá trị \SL{ch8_q10/tham_chieu/model/exact_mean} mỗi bước ở cấu hình tham chiếu và \SL{ch8_q10/giam_5/model/exact_mean} khi $\delta=5\%$, bằng mức tối ưu ở cả năm kịch bản, trong khi Q-learning gốc đạt
+\SL{ch8_q10/giam_5/q/n_opt}/10 seed tối ưu ở $\delta=5\%$.
+
+\section*{Bài học}
+\begin{itemize}
+  \item \textbf{Đường cơ sở quyết định cách đọc kết quả.} Một con số chỉ có nghĩa khi đặt cạnh mô hình đơn giản nhất hoặc mức tối ưu tính được. Ở Chương 8, nếu thiếu mốc tối ưu \SL{ch8_model/d20/optimal}, không thể biết tác tử luật đã tối ưu sẵn và RL chỉ có thể hòa.
+  \item \textbf{Đánh giá phải tách khỏi huấn luyện.} Chỉ chọn mô hình trên tập kiểm định, dùng tập kiểm thử một lần, và lặp nhiều seed khi kết quả phụ thuộc vào ngẫu nhiên.
+  \item \textbf{Chỉ số phải khớp mục tiêu.} Huấn luyện theo doanh thu làm lợi nhuận tụt còn \SL{ch8_g/doanh_thu/eval_mean}. Hệ thống tối ưu đúng cái được đo, không phải cái người thiết kế muốn.
+  \item \textbf{Giới hạn phần cứng là một phần của thiết kế.} Với GPU 8~GB, việc chọn kích thước mô hình, cách xếp hàng GPU và mức dùng bộ nhớ quyết định việc gì chạy được.
+\end{itemize}
+
+\section*{Hạn chế}
+Mô hình được huấn luyện trên đủ dữ liệu, nhưng phần đánh giá LLM chỉ dùng 50 câu mỗi miền ở Chương 5 và Chương 6 nên sai số mẫu còn lớn; nhiều thực nghiệm chỉ chạy một seed với số epoch vừa đủ, nên chưa nêu được độ lệch giữa các lần chạy. LLM cục bộ (mặc định Qwen2.5-7B qua Ollama) nhỏ hơn nhiều so với mô hình trên đám mây nên kết quả ở Chương 5 và 6 chỉ phản ánh cỡ mô hình này. Dữ liệu ở Chương 8 và ca lâm sàng ở Chương 6 là dữ liệu tổng hợp. Các kết quả
+về y tế và đầu tư chỉ mang tính học thuật.
+
+\section*{Hướng phát triển}
+Có ba hướng rõ ràng: thêm tồn kho và nhiều mức giá cho mô hình thị trường, đối thủ có trí nhớ dài hơn; đưa quan sát từ đồ thị tri thức vào tác tử để đánh giá trên câu hỏi đa bước dài hơn; và theo dõi mô hình sau triển khai trên Web App để phát hiện suy giảm chất lượng.

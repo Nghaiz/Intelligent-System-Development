@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \foreach \y/\c/\t/\s in {
+     0.0/cSlate/{Hạ tầng cục bộ}/{Neo4j Docker, Ollama, SQLite, RTX 4060},
+     1.7/cTeal/{Lõi DiaNexus}/{dnx.ml, dnx.kb, dnx.rl, dnx.rules, dnx.agents},
+     3.4/cOrange/{API FastAPI}/{REST, luồng SSE, nạp mô hình khi cần},
+     5.1/cBlue/{Giao diện tĩnh}/{3D Force Graph, ECharts, hiệu ứng, Ctrl+K}}{
+    \khoibaD{0.3}{\y}{11.2}{1.1}{1.2}{\c}
+    \node[font=\small\bfseries, text=white] at (5.9,\y+0.76) {\t};
+    \node[font=\footnotesize, text=white] at (5.9,\y+0.33) {\s};
+  }
+  \foreach \y in {1.15,2.85,4.55}{\draw[{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, very thick, cNavy] (5.9,\y) -- (5.9,\y+0.5);}
+  \node[hop=cRed, minimum width=30mm, minimum height=14mm, align=center] (u) at (14.2,5.7) {Người dùng\\127.0.0.1:8097};
+  \node[hop=cGreen, minimum width=30mm, minimum height=14mm, align=center] (l) at (14.2,3.0) {outputs/logs\\runs.jsonl};
+  \node[hop=cPurple, minimum width=30mm, minimum height=14mm, align=center] (m) at (14.2,0.6) {outputs/metrics\\*.json};
+  \draw[{Stealth[length=2.6mm]}-{Stealth[length=2.6mm]}, very thick, cNavy] (12.5,5.7) -- (u.west);
+  \draw[mui] (l.west) -- (12.5,3.9);
+  \draw[mui] (m.west) -- (12.5,3.6);
+\end{tikzpicture}

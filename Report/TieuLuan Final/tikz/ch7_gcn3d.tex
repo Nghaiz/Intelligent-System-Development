@@ -1,0 +1,27 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \tensorbaD{0}{0}{0.9}{2.6}{1.0}{cBlue}{$X$\\$N\times F$}
+  \draw[mui] (1.7,1.3) -- (2.5,1.3) node[midway, above, nhan] {$W^{(0)}$};
+  \begin{scope}[xshift=2.6cm, yshift=0.15cm]
+    \foreach \i in {0,...,5}{\foreach \j in {0,...,5}{
+      \pgfmathtruncatemacro{\on}{(\i==\j) || (mod(\i+\j,4)==1) || (abs(\i-\j)==3)}
+      \ifnum\on=1 \fill[cOrange!75] (\j*0.38,1.9-\i*0.38) rectangle ++(0.38,0.38);
+      \else \fill[cOrange!8] (\j*0.38,1.9-\i*0.38) rectangle ++(0.38,0.38); \fi
+      \draw[white] (\j*0.38,1.9-\i*0.38) rectangle ++(0.38,0.38);}}
+    \node[font=\small, align=center, anchor=north] at (1.14,-0.1) {$\hat A$ thưa\\$N\times N$};
+  \end{scope}
+  \draw[mui] (5.0,1.3) -- (5.8,1.3) node[midway, above, nhan] {ReLU};
+  \tensorbaD{5.9}{0}{0.9}{2.6}{1.0}{cTeal}{$H^{(1)}$\\$N\times 64$}
+  \draw[mui] (7.6,1.3) -- (8.4,1.3) node[midway, above, nhan] {$W^{(1)}$};
+  \begin{scope}[xshift=8.5cm, yshift=0.15cm]
+    \foreach \i in {0,...,5}{\foreach \j in {0,...,5}{
+      \pgfmathtruncatemacro{\on}{(\i==\j) || (mod(\i+\j,4)==1) || (abs(\i-\j)==3)}
+      \ifnum\on=1 \fill[cPink!70] (\j*0.38,1.9-\i*0.38) rectangle ++(0.38,0.38);
+      \else \fill[cPink!8] (\j*0.38,1.9-\i*0.38) rectangle ++(0.38,0.38); \fi
+      \draw[white] (\j*0.38,1.9-\i*0.38) rectangle ++(0.38,0.38);}}
+    \node[font=\small, align=center, anchor=north] at (1.14,-0.1) {$\hat A$ dùng lại\\$N\times N$};
+  \end{scope}
+  \draw[mui] (10.9,1.3) -- (11.7,1.3) node[midway, above, nhan] {softmax};
+  \tensorbaD{11.8}{0.6}{0.9}{1.4}{1.0}{cGreen}{$Z$\\$N\times C$}
+  \draw[mui] (13.5,1.3) -- (14.2,1.3);
+  \node[khoiR, text width=1.4cm, anchor=west] at (14.2,1.3) {loss chỉ trên nút train};
+\end{tikzpicture}

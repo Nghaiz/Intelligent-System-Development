@@ -1,0 +1,197 @@
+% =====================================================================
+%  Chương 5. Knowledge Graph, Neo4j, RAG và Agent
+%  Số liệu: \SL{ch5_*}; mã: tlf/ch5_*.py, scripts/ch5_*.py; Cypher trích từ tlf/ch5_schema.py
+% =====================================================================
+\newcommand{\maCypher}[2]{%
+  \begin{listing}[!htbp]\caption{#2}\label{code:cy-#1}\inputminted[ignorelexererrors=true]{cypher}{generated/ch5_cy_#1.cypher}\end{listing}}
+\chapter{Knowledge Graph, Neo4j, RAG và Agent}\label{ch:kg}
+
+Chương trước làm việc với chuỗi số. Chương này làm việc với tri thức: thực thể, quan hệ và văn bản, sao cho mô hình ngôn ngữ trả lời được câu hỏi về dữ kiện cụ thể mà không tự nghĩ ra. LLM thuần có ba điểm yếu đã biết: trọng số đóng băng ở thời điểm huấn luyện, ảo giác khi gặp dữ kiện hiếm, và khó nối nhiều mắt xích thông tin. Ba thành phần của chương xử lý ba điểm đó theo thứ tự: đồ thị tri thức trong Neo4j giữ dữ kiện, RAG đưa dữ kiện vào ngữ cảnh của LLM, tác tử ReAct chọn công cụ khi một lần truy xuất không đủ.
+
+Toàn bộ dữ liệu nằm trong một cơ sở dữ liệu Neo4j thật gồm \SL{ch5_graph/total/nodes} nút và \SL{ch5_graph/total/relationships} cạnh, đọc trực tiếp từ máy chủ bằng Cypher. Ba LLM đều chạy cục bộ. Kết quả y tế và đầu tư trong chương chỉ mang tính học thuật.
+
+\section{Biểu diễn tri thức bằng đồ thị}
+
+\begin{dinhnghia}{Đồ thị tri thức}
+Đồ thị tri thức là tập dữ kiện $\mathcal{G} \subseteq \mathcal{E} \times \mathcal{R} \times \mathcal{E}$, trong đó $\mathcal{E}$ là tập thực thể, $\mathcal{R}$ là tập quan hệ~\cite{ch5hogan}. Mỗi dữ kiện $(s, p, o)$ khẳng định chủ thể $s$ có quan hệ $p$ với đối tượng $o$.
+\end{dinhnghia}
+
+RDF~\cite{ch5rdf} chuẩn hóa dữ kiện thành bộ ba và định danh mọi thứ bằng IRI, nhờ đó dữ liệu từ nhiều nguồn nối được với nhau và truy vấn bằng SPARQL. Điểm bất tiện là quan hệ không có thuộc tính riêng: muốn ghi hệ số tương quan của một cặp cổ phiếu phải tách thành nhiều bộ ba. Đồ thị thuộc tính (Labeled Property Graph) cho phép cả nút lẫn cạnh mang thuộc tính, gắn nhãn cho nút và kiểu cho cạnh. Neo4j theo mô hình này, truy vấn bằng Cypher~\cite{ch5cypher}, một ngôn ngữ khớp mẫu mà câu lệnh trông giống chính đồ thị: \texttt{(a)-[:BINDS]->(b)}. Hình~\ref{fig:ch5-triple} đặt hai cách biểu diễn cạnh nhau trên cùng một dữ kiện lấy từ Hetionet.
+
+\hinhtikz{ch5_triple_rdf}{Cùng một dữ kiện theo RDF và theo đồ thị thuộc tính}{ch5-triple}
+
+Bản thể học (ontology) là phần lược đồ: khai báo có những lớp nào, quan hệ nào nối lớp nào, ràng buộc gì phải đúng. Ở Neo4j, ontology của chương được thể hiện bằng nhãn, kiểu cạnh và ràng buộc duy nhất. Đồ thị khác cơ sở dữ liệu vector ở bản chất câu hỏi: đồ thị trả lời chính xác câu hỏi có cấu trúc và truy vết được đường đi, còn vector trả lời câu hỏi mơ hồ theo độ gần nghĩa nhưng chỉ cho một con số khoảng cách, không giải thích được. Chương này dùng cả hai trong cùng một máy chủ.
+
+\section{RAG và phân mảnh văn bản}
+
+RAG~\cite{ch5rag} tách tri thức khỏi trọng số mô hình: lập chỉ mục tài liệu, truy xuất đoạn liên quan, ghép vào prompt rồi mới sinh câu trả lời. Muốn đổi tri thức chỉ cần đổi kho tài liệu, không phải huấn luyện lại. Chất lượng phụ thuộc trước hết vào cách cắt văn bản (Hình~\ref{fig:ch5-chunk}). Cắt cố định đơn giản nhưng hay đứt câu. Cắt đệ quy ưu tiên ranh giới mục, đoạn, câu rồi mới tới từ. Cắt theo cấu trúc bám tiêu đề tài liệu. Cắt ngữ nghĩa đặt ranh giới khi cosin giữa hai câu liền kề tụt xuống. Kiểu cha -- con tìm trên khối nhỏ cho chính xác nhưng đưa khối lớn vào ngữ cảnh. Với Wikipedia, chương dùng cắt đệ quy 180 từ, chồng lấn 30 từ. Dữ liệu sinh từ đồ thị không cần cắt vì mỗi cặp (nút, quan hệ) đã là một đơn vị nghĩa.
+
+\hinhtikz{ch5_chunking}{Năm chiến lược phân mảnh trên cùng một văn bản}{ch5-chunk}
+
+Ba bộ truy xuất cơ sở chấm điểm khác nhau. BM25~\cite{ch5bm25} khớp mặt chữ, với $f(t,d)$ là tần suất từ $t$ trong tài liệu, $|d|$ là độ dài tài liệu:
+\begin{equation}
+\text{BM25}(q,d) = \sum_{t \in q} \text{IDF}(t)\,\frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1\left(1 - b + b\,|d| / \overline{|d|}\right)},\quad k_1=1{,}5,\ b=0{,}75.
+\end{equation}
+Dense nhúng câu hỏi và tài liệu bằng multilingual-e5-base~\cite{ch5e5} (768 chiều) rồi lấy cosin, tìm gần đúng bằng đồ thị HNSW~\cite{ch5hnsw} trong chỉ mục vector của Neo4j. Hybrid hợp nhất các danh sách bằng Reciprocal Rank Fusion~\cite{ch5rrf}, chỉ dùng thứ hạng nên không cần chuẩn hóa điểm:
+\begin{equation}
+\text{RRF}(d) = \sum_{r} \frac{1}{c + \text{hạng}_r(d)},\quad c = 60.
+\end{equation}
+
+\hinhtikz{ch5_rag_evolution}{Năm thế hệ RAG, từ truy xuất đơn lẻ tới tác tử}{ch5-evo}
+
+\section{GraphRAG và tác tử ReAct}
+
+Naive RAG thất bại khi đáp án nằm rải trên hai tài liệu mà tài liệu thứ hai không giống câu hỏi. GraphRAG lấy đồ thị làm đường đi giữa các tài liệu. Phiên bản gốc~\cite{ch5graphrag} dựng cộng đồng thực thể rồi tóm tắt bằng LLM, phù hợp câu hỏi toàn cục nhưng tốn nhiều lượt gọi LLM lúc lập chỉ mục. Chương này chọn hướng tìm kiếm cục bộ, không cần LLM khi dựng chỉ mục (Hình~\ref{fig:ch5-graphrag}): tìm thực thể trong câu hỏi bằng chỉ mục toàn văn, thêm thực thể từ năm chunk gần nhất theo vector, mở rộng một bước trên đồ thị, rồi xếp hạng các chunk gắn với tập nút vừa thu được:
+\begin{equation}
+\text{score}(c) = \cos(\mathbf{q}, \mathbf{c}) + \lambda\, h(c),\quad \lambda = 0{,}15,
+\end{equation}
+trong đó $h(c)$ là số thực thể liên kết từ câu hỏi mà chunk $c$ trực tiếp gắn với. Hệ số $\lambda$ đặt tay và giữ cố định, không dò trên tập đánh giá.
+
+\hinhtikz{ch5_graphrag_flow}{Luồng GraphRAG cục bộ trên Neo4j}{ch5-graphrag}
+
+ReAct~\cite{ch5react} xen kẽ suy nghĩ và hành động: ở mỗi lượt LLM viết một Thought rồi chọn Action, chương trình chạy công cụ và trả Observation vào ngữ cảnh, $S_{t+1} = S_t \cup \{\text{Thought}_t, \text{Action}_t, \text{Observation}_t\}$, cho tới khi LLM viết Final. Tác tử trong chương có ba công cụ: truy vấn Cypher chỉ đọc, tra vector và máy tính. Trước vòng lặp có một bộ lọc biểu thức chính quy chặn câu xin chẩn đoán hoặc kê đơn, chạy ngoài LLM nên không phụ thuộc vào việc mô hình có nghe lời hay không (Hình~\ref{fig:ch5-react}).
+
+\hinhtikz{ch5_react_loop}{Vòng lặp ReAct có bộ lọc an toàn đặt trước LLM}{ch5-react}
+
+\section{Thiết kế đồ thị trong Neo4j}
+
+Neo4j 5.26 Community chạy trong Docker, heap 768 MB, page cache 512 MB. Mọi miền dùng chung một cơ sở dữ liệu vì bản Community chỉ có một cơ sở dữ liệu người dùng. Nút tri thức đều có nhãn chung \texttt{Entity} kèm nhãn riêng và thuộc tính \texttt{dataset}, nhờ đó một ràng buộc duy nhất và một chỉ mục toàn văn phủ cả ba miền (Hình~\ref{fig:ch5-schema}, Bảng~\ref{tab:ch5-onto}). Mỗi miền có một nhãn chunk và một chỉ mục vector riêng, vì chỉ mục vector của Neo4j lọc sau khi tìm, dùng chung sẽ làm mất ứng viên.
+
+\hinhtikz{ch5_schema3d}{Ba miền tri thức và tầng chunk trong cùng một đồ thị Neo4j}{ch5-schema}
+\bang{ch5_ontology}{Ontology của đồ thị, số nút đọc từ Neo4j}{ch5-onto}
+\maCypher{schema}{Ràng buộc, chỉ mục toàn văn và chỉ mục vector}
+\maCypher{load}{Nạp cạnh theo lô UNWIND, kiểu cạnh động qua APOC}
+
+Dữ liệu nạp theo lô tối đa \SL{ch5_cfg/batch} dòng để giao dịch không vượt heap. Mọi lệnh ghi dùng \texttt{MERGE} nên chạy lại không sinh trùng. Bảng~\ref{tab:ch5-graph} là số thật đọc từ máy chủ sau khi nạp.
+
+\bang{ch5_graph}{Quy mô đồ thị theo miền, đọc từ Neo4j}{ch5-graph}
+
+\hinhpdf{ch5_degree}{0.92}{Phân bố bậc của ba đồ thị, trục log -- log}{ch5-degree}
+
+\nhanxet{Hetionet và HotpotQA có phân bố bậc đuôi dài: trung vị bậc lần lượt \SL{ch5_graph/hetionet/degree/median} và \SL{ch5_graph/hotpot/degree/median} trong khi bậc lớn nhất là \SL{ch5_graph/hetionet/degree/max} và \SL{ch5_graph/hotpot/degree/max}. Nút trung tâm của HotpotQA là từ ``American'', một cụm viết hoa ít giá trị suy luận. Vì vậy truy vấn mở rộng phải đặt trần 120 láng giềng cho mỗi nút, nếu không một nút như vậy kéo theo gần như cả đồ thị. VN30 có 30 công ty với mạng tương quan dày nên không có đuôi dài.}
+
+\section{Ba bộ dữ liệu}
+
+\subsection{Hetionet: tiểu đồ thị đái tháo đường}
+
+\textbf{Nguồn:} Hetionet v1.0~\cite{ch5hetionet}, tệp TSV và SIF trên \url{https://github.com/hetio/hetionet}, giấy phép CC0. \textbf{Kích cỡ:} bản đầy đủ có \SL{ch5_build/hetionet/edges_full} cạnh; tiểu đồ thị giữ \SL{ch5_build/hetionet/edges_kept} cạnh và \SL{ch5_build/hetionet/nodes_kept} nút. \textbf{Tiền xử lý:} lấy hai bệnh hạt đái tháo đường type 1 và type 2 cùng \SL{ch5_build/hetionet/seed_hop1} nút trong một bước quanh chúng, giữ mọi cạnh giữa các nút này, rồi giữ thêm các cạnh đi ra thuộc nhóm hữu ích cho câu hỏi thuốc và bệnh. Quá trình sinh học (GpBP, hơn 40 nghìn cạnh) và biểu hiện mô đi ra ngoài bị bỏ để vừa heap. Mỗi cặp (nút, quan hệ) sinh một chunk tiếng Việt liệt kê láng giềng, chia phần khi quá 70 tên.
+
+\begin{ketqua}{Mẫu chunk Hetionet}
+\input{generated/ch5_sample_hetionet}
+\end{ketqua}
+
+\haihinh{ch5_sub_het}{Quanh Metformin}{ch5_sub_vn30}{Quanh FPT}{Đồ thị con đọc từ Neo4j bằng \texttt{subgraph()}}{ch5-sub}
+
+\hinhpdf{ch5_het_edges}{0.92}{Số cạnh theo kiểu trong tiểu đồ thị Hetionet}{ch5-het-edges}
+
+\nhanxet{Hai kiểu cạnh PARTICIPATES và INTERACTS chiếm hơn một nửa số cạnh, trong khi TREATS rất ít. Câu hỏi về điều trị vì vậy dựa trên số ít cạnh có giá trị cao. Nút bậc cao nhất trong tiểu đồ thị không phải đái tháo đường mà là hypertension, do các gen dùng chung kéo cả các bệnh lân cận vào đồ thị.}
+
+\subsection{VN30: công ty, ngành, chỉ số và văn bản}
+
+\textbf{Nguồn:} giá phiên từ Yahoo Finance qua \texttt{yfinance}, mã có hậu tố \texttt{.VN}; bài viết từ API của Wikipedia tiếng Việt. \textbf{Kích cỡ:} \SL{ch5_build/vn30/sessions} dòng phiên của \SL{ch5_build/vn30/tickers} mã từ \SL{ch5_build/vn30/date_min} tới \SL{ch5_build/vn30/date_max}, \SL{ch5_build/vn30/stat_rows} nút chỉ số, \SL{ch5_graph/vn30/chunks} chunk. Danh sách 30 mã và ngành do người viết khai báo để minh họa, không phải ảnh chụp chính thức của rổ VN30 tại một ngày. Một số mã niêm yết muộn nên chỉ có dữ liệu từ năm 2020 hoặc 2021.
+
+\textbf{Tiền xử lý:} tính lợi suất kỳ, độ biến động năm hóa, cao thấp theo năm và tháng; năm dưới 100 phiên bị bỏ. Từ \SL{ch5_build/vn30/pairs} cặp mã, giữ \SL{ch5_build/vn30/pairs_kept} cặp có hệ số tương quan lợi suất ngày từ 0,35 trở lên làm cạnh \texttt{CORRELATED}. Wikipedia cắt đệ quy, mỗi chunk giữ URL và mã phiên bản bài. Hai ngoại lệ: VRE không có bài riêng nên bỏ, MSN dùng bài Masan Consumer là công ty con vì tìm kiếm trả về bài đó.
+
+\begin{ketqua}{Mẫu chunk VN30}
+\input{generated/ch5_sample_vn30}
+\end{ketqua}
+
+\hinhpdf{ch5_vn30_corr}{0.9}{Ma trận tương quan lợi suất ngày của 30 mã, xếp theo tương quan trung bình}{ch5-corr}
+
+\nhanxet{Các mã ngân hàng và SSI tập trung thành khối tương quan cao ở góc trên trái. SAB và VIC nằm ở cuối ma trận, tức biến động ít đồng pha với phần còn lại. Tương quan chỉ mô tả quá khứ, không hàm ý nhân quả.}
+
+\subsection{HotpotQA: truy xuất đa bước}
+
+\textbf{Nguồn:} HotpotQA~\cite{ch5hotpot}, cấu hình distractor, \url{https://huggingface.co/datasets/hotpotqa/hotpot_qa}. \textbf{Kích cỡ:} dùng \SL{ch5_build/hotpot/questions} câu đầu của tập validation; gộp 10 đoạn của mỗi câu theo tiêu đề được \SL{ch5_build/hotpot/paragraphs} đoạn. \textbf{Tiền xử lý:} mỗi tiêu đề là một thực thể, mỗi đoạn là một tài liệu; cụm viết hoa xuất hiện ít nhất hai đoạn cũng thành thực thể, tạo cạnh \texttt{MENTIONS} và \texttt{LINKS\_TO}. Đây là trích xuất luật, không dùng LLM.
+
+\begin{ketqua}{Mẫu chunk HotpotQA}
+\input{generated/ch5_sample_hotpot}
+\end{ketqua}
+
+\hinhpdf{ch5_hotpot_len}{0.92}{Độ dài câu hỏi và đoạn văn của HotpotQA}{ch5-hotpot}
+
+\maCypher{bridge}{Đường đi cầu nối giữa hai tài liệu qua một thực thể}
+
+\nhanxet{Mỗi câu có đúng hai đoạn vàng, tám đoạn còn lại là đoạn nhiễu được chọn vì giống câu hỏi, nên đây là tập khó cho truy xuất một bước. Ngữ cảnh cắt ở 170 từ mỗi đoạn là đủ cho phần lớn các đoạn.}
+
+\section{Cài đặt truy xuất trên Neo4j}
+
+Câu hỏi trên đồ thị được viết thẳng bằng Cypher. Truy vấn dưới đây trả lời một câu hai bước mà tìm kiếm văn bản khó làm được: gen nào vừa liên quan tới đái tháo đường type 2 vừa là đích của thuốc điều trị bệnh đó. Đáp án của bộ câu hỏi đánh giá được tính bằng đúng các truy vấn dạng này.
+
+\maCypher{drug}{Giao hai đường đi: thuốc điều trị bệnh và gen liên quan tới bệnh}
+\begin{ketqua}{Năm dòng đầu của kết quả thật}
+\input{generated/ch5_out_drug}
+\end{ketqua}
+\maCypher{sector}{Mã có lợi suất cao nhất của mỗi ngành trong một năm}
+\begin{ketqua}{Năm dòng đầu của kết quả thật, năm 2023}
+\input{generated/ch5_out_sector}
+\end{ketqua}
+
+GraphRAG gồm hai truy vấn. Truy vấn đầu dùng chỉ mục toàn văn để liên kết thực thể. Truy vấn sau mở rộng một bước từ tập hạt, gom chunk gắn với tập nút và tính điểm ngay trong Cypher bằng \texttt{vector.similarity.cosine}.
+
+\maCypher{link}{Liên kết thực thể bằng chỉ mục toàn văn}
+\maCypher{retrieve}{Mở rộng đồ thị và xếp hạng chunk}
+\maNguon{ch5_retrieval__Graph.search}{Ghép ba bước của GraphRAG trong Python}
+\maNguon{ch5_retrieval__Hybrid.search}{Hợp nhất RRF}
+
+\section{Đánh giá truy xuất}
+
+Câu hỏi Hetionet và VN30 sinh bằng khuôn, đáp án tính từ dữ liệu bằng Cypher. Câu HotpotQA giữ nguyên câu gốc và đoạn vàng do bộ dữ liệu cung cấp. Vì sinh bằng khuôn nên hai bộ đầu đều đặn hơn câu hỏi thật, kết quả không nên suy rộng cho người dùng thật. Mọi câu hỏi trong Bảng~\ref{tab:ch5-q} đều được chạy, không lấy mẫu con. Với $G$ là tập chunk vàng và $\text{rel}_i$ cho biết kết quả hạng $i$ có vàng hay không:
+\begin{equation}
+\text{Recall@}k = \frac{|G \cap \text{top-}k|}{|G|},\quad \text{nDCG@}10 = \frac{\sum_{i=1}^{10} \text{rel}_i / \log_2(i+1)}{\text{IDCG}}.
+\end{equation}
+MRR là trung bình nghịch đảo hạng của kết quả đúng đầu tiên, tính trong top-10.
+
+\bang{ch5_questions}{Bộ câu hỏi đánh giá theo miền và loại}{ch5-q}
+\bang{ch5_ret}{Chất lượng truy xuất của bốn phương pháp}{ch5-ret}
+\hinhpdf{ch5_ret_bars}{0.92}{Recall@5 theo miền và bộ truy xuất}{ch5-ret-bars}
+\bang{ch5_ret_type}{Recall@5 theo loại câu hỏi}{ch5-ret-type}
+
+\begin{phathien}{Không có bộ truy xuất thắng ở mọi miền}
+GraphRAG dẫn đầu rõ ở Hetionet: Recall@5 \SL{ch5_sl/hetionet/GraphRAG/recall5} so với \SL{ch5_sl/hetionet/BM25/recall5} của BM25 và \SL{ch5_sl/hetionet/Dense/recall5} của Dense. Ở câu giao hai bước, Dense chỉ đạt \SL{ch5_sl/hetionet/Dense/intersect_2hop} còn GraphRAG đạt \SL{ch5_sl/hetionet/GraphRAG/intersect_2hop}: chunk chỉ liệt kê tên nên vector không phân biệt được, trong khi đồ thị đi đúng cạnh.
+
+HotpotQA cho kết quả ngược lại: Dense đạt \SL{ch5_sl/hotpot/Dense/recall5}, GraphRAG chỉ \SL{ch5_sl/hotpot/GraphRAG/recall5}. Đồ thị ở miền này dựng bằng luật từ cụm viết hoa nên nhiễu, các nút như ``American'' đẩy nhầm chunk qua số hạng $\lambda h(c)$. GraphRAG chỉ tốt khi đồ thị tốt.
+\end{phathien}
+
+\nhanxet{Hybrid thắng ở VN30 (MRR \SL{ch5_sl/vn30/Hybrid/mrr}) và có Recall@10 cao nhất ở HotpotQA (\SL{ch5_sl/hotpot/Hybrid/recall10}), nhưng ở Hetionet lại kém GraphRAG (\SL{ch5_sl/hetionet/Hybrid/recall5} so với \SL{ch5_sl/hetionet/GraphRAG/recall5}): RRF bầu theo số đông nên một nguồn tốt bị hai nguồn yếu kéo xuống. Câu tổng hợp theo ngành của VN30 là loại khó nhất, Recall@5 không quá \SL{ch5_sl/vn30/Hybrid/aggregate_2hop}, vì đáp án phải so sánh nhiều mã chứ không nằm ở một chunk. Loại câu này cần Cypher, phần tác tử sẽ kiểm tra điều đó. Độ trễ trung vị của Hybrid cao nhất, \SL{ch5_sl/hotpot/Hybrid/ms_p50} ms ở HotpotQA, vì phải chạy cả ba nguồn tuần tự.}
+
+\section{Đánh giá sinh với ba LLM}
+
+Ba mô hình chạy cục bộ qua Ollama trên RTX 4060: Qwen2.5 7B, Gemma 3 4B và Qwen2.5 1.5B. Cả ba nhận cùng ngữ cảnh Hybrid top-\SL{ch5_cfg/top_k}, mỗi chunk cắt ở \SL{ch5_cfg/ctx_words} từ, nhiệt độ 0, tối đa 48 token. Mỗi mô hình trả lời 50 câu đầu của mỗi miền, tổng cộng 450 lượt sinh. EM là tỷ lệ khớp chính xác sau chuẩn hóa, đáp án số được phép lệch 0,5\%. F1 tính trên token. Độ bám ngữ cảnh là tỷ lệ token của câu trả lời có mặt trong ngữ cảnh, phản ánh mức độ không tự nghĩ ra nhưng không khẳng định câu trả lời đúng. Câu trả lời ``Không đủ dữ liệu'' được tính là bám ngữ cảnh.
+
+\bang{ch5_gen}{Chất lượng và độ trễ sinh của ba LLM trên ba miền}{ch5-gen}
+\hinhpdf{ch5_gen_bars}{0.92}{EM của ba LLM theo miền}{ch5-gen-bars}
+
+\nhanxet{Qwen2.5 7B có EM cao nhất cả ba miền, cao nhất ở VN30 (\SL{ch5_sl/vn30/qwen25-7b/em}) và thấp nhất ở HotpotQA (\SL{ch5_sl/hotpot/qwen25-7b/em}). Gemma 3 4B theo sát ở VN30 (\SL{ch5_sl/vn30/gemma3-4b/em}) nhưng kém rõ ở Hetionet (\SL{ch5_sl/hetionet/gemma3-4b/em} so với \SL{ch5_sl/hetionet/qwen25-7b/em}). Qwen2.5 1.5B yếu nhất ở cả ba miền nhưng nhanh nhất, trung vị \SL{ch5_sl/vn30/qwen25-15b/latency_p50} giây ở VN30 so với \SL{ch5_sl/vn30/qwen25-7b/latency_p50} giây của 7B. Độ bám ngữ cảnh ở VN30 của cả ba đều xấp xỉ \SL{ch5_sl/vn30/qwen25-7b/faith} vì đáp án là mã hoặc số lấy thẳng từ ngữ cảnh. Ở HotpotQA, 7B có độ bám thấp hơn hai mô hình còn lại dù EM cao hơn, nên độ bám không thay thế được độ chính xác. Với 50 câu mỗi ô, sai lệch một vài câu đã đổi EM vài điểm phần trăm, nên chỉ các chênh lệch lớn mới có ý nghĩa.}
+
+\textbf{Phân tích lỗi của Qwen2.5 7B.} Hybrid đưa được ít nhất một chunk vàng vào top-4 ở \SL{ch5_sl/gen/hitPct}\% số câu, nên phần lớn lỗi nằm ở bước đọc. Có ba nhóm. Một là không ghép được hai chunk: \SL{ch5_sl/gen/nodata}/\SL{ch5_sl/gen/n} câu trả lời ``Không đủ dữ liệu'', như câu hỏi thuốc điều trị đái tháo đường gây một tác dụng phụ cụ thể, có đáp án Ramipril. Hai là đọc nhầm con số trong chunk dày số: hỏi lợi suất VIC tháng 1/2024, đáp án $-4{,}71$, mô hình trả $-17{,}16$. Ba là lỗi do cách chấm: ``Lee Hazlewood'' so với đáp án vàng ``Barton Lee Hazlewood'' bị tính sai EM dù đúng người, nên EM ở HotpotQA thấp hơn chất lượng thực tế.
+
+\section{Tác tử ReAct và so sánh ba hệ}
+
+Tác tử dùng Qwen2.5 7B, tối đa \SL{ch5_cfg/max_steps} lượt. Công cụ Cypher chỉ cho phép câu lệnh đọc: từ khóa ghi và thủ tục ghi bị từ chối trước khi tới máy chủ, câu lệnh có giới hạn thời gian 10 giây và 20 dòng kết quả. Bộ lọc lâm sàng được thử trên 20 câu tự viết: chặn \SL{ch5_guard/blocked}/\SL{ch5_guard/must_block} câu xin chẩn đoán hoặc kê đơn và chặn nhầm \SL{ch5_guard/wrongly_blocked}/\SL{ch5_guard/must_pass} câu tra cứu học thuật. Bộ lọc dựa trên từ khóa nên cách diễn đạt né từ khóa vẫn có thể lọt qua, con số trên chỉ áp dụng cho bộ thử này.
+
+\maNguon{ch5_agent__run_agent}{Vòng lặp ReAct: LLM viết, chương trình chạy công cụ}
+
+\bang{ch5_sys}{Naive RAG, GraphRAG và Agent trên cùng LLM Qwen2.5 7B}{ch5-sys}
+\hinhpdf{ch5_agent_bars}{0.92}{EM của ba hệ theo miền}{ch5-agent-bars}
+
+\begin{vetsuyluan}{Vết suy luận đúng, câu hỏi VN30}
+\input{generated/ch5_trace_vn30_1}
+\end{vetsuyluan}
+
+\begin{vetsuyluan}{Vết suy luận sai, câu hỏi Hetionet}
+\input{generated/ch5_trace_hetionet_0}
+\end{vetsuyluan}
+
+\begin{phathien}{Tác tử không thắng toàn cục, nhưng thắng đúng chỗ dự đoán}
+Tính chung, GraphRAG một lượt có EM cao hơn Agent ở Hetionet (\SL{ch5_sl/hetionet/sysGraphRAG/em} so với \SL{ch5_sl/hetionet/sysAgent/em}) và VN30 (\SL{ch5_sl/vn30/sysGraphRAG/em} so với \SL{ch5_sl/vn30/sysAgent/em}). Ở câu tổng hợp theo ngành của VN30, nơi đáp án không nằm trong một chunk, tình hình đảo ngược: Agent đạt \SL{ch5_traces/em/vn30/aggregate_2hop/Agent}, GraphRAG chỉ \SL{ch5_traces/em/vn30/aggregate_2hop/GraphRAG}. Ở HotpotQA câu cầu nối, Agent cũng hơn GraphRAG (\SL{ch5_traces/em/hotpot/bridge/Agent} so với \SL{ch5_traces/em/hotpot/bridge/GraphRAG}), nhưng ở đây GraphRAG vốn yếu do đồ thị nhiễu và Naive RAG mới là hệ tốt nhất (\SL{ch5_sl/hotpot/sysNaiveRAG/em}).
+\end{phathien}
+
+\nhanxet{Nguyên nhân Agent thua nằm ở câu Cypher do LLM viết, không nằm ở dữ liệu. Ở Hetionet, trong các lượt gọi Cypher chỉ \SL{ch5_traces/calls/hetionet/cypher/ok} lượt có kết quả, \SL{ch5_traces/calls/hetionet/cypher/empty} lượt rỗng và \SL{ch5_traces/calls/hetionet/cypher/err} lượt lỗi. Lỗi rỗng thường do sai chiều cạnh, như viết \texttt{(c)-[:INCLUDES]->(pc)} trong khi lược đồ là chiều ngược lại, hoặc nối sai kiểu cạnh. Khi thấy rỗng, mô hình thường kết luận luôn thay vì sửa truy vấn. Ở VN30 có \SL{ch5_traces/calls/vn30/cypher/err} lượt lỗi; một phần do mô hình bọc câu lệnh trong khối mã nhiều dòng mà bộ phân tích của tác tử chỉ đọc một dòng. Đây là điểm yếu của cài đặt, chưa được sửa trong lần đo này. Cái giá của vòng lặp là độ trễ: trung vị Agent \SL{ch5_sl/vn30/sysAgent/latency_p50} giây ở VN30, so với \SL{ch5_sl/vn30/sysGraphRAG/latency_p50} giây của GraphRAG. Với mẫu 30 câu mỗi miền, chênh lệch dưới khoảng 10 điểm phần trăm không nên xem là khác biệt chắc chắn.}
+
+\section{Triển khai và kết luận chương}
+
+\texttt{tlf/serve\_ch5.py} cung cấp \texttt{ask(question, mode, model)}, một generator phát các sự kiện bước, chunk truy xuất, token và kết quả cuối để Web App truyền qua SSE, cùng \texttt{subgraph()} và \texttt{stats()} cho trang đồ thị. Câu trả lời ở miền y tế và tài chính kèm ghi chú chỉ mang tính học thuật. Lần hỏi đầu tiên phải nạp e5-base lên CPU; lúc máy bận, bước này đo được \SL{ch5_cfg/first_load_s} giây, nên giao diện báo tiến độ và \texttt{unload()} giải phóng bộ nhúng khi không dùng.
+
+\haiUI{graph}{Khám phá đồ thị Neo4j}{chat}{Trợ lý hỏi đáp}{Web App: trang đồ thị và trang trợ lý}{ch5-ui}
+Ba kết luận rút ra từ số đo. Thứ nhất, cách dựng đồ thị quyết định GraphRAG: đồ thị có cấu trúc thật của Hetionet cho Recall@5 cao hơn hẳn văn bản thuần, đồ thị trích bằng luật của HotpotQA lại làm kết quả tệ đi. Thứ hai, không có một bộ truy xuất tốt nhất, và RRF không phải lúc nào cũng an toàn. Thứ ba, tác tử đáng dùng cho câu hỏi tổng hợp nhưng trên LLM 7B chất lượng câu Cypher là nút thắt: cung cấp sẵn các truy vấn có tham số an toàn hơn để LLM tự viết. Giới hạn của đánh giá: câu hỏi Hetionet và VN30 sinh bằng khuôn, không có câu hỏi trả lời từ phần Wikipedia, và GraphRAG không dùng tóm tắt cộng đồng. Chương 6 đi tiếp sang kiến trúc nhiều tác tử.

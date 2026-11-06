@@ -1,0 +1,25 @@
+# Neo4j cho Chương 5 và Web App. Dữ liệu nằm trong volume có tên, không phải anonymous volume.
+# WSL của máy chỉ có 3 GB nên heap và page cache đặt nhỏ.
+services:
+  neo4j:
+    image: neo4j:5.26-community
+    container_name: tlf-neo4j
+    ports:
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/tieuluanfinal
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 768m
+      NEO4J_server_memory_pagecache_size: 512m
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    volumes:
+      - tlf_neo4j_data:/data
+      - tlf_neo4j_logs:/logs
+      - tlf_neo4j_import:/import
+    restart: "no"
+volumes:
+  tlf_neo4j_data:
+  tlf_neo4j_logs:
+  tlf_neo4j_import:

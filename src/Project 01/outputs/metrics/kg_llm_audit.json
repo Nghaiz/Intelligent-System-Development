@@ -1,0 +1,515 @@
+{
+ "n": 50,
+ "correct": 27,
+ "precision": 0.54,
+ "wilson95": [
+  0.40398634328388083,
+  0.6703056539821737
+ ],
+ "seed": 42,
+ "sampled_from": "data/kb/llm_edges.jsonl",
+ "judge": "Claude Opus 5.5 (tác tử AI của làn L2), không phải bác sĩ hay người gán nhãn",
+ "criterion": "Đúng khi chủ thể, quan hệ, đối tượng đều đúng VÀ câu bằng chứng tự nó đủ ủng hộ cạnh; chấm chặt, đồng xuất hiện hoặc kết quả trên động vật tính sai",
+ "edges": [
+  {
+   "i": 0,
+   "s": "Diabetes Complications",
+   "rel": "CAUSES",
+   "o": "sleep complaints",
+   "evidence": "Participants who experienced sleep complaints for 15 or more days in a month were more likely to experience diabetic complications.",
+   "source": "europepmc",
+   "correct": false,
+   "note": "đảo chiều"
+  },
+  {
+   "i": 1,
+   "s": "Depression",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "Diabetes Mellitus",
+   "evidence": "For individuals with depression, the odds of having diabetes for those who were born in Mexico and had <30 years living in the US were 0.04 (95% CI: 0, 0.42) times the corresponding odds of individual",
+   "source": "europepmc",
+   "correct": false,
+   "note": "bằng chứng là odds trong phân nhóm, không phải yếu tố nguy cơ tổng quát"
+  },
+  {
+   "i": 2,
+   "s": "Weight loss",
+   "rel": "PREVENTS",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "You may be able to prevent or delay diabetes by losing 5 to 7 percent of your starting weight.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 3,
+   "s": "Insulinoma",
+   "rel": "COMPLICATION_OF",
+   "o": "Diabetes Mellitus",
+   "evidence": "Removing the entire pancreas leads to diabetes because there is no longer any insulin being produced.",
+   "source": "medlineplus",
+   "correct": false,
+   "note": "gán nhầm thực thể"
+  },
+  {
+   "i": 4,
+   "s": "sickle cell disease",
+   "rel": "CAUSES",
+   "o": "severe and chronic pain",
+   "evidence": "These sickle cells can get stuck in the blood vessels. This can block the blood flow to the organs, which can cause severe and chronic pain , infections, and other complications.",
+   "source": "medlineplus",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 5,
+   "s": "Prediabetes",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "And if you have prediabetes or are at risk for diabetes, eating foods that keep your blood glucose levels healthy may help prevent type 2 diabetes later on.",
+   "source": "medlineplus",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 6,
+   "s": "gestational diabetes mellitus",
+   "rel": "DIAGNOSED_BY",
+   "o": "iFGF23",
+   "evidence": "Mothers who developed GDM had higher concentrations of iFGF-23 compared to mothers who did not suffer from GDM (19.73 vs. 13.23 pg/mL, p < 0.0001).",
+   "source": "europepmc",
+   "correct": false,
+   "note": "nồng độ khác biệt không phải chẩn đoán"
+  },
+  {
+   "i": 7,
+   "s": "family history",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "High cholesterol",
+   "evidence": "Family history. High blood cholesterol can run in families.",
+   "source": "medlineplus",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 8,
+   "s": "wounds",
+   "rel": "COMPLICATION_OF",
+   "o": "Diabetes mellitus",
+   "evidence": "Diabetes mellitus is a chronic disease characterized by increased blood glucose levels, leading to damage of the nerves blood vessels, subsequently manifesting as organ failures, wounds, or ulceration",
+   "source": "europepmc",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 9,
+   "s": "Tobacco Use",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "Tiền sử sử dụng thuốc lá, uống rượu và sử dụng thuốc gây nghiện.",
+   "source": "bo_y_te",
+   "correct": false,
+   "note": "câu chỉ là mục khai thác tiền sử"
+  },
+  {
+   "i": 10,
+   "s": "Diabetes Mellitus",
+   "rel": "CAUSES",
+   "o": "Hyperglycemia",
+   "evidence": "If you have diabetes, you need to watch out for blood glucose levels that are too high (hyperglycemia) or too low for you (hypoglycemia). These can happen quickly and can become dangerous.",
+   "source": "medlineplus",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 11,
+   "s": "Tobacco smoking",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "Overweight/obesity, smoking, dyslipidaemia, and hyperuricaemia played crucial but different roles in transitions.",
+   "source": "europepmc",
+   "correct": false,
+   "note": "câu không nói về ĐTĐ típ 2"
+  },
+  {
+   "i": 12,
+   "s": "overweight/obesity",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "Overweight/obesity, smoking, dyslipidaemia, and hyperuricaemia played crucial but different roles in transitions.",
+   "source": "europepmc",
+   "correct": false,
+   "note": "câu không nói về ĐTĐ típ 2"
+  },
+  {
+   "i": 13,
+   "s": "peripheral neuropathy",
+   "rel": "COMPLICATION_OF",
+   "o": "type 1 diabetes mellitus",
+   "evidence": "12.5% kidney injury; and 10% peripheral neuropathy.",
+   "source": "europepmc",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 14,
+   "s": "diet",
+   "rel": "TREATS",
+   "o": "Diabetes Mellitus",
+   "evidence": "Chế độ ăn kiêng cho người tiểu đường là một chế độ ăn của những người có bệnh tiểu đường, hay còn gọi là những người có đường trong máu cao, để giảm thiểu các triệu chứng và các biến chứng nguy hiểm c",
+   "source": "wikipedia_vi",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 15,
+   "s": "carbonhydrate",
+   "rel": "TREATS",
+   "o": "Hypoglycemia",
+   "evidence": "Điều trị cơn hạ glucose máu - Với thể nhẹ: Chỉ cần 10-15g Carbonhydrate uống là glucose máu nhanh chóng trở lại bình thường.",
+   "source": "bo_y_te",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 16,
+   "s": "MASLD",
+   "rel": "COMPLICATION_OF",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "In fact, up to 70% of people with type 2 diabetes also have MASLD.",
+   "source": "cdc",
+   "correct": false,
+   "note": "đồng mắc, không phải biến chứng"
+  },
+  {
+   "i": 17,
+   "s": "Hypoglycemia",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "Diabetes Mellitus",
+   "evidence": "Tiền sử các cơn hạ glucose huyết, khả năng nhận biết và cách xử trí lúc có cơn, tần suất, nguyên nhân.",
+   "source": "bo_y_te",
+   "correct": false,
+   "note": "mục tiền sử, sai quan hệ"
+  },
+  {
+   "i": 18,
+   "s": "educational attainment",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "Diabetes Mellitus",
+   "evidence": "The odds of having diabetes for individuals with ≥12 years of educational attainment were 0.29 (95% CI: 0.14, 0.61) times the corresponding odds of individuals with <12 years of educational attainment",
+   "source": "europepmc",
+   "correct": false,
+   "note": "quan hệ nghịch"
+  },
+  {
+   "i": 19,
+   "s": "high glucose level",
+   "rel": "CAUSES",
+   "o": "blood sugar increase",
+   "evidence": "A high glucose level may be treated with insulin given through a vein.",
+   "source": "medlineplus",
+   "correct": false,
+   "note": "câu nói về điều trị"
+  },
+  {
+   "i": 20,
+   "s": "type 2 diabetes mellitus",
+   "rel": "DIAGNOSED_BY",
+   "o": "HbA1c",
+   "evidence": "HbA1c ≥ 6,5% (48 mmol/mol). Xét nghiệm này phải được thực hiện ở phòng thí nghiệm được chuẩn hóa theo tiêu chuẩn quốc tế.",
+   "source": "bo_y_te",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 21,
+   "s": "celiac disease",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "type 1 diabetes mellitus",
+   "evidence": "Bệnh Celiac có liên quan đến một số tình trạng bệnh lý khác, trong đó có nhiều rối loạn tự miễn dịch: đái tháo đường type 1,",
+   "source": "wikipedia_vi",
+   "correct": false,
+   "note": "liên quan, không phải yếu tố nguy cơ"
+  },
+  {
+   "i": 22,
+   "s": "lifestyle changes",
+   "rel": "PREVENTS",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "To date, the DPPOS has shown that people can prevent or delay type 2 diabetes for at least 15 years with lifestyle changes or metformin.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 23,
+   "s": "type 2 diabetes mellitus",
+   "rel": "MONITORED_BY",
+   "o": "FPG or RPG",
+   "evidence": "TEST ADULTS who have symptoms of diabetes with fasting or random plasma glucose (FPG or RPG) TEST ASYMPTOMATIC ADULTS who are 40+ years old and BMI ≥25 (FPG)",
+   "source": "who",
+   "correct": false,
+   "note": "sàng lọc, không phải theo dõi"
+  },
+  {
+   "i": 24,
+   "s": "type 2 diabetes mellitus",
+   "rel": "DIAGNOSED_BY",
+   "o": "Fasting plasma glucose",
+   "evidence": "Xác định lại chẩn đoán nếu đường máu lúc đói ban đầu 5,5-6,9 mmol/l hoặc đường máu bất kỳ 5,5-11,0 mmol/l.",
+   "source": "bo_y_te",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 25,
+   "s": "water consumption",
+   "rel": "PREVENTS",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "Drink water instead of sweetened beverages.",
+   "source": "niddk",
+   "correct": false,
+   "note": "câu không nêu ĐTĐ"
+  },
+  {
+   "i": 26,
+   "s": "Linoleic Acid",
+   "rel": "CAUSES",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "Reverse MR analyses showed a correlation between type 2 diabetes and reduced levels of linoleic acid (β_IVW: -0.033, 95% CI: (-0.059,-0.006), P =0.014<0.05).",
+   "source": "europepmc",
+   "correct": false,
+   "note": "phân tích ngược, sai chiều nhân quả"
+  },
+  {
+   "i": 27,
+   "s": "Gestational diabetes history",
+   "rel": "CAUSES",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "Gestational diabetes usually goes away after your baby is born. However, it increases your risk for type 2 diabetes later in life.",
+   "source": "cdc",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 28,
+   "s": "Urinary Tract Infections",
+   "rel": "CAUSES",
+   "o": "kidney infections",
+   "evidence": "Bladder infections can develop into kidney infections.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 29,
+   "s": "high levels of glucose",
+   "rel": "CAUSES",
+   "o": "glucose in saliva",
+   "evidence": "High levels of glucose in your blood can also cause glucose to build up in your saliva.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 30,
+   "s": "Diabetic retinopathy",
+   "rel": "CAUSES",
+   "o": "Blindness",
+   "evidence": "Diabetic retinopathy is a highly specific microvascular complication of diabetes. It is among the leading causes of blindness.",
+   "source": "who",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 31,
+   "s": "keeping your mouth healthy",
+   "rel": "PREVENTS",
+   "o": "History of heart disease",
+   "evidence": "Keeping your mouth healthy will also make it easier for you to manage your diabetes and prevent diabetes-related health problems, such as heart disease and kidney disease.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 32,
+   "s": "Blepharitis",
+   "rel": "PRESENTS",
+   "o": "Pain",
+   "evidence": "Treatment of these conditions is directed at alleviating the symptoms and preventing the evolution towards more severe stages of those diseases.",
+   "source": "who",
+   "correct": false,
+   "note": "câu không nêu triệu chứng"
+  },
+  {
+   "i": 33,
+   "s": "geraniol",
+   "rel": "TREATS",
+   "o": "type 2 diabetes mellitus",
+   "evidence": "Geraniol treatment for 6 weeks instigated a remarkable retrieval of the lipid profile, liver, and kidney function.",
+   "source": "europepmc",
+   "correct": false,
+   "note": "câu không nêu điều trị ĐTĐ"
+  },
+  {
+   "i": 34,
+   "s": "managing blood glucose, blood pressure, and cholesterol",
+   "rel": "PREVENTS",
+   "o": "eye disease",
+   "evidence": "The best way to prevent eye disease is to manage your blood glucose, blood pressure, and cholesterol; and to not smoke.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 35,
+   "s": "managing blood glucose levels",
+   "rel": "PREVENTS",
+   "o": "bladder infections",
+   "evidence": "Managing your blood glucose levels can help prevent bladder infections.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 36,
+   "s": "ALTT > 340 mosM",
+   "rel": "DIAGNOSED_BY",
+   "o": "Glucose máu",
+   "evidence": "Chẩn đoán xác định khi ALTT > 340 mosM.",
+   "source": "bo_y_te",
+   "correct": false,
+   "note": "sai chủ thể"
+  },
+  {
+   "i": 37,
+   "s": "obesity",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "Insulin resistance",
+   "evidence": "Although overweight and obesity are risk factors, you do not have to have them to have insulin resistance.",
+   "source": "cdc",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 38,
+   "s": "SGLT inhibitors",
+   "rel": "CAUSES",
+   "o": "genital mycotic infection",
+   "evidence": "These trials also reported increased risks of genital mycotic infection and DKA.",
+   "source": "europepmc",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 39,
+   "s": "obesity",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "post-COVID syndrome",
+   "evidence": "Những người béo phì có nguy cơ mắc hội chứng hậu COVID-19 cao hơn.",
+   "source": "wikipedia_vi",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 40,
+   "s": "being 45 years or older",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "Prediabetes",
+   "evidence": "Having a parent, brother, or sister with type 2 diabetes Being physically active less than 3 times a week Ever having gestational diabetes (diabetes during pregnancy) Giving birth to a baby who weighe",
+   "source": "cdc",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 41,
+   "s": "Diabetes Mellitus",
+   "rel": "CAUSES",
+   "o": "loss of interest in sex",
+   "evidence": "Sexual and bladder problems are more common in people with diabetes. Problems like erectile dysfunction, loss of interest in sex, bladder leaks, and retained urine can happen if diabetes damages your ",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 42,
+   "s": "Conjunctivitis",
+   "rel": "PRESENTS",
+   "o": "Discomfort",
+   "evidence": "Treatment of these conditions is directed at alleviating the symptoms and preventing the evolution towards more severe stages of those diseases.",
+   "source": "who",
+   "correct": false,
+   "note": "câu không nêu triệu chứng"
+  },
+  {
+   "i": 43,
+   "s": "pancreatic islet transplantation",
+   "rel": "TREATS",
+   "o": "type 1 diabetes mellitus",
+   "evidence": "Pancreatic islet transplantation is a treatment for type 1 diabetes in people who struggle to manage their blood glucose levels.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 44,
+   "s": "type 2 diabetes mellitus",
+   "rel": "PRESENTS",
+   "o": "symptoms",
+   "evidence": "Prediabetes and type 2 diabetes often don't have any symptoms.",
+   "source": "cdc",
+   "correct": false,
+   "note": "đối tượng chung chung, câu phủ định"
+  },
+  {
+   "i": 45,
+   "s": "diabetes-related nerve damage",
+   "rel": "CAUSES",
+   "o": "hypoglycemia unawareness",
+   "evidence": "If diabetes-related nerve damage leads to hypoglycemia unawareness, you may need to check your blood glucose more often, so you know when you need to treat hypoglycemia or take steps to prevent it.",
+   "source": "niddk",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 46,
+   "s": "baby or mother",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "complications",
+   "evidence": "With proper identification of symptoms and careful follow-up, serious complications for the baby or mother are rare.",
+   "source": "medlineplus",
+   "correct": false,
+   "note": "chủ thể vô nghĩa"
+  },
+  {
+   "i": 47,
+   "s": "atherosclerosis of the arteries",
+   "rel": "COMPLICATION_OF",
+   "o": "coronary artery disease",
+   "evidence": "Tiền sử có bệnh tim mạch do xơ vữa động mạch.",
+   "source": "bo_y_te",
+   "correct": false,
+   "note": "sai quan hệ"
+  },
+  {
+   "i": 48,
+   "s": "Family history of diabetes",
+   "rel": "RISK_FACTOR_FOR",
+   "o": "Gestational diabetes history",
+   "evidence": "But you are more likely to develop it if you: Have a family history of diabetes",
+   "source": "medlineplus",
+   "correct": true,
+   "note": ""
+  },
+  {
+   "i": 49,
+   "s": "Abn-CBD",
+   "rel": "TREATS",
+   "o": "type 1 diabetes mellitus",
+   "evidence": "Abn-CBD significantly reduced islet cell apoptosis and improved glucose tolerance. In STZ-injected mice, Abn-CBD decreased circulating proinflammatory cytokines and ameliorated islet inflammation redu",
+   "source": "europepmc",
+   "correct": false,
+   "note": "nghiên cứu trên chuột"
+  }
+ ]
+}

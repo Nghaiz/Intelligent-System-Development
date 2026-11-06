@@ -1,0 +1,67 @@
+\chapter{Học máy, học sâu và dự đoán}\label{chap:hocmay}
+
+\section{Quy trình thí nghiệm}
+
+Ba bài toán bảng đi qua cùng một quy trình (Hình~\ref{fig:pipeline}). Việc được chia cho hai loại phần cứng: mô hình cổ điển chạy trên CPU 32 luồng, mô hình sâu chạy trên GPU RTX 4060 và xếp hàng qua khóa GPU, nhờ đó hai nhóm chạy song song mà không tranh tài nguyên.
+
+\hinhtikz{ch4_pipeline}{Quy trình chung: mọi lựa chọn diễn ra trên val, test chỉ mở một lần}{pipeline}
+
+\section{Mô hình sâu cho dữ liệu bảng}
+
+Ba mô hình sâu dùng chung bước nhúng đặc trưng và vòng huấn luyện có dừng sớm. FT-Transformer dùng token CLS để gom thông tin từ mọi đặc trưng, đúng như mô tả ở Mục lý thuyết.
+
+\maNguon{deep__FTTransformer}{Cài đặt FT-Transformer bằng PyTorch}
+
+\section{Kết quả trên tập kiểm tra}
+
+\begin{table}[!htbp]\centering\caption{Kết quả sáu mô hình trên test của ba bài toán sau hiệu chỉnh isotonic}\label{tab:models}
+\small\setlength{\tabcolsep}{3.5pt}\input{generated/ch4_models}\end{table}
+
+Bảng~\ref{tab:models} và Hình~\ref{fig:compare} cho thấy mô hình sâu \textbf{không} vượt XGBoost trên dữ liệu bảng ở quy mô này. FT-Transformer tốn \SL{ml_summary/full/models/ft_transformer/seconds} giây trên bài có xét nghiệm, trong khi XGBoost cần \SL{ml_summary/full/models/xgboost/seconds} giây và cho PR-AUC cao hơn. Ở bài sàng lọc, FT-Transformer nhỉnh nhất trên val nhưng khoảng cách chỉ \SL{ml_summary/screening/val_gap_best_minus_served}, nên hệ thống phục vụ XGBoost vì giải thích SHAP nhanh và chính xác trên cây.
+
+\hinhpdf{ml_compare}{1.0}{ROC-AUC của sáu mô hình trên ba bài toán}{compare}
+
+Mô hình phục vụ đạt ROC-AUC \SL{ml_summary/full/served_test/roc_auc} ở bài có xét nghiệm, với khoảng tin cậy bootstrap \SL{ml_summary/full/bootstrap_ci_test/roc_auc/0}--\SL{ml_summary/full/bootstrap_ci_test/roc_auc/1}. Như đã nêu ở Chương~\ref{chap:dulieu}, con số này cao vì nhãn gần như sinh theo ngưỡng. Hai bài còn lại phản ánh độ khó thật: sàng lọc tự khai đạt \SL{ml_summary/screening/served_test/roc_auc}, còn tái nhập viện chỉ đạt \SL{ml_summary/readmission/served_test/roc_auc}. Tái nhập viện phụ thuộc nhiều vào yếu tố ngoài hồ sơ, nên hệ thống chỉ dùng kết quả này như tín hiệu tham khảo.
+
+\hinhpdf{ml_roc_pr_screening}{0.95}{ROC và Precision--Recall của bài sàng lọc không xét nghiệm}{rocpr}
+
+Kết quả hiệu chỉnh không như kỳ vọng ban đầu. Với XGBoost, isotonic chỉ giảm ECE ở bài tái nhập viện (\SL{ml_summary/readmission/models/xgboost/test_ece_raw} xuống \SL{ml_summary/readmission/models/xgboost/test_ece}); ở bài có xét nghiệm ECE tăng từ \SL{ml_summary/full/models/xgboost/test_ece_raw} lên \SL{ml_summary/full/models/xgboost/test_ece}, ở bài sàng lọc từ \SL{ml_summary/screening/models/xgboost/test_ece_raw} lên \SL{ml_summary/screening/models/xgboost/test_ece}. XGBoost vốn đã khá chuẩn, nên isotonic không giúp thêm. Đồ án vẫn giữ bước này để mọi mô hình đi qua cùng quy trình, và cả hai mức sai số đều rất nhỏ, đường tin cậy ở Hình~\ref{fig:reliability} bám sát đường chéo. Lớp phục vụ còn kẹp xác suất vào khoảng \([0{,}005;\,0{,}995]\), vì hệ thống không được khẳng định chắc chắn một người mắc bệnh hay không.
+
+\hinhpdf{ml_reliability}{0.92}{Biểu đồ tin cậy trước và sau hiệu chỉnh}{reliability}
+
+\hinhpdf{ml_shap_summary}{0.95}{Độ quan trọng SHAP trung bình của hai mô hình phục vụ}{shap}
+
+SHAP trong Hình~\ref{fig:shap} khớp với y văn: HbA1c, đường huyết đứng đầu khi có xét nghiệm; khi không có xét nghiệm, sức khỏe tự đánh giá, huyết áp cao và BMI thay thế vai trò đó.
+
+\section{Đối chuẩn chéo miền}\label{sec:crossdomain}
+
+Để kiểm tra độ bền ngoài miền huấn luyện, đồ án huấn luyện trên một bộ rồi chấm trên bộ khác, chỉ bằng ba đặc trưng chung: tuổi, BMI, đường huyết. Hình~\ref{fig:cross} cho thấy ROC-AUC giảm vừa phải, nhưng thiệt hại thật nằm ở xác suất và ngưỡng: khi tỉ lệ bệnh của miền đích khác xa miền nguồn, sai số hiệu chỉnh tăng hàng chục lần, F1 tụt từ 0,58 xuống dưới 0,1. Một mô hình xếp hạng tốt vẫn có thể báo sai mức nguy cơ ở quần thể mới, đó là lý do DiaNexus nêu rõ nguồn dữ liệu của mô hình và không dùng xác suất như một chẩn đoán.
+
+\hinhpdf{ml_crossdomain}{0.70}{ROC-AUC của XGBoost khi huấn luyện ở miền nguồn, chấm ở miền đích}{cross}
+
+\section{Phân cấp bệnh võng mạc}
+
+Nhánh ảnh dùng hai mạng tiền huấn luyện ImageNet là ResNet-34 và EfficientNet-B0 trên \SL{data_retina/splits/train/n} ảnh. Lớp bệnh nặng rất hiếm (Hình~\ref{fig:retsamples}), nên mỗi epoch lấy mẫu theo trọng số nghịch đảo căn tần suất. Tăng cường ảnh chạy thẳng trên GPU, không cần tiến trình nạp dữ liệu, nhờ đó mỗi mô hình chỉ cần khoảng 24 phút và tối đa \SL{retina_results/models/efficientnet_b0/peak_vram_mb} MB VRAM.
+
+\hinhpdf{retina_samples}{1.0}{Ảnh đáy mắt thật của năm cấp bệnh}{retsamples}
+
+\maNguon{retina__augment}{Tăng cường ảnh trên GPU: lật, xoay, phóng, sáng và tương phản}
+
+\begin{table}[!htbp]\centering\caption{Kết quả phân cấp võng mạc trên test (chọn mô hình bằng QWK trên val)}\label{tab:retina}
+\small\begin{tabular}{@{}lcccc@{}}\toprule
+\textbf{Mô hình} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{QWK val} & \textbf{QWK test}\\\midrule
+ResNet-34 & \SL{retina_results/models/resnet34/test/accuracy} & \SL{retina_results/models/resnet34/test/macro_f1} & \SL{retina_results/models/resnet34/val/qwk} & \SL{retina_results/models/resnet34/test/qwk}\\
+EfficientNet-B0 & \SL{retina_results/models/efficientnet_b0/test/accuracy} & \SL{retina_results/models/efficientnet_b0/test/macro_f1} & \SL{retina_results/models/efficientnet_b0/val/qwk} & \SL{retina_results/models/efficientnet_b0/test/qwk}\\\bottomrule
+\end{tabular}\end{table}
+
+Theo Bảng~\ref{tab:retina}, EfficientNet-B0 thắng trên val với khoảng cách rất nhỏ nên được chọn, dù trên test ResNet-34 nhỉnh hơn; đồ án giữ đúng quy tắc chọn trên val. QWK khoảng 0,69 cho thấy mô hình bắt được thứ tự nặng nhẹ, nhưng Hình~\ref{fig:retconf} chỉ rõ điểm yếu: cấp 1 có F1 chỉ \SL{retina_results/models/efficientnet_b0/test/per_class_f1/1}, vì tổn thương sớm rất nhỏ ở độ phân giải 224 px. Bộ dữ liệu cũng không có mã bệnh nhân, nên không loại trừ được hai mắt của một người rơi vào hai tập khác nhau. Kết quả chỉ nên xem như gợi ý đi khám mắt.
+
+\hinhpdf{retina_confusion}{0.68}{Ma trận nhầm lẫn của EfficientNet-B0 trên test}{retconf}
+
+\hinhpdf{retina_gradcam}{1.0}{Grad-CAM: vùng ảnh mà mô hình dựa vào để phân cấp}{retcam}
+
+\section{Phục vụ mô hình}
+
+Lớp phục vụ chọn chế độ theo dữ liệu người dùng cung cấp: có HbA1c hoặc đường huyết thì dùng mô hình xét nghiệm, nếu không thì dùng mô hình sàng lọc. Kết quả gồm xác suất đã hiệu chỉnh, ngưỡng và danh sách đóng góp SHAP, sẵn sàng cho tác tử Risk và trang what-if.
+
+\maNguon{serve__predict}{Hàm dự đoán dùng chung cho tác tử và website}

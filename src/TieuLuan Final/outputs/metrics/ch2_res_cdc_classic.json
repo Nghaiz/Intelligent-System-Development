@@ -1,0 +1,195 @@
+{
+ "rows": [
+  {
+   "accuracy": 0.8470454941607112,
+   "f1_macro": 0.458594819044024,
+   "roc_auc": 0.5,
+   "precision_pos": 0.0,
+   "recall_pos": 0.0,
+   "f1_pos": 0.0,
+   "ci_lo": 0.4575364095546933,
+   "ci_hi": 0.4596584354999175,
+   "dataset": "CDC Diabetes",
+   "model": "Dummy",
+   "family": "dummy",
+   "framework": "scikit-learn",
+   "seconds": 0.04446059999963836,
+   "val_score": 0.4586020321494857,
+   "params": {},
+   "threshold": null,
+   "grid_size": 1,
+   "search_seconds": 0.04446059999963836
+  },
+  {
+   "accuracy": 0.8129975015978154,
+   "f1_macro": 0.6725600801380567,
+   "roc_auc": 0.8124602534121117,
+   "precision_pos": 0.41140006047777444,
+   "recall_pos": 0.5168091168091168,
+   "f1_pos": 0.45811937031736677,
+   "ci_lo": 0.6663786116546812,
+   "ci_hi": 0.678494996526015,
+   "dataset": "CDC Diabetes",
+   "model": "LogReg/Ridge",
+   "family": "linear",
+   "framework": "scikit-learn",
+   "seconds": 1.7821328999998514,
+   "val_score": 0.67226072195488,
+   "params": {
+    "C": 1
+   },
+   "threshold": 0.27,
+   "grid_size": 1,
+   "search_seconds": 1.7821328999998514
+  },
+  {
+   "accuracy": 0.8012317703794085,
+   "f1_macro": 0.6708987626933983,
+   "roc_auc": 0.8122210825689693,
+   "precision_pos": 0.39479653102068046,
+   "recall_pos": 0.5620132953466287,
+   "f1_pos": 0.46379310344827585,
+   "ci_lo": 0.6643713253701686,
+   "ci_hi": 0.6768186174723874,
+   "dataset": "CDC Diabetes",
+   "model": "Linear SVM",
+   "family": "svm",
+   "framework": "scikit-learn",
+   "seconds": 8.74478739999995,
+   "val_score": 0.6697280034230337,
+   "params": {
+    "C": 0.1
+   },
+   "threshold": 0.24000000000000005,
+   "grid_size": 1,
+   "search_seconds": 8.74478739999995
+  },
+  {
+   "accuracy": 0.81020858753123,
+   "f1_macro": 0.6689105207048114,
+   "roc_auc": 0.8040304737873075,
+   "precision_pos": 0.40494752623688157,
+   "recall_pos": 0.5130104463437797,
+   "f1_pos": 0.4526183493925429,
+   "ci_lo": 0.6622487497718563,
+   "ci_hi": 0.6750652177760965,
+   "dataset": "CDC Diabetes",
+   "model": "Cây quyết định",
+   "family": "tree",
+   "framework": "scikit-learn",
+   "seconds": 3.2995162000001983,
+   "val_score": 0.6677848954511207,
+   "params": {
+    "max_depth": 10,
+    "min_samples_leaf": 20
+   },
+   "threshold": 0.29000000000000004,
+   "grid_size": 1,
+   "search_seconds": 3.2995162000001983
+  },
+  {
+   "accuracy": 0.8163964906164662,
+   "f1_macro": 0.675584924388114,
+   "roc_auc": 0.8128386319718305,
+   "precision_pos": 0.4185831146781911,
+   "recall_pos": 0.5150997150997151,
+   "f1_pos": 0.46185286103542234,
+   "ci_lo": 0.6685812074248155,
+   "ci_hi": 0.6820377428263595,
+   "dataset": "CDC Diabetes",
+   "model": "Random Forest",
+   "family": "rf",
+   "framework": "scikit-learn",
+   "seconds": 51.788773499999934,
+   "val_score": 0.6712707856367655,
+   "params": {
+    "max_depth": 20,
+    "min_samples_leaf": 2
+   },
+   "threshold": 0.29000000000000004,
+   "grid_size": 1,
+   "search_seconds": 51.788773499999934
+  },
+  {
+   "accuracy": 0.824705130439835,
+   "f1_macro": 0.6815297910470814,
+   "roc_auc": 0.8223441087727537,
+   "precision_pos": 0.43672864900444297,
+   "recall_pos": 0.5040835707502375,
+   "f1_pos": 0.4679950625991889,
+   "ci_lo": 0.6751757458994921,
+   "ci_hi": 0.6879316826160199,
+   "dataset": "CDC Diabetes",
+   "model": "XGBoost",
+   "family": "xgb",
+   "framework": "xgboost",
+   "seconds": 12.421196299999792,
+   "val_score": 0.6809454024963272,
+   "params": {
+    "max_depth": 5,
+    "reg_lambda": 1
+   },
+   "threshold": 0.30000000000000004,
+   "grid_size": 1,
+   "search_seconds": 12.421196299999792,
+   "n_trees": 105
+  }
+ ],
+ "best": {
+  "family": "xgb",
+  "name": "XGBoost",
+  "threshold": 0.30000000000000004
+ },
+ "importance": {
+  "rows": [
+   {
+    "feature": "GenHlth",
+    "drop": 0.04792166287770775
+   },
+   {
+    "feature": "Age",
+    "drop": 0.03864579171328834
+   },
+   {
+    "feature": "BMI",
+    "drop": 0.03753528585333036
+   },
+   {
+    "feature": "HighBP",
+    "drop": 0.018144425636878753
+   },
+   {
+    "feature": "HighChol",
+    "drop": 0.01067986605315289
+   },
+   {
+    "feature": "CholCheck",
+    "drop": 0.00652883985632291
+   },
+   {
+    "feature": "HvyAlcoholConsump",
+    "drop": 0.0038261189995992075
+   },
+   {
+    "feature": "Sex",
+    "drop": 0.002983787069466337
+   },
+   {
+    "feature": "Income",
+    "drop": 0.0028244933441151643
+   },
+   {
+    "feature": "PhysHlth",
+    "drop": 0.001454011168400493
+   },
+   {
+    "feature": "HeartDiseaseorAttack",
+    "drop": 0.0013795103850408053
+   },
+   {
+    "feature": "MentHlth",
+    "drop": 0.001210213403756229
+   }
+  ]
+ }
+}

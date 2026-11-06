@@ -1,0 +1,21 @@
+{
+ "seeds": [
+  "atherosclerosis",
+  "chronic kidney failure",
+  "coronary artery disease",
+  "gestational diabetes",
+  "gout",
+  "hypertension",
+  "hypothyroidism",
+  "metabolic syndrome X",
+  "obesity",
+  "type 1 diabetes mellitus",
+  "type 2 diabetes mellitus"
+ ],
+ "edges_full": 2250197,
+ "hop1_nodes": 2114,
+ "core_edges": 63305,
+ "kept_edges": 260000,
+ "kept_nodes": 25754,
+ "budget": 260000
+}

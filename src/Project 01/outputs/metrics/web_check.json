@@ -1,0 +1,127 @@
+{
+ "ts": "2026-11-06T12:50:32",
+ "desktop": [
+  {
+   "page": "overview",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "consult",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "screen",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "risk",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "retina",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "graph",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "search",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "data",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "lab",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "logs",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  }
+ ],
+ "mobile": [
+  {
+   "page": "overview",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "consult",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "screen",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "risk",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "retina",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "graph",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "search",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "data",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "lab",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  },
+  {
+   "page": "logs",
+   "live": true,
+   "console_errors": [],
+   "overflow_px": 0
+  }
+ ]
+}

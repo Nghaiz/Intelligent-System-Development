@@ -1,0 +1,130 @@
+{
+ "date": "2026-11-06",
+ "user_agent": "DiaNexus-KB/1.0 (academic research project)",
+ "epmc_query": "(TITLE:\"diabetes\" OR MESH:\"Diabetes Mellitus\") AND HAS_ABSTRACT:y AND SRC:MED AND LANG:eng AND PUB_YEAR:[2010 TO 2023]",
+ "sources": {
+  "bo_y_te": {
+   "docs": 2,
+   "chars": 60089,
+   "lang": [
+    "vi"
+   ],
+   "hosts": [
+    "files01.duytan.edu.vn",
+    "kcb.vn"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://kcb.vn/upload/2005611/20210723/8e4a6b72bc14089e7c9028042a34193f3280_Q-BYT.pdf"
+  },
+  "cdc": {
+   "docs": 56,
+   "chars": 189860,
+   "lang": [
+    "en"
+   ],
+   "hosts": [
+    "www.cdc.gov"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://www.cdc.gov/diabetes/php/current-research/index.html"
+  },
+  "europepmc": {
+   "docs": 22518,
+   "chars": 37060970,
+   "lang": [
+    "en"
+   ],
+   "hosts": [
+    "europepmc.org"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://europepmc.org/article/MED/29663930"
+  },
+  "medlineplus": {
+   "docs": 222,
+   "chars": 1577666,
+   "lang": [
+    "en"
+   ],
+   "hosts": [
+    "medlineplus.gov"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://medlineplus.gov/diabetes.html"
+  },
+  "medlineplus_vi": {
+   "docs": 12,
+   "chars": 75218,
+   "lang": [
+    "vi"
+   ],
+   "hosts": [
+    "storage.googleapis.com",
+    "www.cda.org",
+    "www.fda.gov"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://storage.googleapis.com/healthinfotranslations-pdfdocs/FastingBloodSugar_Viet.pdf"
+  },
+  "niddk": {
+   "docs": 67,
+   "chars": 696817,
+   "lang": [
+    "en"
+   ],
+   "hosts": [
+    "www.niddk.nih.gov"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://www.niddk.nih.gov/health-information/diabetes"
+  },
+  "who": {
+   "docs": 14,
+   "chars": 279443,
+   "lang": [
+    "en"
+   ],
+   "hosts": [
+    "iris.who.int",
+    "www.who.int"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://www.who.int/news-room/fact-sheets/detail/diabetes"
+  },
+  "wikipedia_vi": {
+   "docs": 196,
+   "chars": 1906090,
+   "lang": [
+    "vi"
+   ],
+   "hosts": [
+    "vi.wikipedia.org"
+   ],
+   "fetched": [
+    "2026-11-06"
+   ],
+   "example_url": "https://vi.wikipedia.org/wiki/%C4%90%C3%A1i_th%C3%A1o_%C4%91%C6%B0%E1%BB%9Dng"
+  }
+ },
+ "errors": {},
+ "status": {},
+ "notes": {
+  "wikipedia_user_agent": "Wikipedia dùng User-Agent riêng chứa URL repo theo chính sách Wikimedia, tốc độ ~1 yêu cầu/s.",
+  "pubmed_eutils": "Không dùng: eutils trả 302 về trang misuse.ncbi của NCBI khi thăm dò ngày 2026-11-06; dùng Europe PMC REST.",
+  "cdc_www": "www.cdc.gov (kể cả robots.txt) trả 403 cho thu thập; chỉ dùng API phân phối tools.cdc.gov."
+ }
+}

@@ -1,0 +1,38 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \tikzset{ten/.style={font=\footnotesize, align=center, anchor=north, text=black!85}}
+  % ảnh vào: ba lát màu R, G, B
+  \foreach \k/\c in {0/cRed,1/cGreen,2/cBlue}{\khoibaD{0+0.13*\k}{0}{0.09}{2.8}{2.8}{\c}}
+  \node[ten] at (0.4,-0.1) {Ảnh vào\\$32{\times}32{\times}3$};
+  % stem
+  \foreach \k in {0,...,7}{\khoibaD{2.1+0.08*\k}{0}{0.06}{2.8}{2.8}{cSky}}
+  \node[ten] at (2.55,-0.1) {Stem\\$32{\times}32{\times}64$};
+  % tầng 1
+  \foreach \k in {0,...,7}{\khoibaD{4.15+0.08*\k}{0}{0.06}{2.8}{2.8}{cBlue}}
+  \node[ten] at (4.6,-0.1) {Tầng 1\\$32{\times}32{\times}64$};
+  % tầng 2
+  \foreach \k in {0,...,13}{\khoibaD{6.25+0.06*\k}{0.5}{0.05}{1.65}{1.65}{cPurple}}
+  \node[ten] at (6.7,0.35) {Tầng 2\\$16{\times}16{\times}128$};
+  % tầng 3
+  \foreach \k in {0,...,19}{\khoibaD{8.3+0.05*\k}{0.85}{0.04}{0.9}{0.9}{cPink}}
+  \node[ten] at (8.85,0.7) {Tầng 3\\$8{\times}8{\times}256$};
+  % tầng 4
+  \foreach \k in {0,...,27}{\khoibaD{10.3+0.035*\k}{1.05}{0.03}{0.5}{0.5}{cOrange}}
+  \node[ten] at (10.95,0.9) {Tầng 4\\$4{\times}4{\times}512$};
+  % GAP, FC
+  \khoibaD{12.55}{-0.15}{0.2}{3.3}{0.2}{cYellow}
+  \node[ten] at (12.7,-0.25) {GAP\\$512$};
+  \khoibaD{13.75}{0.9}{0.2}{1.2}{0.2}{cRed}
+  \node[ten] at (13.9,0.8) {FC\\$10$};
+  % mũi tên
+  \foreach \a/\b/\y in {1.75/2.05/1.4, 3.75/4.1/1.4, 5.8/6.2/1.3, 7.9/8.25/1.3, 9.75/10.25/1.3, 11.65/12.5/1.3, 12.95/13.7/1.5}{\draw[mui] (\a,\y) -- (\b,\y);}
+  % chú thích phép biến đổi
+  \node[nhan, anchor=south] at (2.8,3.75) {Conv $3{\times}3$};
+  \node[nhan, anchor=south] at (5.0,3.75) {$2$ khối dư};
+  \node[nhan, anchor=south, align=center] at (7.3,2.75) {$2$ khối dư\\stride $2$};
+  \node[nhan, anchor=south, align=center] at (9.2,2.35) {$2$ khối dư\\stride $2$};
+  \node[nhan, anchor=south, align=center] at (11.1,2.05) {$2$ khối dư\\stride $2$};
+  \node[nhan, anchor=south] at (12.75,3.25) {trung bình};
+  \node[nhan, anchor=south] at (13.95,2.25) {Softmax};
+  \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick, cNavy] (2.1,-1.15) -- (11.6,-1.15)
+     node[midway, below=6pt, font=\small, align=center, text=cNavy] {kích thước không gian giảm, số kênh tăng, vùng cảm nhận mở rộng};
+\end{tikzpicture}

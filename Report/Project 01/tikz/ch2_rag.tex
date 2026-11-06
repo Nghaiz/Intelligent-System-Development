@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[hop=cNavy, minimum width=24mm, minimum height=14mm] (q) at (1.3,3.3) {Câu hỏi\\tiếng Việt};
+  \node[hop=cBlue, minimum width=36mm] (b) at (5.6,5.4) {BM25: từ khóa};
+  \node[hop=cTeal, minimum width=36mm] (d) at (5.6,3.3) {Vector e5: ngữ nghĩa};
+  \node[hop=cOrange, minimum width=36mm] (g) at (5.6,1.2) {Đồ thị: thực thể, lân cận};
+  \foreach \n in {b,d,g} \draw[mui] (q.east) -- (\n.west);
+  \foreach \y/\c in {5.4/cBlue,3.3/cTeal,1.2/cOrange}{
+    \foreach \k in {0,1,2}{\fill[\c!70, draw=\c!60!black] (8.0+0.42*\k,\y-0.45+0.3*\k) rectangle ++(0.36,0.25);}
+  }
+  \node[cau=cPurple, minimum size=18mm, align=center, font=\small\bfseries] (rrf) at (11.0,3.3) {RRF};
+  \foreach \y in {5.4,3.3,1.2} \draw[mui] (9.4,\y) -- (rrf);
+  \node[hop=cRed, minimum width=24mm, minimum height=14mm] (rr) at (14.0,3.3) {Xếp hạng lại\\cross-encoder};
+  \draw[mui] (rrf) -- (rr);
+  \node[hop=cGreen, minimum width=30mm] (a) at (14.0,0.9) {Ngữ cảnh có trích dẫn};
+  \draw[mui] (rr) -- (a);
+\end{tikzpicture}

@@ -1,0 +1,129 @@
+{
+ "edges": [
+  {
+   "source": "supervisor",
+   "target": "advisor",
+   "label": "ngoài phạm vi"
+  },
+  {
+   "source": "supervisor",
+   "target": "intake",
+   "label": "có người dùng"
+  },
+  {
+   "source": "supervisor",
+   "target": "knowledge",
+   "label": "hỏi kiến thức"
+  },
+  {
+   "source": "intake",
+   "target": "end",
+   "label": "hỏi lại người dùng"
+  },
+  {
+   "source": "intake",
+   "target": "risk",
+   "label": "RL dừng hỏi"
+  },
+  {
+   "source": "intake",
+   "target": "rule_guard",
+   "label": "kiểm khẩn cấp"
+  },
+  {
+   "source": "intake",
+   "target": "risk",
+   "label": "cần ước lượng"
+  },
+  {
+   "source": "intake",
+   "target": "retina",
+   "label": "có ảnh"
+  },
+  {
+   "source": "intake",
+   "target": "knowledge",
+   "label": "tra cứu"
+  },
+  {
+   "source": "rule_guard",
+   "target": "advisor",
+   "label": "viết câu trả lời"
+  },
+  {
+   "source": "rule_guard",
+   "target": "risk",
+   "label": "cần ước lượng"
+  },
+  {
+   "source": "rule_guard",
+   "target": "retina",
+   "label": "có ảnh"
+  },
+  {
+   "source": "rule_guard",
+   "target": "knowledge",
+   "label": "tra cứu"
+  },
+  {
+   "source": "risk",
+   "target": "intake",
+   "label": "thiếu dữ liệu, hỏi lại"
+  },
+  {
+   "source": "risk",
+   "target": "retina",
+   "label": "có ảnh"
+  },
+  {
+   "source": "risk",
+   "target": "knowledge",
+   "label": "tra cứu"
+  },
+  {
+   "source": "retina",
+   "target": "knowledge",
+   "label": "tra cứu"
+  },
+  {
+   "source": "knowledge",
+   "target": "knowledge",
+   "label": "mở rộng truy vấn"
+  },
+  {
+   "source": "knowledge",
+   "target": "rule_guard",
+   "label": "soát luật"
+  },
+  {
+   "source": "knowledge",
+   "target": "advisor",
+   "label": "viết câu trả lời"
+  },
+  {
+   "source": "advisor",
+   "target": "critic",
+   "label": "kiểm tra"
+  },
+  {
+   "source": "advisor",
+   "target": "end",
+   "label": "trả lời"
+  },
+  {
+   "source": "critic",
+   "target": "end",
+   "label": "đạt"
+  },
+  {
+   "source": "critic",
+   "target": "knowledge",
+   "label": "thiếu bằng chứng"
+  },
+  {
+   "source": "critic",
+   "target": "advisor",
+   "label": "viết lại"
+  }
+ ]
+}
